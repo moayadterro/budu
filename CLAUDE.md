@@ -219,6 +219,12 @@ Built and verified:
 - Roles: admin / manager / teacher / student from IOMAD; admin "Tenants" page (live IOMAD data);
   server-side `requireRole`; sessions refresh role every 5 min.
 - Stack upgraded 2026-10-19 (see Running → Versions).
+- Homework loop on live IOMAD data (tested in the browser 2026-10-21): teacher adds students by
+  email (`/teach/classes/:id`), adds homework to lessons (course builder), grades answers 0–100 with
+  feedback (`/grading`, "Save & next"), sees the students × homework grid (`/gradebook`) and a
+  dashboard (`/teach`). Students see their enrolled courses (`/classes`), lessons with streamed
+  video / PDFs (`/classes/:id/lessons/:lessonId`), hand in text + files and see grade + feedback
+  (`/classes/:id/homework/:homeworkId`); student home shows real courses and homework due.
 - Settings: profile photo saved as the IOMAD user picture (shown in the sidebar via `/files/:id`),
   first/last name, password change (current password checked by IOMAD, other devices signed out),
   language, theme. Tested 2026-10-21.
@@ -228,10 +234,11 @@ Built and verified:
   + attachment). Files via `/files/:id`. Tested in the browser 2026-10-20.
 
 Not built yet (rough priority):
-1. Real data: replace `shared/api/mock.ts` with IOMAD calls (courses, timetable, lessons, homework).
-2. Teacher screens: dashboard, my classes, grading, gradebook. Course builder follow-ups: pricing /
-   audience / subject (prototype fields), upload progress bar, student side of real courses
-   (lesson page + homework submit on IOMAD data), enrolment of classes into a course.
+1. Still mock: timetable, next-class hero on student home, live classroom, explore (marketplace).
+   Video: transcoding / CDN (Kinescope, Bunny Stream or self-hosted HLS) behind `/files` later —
+   NOT YouTube/RuTube (their terms require their branded player; see Decision log).
+2. Teacher follow-ups: invite link for students without an account, lesson completion / progress,
+   pricing / audience / subject fields (prototype), upload progress bar, AI feedback draft.
    Admin screens: people, course deals, platform settings (only "Tenants" exists).
 3. Manager screens: school overview, classes, courses (catalog + approvals), people, schedule,
    school settings + grade-scale page.
@@ -244,6 +251,14 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-21 Homework = IOMAD assignments; students are manual enrolments (student role) added by
+  the teacher by email; answers handed in and graded through `local_budu` learning functions (the
+  integration user acts with editothersubmission / grade after checking the real user). No drafts:
+  handing in = submitted; a graded answer is locked. Grades 0–100 (tenant scale display: later).
+- 2026-10-21 Lesson videos stay on our own server (IOMAD files via `/files`). Owner asked about
+  hiding videos on YouTube/RuTube: rejected — their terms require their branded player, private
+  videos can't be embedded, it's visible in devtools, and YouTube is throttled in Russia. A
+  white-label video service can sit behind `/files` later without students seeing it.
 - 2026-10-21 Languages EN/RU/AR (owner: "fully supported"). Own tiny i18n (no library): typed
   dictionaries + `getT()`/`useT()`; locale in a cookie, Accept-Language fallback.
 - 2026-10-21 Profile photo = the IOMAD (Moodle) user picture via `core_user_update_picture`; served
