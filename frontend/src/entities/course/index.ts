@@ -1,1 +1,5 @@
 export { CourseCard, formatPrice } from './ui/CourseCard'
+export { CourseRow } from './ui/CourseRow'
+export { LessonItemIcon } from './ui/LessonItemIcon'
+export { fileUrl, COURSE_LIMITS } from './model/types'
+export type { Course, CourseSummary, CourseLesson, LessonItem, LessonItemKind, CourseFile } from './model/types'

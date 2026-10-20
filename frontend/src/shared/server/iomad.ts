@@ -63,3 +63,37 @@ export async function iomadCheckPassword(inst: IomadInstance, username: string, 
     password,
   })
 }
+
+/**
+ * Uploads a file into the integration user's draft area (webservice/upload.php)
+ * and returns the draft item id, which a local_budu function then moves into
+ * the course (lesson material, task attachment).
+ */
+export async function iomadUpload(inst: IomadInstance, file: File): Promise<number> {
+  const body = new FormData()
+  body.append('token', inst.token)
+  body.append('filearea', 'draft')
+  body.append('itemid', '0')
+  body.append('file_1', file, file.name)
+  const res = await fetch(`${inst.url}/webservice/upload.php`, { method: 'POST', body, cache: 'no-store' })
+  if (!res.ok) throw new IomadError('http', `IOMAD upload: HTTP ${res.status}`)
+  const data = await res.json()
+  if (!Array.isArray(data) || !data[0]?.itemid) {
+    throw new IomadError(data?.errorcode ?? 'upload', `IOMAD upload: ${data?.error ?? data?.message ?? 'failed'}`)
+  }
+  return data[0].itemid as number
+}
+
+/**
+ * Fetches a course file from webservice/pluginfile.php (token in the POST body).
+ * `range` is passed through, so videos can seek (206 Partial Content).
+ * The caller must have checked access first (local_budu_file_access).
+ */
+export function iomadFile(inst: IomadInstance, path: string, range?: string | null) {
+  return fetch(`${inst.url}/webservice/pluginfile.php${path}`, {
+    method: 'POST',
+    body: new URLSearchParams({ token: inst.token }),
+    headers: range ? { Range: range } : {},
+    cache: 'no-store',
+  })
+}
