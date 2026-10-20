@@ -6,10 +6,11 @@ import { Badge } from '@/shared/ui/badge'
 import { buttonVariants } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { Icon } from '@/shared/ui/icon'
-import { t } from '@/shared/i18n'
+import { getT } from '@/shared/i18n/server'
 
 /** Homework: instructions + attachment, then the student's submission. */
 export async function HomeworkPage({ params }: { params: Promise<{ subject: string }> }) {
+  const t = await getT()
   const { subject } = await params
   if (!isSubject(subject)) notFound()
   return (

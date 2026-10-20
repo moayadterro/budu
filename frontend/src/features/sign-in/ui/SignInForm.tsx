@@ -8,12 +8,13 @@ import { Input } from '@/shared/ui/input'
 import { PasswordInput } from '@/shared/ui/password-input'
 import { Appear } from '@/shared/ui/motion'
 import { SubmitButton } from '@/shared/ui/submit-button'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 import { resendVerification, signIn, SignInState } from '../server/actions'
 
 const idle: SignInState = { status: 'idle' }
 
 export function SignInForm({ next, notice }: { next?: string; notice?: 'verified' | 'reset' }) {
+  const t = useT()
   const [state, action] = useActionState(signIn, idle)
   const [resendState, resend] = useActionState(resendVerification, idle)
   const s = t.auth.signIn

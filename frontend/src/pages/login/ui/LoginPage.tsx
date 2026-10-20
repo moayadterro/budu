@@ -4,11 +4,12 @@ import { SignInForm } from '@/features/sign-in'
 import { homeFor } from '@/shared/config/nav'
 import { safeNext } from '@/shared/lib/password'
 import { AuthCard } from '@/shared/ui/auth-card'
-import { t } from '@/shared/i18n'
+import { getT } from '@/shared/i18n/server'
 
 type Search = { next?: string; verified?: string; reset?: string }
 
 export async function LoginPage(props: { searchParams: Promise<Search> }) {
+  const t = await getT()
   const searchParams = await props.searchParams
   const session = await getSession()
   if (session) redirect(homeFor(session.role))

@@ -1,11 +1,14 @@
+'use client'
+
 import type { CourseSummary } from '@/entities/course'
 import { Badge } from '@/shared/ui/badge'
 import { SubmitButton } from '@/shared/ui/submit-button'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 import { setCoursePublished } from '../server/actions'
 
 /** Draft ↔ published, with a one-line explanation. */
 export function PublishToggle({ course }: { course: CourseSummary }) {
+  const t = useT()
   const s = t.courses
   return (
     <form action={setCoursePublished} className="flex flex-col items-start gap-3">

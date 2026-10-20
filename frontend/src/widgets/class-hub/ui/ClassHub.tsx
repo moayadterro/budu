@@ -12,12 +12,13 @@ import { Card, CardContent } from '@/shared/ui/card'
 import { PlayIcon } from '@/shared/ui/icon'
 import { Tabs, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 import { CLASS_HOMEWORK, CLASSMATES, HUB, LESSONS, SUBJECTS, SubjectKey } from '@/shared/mock'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 
 type Tab = 'lessons' | 'homework' | 'classmates'
 
 /** A subject's class: header, next live lesson, and lessons / homework / classmates tabs. */
 export function ClassHub({ subject }: { subject: SubjectKey }) {
+  const t = useT()
   const [tab, setTab] = useState<Tab>('lessons')
   const s = SUBJECTS[subject]
   const base = `/classes/${subject}`

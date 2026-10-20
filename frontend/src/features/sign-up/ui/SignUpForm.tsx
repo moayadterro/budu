@@ -13,7 +13,7 @@ import { PasswordInput } from '@/shared/ui/password-input'
 import { SubmitButton } from '@/shared/ui/submit-button'
 import { Appear } from '@/shared/ui/motion'
 import { cn } from '@/shared/lib/cn'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 import { signUp } from '../server/actions'
 import { ACCOUNT_KINDS, AccountKind, initialSignUpState } from '../model/types'
 
@@ -28,6 +28,7 @@ function Section({ children }: { children: React.ReactNode }) {
 
 /** One sign-up for schools, independent teachers and students (server action → IOMAD). */
 export function SignUpForm() {
+  const t = useT()
   const [kind, setKind] = useState<AccountKind>('school')
   const [state, action] = useActionState(signUp, initialSignUpState)
 

@@ -6,13 +6,14 @@ import { useSession } from '@/entities/session'
 import { HangUpIcon, Icon, IconName, RecIcon } from '@/shared/ui/icon'
 import { LIVE_CLASS } from '@/shared/mock'
 import { cn } from '@/shared/lib/cn'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 
 /**
  * Live classroom (BigBlueButton-style). Visual only for now: controls toggle
  * local state; the real session will be the BBB join URL / embed.
  */
 export function LiveClassroom() {
+  const t = useT()
   const role = useSession((s) => s.user.role)
   const router = useRouter()
   const host = role === 'teacher'

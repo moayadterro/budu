@@ -3,7 +3,7 @@
 import { Icon, IconName } from '@/shared/ui/icon'
 import { Theme, useThemeStore } from '@/shared/theme/store'
 import { cn } from '@/shared/lib/cn'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 
 const OPTIONS: Array<{ id: Theme; icon: IconName }> = [
   { id: 'light', icon: 'sun' },
@@ -13,6 +13,7 @@ const OPTIONS: Array<{ id: Theme; icon: IconName }> = [
 
 /** Light / dark / system choice (account settings). */
 export function ThemePicker() {
+  const t = useT()
   const { theme, setTheme } = useThemeStore()
 
   return (

@@ -6,10 +6,11 @@ import { Button, buttonVariants } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { Icon, PlayIcon } from '@/shared/ui/icon'
 import { cn } from '@/shared/lib/cn'
-import { t } from '@/shared/i18n'
+import { getT } from '@/shared/i18n/server'
 
 /** Recorded lesson: video, description, materials, mark complete, course contents. */
 export async function LessonPage({ params }: { params: Promise<{ subject: string }> }) {
+  const t = await getT()
   const { subject } = await params
   if (!isSubject(subject)) notFound()
   return (

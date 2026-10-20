@@ -1,8 +1,9 @@
 import { CourseCatalog } from '@/widgets/course-catalog'
 import { ScreenHead } from '@/shared/ui/screen-head'
-import { t } from '@/shared/i18n'
+import { getT } from '@/shared/i18n/server'
 
-export function ExplorePage() {
+export async function ExplorePage() {
+  const t = await getT()
   return (
     <>
       <ScreenHead title={t.explore.title} sub={t.explore.sub} />

@@ -3,11 +3,12 @@
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Logout01Icon } from '@hugeicons/core-free-icons'
 import { DropdownMenuItem } from '@/shared/ui/dropdown-menu'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 import { signOut } from '../server/actions'
 
 /** "Sign out" entry for a dropdown menu (user menu in the sidebar). */
 export function SignOutMenuItem() {
+  const t = useT()
   return (
     <DropdownMenuItem
       onSelect={() => {

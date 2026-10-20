@@ -1,8 +1,9 @@
 import { ForgotPasswordForm } from '@/features/reset-password'
 import { AuthCard } from '@/shared/ui/auth-card'
-import { t } from '@/shared/i18n'
+import { getT } from '@/shared/i18n/server'
 
-export function ForgotPasswordPage() {
+export async function ForgotPasswordPage() {
+  const t = await getT()
   return (
     <AuthCard title={t.auth.forgot.title} sub={t.auth.forgot.sub}>
       <ForgotPasswordForm />

@@ -1,13 +1,16 @@
+'use client'
+
 import { ReactNode } from 'react'
 import { Badge } from '@/shared/ui/badge'
 import { Icon } from '@/shared/ui/icon'
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/shared/ui/item'
 import { LocalTime } from '@/shared/ui/local-time'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 import type { CourseSummary } from '../model/types'
 
 /** One course in a teacher's list: thumb, title, lessons · updated, status; `action` slot (e.g. Edit). */
 export function CourseRow({ course, action }: { course: CourseSummary; action?: ReactNode }) {
+  const t = useT()
   const s = t.courses
   return (
     <Item variant="outline" className="bg-card">

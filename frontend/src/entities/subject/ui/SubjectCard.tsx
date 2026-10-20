@@ -1,10 +1,13 @@
+'use client'
+
 import Link from 'next/link'
 import { Progress } from '@/shared/ui/progress'
 import { SUBJECTS, SubjectKey } from '@/shared/mock'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 import { SubjectTile } from './SubjectTile'
 
 export function SubjectCard({ subject }: { subject: SubjectKey }) {
+  const t = useT()
   const s = SUBJECTS[subject]
   return (
     <Link

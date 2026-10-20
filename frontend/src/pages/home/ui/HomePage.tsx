@@ -8,10 +8,11 @@ import { getSession } from '@/entities/session/server'
 import { SubjectCard } from '@/entities/subject'
 import { HOMEWORK, STUDENT, SUBJECTS, TIMES, TODAY, WEEK, isLive } from '@/shared/mock'
 import { cn } from '@/shared/lib/cn'
-import { t } from '@/shared/i18n'
+import { getT } from '@/shared/i18n/server'
 
 /** Student dashboard. */
 export async function HomePage() {
+  const t = await getT()
   const user = await getSession()
   const firstName = user?.name.split(' ')[0] ?? ''
   return (
@@ -95,7 +96,8 @@ export async function HomePage() {
   )
 }
 
-function NextClass() {
+async function NextClass() {
+  const t = await getT()
   return (
     <div className="overflow-hidden rounded-xl bg-brand p-6 text-primary-foreground shadow-sm">
       <div className="flex items-center gap-2 text-xs font-bold opacity-90">
@@ -124,7 +126,8 @@ function NextClass() {
   )
 }
 
-function TodayStrip() {
+async function TodayStrip() {
+  const t = await getT()
   return (
     <div className="flex gap-2.5 overflow-x-auto pb-1">
       {TIMES.map((time, row) => {

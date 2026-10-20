@@ -6,7 +6,7 @@ import { Button } from '@/shared/ui/button'
 import { ConfirmButton } from '@/shared/ui/confirm-button'
 import { Icon } from '@/shared/ui/icon'
 import { Item, ItemActions as ItemActionsSlot } from '@/shared/ui/item'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 import { deleteItemAction } from '../server/actions'
 import { TaskForm } from './TaskForm'
 
@@ -25,6 +25,7 @@ export function ItemActions({
   item: LessonItem
   children: ReactNode
 }) {
+  const t = useT()
   const [editing, setEditing] = useState(false)
   const close = useCallback(() => setEditing(false), [])
   const s = t.courses

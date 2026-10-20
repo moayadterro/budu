@@ -5,7 +5,7 @@ import { CourseCard } from '@/entities/course'
 import { CourseActions } from '@/features/request-course'
 import { CATALOG } from '@/shared/mock'
 import { cn } from '@/shared/lib/cn'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 
 type Filter = 'all' | 'live' | 'self' | 'free'
 const FILTERS: Filter[] = ['all', 'live', 'self', 'free']
@@ -15,6 +15,7 @@ const matches = (f: Filter, c: (typeof CATALOG)[number]) =>
 
 /** Marketplace: filter chips + course cards. */
 export function CourseCatalog() {
+  const t = useT()
   const [filter, setFilter] = useState<Filter>('all')
   return (
     <>

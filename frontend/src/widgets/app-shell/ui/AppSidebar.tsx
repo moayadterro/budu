@@ -31,17 +31,19 @@ import {
   SidebarRail,
   useSidebar,
 } from '@/shared/ui/sidebar'
-import { t } from '@/shared/i18n'
+import { dirOf, useLocale, useT } from '@/shared/i18n'
 
 /** App sidebar: tenant, the role's screens, signed-in user menu. Becomes a sheet on mobile. */
 export function AppSidebar() {
+  const t = useT()
   const user = useSession((s) => s.user)
   const path = usePathname()
   const { isMobile, setOpenMobile } = useSidebar()
+  const locale = useLocale()
   const closeOnMobile = () => isMobile && setOpenMobile(false)
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" side={dirOf(locale) === 'rtl' ? 'right' : 'left'}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -67,16 +69,16 @@ export function AppSidebar() {
             {NAV[user.role].map((item) => (
               <SidebarMenuItem key={item.label}>
                 {item.href ? (
-                  <SidebarMenuButton asChild isActive={isActive(item.href, path)} tooltip={item.label}>
+                  <SidebarMenuButton asChild isActive={isActive(item.href, path)} tooltip={t.nav[item.label]}>
                     <Link href={item.href} onClick={closeOnMobile}>
                       <Icon name={item.icon} />
-                      <span>{item.label}</span>
+                      <span>{t.nav[item.label]}</span>
                     </Link>
                   </SidebarMenuButton>
                 ) : (
-                  <SidebarMenuButton disabled tooltip={`${item.label} · ${t.soon}`}>
+                  <SidebarMenuButton disabled tooltip={`${t.nav[item.label]} · ${t.soon}`}>
                     <Icon name={item.icon} />
-                    <span>{item.label}</span>
+                    <span>{t.nav[item.label]}</span>
                   </SidebarMenuButton>
                 )}
               </SidebarMenuItem>
@@ -102,7 +104,7 @@ export function AppSidebar() {
                   <HugeiconsIcon icon={ArrowUpDownIcon} strokeWidth={2} className="ms-auto size-4" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="min-w-56" side={isMobile ? 'bottom' : 'right'} align="end" sideOffset={4}>
+              <DropdownMenuContent className="min-w-56" side={isMobile ? 'bottom' : dirOf(locale) === 'rtl' ? 'left' : 'right'} align="end" sideOffset={4}>
                 <DropdownMenuLabel className="font-normal">
                   <div className="grid text-sm leading-tight">
                     <span className="truncate font-medium">{user.name}</span>

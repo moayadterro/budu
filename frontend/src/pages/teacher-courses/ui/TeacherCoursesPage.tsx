@@ -7,10 +7,11 @@ import { Button } from '@/shared/ui/button'
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/shared/ui/empty'
 import { Icon } from '@/shared/ui/icon'
 import { ScreenHead } from '@/shared/ui/screen-head'
-import { t } from '@/shared/i18n'
+import { getT } from '@/shared/i18n/server'
 
 /** Teacher: the courses they publish (live IOMAD data). */
 export async function TeacherCoursesPage() {
+  const t = await getT()
   const user = await requireRole('teacher')
   const s = t.courses
 

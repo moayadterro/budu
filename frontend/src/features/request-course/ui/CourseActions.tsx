@@ -3,13 +3,14 @@
 import { useState } from 'react'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 
 /**
  * Buy/enrol for yourself, or ask your school to provide the course.
  * Local state for now; later: payment + an approval request to the school manager.
  */
 export function CourseActions({ free }: { free: boolean }) {
+  const t = useT()
   const [requested, setRequested] = useState(false)
   if (requested) {
     return (

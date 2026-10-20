@@ -4,10 +4,11 @@ import { useState } from 'react'
 import { Button } from '@/shared/ui/button'
 import { Icon } from '@/shared/ui/icon'
 import { Appear } from '@/shared/ui/motion'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 
 /** Marks the lesson complete. Local for now; later writes completion to IOMAD. */
 export function MarkComplete() {
+  const t = useT()
   const [done, setDone] = useState(false)
   if (done) {
     return (

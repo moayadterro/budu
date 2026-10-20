@@ -6,13 +6,14 @@ import { Field } from '@/shared/ui/field'
 import { Appear } from '@/shared/ui/motion'
 import { PasswordInput } from '@/shared/ui/password-input'
 import { SubmitButton } from '@/shared/ui/submit-button'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 import { changePassword } from '../server/actions'
 import type { ProfileState } from '../model/types'
 
 const idle: ProfileState = { status: 'idle' }
 
 export function PasswordForm() {
+  const t = useT()
   const [state, action] = useActionState(changePassword, idle)
   const form = useRef<HTMLFormElement>(null)
   const s = t.account

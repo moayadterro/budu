@@ -1,12 +1,15 @@
+'use client'
+
 import { fileUrl, LessonItemIcon, type LessonItem } from '@/entities/course'
 import { Icon } from '@/shared/ui/icon'
 import { ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/shared/ui/item'
 import { LocalTime } from '@/shared/ui/local-time'
 import { formatBytes } from '@/shared/lib/format'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 
 /** Media + text of a lesson material or task (goes inside an <Item>). */
 export function LessonItemView({ item }: { item: LessonItem }) {
+  const t = useT()
   const s = t.courses
   const [first] = item.files
   return (

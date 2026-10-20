@@ -1,13 +1,16 @@
+'use client'
+
 import Link from 'next/link'
 import { Card } from '@/shared/ui/card'
 import { PlayIcon } from '@/shared/ui/icon'
 import { DATES, DAYS, SUBJECTS, TIMES, TODAY, WEEK, isLive } from '@/shared/mock'
 import { tint } from '@/shared/lib/color'
 import { cn } from '@/shared/lib/cn'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 
 /** Desktop week grid. */
 export function TimetableWeek({ className }: { className?: string }) {
+  const t = useT()
   return (
     <Card className={cn('px-6', className)}>
       <div className="overflow-x-auto">
@@ -42,6 +45,7 @@ export function TimetableWeek({ className }: { className?: string }) {
 }
 
 function Row({ time, row }: { time: string; row: number }) {
+  const t = useT()
   return (
     <>
       <div className="flex items-start justify-end pe-1 pt-1 text-[11px] font-bold tabular-nums text-muted-foreground">{time}</div>

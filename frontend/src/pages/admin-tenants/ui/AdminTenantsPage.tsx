@@ -3,7 +3,7 @@ import { listTenants } from '@/entities/tenant/server'
 import { Badge } from '@/shared/ui/badge'
 import { Card } from '@/shared/ui/card'
 import { ScreenHead } from '@/shared/ui/screen-head'
-import { t } from '@/shared/i18n'
+import { getT } from '@/shared/i18n/server'
 
 const regionName = new Intl.DisplayNames(['en'], { type: 'region' })
 const countryName = (code: string) => {
@@ -16,6 +16,7 @@ const countryName = (code: string) => {
 
 /** Platform admin: all tenants (IOMAD companies). Live data, admin only. */
 export async function AdminTenantsPage() {
+  const t = await getT()
   await requireRole('admin')
   const tenants = await listTenants()
   const s = t.admin

@@ -8,13 +8,14 @@ import { Input } from '@/shared/ui/input'
 import { Textarea } from '@/shared/ui/textarea'
 import { Appear } from '@/shared/ui/motion'
 import { SubmitButton } from '@/shared/ui/submit-button'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 import { createCourseAction } from '../server/actions'
 import type { CourseFormState } from '../model/types'
 
 const idle: CourseFormState = { status: 'idle' }
 
 export function CreateCourseForm() {
+  const t = useT()
   const [state, action] = useActionState(createCourseAction, idle)
   const s = t.courses
   return (

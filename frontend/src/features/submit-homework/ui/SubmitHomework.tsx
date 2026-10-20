@@ -6,10 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { Icon } from '@/shared/ui/icon'
 import { Textarea } from '@/shared/ui/textarea'
 import { Appear } from '@/shared/ui/motion'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 
 /** Answer text + file upload + submit. Local for now; later submits to the IOMAD assignment. */
 export function SubmitHomework() {
+  const t = useT()
   const [file, setFile] = useState<string | null>(null)
   const [submitted, setSubmitted] = useState(false)
 

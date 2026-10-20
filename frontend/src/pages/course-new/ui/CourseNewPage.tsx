@@ -4,10 +4,11 @@ import { CreateCourseForm } from '@/features/edit-course'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card'
 import { Icon } from '@/shared/ui/icon'
-import { t } from '@/shared/i18n'
+import { getT } from '@/shared/i18n/server'
 
 /** Teacher: start a new course (title + description), then continue in the builder. */
 export async function CourseNewPage() {
+  const t = await getT()
   await requireRole('teacher')
   const s = t.courses
   return (

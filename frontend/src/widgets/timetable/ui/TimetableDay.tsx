@@ -7,10 +7,11 @@ import { PlayIcon } from '@/shared/ui/icon'
 import { DATES, DAYS, Day, STUDENT, SUBJECTS, TIMES, TODAY, WEEK, isLive } from '@/shared/mock'
 import { tint } from '@/shared/lib/color'
 import { cn } from '@/shared/lib/cn'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 
 /** Mobile timetable: day strip + agenda for the selected day. */
 export function TimetableDay() {
+  const t = useT()
   const [sel, setSel] = useState<Day>(TODAY)
   const lessons = TIMES.map((time, row) => ({ time, row, key: WEEK[row][sel] })).filter((l) => l.key)
 

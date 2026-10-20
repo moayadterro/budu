@@ -3,12 +3,13 @@
 import { useCallback, useState } from 'react'
 import { Button } from '@/shared/ui/button'
 import { Icon } from '@/shared/ui/icon'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 import { MaterialForm } from './MaterialForm'
 import { TaskForm } from './TaskForm'
 
 /** "Add video or PDF" / "Add task" buttons under a lesson; each opens its form inline. */
 export function AddLessonContent({ courseId, lessonId }: { courseId: number; lessonId: number }) {
+  const t = useT()
   const [open, setOpen] = useState<'none' | 'material' | 'task'>('none')
   const close = useCallback(() => setOpen('none'), [])
   const s = t.courses

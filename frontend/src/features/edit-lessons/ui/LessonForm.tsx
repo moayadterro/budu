@@ -8,7 +8,7 @@ import { Field } from '@/shared/ui/field'
 import { Input } from '@/shared/ui/input'
 import { Textarea } from '@/shared/ui/textarea'
 import { SubmitButton } from '@/shared/ui/submit-button'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 import { saveLessonAction } from '../server/actions'
 import type { LessonFormState } from '../model/types'
 
@@ -24,6 +24,7 @@ export function LessonForm({
   lesson?: { id: number; title: string; description: string }
   onDone: () => void
 }) {
+  const t = useT()
   const [state, action] = useActionState(saveLessonAction, idle)
   const s = t.courses
   useEffect(() => {

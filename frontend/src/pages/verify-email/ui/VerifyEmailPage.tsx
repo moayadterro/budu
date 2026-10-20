@@ -2,9 +2,10 @@ import Link from 'next/link'
 import { verifyEmail } from '@/features/verify-email/server'
 import { AuthCard } from '@/shared/ui/auth-card'
 import { buttonVariants } from '@/shared/ui/button'
-import { t } from '@/shared/i18n'
+import { getT } from '@/shared/i18n/server'
 
 export async function VerifyEmailPage(props: { searchParams: Promise<{ token?: string }> }) {
+  const t = await getT()
   const searchParams = await props.searchParams
   const ok = await verifyEmail(searchParams.token)
   const s = t.auth.verify

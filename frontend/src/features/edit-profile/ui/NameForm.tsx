@@ -6,13 +6,14 @@ import { Field } from '@/shared/ui/field'
 import { Input } from '@/shared/ui/input'
 import { Appear } from '@/shared/ui/motion'
 import { SubmitButton } from '@/shared/ui/submit-button'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 import { saveName } from '../server/actions'
 import { NAME_MAX, type ProfileState } from '../model/types'
 
 const idle: ProfileState = { status: 'idle' }
 
 export function NameForm({ firstName, lastName, email }: { firstName: string; lastName: string; email: string }) {
+  const t = useT()
   const [state, action] = useActionState(saveName, idle)
   const s = t.account
   return (

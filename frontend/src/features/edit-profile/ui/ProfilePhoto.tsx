@@ -6,7 +6,7 @@ import { Alert } from '@/shared/ui/alert'
 import { Button } from '@/shared/ui/button'
 import { Icon } from '@/shared/ui/icon'
 import { InitialsAvatar } from '@/shared/ui/initials-avatar'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 import { removePhoto, updatePhoto } from '../server/actions'
 import { PHOTO_TYPES, type ProfileState } from '../model/types'
 
@@ -14,6 +14,7 @@ const idle: ProfileState = { status: 'idle' }
 
 /** Profile photo: pick an image → uploads at once; remove when one is set. */
 export function ProfilePhoto() {
+  const t = useT()
   const user = useSession((s) => s.user)
   const [state, action, pending] = useActionState(updatePhoto, idle)
   const form = useRef<HTMLFormElement>(null)

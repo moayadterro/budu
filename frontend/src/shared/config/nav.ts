@@ -1,5 +1,5 @@
 import type { IconName } from '@/shared/ui/icon'
-import { t } from '@/shared/i18n'
+import type { Messages } from '@/shared/i18n'
 
 /**
  * Budu roles. Adding one: extend this union + ROLES, then fix every compile error
@@ -10,7 +10,8 @@ export type Role = 'admin' | 'manager' | 'teacher' | 'student'
 export const ROLES: Role[] = ['admin', 'manager', 'teacher', 'student']
 
 export type NavItem = {
-  label: string
+  /** key into t.nav (the label is translated where it's rendered) */
+  label: keyof Messages['nav']
   icon: IconName
   /** route of the screen; null until that screen is built (rendered disabled) */
   href: string | null
@@ -24,34 +25,34 @@ export const isActive = (href: string | null, path: string | null) =>
 
 export const NAV: Record<Role, NavItem[]> = {
   admin: [
-    { label: t.nav.tenants, icon: 'layers', href: '/admin', bottom: true },
-    { label: t.nav.people, icon: 'users', href: null, bottom: true },
-    { label: t.nav.deals, icon: 'store', href: null, bottom: true },
-    { label: t.nav.platformSettings, icon: 'gear', href: null },
+    { label: 'tenants', icon: 'layers', href: '/admin', bottom: true },
+    { label: 'people', icon: 'users', href: null, bottom: true },
+    { label: 'deals', icon: 'store', href: null, bottom: true },
+    { label: 'platformSettings', icon: 'gear', href: null },
   ],
   student: [
-    { label: t.nav.home, icon: 'grid', href: '/home', bottom: true },
-    { label: t.nav.timetable, icon: 'cal', href: '/timetable', bottom: true },
-    { label: t.nav.myClasses, icon: 'book', href: '/classes', bottom: true },
-    { label: t.nav.explore, icon: 'search', href: '/explore' },
-    { label: t.nav.live, icon: 'video', href: '/live', bottom: true },
+    { label: 'home', icon: 'grid', href: '/home', bottom: true },
+    { label: 'timetable', icon: 'cal', href: '/timetable', bottom: true },
+    { label: 'myClasses', icon: 'book', href: '/classes', bottom: true },
+    { label: 'explore', icon: 'search', href: '/explore' },
+    { label: 'live', icon: 'video', href: '/live', bottom: true },
   ],
   teacher: [
-    { label: t.nav.dashboard, icon: 'grid', href: null, bottom: true },
-    { label: t.nav.myClasses, icon: 'book', href: null, bottom: true },
-    { label: t.nav.courses, icon: 'store', href: '/courses' },
-    { label: t.nav.grading, icon: 'check', href: null, bottom: true },
-    { label: t.nav.gradebook, icon: 'report', href: null, bottom: true },
-    { label: t.nav.live, icon: 'video', href: '/live' },
+    { label: 'dashboard', icon: 'grid', href: null, bottom: true },
+    { label: 'myClasses', icon: 'book', href: null, bottom: true },
+    { label: 'courses', icon: 'store', href: '/courses' },
+    { label: 'grading', icon: 'check', href: null, bottom: true },
+    { label: 'gradebook', icon: 'report', href: null, bottom: true },
+    { label: 'live', icon: 'video', href: '/live' },
   ],
   manager: [
-    { label: t.nav.school, icon: 'grid', href: null, bottom: true },
-    { label: t.nav.classes, icon: 'layers', href: null, bottom: true },
-    { label: t.nav.courses, icon: 'store', href: null },
-    { label: t.nav.people, icon: 'users', href: null, bottom: true },
-    { label: t.nav.gradebook, icon: 'report', href: null, bottom: true },
-    { label: t.nav.schedule, icon: 'cal', href: '/timetable' },
-    { label: t.nav.settings, icon: 'gear', href: null },
+    { label: 'school', icon: 'grid', href: null, bottom: true },
+    { label: 'classes', icon: 'layers', href: null, bottom: true },
+    { label: 'courses', icon: 'store', href: null },
+    { label: 'people', icon: 'users', href: null, bottom: true },
+    { label: 'gradebook', icon: 'report', href: null, bottom: true },
+    { label: 'schedule', icon: 'cal', href: '/timetable' },
+    { label: 'settings', icon: 'gear', href: null },
   ],
 }
 

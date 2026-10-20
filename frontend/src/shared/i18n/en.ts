@@ -1,4 +1,4 @@
-/** English UI strings. Every user-facing string lives here (RU/AR added later as siblings). */
+/** English UI strings — the reference dictionary. Every user-facing string lives here; ru.ts / ar.ts mirror it. */
 export const en = {
   appName: 'Budu',
   searchPh: 'Search…',
@@ -98,8 +98,6 @@ export const en = {
     done: 'Done',
     resume: 'Resume',
     soon: 'Soon',
-  showPassword: 'Show password',
-  hidePassword: 'Hide password',
     submit: 'Submit',
     graded: 'Graded',
   },
@@ -404,4 +402,3 @@ export const en = {
   },
 }
 
-export type Strings = typeof en

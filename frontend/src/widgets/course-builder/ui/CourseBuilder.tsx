@@ -1,3 +1,5 @@
+'use client'
+
 import type { Course } from '@/entities/course'
 import { initialsOf } from '@/entities/session'
 import { CourseDetailsForm, PublishToggle } from '@/features/edit-course'
@@ -6,11 +8,12 @@ import { AddLesson, LessonHeader } from '@/features/edit-lessons'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card'
 import { InitialsAvatar } from '@/shared/ui/initials-avatar'
 import { Separator } from '@/shared/ui/separator'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 import { LessonItemView } from './LessonItemView'
 
 /** Teacher's course editor: publish status, details, then lessons with their videos, PDFs and tasks. */
 export function CourseBuilder({ course, authorName }: { course: Course; authorName: string }) {
+  const t = useT()
   const s = t.courses
   return (
     <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">

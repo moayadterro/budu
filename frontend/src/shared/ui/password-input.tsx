@@ -4,10 +4,11 @@ import { InputHTMLAttributes, useState } from 'react'
 import { Icon } from './icon'
 import { Input } from './input'
 import { cn } from '@/shared/lib/cn'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 
 /** Password field with a show/hide toggle. Takes every <input> prop except `type`. */
 export function PasswordInput({ className, ...props }: Omit<InputHTMLAttributes<HTMLInputElement>, 'type'>) {
+  const t = useT()
   const [visible, setVisible] = useState(false)
   return (
     <div className="relative">

@@ -8,7 +8,7 @@ import { Button } from '@/shared/ui/button'
 import { Field } from '@/shared/ui/field'
 import { Input } from '@/shared/ui/input'
 import { SubmitButton } from '@/shared/ui/submit-button'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 import { addMaterialAction } from '../server/actions'
 import type { ContentFormState } from '../model/types'
 import { FilePicker } from './FilePicker'
@@ -18,6 +18,7 @@ const ACCEPT = 'video/*,application/pdf,image/*,.doc,.docx,.ppt,.pptx,.xls,.xlsx
 
 /** Upload a video / PDF / document into a lesson. */
 export function MaterialForm({ courseId, lessonId, onDone }: { courseId: number; lessonId: number; onDone: () => void }) {
+  const t = useT()
   const [state, action] = useActionState(addMaterialAction, idle)
   const [tooBig, setTooBig] = useState(false)
   const s = t.courses

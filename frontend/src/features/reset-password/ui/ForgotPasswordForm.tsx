@@ -6,12 +6,13 @@ import { Field } from '@/shared/ui/field'
 import { Input } from '@/shared/ui/input'
 import { Appear } from '@/shared/ui/motion'
 import { SubmitButton } from '@/shared/ui/submit-button'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 import { ForgotState, requestPasswordReset } from '../server/actions'
 
 const idle: ForgotState = { status: 'idle' }
 
 export function ForgotPasswordForm() {
+  const t = useT()
   const [state, action] = useActionState(requestPasswordReset, idle)
   const s = t.auth.forgot
   return (

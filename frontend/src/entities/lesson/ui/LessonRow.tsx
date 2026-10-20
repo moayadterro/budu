@@ -1,11 +1,14 @@
+'use client'
+
 import { Badge } from '@/shared/ui/badge'
 import { Icon, PlayIcon } from '@/shared/ui/icon'
 import type { LessonState } from '@/shared/mock'
 import { cn } from '@/shared/lib/cn'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 
 /** One lesson in a class's lesson list. */
 export function LessonRow({ title, meta, state }: { title: string; meta: string; state: LessonState }) {
+  const t = useT()
   const live = state === 'live'
   return (
     <div className="flex items-center gap-3 py-3">

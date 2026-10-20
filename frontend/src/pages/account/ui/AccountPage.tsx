@@ -2,15 +2,17 @@ import { requireRole } from '@/entities/session/server'
 import { getAccount } from '@/entities/user/server'
 import { NameForm, PasswordForm, ProfilePhoto } from '@/features/edit-profile'
 import { SignOutButton } from '@/features/sign-out'
+import { LanguagePicker } from '@/features/switch-language'
 import { ThemePicker } from '@/features/switch-theme'
 import { ROLES } from '@/shared/config/nav'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card'
 import { Separator } from '@/shared/ui/separator'
 import { ScreenHead } from '@/shared/ui/screen-head'
-import { t } from '@/shared/i18n'
+import { getT } from '@/shared/i18n/server'
 
 /** Personal settings: profile (photo, name), password, language, theme. */
 export async function AccountPage() {
+  const t = await getT()
   const user = await requireRole(...ROLES)
   const account = await getAccount(user.email)
   const [first = '', ...rest] = user.name.split(' ')
@@ -41,6 +43,16 @@ export async function AccountPage() {
         </CardHeader>
         <CardContent>
           <PasswordForm />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{s.language}</CardTitle>
+          <CardDescription>{s.languageHint}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <LanguagePicker />
         </CardContent>
       </Card>
 

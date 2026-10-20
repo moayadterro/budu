@@ -9,7 +9,7 @@ import { Field } from '@/shared/ui/field'
 import { Input } from '@/shared/ui/input'
 import { Textarea } from '@/shared/ui/textarea'
 import { SubmitButton } from '@/shared/ui/submit-button'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 import { saveTaskAction } from '../server/actions'
 import type { ContentFormState } from '../model/types'
 import { FilePicker } from './FilePicker'
@@ -36,6 +36,7 @@ export function TaskForm({
   task?: LessonItem
   onDone: () => void
 }) {
+  const t = useT()
   const [state, action] = useActionState(saveTaskAction, idle)
   const [due, setDue] = useState(() => toLocalInput(task?.dueAt ?? null))
   const [tooBig, setTooBig] = useState(false)

@@ -7,12 +7,13 @@ import { Field } from '@/shared/ui/field'
 import { PasswordInput } from '@/shared/ui/password-input'
 import { Appear } from '@/shared/ui/motion'
 import { SubmitButton } from '@/shared/ui/submit-button'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 import { resetPassword, ResetState } from '../server/actions'
 
 const idle: ResetState = { status: 'idle' }
 
 export function ResetPasswordForm({ token }: { token: string }) {
+  const t = useT()
   const [state, action] = useActionState(resetPassword, idle)
   const s = t.auth.reset
   return (

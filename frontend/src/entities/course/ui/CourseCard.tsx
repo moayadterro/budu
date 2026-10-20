@@ -1,3 +1,5 @@
+'use client'
+
 import { ReactNode } from 'react'
 import { InitialsAvatar as Avatar } from '@/shared/ui/initials-avatar'
 import { Badge } from '@/shared/ui/badge'
@@ -5,14 +7,15 @@ import { Card } from '@/shared/ui/card'
 import { Icon, StarIcon } from '@/shared/ui/icon'
 import { CATALOG, SUBJECTS } from '@/shared/mock'
 import { tint } from '@/shared/lib/color'
-import { t } from '@/shared/i18n'
+import { useT } from '@/shared/i18n'
 
 type Course = (typeof CATALOG)[number]
 
-export const formatPrice = (price: number) => (price ? `$${price}` : t.explore.free)
+export const formatPrice = (price: number, free: string) => (price ? `$${price}` : free)
 
 /** Marketplace course card; `actions` slot holds buy/enrol/ask buttons. */
 export function CourseCard({ course, actions }: { course: Course; actions?: ReactNode }) {
+  const t = useT()
   const color = SUBJECTS[course.subject].color
   return (
     <Card className="gap-0 overflow-hidden py-0">
@@ -34,7 +37,7 @@ export function CourseCard({ course, actions }: { course: Course; actions?: Reac
         </div>
         <div className="mt-auto flex flex-col gap-3 pt-3">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-base font-semibold">{formatPrice(course.price)}</span>
+            <span className="text-base font-semibold">{formatPrice(course.price, t.explore.free)}</span>
             <span className="inline-flex items-center gap-[3px] text-xs font-bold text-muted-foreground">
               <StarIcon className="h-[13px] w-[13px] text-highlight" />
               {course.rating}
