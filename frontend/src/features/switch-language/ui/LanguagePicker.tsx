@@ -1,32 +1,36 @@
 'use client'
 
 import { useTransition } from 'react'
-import { cn } from '@/shared/lib/cn'
-import { LOCALE_NAMES, LOCALES, useLocale } from '@/shared/i18n'
+import { LANGUAGES, isLocale, useLocale, useT } from '@/shared/i18n'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select'
+import { secondaryName } from '../lib/languageLabel'
 import { setLanguage } from '../server/actions'
 
-/** Three language tiles (Settings page). */
+/** Language dropdown (Settings). Lists every language in the registry, so it scales to many. */
 export function LanguagePicker() {
+  const t = useT()
   const locale = useLocale()
   const [pending, start] = useTransition()
   return (
-    <div className="grid grid-cols-3 gap-2">
-      {LOCALES.map((code) => (
-        <button
-          key={code}
-          type="button"
-          lang={code}
-          disabled={pending}
-          aria-pressed={locale === code}
-          onClick={() => start(() => setLanguage(code))}
-          className={cn(
-            'rounded-lg border p-3 text-sm font-medium transition-colors disabled:opacity-60',
-            locale === code ? 'border-primary bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted',
-          )}
-        >
-          {LOCALE_NAMES[code]}
-        </button>
-      ))}
-    </div>
+    <Select
+      value={locale}
+      disabled={pending}
+      onValueChange={(code) => isLocale(code) && start(() => setLanguage(code))}
+    >
+      <SelectTrigger className="w-full sm:w-72" aria-label={t.account.language}>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {LANGUAGES.map((l) => {
+          const other = secondaryName(l.code, locale)
+          return (
+            <SelectItem key={l.code} value={l.code}>
+              <span lang={l.code}>{l.name}</span>
+              {other && <span className="text-muted-foreground">· {other}</span>}
+            </SelectItem>
+          )
+        })}
+      </SelectContent>
+    </Select>
   )
 }

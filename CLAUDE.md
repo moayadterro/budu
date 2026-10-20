@@ -126,7 +126,10 @@ fixed dark live-classroom stage (`bg-live`, `text-live-foreground` …). Rules:
 ## Conventions
 - TypeScript + Tailwind utilities. Use `cn()` for conditional classes.
 - Dark mode = same tokens, dark values (`.dark` class; 'system' follows the OS). Don't add a parallel colour system.
-- **Localization: English, Russian, Arabic.** Strings live in `src/shared/i18n/en.ts` (reference);
+- **Localization: English, Russian, Arabic** (up to ~10 planned). The languages are ONE list,
+  `LANGUAGES` in `src/shared/i18n/config.ts` (code, native name, dir); pickers, `<html lang/dir>`, RTL
+  and Accept-Language matching all derive from it — see the steps in that file to add one.
+  Strings live in `src/shared/i18n/en.ts` (reference);
   `ru.ts` and `ar.ts` are typed `typeof en`, so a missing key fails the build — add every new string
   to all three. Server components / server code: `const t = await getT()` (`@/shared/i18n/server`);
   client components: `const t = useT()` (`@/shared/i18n`). Never import a dictionary directly or use

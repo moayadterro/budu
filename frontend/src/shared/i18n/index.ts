@@ -4,5 +4,5 @@
  * Every string lives in en.ts; ru.ts and ar.ts must have the same keys (TypeScript checks).
  */
 export { I18nProvider, useLocale, useT } from './provider'
-export { LOCALES, LOCALE_COOKIE, LOCALE_NAMES, DEFAULT_LOCALE, dirOf, isLocale, type Locale } from './config'
+export { LANGUAGES, LOCALES, LOCALE_COOKIE, LOCALE_NAMES, DEFAULT_LOCALE, dirOf, isLocale, type Language, type Locale } from './config'
 export type { Messages } from './messages'
