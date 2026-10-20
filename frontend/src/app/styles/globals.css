@@ -1,0 +1,36 @@
+@import 'tailwindcss';
+@import '../../shared/theme/tokens.css';
+
+/* Base styles live in @layer base so Tailwind utilities can still override them. */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  /* Tailwind 4 no longer gives buttons a pointer cursor. */
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']) {
+    cursor: pointer;
+  }
+}
+
+/* Pulsing "live now" dot. Colour comes from the element (bg-* / text-*). */
+.dot-live {
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  animation: live-pulse 2s infinite;
+}
+@keyframes live-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 55%, transparent); }
+  70% { box-shadow: 0 0 0 7px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dot-live { animation: none; }
+}
