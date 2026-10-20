@@ -1,1 +1,1 @@
-export { SubmitHomework } from './ui/SubmitHomework'
+export { SubmitHomeworkForm } from './ui/SubmitHomeworkForm'

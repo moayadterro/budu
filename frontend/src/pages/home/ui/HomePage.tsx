@@ -4,17 +4,27 @@ import { Button, buttonVariants } from '@/shared/ui/button'
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/shared/ui/item'
 import { Icon, PlayIcon } from '@/shared/ui/icon'
-import { getSession } from '@/entities/session/server'
-import { SubjectCard } from '@/entities/subject'
-import { HOMEWORK, STUDENT, SUBJECTS, TIMES, TODAY, WEEK, isLive } from '@/shared/mock'
+import { requireRole } from '@/entities/session/server'
+import { StudentCourseCard } from '@/entities/course'
+import { myCourses } from '@/entities/course/server'
+import { HomeworkStatusBadge } from '@/entities/homework'
+import { myHomework } from '@/entities/homework/server'
+import { STUDENT, SUBJECTS, TIMES, TODAY, WEEK, isLive } from '@/shared/mock'
+import { LocalTime } from '@/shared/ui/local-time'
 import { cn } from '@/shared/lib/cn'
 import { getT } from '@/shared/i18n/server'
 
 /** Student dashboard. */
 export async function HomePage() {
   const t = await getT()
-  const user = await getSession()
-  const firstName = user?.name.split(' ')[0] ?? ''
+  const user = await requireRole('student')
+  const firstName = user.name.split(' ')[0] ?? ''
+  const [courses, homework] = await Promise.all([myCourses(user.userId), myHomework(user.userId)])
+  // what's still to hand in, soonest due first (no due date last)
+  const due = homework
+    .filter((h) => h.status === 'new')
+    .sort((a, b) => (a.dueAt ?? Infinity) - (b.dueAt ?? Infinity))
+    .slice(0, 5)
   return (
     <>
       <ScreenHead eyebrow={t.home.todayDate} title={t.home.hi(firstName)} sub={t.home.classLine} />
@@ -37,7 +47,7 @@ export async function HomePage() {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>{t.home.subjectsTitle}</CardTitle>
+              <CardTitle>{t.learn.coursesTitle}</CardTitle>
               <CardAction>
                 <Button variant="link" size="sm" className="h-auto p-0" asChild>
                   <Link href="/classes">{t.viewAll}</Link>
@@ -45,8 +55,9 @@ export async function HomePage() {
               </CardAction>
             </CardHeader>
             <CardContent className="grid gap-3 sm:grid-cols-2">
-              {(['math', 'phys', 'rus', 'eng'] as const).map((s) => (
-                <SubjectCard key={s} subject={s} />
+              {courses.length === 0 && <p className="text-sm text-muted-foreground">{t.learn.empty}</p>}
+              {courses.slice(0, 4).map((c) => (
+                <StudentCourseCard key={c.id} course={c} />
               ))}
             </CardContent>
           </Card>
@@ -56,27 +67,27 @@ export async function HomePage() {
           <Card>
             <CardHeader>
               <CardTitle>{t.home.hwTitle}</CardTitle>
-              <CardAction>
-                <Button variant="link" size="sm" className="h-auto p-0" asChild>
-                  <Link href="/classes/math/homework">{t.viewAll}</Link>
-                </Button>
-              </CardAction>
             </CardHeader>
             <CardContent className="flex flex-col gap-1">
-              {HOMEWORK.map((hw) => (
-                <Item key={hw.title} size="sm" asChild className="px-2">
-                  <Link href="/classes/math/homework">
-                    <ItemMedia
-                      variant="icon"
-                      className={cn(hw.urgent ? 'bg-warning/10 text-warning' : 'bg-muted text-muted-foreground')}
-                    >
-                      <Icon name="alert" />
+              {due.length === 0 && <p className="text-sm text-muted-foreground">{t.learn.allDone}</p>}
+              {due.map((hw) => (
+                <Item key={hw.id} size="sm" asChild className="px-2">
+                  <Link href={`/classes/${hw.courseId}/homework/${hw.id}`}>
+                    <ItemMedia variant="icon" className="bg-warning/10 text-warning">
+                      <Icon name="task" />
                     </ItemMedia>
                     <ItemContent className="min-w-0">
                       <ItemTitle className="truncate">{hw.title}</ItemTitle>
-                      <ItemDescription>{hw.meta}</ItemDescription>
+                      <ItemDescription className="truncate">
+                        {hw.courseTitle}
+                        {hw.dueAt && (
+                          <>
+                            {' '}· {t.hw.due} <LocalTime seconds={hw.dueAt} />
+                          </>
+                        )}
+                      </ItemDescription>
                     </ItemContent>
-                    <span className="text-xs font-medium whitespace-nowrap text-muted-foreground">{hw.due}</span>
+                    <HomeworkStatusBadge status={hw.status} grade={hw.grade} dueAt={hw.dueAt} submittedAt={hw.submittedAt} />
                   </Link>
                 </Item>
               ))}
