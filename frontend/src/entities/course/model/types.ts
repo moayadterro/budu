@@ -42,3 +42,17 @@ export const fileUrl = (file: CourseFile) => `/files/${file.id}`
 
 /** Limits shared by forms and server actions. */
 export const COURSE_LIMITS = { title: 200, text: 5000 } as const
+
+/** A course the signed-in student is enrolled in. */
+export type StudentCourse = {
+  id: number
+  title: string
+  description: string
+  teachers: string
+  lessonCount: number
+  homeworkCount: number
+  /** homework not handed in yet */
+  todo: number
+}
+
+export type EnrolResult = 'enrolled' | 'already' | 'notfound' | 'notstudent'

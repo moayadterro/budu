@@ -67,13 +67,14 @@ export async function iomadCheckPassword(inst: IomadInstance, username: string, 
 /**
  * Uploads a file into the integration user's draft area (webservice/upload.php)
  * and returns the draft item id, which a local_budu function then moves into
- * the course (lesson material, task attachment).
+ * the course (lesson material, task attachment, homework answer). Pass the id
+ * back in to add more files to the same draft.
  */
-export async function iomadUpload(inst: IomadInstance, file: File): Promise<number> {
+export async function iomadUpload(inst: IomadInstance, file: File, draftItemId = 0): Promise<number> {
   const body = new FormData()
   body.append('token', inst.token)
   body.append('filearea', 'draft')
-  body.append('itemid', '0')
+  body.append('itemid', String(draftItemId)) // reuse a draft area to collect several files
   body.append('file_1', file, file.name)
   const res = await fetch(`${inst.url}/webservice/upload.php`, { method: 'POST', body, cache: 'no-store' })
   if (!res.ok) throw new IomadError('http', `IOMAD upload: HTTP ${res.status}`)

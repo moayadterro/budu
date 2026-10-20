@@ -12,4 +12,9 @@ export {
   saveTask,
   deleteLessonItem,
   lessonFileAccess,
+  listStudents,
+  enrolStudent,
+  unenrolStudent,
+  myCourses,
 } from './courses'
+export type { EnrolResult } from '../model/types'

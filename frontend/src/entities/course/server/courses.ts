@@ -1,6 +1,7 @@
 import 'server-only'
 import { defaultInstance, iomadCall, iomadUpload, IomadError } from '@/shared/server/iomad'
-import type { Course, CourseSummary, LessonItem } from '../model/types'
+import { toPerson, type Person, type RawPerson } from '@/shared/lib/person'
+import type { Course, CourseSummary, EnrolResult, LessonItem, StudentCourse } from '../model/types'
 
 /**
  * Courses, lessons, materials and tasks in IOMAD, via the local_budu plugin.
@@ -117,4 +118,37 @@ export async function lessonFileAccess(userId: number, fileId: number): Promise<
     fileid: fileId,
   })
   return r.allowed ? { allowed: true, path: r.path, name: r.filename, size: r.filesize, mime: r.mimetype } : { allowed: false }
+}
+
+// ----- students (local_budu learning functions) -----
+
+/** Students enrolled in a course the user teaches. */
+export async function listStudents(userId: number, courseId: number): Promise<Person[]> {
+  const rows = await call<RawPerson[]>('list_students', { courseid: courseId, userid: userId })
+  return rows.map(toPerson)
+}
+
+/** Enrol an existing Budu account (by email) as a student. */
+export async function enrolStudent(userId: number, courseId: number, email: string): Promise<EnrolResult> {
+  const r = await call<{ result: EnrolResult }>('enrol_student', { courseid: courseId, userid: userId, email })
+  return r.result
+}
+
+export const unenrolStudent = (userId: number, courseId: number, studentId: number) =>
+  call<Id>('unenrol_student', { courseid: courseId, userid: userId, studentid: studentId })
+
+/** Published courses the user is enrolled in as a student. */
+export async function myCourses(userId: number): Promise<StudentCourse[]> {
+  const rows = await call<
+    Array<{ id: number; fullname: string; summary: string; teachers: string; lessons: number; homework: number; todo: number }>
+  >('my_courses', { userid: userId })
+  return rows.map((c) => ({
+    id: c.id,
+    title: c.fullname,
+    description: c.summary,
+    teachers: c.teachers,
+    lessonCount: c.lessons,
+    homeworkCount: c.homework,
+    todo: c.todo,
+  }))
 }

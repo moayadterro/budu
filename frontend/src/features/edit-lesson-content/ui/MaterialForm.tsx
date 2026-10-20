@@ -11,7 +11,7 @@ import { SubmitButton } from '@/shared/ui/submit-button'
 import { useT } from '@/shared/i18n'
 import { addMaterialAction } from '../server/actions'
 import type { ContentFormState } from '../model/types'
-import { FilePicker } from './FilePicker'
+import { FilePicker } from '@/shared/ui/file-picker'
 
 const idle: ContentFormState = { status: 'idle' }
 const ACCEPT = 'video/*,application/pdf,image/*,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.odt,.odp,.ods,.txt'

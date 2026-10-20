@@ -15,3 +15,7 @@ export const formFile = (form: FormData, key: string) => {
   const v = form.get(key)
   return v instanceof File && v.size > 0 ? v : null
 }
+
+/** All non-empty uploaded files under one name (multiple file input). */
+export const formFiles = (form: FormData, key: string) =>
+  form.getAll(key).filter((v): v is File => v instanceof File && v.size > 0)
