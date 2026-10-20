@@ -20,6 +20,18 @@ const FUNCTIONS = [
     'core_user_update_users',           // activate after email confirmation, reset password
     'local_budu_get_account',           // sign-in lookup + tenant role (iomad/local_budu)
     'local_budu_check_password',        // sign-in password check (iomad/local_budu)
+    // Course builder (iomad/local_budu/classes/external/courses.php); each checks the acting user's rights.
+    'local_budu_list_courses',
+    'local_budu_create_course',
+    'local_budu_update_course',
+    'local_budu_get_course',
+    'local_budu_save_lesson',
+    'local_budu_delete_lesson',
+    'local_budu_move_lesson',
+    'local_budu_add_material',
+    'local_budu_save_task',
+    'local_budu_delete_item',
+    'local_budu_file_access',
 ];
 const CAPABILITIES = [
     'webservice/rest:use',
@@ -31,6 +43,22 @@ const CAPABILITIES = [
     'block/iomad_company_admin:company_view',
     'block/iomad_company_admin:assign_company_manager',
     'moodle/user:update',
+    // Course builder: the integration user makes the changes after local_budu checked the teacher.
+    'moodle/course:create',
+    'moodle/course:update',
+    'moodle/course:manageactivities',
+    'moodle/course:movesections',
+    'moodle/course:sectionvisibility',
+    'moodle/course:viewhiddensections',
+    'moodle/course:viewhiddenactivities',
+    'moodle/course:viewhiddencourses',
+    'moodle/course:view',             // open course files without being enrolled (webservice/pluginfile.php)
+    'moodle/user:manageownfiles',     // upload into its own draft area (webservice/upload.php)
+    'enrol/manual:enrol',
+    'mod/resource:addinstance',
+    'mod/resource:view',
+    'mod/assign:addinstance',
+    'mod/assign:view',
 ];
 
 $system = context_system::instance();
@@ -81,12 +109,16 @@ if (!$service) {
         'shortname' => 'budu',
         'enabled' => 1,
         'restrictedusers' => 1,
-        'downloadfiles' => 0,
-        'uploadfiles' => 0,
+        'downloadfiles' => 1,
+        'uploadfiles' => 1,
         'requiredcapability' => '',
         'timecreated' => time(),
     ];
     $service->id = $DB->insert_record('external_services', $service);
+}
+// Lesson files: upload to IOMAD (webservice/upload.php) and stream them back (webservice/pluginfile.php).
+if (!$service->uploadfiles || !$service->downloadfiles) {
+    $DB->update_record('external_services', (object)['id' => $service->id, 'uploadfiles' => 1, 'downloadfiles' => 1]);
 }
 foreach (FUNCTIONS as $fn) {
     if (!$DB->record_exists('external_services_functions', ['externalserviceid' => $service->id, 'functionname' => $fn])) {
