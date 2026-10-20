@@ -1,0 +1,17 @@
+# deps / build
+node_modules/
+.next/
+out/
+dist/
+
+# env
+.env
+.env.local
+
+# misc
+*.log
+.DS_Store
+
+# stray / generated
+yarn.lock
+*.tsbuildinfo
