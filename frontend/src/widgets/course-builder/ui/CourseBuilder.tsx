@@ -5,7 +5,10 @@ import { initialsOf } from '@/entities/session'
 import { CourseDetailsForm, PublishToggle } from '@/features/edit-course'
 import { AddLessonContent, ItemActions } from '@/features/edit-lesson-content'
 import { AddLesson, LessonHeader } from '@/features/edit-lessons'
+import Link from 'next/link'
+import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card'
+import { Icon } from '@/shared/ui/icon'
 import { InitialsAvatar } from '@/shared/ui/initials-avatar'
 import { Separator } from '@/shared/ui/separator'
 import { useT } from '@/shared/i18n'
@@ -53,6 +56,20 @@ export function CourseBuilder({ course, authorName }: { course: Course; authorNa
           </CardHeader>
           <CardContent>
             <PublishToggle course={course} />
+          </CardContent>
+        </Card>
+        <Card size="sm">
+          <CardHeader>
+            <CardTitle>{t.teach.studentsTitle}</CardTitle>
+            <CardDescription>{t.teach.studentsSub}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button variant="outline" className="w-full" asChild>
+              <Link href={`/teach/classes/${course.id}`}>
+                <Icon name="users" />
+                {t.teach.manageStudents}
+              </Link>
+            </Button>
           </CardContent>
         </Card>
         <Card size="sm">

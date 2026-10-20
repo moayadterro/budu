@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { fileUrl, LessonItemIcon, type LessonItem } from '@/entities/course'
 import { Icon } from '@/shared/ui/icon'
 import { ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/shared/ui/item'
@@ -34,8 +35,17 @@ export function LessonItemView({ item }: { item: LessonItem }) {
         {item.kind === 'task' && item.instructions && (
           <p className="line-clamp-2 whitespace-pre-line text-sm text-muted-foreground">{item.instructions}</p>
         )}
-        {item.files.length > 0 && (
+        {(item.files.length > 0 || item.kind === 'task') && (
           <div className="flex flex-wrap gap-x-3 gap-y-1">
+            {item.kind === 'task' && (
+              <Link
+                href={`/grading?homework=${item.id}`}
+                className="inline-flex items-center gap-1 text-sm font-medium text-primary underline-offset-4 hover:underline"
+              >
+                <Icon name="check" className="size-3.5" />
+                {t.grading.answer}
+              </Link>
+            )}
             {item.files.map((f) => (
               <a
                 key={f.id}

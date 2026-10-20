@@ -19,6 +19,12 @@ export type NavItem = {
   bottom?: boolean
 }
 
+/** The nav item for `path`: the longest href that is `path` or a parent of it ('/teach' vs '/teach/classes'). */
+export const activeHref = (items: NavItem[], path: string | null) =>
+  items
+    .filter((i) => isActive(i.href, path))
+    .sort((a, b) => b.href!.length - a.href!.length)[0]?.href ?? null
+
 /** Is `path` this nav item's screen or one of its sub-screens? */
 export const isActive = (href: string | null, path: string | null) =>
   !!href && !!path && (path === href || path.startsWith(href + '/'))
@@ -38,11 +44,11 @@ export const NAV: Record<Role, NavItem[]> = {
     { label: 'live', icon: 'video', href: '/live', bottom: true },
   ],
   teacher: [
-    { label: 'dashboard', icon: 'grid', href: null, bottom: true },
-    { label: 'myClasses', icon: 'book', href: null, bottom: true },
+    { label: 'dashboard', icon: 'grid', href: '/teach', bottom: true },
+    { label: 'myClasses', icon: 'book', href: '/teach/classes', bottom: true },
     { label: 'courses', icon: 'store', href: '/courses' },
-    { label: 'grading', icon: 'check', href: null, bottom: true },
-    { label: 'gradebook', icon: 'report', href: null, bottom: true },
+    { label: 'grading', icon: 'check', href: '/grading', bottom: true },
+    { label: 'gradebook', icon: 'report', href: '/gradebook', bottom: true },
     { label: 'live', icon: 'video', href: '/live' },
   ],
   manager: [

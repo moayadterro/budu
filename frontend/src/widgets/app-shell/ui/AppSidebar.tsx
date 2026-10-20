@@ -6,7 +6,7 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowUpDownIcon, UserCircleIcon } from '@hugeicons/core-free-icons'
 import { initialsOf, pictureUrl, useSession } from '@/entities/session'
 import { SignOutMenuItem } from '@/features/sign-out'
-import { NAV, isActive } from '@/shared/config/nav'
+import { NAV, activeHref } from '@/shared/config/nav'
 import { ORG } from '@/shared/mock'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import {
@@ -41,6 +41,7 @@ export function AppSidebar() {
   const { isMobile, setOpenMobile } = useSidebar()
   const locale = useLocale()
   const closeOnMobile = () => isMobile && setOpenMobile(false)
+  const active = activeHref(NAV[user.role], path)
 
   return (
     <Sidebar collapsible="icon" side={dirOf(locale) === 'rtl' ? 'right' : 'left'}>
@@ -69,7 +70,7 @@ export function AppSidebar() {
             {NAV[user.role].map((item) => (
               <SidebarMenuItem key={item.label}>
                 {item.href ? (
-                  <SidebarMenuButton asChild isActive={isActive(item.href, path)} tooltip={t.nav[item.label]}>
+                  <SidebarMenuButton asChild isActive={item.href === active} tooltip={t.nav[item.label]}>
                     <Link href={item.href} onClick={closeOnMobile}>
                       <Icon name={item.icon} />
                       <span>{t.nav[item.label]}</span>
