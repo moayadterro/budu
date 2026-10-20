@@ -535,6 +535,7 @@ class courses extends external_api {
      * pictures (any user — they appear next to names everywhere).
      */
     public static function file_access(int $userid, int $fileid): array {
+        global $DB;
         $p = self::validate_parameters(self::file_access_parameters(), compact('userid', 'fileid'));
         self::setup();
         $no = ['allowed' => false, 'path' => '', 'filename' => '', 'filesize' => 0, 'mimetype' => ''];
@@ -550,6 +551,17 @@ class courses extends external_api {
             }
             // user/icon URLs: /{usercontext}/user/icon/{theme}/f1 (Moodle picks the stored extension)
             $path = '/' . $file->get_contextid() . '/user/icon/boost/' . pathinfo($file->get_filename(), PATHINFO_FILENAME);
+            return ['allowed' => true, 'path' => $path] + self::file_info($file);
+        }
+        if ($area === 'assignsubmission_file/submission_files') {
+            // A homework answer: its author, or someone who grades in that course.
+            $ctx = \context::instance_by_id($file->get_contextid(), IGNORE_MISSING);
+            $owner = $DB->get_field('assign_submission', 'userid', ['id' => $file->get_itemid()]);
+            if (!$ctx || !$owner || ($owner != $p['userid'] && !has_capability('mod/assign:grade', $ctx, $p['userid']))) {
+                return $no;
+            }
+            $path = '/' . $file->get_contextid() . '/assignsubmission_file/submission_files/' . $file->get_itemid()
+                . $file->get_filepath() . $file->get_filename();
             return ['allowed' => true, 'path' => $path] + self::file_info($file);
         }
         if (!in_array($area, ['mod_resource/content', 'mod_assign/introattachment'])) {

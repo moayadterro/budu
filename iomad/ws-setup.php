@@ -33,6 +33,18 @@ const FUNCTIONS = [
     'local_budu_save_task',
     'local_budu_delete_item',
     'local_budu_file_access',
+    // Students, homework and grades (iomad/local_budu/classes/external/learning.php).
+    'local_budu_list_students',
+    'local_budu_enrol_student',
+    'local_budu_unenrol_student',
+    'local_budu_submissions',
+    'local_budu_get_submission',
+    'local_budu_grade',
+    'local_budu_gradebook',
+    'local_budu_my_courses',
+    'local_budu_my_homework',
+    'local_budu_my_submission',
+    'local_budu_submit',
 ];
 const CAPABILITIES = [
     'webservice/rest:use',
@@ -61,6 +73,13 @@ const CAPABILITIES = [
     'mod/resource:view',
     'mod/assign:addinstance',
     'mod/assign:view',
+    // Homework: hand in for a student, grade, read grades (after local_budu checked the real user).
+    'mod/assign:editothersubmission',
+    'mod/assign:grade',
+    'mod/assign:viewgrades',
+    'mod/assign:submit',
+    'moodle/grade:edit',
+    'enrol/manual:unenrol',
 ];
 
 $system = context_system::instance();
