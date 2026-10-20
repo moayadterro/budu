@@ -126,9 +126,16 @@ fixed dark live-classroom stage (`bg-live`, `text-live-foreground` …). Rules:
 ## Conventions
 - TypeScript + Tailwind utilities. Use `cn()` for conditional classes.
 - Dark mode = same tokens, dark values (`.dark` class; 'system' follows the OS). Don't add a parallel colour system.
-- **Localization:** English only for now. **All user-facing strings live in `src/shared/i18n/en.ts`**
-  (UI labels). Course/lesson titles and other content are data (mock now, IOMAD later), not strings.
-  Use logical properties (`ms-`, `pe-`, `start-`, `rtl:`) so Arabic RTL works later.
+- **Localization: English, Russian, Arabic.** Strings live in `src/shared/i18n/en.ts` (reference);
+  `ru.ts` and `ar.ts` are typed `typeof en`, so a missing key fails the build — add every new string
+  to all three. Server components / server code: `const t = await getT()` (`@/shared/i18n/server`);
+  client components: `const t = useT()` (`@/shared/i18n`). Never import a dictionary directly or use
+  `t` at module level (nav items hold label *keys*). Locale = `budu_locale` cookie (Settings / globe
+  menu, `features/switch-language`), else Accept-Language. `<html lang dir>` is set in RootLayout:
+  Arabic is RTL with IBM Plex Sans Arabic (`:root[lang='ar']` in tokens.css) and the sidebar on the
+  right. Use logical classes only (`ms-`/`me-`/`ps-`/`pe-`/`start-`/`end-`/`text-start`, `rtl:`).
+  Dates via `LocalTime` (viewer's zone + UI language). Emails use the requester's language.
+  Course/lesson titles and other content are data (mock now, IOMAD later), not strings.
 - Keep it **simple-first** — minimal implementations, no premature complexity.
 
 ## Roles
@@ -173,7 +180,7 @@ signing out; a suspended/deleted account's sessions end. (An email change in IOM
   (integration user/role/token, allowed functions, lockout). New IOMAD function needed → add it to
   `FUNCTIONS` (and any capability) there and re-run the script.
 - Not done yet: rate limiting beyond IOMAD lockout (e.g. on register/forgot), captcha, inviting
-  users into a school, changing password/email from Settings, profile photo upload to IOMAD.
+  users into a school, changing email from Settings.
 
 ## Running
 ```bash
@@ -209,6 +216,10 @@ Built and verified:
 - Roles: admin / manager / teacher / student from IOMAD; admin "Tenants" page (live IOMAD data);
   server-side `requireRole`; sessions refresh role every 5 min.
 - Stack upgraded 2026-10-19 (see Running → Versions).
+- Settings: profile photo saved as the IOMAD user picture (shown in the sidebar via `/files/:id`),
+  first/last name, password change (current password checked by IOMAD, other devices signed out),
+  language, theme. Tested 2026-10-21.
+- UI fully in English / Russian / Arabic (RTL), switchable in Settings or the header globe menu.
 - Teacher course builder (live IOMAD data): `/courses` (my courses), `/courses/new`, `/courses/:id`
   (details, publish/draft, lessons add/rename/move/delete, upload video/PDF/files, tasks with due date
   + attachment). Files via `/files/:id`. Tested in the browser 2026-10-20.
@@ -223,12 +234,18 @@ Not built yet (rough priority):
    school settings + grade-scale page.
 4. Invites: manager invites teachers/students into a school (IOMAD company).
 5. BigBlueButton: real live classes (join URLs), recordings → AI summaries.
-6. Account: change password/email in Settings, avatar upload to IOMAD.
-7. Abuse protection for public sign-up/forgot (rate limit, captcha); RU/AR translations + RTL.
+6. Account: change email (needs a confirmation flow); remember the language per user in IOMAD
+   (today it's per browser, a cookie).
+7. Abuse protection for public sign-up/forgot (rate limit, captcha). Translate the mock data.
 8. Move IOMAD to Moodle 5.3 LTS when IOMAD publishes `IOMAD_503_STABLE` (5.1+ moves the web root
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-21 Languages EN/RU/AR (owner: "fully supported"). Own tiny i18n (no library): typed
+  dictionaries + `getT()`/`useT()`; locale in a cookie, Accept-Language fallback.
+- 2026-10-21 Profile photo = the IOMAD (Moodle) user picture via `core_user_update_picture`; served
+  through `/files/:id` (profile pictures are visible to any signed-in user). Session row caches
+  `picture_id`.
 - 2026-10-20 UI moves to real shadcn/ui components (owner: "professional look", not the prototype's
   custom styling) with the owner's generated theme and Hugeicons. App shell = shadcn Sidebar (sheet on
   mobile; the bottom tab bar is gone). Layout/structure of screens still follows the prototype.
