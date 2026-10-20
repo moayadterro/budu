@@ -530,8 +530,9 @@ class courses extends external_api {
     }
 
     /**
-     * May this user open this lesson file? If so, where it is (for webservice/pluginfile.php).
-     * Only lesson materials and task attachments are served.
+     * May this user open this file? If so, where it is (for webservice/pluginfile.php).
+     * Served: lesson materials and task attachments (course viewers), and profile
+     * pictures (any user — they appear next to names everywhere).
      */
     public static function file_access(int $userid, int $fileid): array {
         $p = self::validate_parameters(self::file_access_parameters(), compact('userid', 'fileid'));
@@ -543,6 +544,14 @@ class courses extends external_api {
             return $no;
         }
         $area = $file->get_component() . '/' . $file->get_filearea();
+        if ($area === 'user/icon' && preg_match('/^f[123]\./', $file->get_filename())) {
+            if (!\core_user::get_user($p['userid'])) {
+                return $no;
+            }
+            // user/icon URLs: /{usercontext}/user/icon/{theme}/f1 (Moodle picks the stored extension)
+            $path = '/' . $file->get_contextid() . '/user/icon/boost/' . pathinfo($file->get_filename(), PATHINFO_FILENAME);
+            return ['allowed' => true, 'path' => $path] + self::file_info($file);
+        }
         if (!in_array($area, ['mod_resource/content', 'mod_assign/introattachment'])) {
             return $no;
         }

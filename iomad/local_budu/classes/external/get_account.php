@@ -46,8 +46,15 @@ class get_account extends external_api {
             ['userid' => $user->id]
         );
 
+        // Profile picture (f1, 100px) for the frontend's /files route; 0 = none.
+        $usercontext = \context_user::instance($user->id, IGNORE_MISSING);
+        $picture = $usercontext ? (int)$DB->get_field_select('files', 'id',
+            "contextid = ? AND component = 'user' AND filearea = 'icon' AND itemid = 0 AND " . $DB->sql_like('filename', '?'),
+            [$usercontext->id, 'f1.%'], IGNORE_MULTIPLE) : 0;
+
         return [
             'found' => true,
+            'picture' => $picture,
             'id' => (int)$user->id,
             'username' => $user->username,
             'firstname' => $user->firstname,
@@ -74,6 +81,7 @@ class get_account extends external_api {
             'email' => new external_value(PARAM_RAW, 'Email', VALUE_OPTIONAL),
             'suspended' => new external_value(PARAM_BOOL, 'Account suspended (e.g. email not confirmed)', VALUE_OPTIONAL),
             'siteadmin' => new external_value(PARAM_BOOL, 'IOMAD site administrator (Budu platform admin)', VALUE_OPTIONAL),
+            'picture' => new external_value(PARAM_INT, 'Profile picture file id (f1), 0 = none', VALUE_OPTIONAL),
             'memberships' => new external_multiple_structure(new external_single_structure([
                 'companyid' => new external_value(PARAM_INT, 'IOMAD company (tenant) id'),
                 'companyname' => new external_value(PARAM_TEXT, 'Company name'),

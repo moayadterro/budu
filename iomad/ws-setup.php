@@ -20,6 +20,7 @@ const FUNCTIONS = [
     'core_user_update_users',           // activate after email confirmation, reset password
     'local_budu_get_account',           // sign-in lookup + tenant role (iomad/local_budu)
     'local_budu_check_password',        // sign-in password check (iomad/local_budu)
+    'core_user_update_picture',         // profile photo (draft uploaded via webservice/upload.php)
     // Course builder (iomad/local_budu/classes/external/courses.php); each checks the acting user's rights.
     'local_budu_list_courses',
     'local_budu_create_course',
@@ -43,6 +44,7 @@ const CAPABILITIES = [
     'block/iomad_company_admin:company_view',
     'block/iomad_company_admin:assign_company_manager',
     'moodle/user:update',
+    'moodle/user:editprofile',          // core_user_update_picture for another user
     // Course builder: the integration user makes the changes after local_budu checked the teacher.
     'moodle/course:create',
     'moodle/course:update',
