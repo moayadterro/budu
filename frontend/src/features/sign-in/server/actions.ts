@@ -44,6 +44,7 @@ export async function signIn(_prev: SignInState, form: FormData): Promise<SignIn
       companyId,
       name: `${account.firstname} ${account.lastname}`.trim(),
       email: account.email,
+      pictureId: account.picture || null,
     })
     destination = safeNext(form.get('next')) ?? homeFor(role)
   } catch (e) {

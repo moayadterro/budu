@@ -21,6 +21,8 @@ CREATE TABLE IF NOT EXISTS sessions (
 CREATE INDEX IF NOT EXISTS sessions_user ON sessions (iomad_user_id);
 -- last time role/name were re-read from IOMAD ('epoch' = check on next request)
 ALTER TABLE sessions ADD COLUMN IF NOT EXISTS refreshed_at timestamptz NOT NULL DEFAULT 'epoch';
+-- IOMAD profile picture file id (served by /files/:id); NULL = initials
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS picture_id integer;
 
 CREATE TABLE IF NOT EXISTS auth_tokens (
   token_hash    text PRIMARY KEY,              -- sha256; the raw token only travels in the email

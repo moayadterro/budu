@@ -22,9 +22,9 @@ const REFRESH_MINUTES = 5
 export async function createSession(user: SessionUser) {
   const raw = newSecret()
   await query(
-    `INSERT INTO sessions (token_hash, iomad_user_id, role, company_id, name, email, expires_at, refreshed_at)
-     VALUES ($1, $2, $3, $4, $5, $6, now() + make_interval(days => $7), now())`,
-    [hashSecret(raw), user.userId, user.role, user.companyId, user.name, user.email, MAX_AGE_DAYS],
+    `INSERT INTO sessions (token_hash, iomad_user_id, role, company_id, name, email, picture_id, expires_at, refreshed_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, now() + make_interval(days => $8), now())`,
+    [hashSecret(raw), user.userId, user.role, user.companyId, user.name, user.email, user.pictureId, MAX_AGE_DAYS],
   )
   const jar = await cookies()
   jar.set(SESSION_COOKIE, raw, {
@@ -36,7 +36,15 @@ export async function createSession(user: SessionUser) {
   })
 }
 
-type Row = { iomad_user_id: number; role: Role; company_id: number | null; name: string; email: string; stale: boolean }
+type Row = {
+  iomad_user_id: number
+  role: Role
+  company_id: number | null
+  name: string
+  email: string
+  picture_id: number | null
+  stale: boolean
+}
 
 /** The signed-in user, or null. Cached per request. */
 export const getSession = cache(async (): Promise<SessionUser | null> => {
@@ -44,13 +52,20 @@ export const getSession = cache(async (): Promise<SessionUser | null> => {
   if (!raw) return null
   const hash = hashSecret(raw)
   const [row] = await query<Row>(
-    `SELECT iomad_user_id, role, company_id, name, email,
+    `SELECT iomad_user_id, role, company_id, name, email, picture_id,
             refreshed_at < now() - make_interval(mins => $2) AS stale
        FROM sessions WHERE token_hash = $1 AND expires_at > now()`,
     [hash, REFRESH_MINUTES],
   )
   if (!row) return null
-  const user: SessionUser = { userId: row.iomad_user_id, role: row.role, companyId: row.company_id, name: row.name, email: row.email }
+  const user: SessionUser = {
+    userId: row.iomad_user_id,
+    role: row.role,
+    companyId: row.company_id,
+    name: row.name,
+    email: row.email,
+    pictureId: row.picture_id,
+  }
   return row.stale ? refresh(hash, user) : user
 })
 
@@ -64,13 +79,12 @@ async function refresh(hash: string, user: SessionUser): Promise<SessionUser | n
     }
     const { role, companyId } = roleFor(account.memberships, account.siteadmin)
     const name = `${account.firstname} ${account.lastname}`.trim()
-    await query(`UPDATE sessions SET role = $2, company_id = $3, name = $4, refreshed_at = now() WHERE token_hash = $1`, [
-      hash,
-      role,
-      companyId,
-      name,
-    ])
-    return { ...user, role, companyId, name }
+    const pictureId = account.picture || null
+    await query(
+      `UPDATE sessions SET role = $2, company_id = $3, name = $4, picture_id = $5, refreshed_at = now() WHERE token_hash = $1`,
+      [hash, role, companyId, name, pictureId],
+    )
+    return { ...user, role, companyId, name, pictureId }
   } catch (e) {
     console.error('session refresh failed; keeping current session', e)
     return user
@@ -93,6 +107,20 @@ export async function requireRole(...roles: Role[]): Promise<SessionUser> {
   if (!user) redirect('/login')
   if (!roles.includes(user.role)) notFound()
   return user
+}
+
+/** After a profile change: update the name / picture shown by all of the user's sessions. */
+export async function updateSessionProfile(userId: number, profile: { name?: string; pictureId?: number | null }) {
+  if (profile.name !== undefined) await query(`UPDATE sessions SET name = $2 WHERE iomad_user_id = $1`, [userId, profile.name])
+  if (profile.pictureId !== undefined) {
+    await query(`UPDATE sessions SET picture_id = $2 WHERE iomad_user_id = $1`, [userId, profile.pictureId])
+  }
+}
+
+/** Sign the user out on every other device, keeping this session (e.g. after changing the password). */
+export async function revokeOtherSessions(userId: number) {
+  const raw = (await cookies()).get(SESSION_COOKIE)?.value
+  await query(`DELETE FROM sessions WHERE iomad_user_id = $1 AND token_hash <> $2`, [userId, raw ? hashSecret(raw) : ''])
 }
 
 /** Sign the user out everywhere (e.g. after a password reset). */

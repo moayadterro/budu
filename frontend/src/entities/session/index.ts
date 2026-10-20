@@ -1,2 +1,2 @@
 export { SessionProvider, useSession } from './model/store'
-export { initialsOf, type SessionUser } from './model/types'
+export { initialsOf, pictureUrl, type SessionUser } from './model/types'

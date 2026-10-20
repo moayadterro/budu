@@ -1,3 +1,11 @@
 import 'server-only'
 // Server-only public API of the session entity.
-export { createSession, getSession, requireRole, destroySession, revokeUserSessions } from './session'
+export {
+  createSession,
+  getSession,
+  requireRole,
+  destroySession,
+  revokeUserSessions,
+  revokeOtherSessions,
+  updateSessionProfile,
+} from './session'

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowUpDownIcon, UserCircleIcon } from '@hugeicons/core-free-icons'
-import { initialsOf, useSession } from '@/entities/session'
+import { initialsOf, pictureUrl, useSession } from '@/entities/session'
 import { SignOutMenuItem } from '@/features/sign-out'
 import { NAV, isActive } from '@/shared/config/nav'
 import { ORG } from '@/shared/mock'
@@ -36,7 +36,6 @@ import { t } from '@/shared/i18n'
 /** App sidebar: tenant, the role's screens, signed-in user menu. Becomes a sheet on mobile. */
 export function AppSidebar() {
   const user = useSession((s) => s.user)
-  const photo = useSession((s) => s.photo)
   const path = usePathname()
   const { isMobile, setOpenMobile } = useSidebar()
   const closeOnMobile = () => isMobile && setOpenMobile(false)
@@ -93,7 +92,7 @@ export function AppSidebar() {
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent">
                   <Avatar className="size-8 rounded-lg">
-                    {photo && <AvatarImage src={photo} alt="" />}
+                    {user.pictureId && <AvatarImage src={pictureUrl(user.pictureId)!} alt="" />}
                     <AvatarFallback className="rounded-lg">{initialsOf(user.name)}</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-start text-sm leading-tight">

@@ -1,62 +1,59 @@
-'use client'
-
-import { initialsOf, useSession } from '@/entities/session'
+import { requireRole } from '@/entities/session/server'
+import { getAccount } from '@/entities/user/server'
+import { NameForm, PasswordForm, ProfilePhoto } from '@/features/edit-profile'
 import { SignOutButton } from '@/features/sign-out'
 import { ThemePicker } from '@/features/switch-theme'
-import { AvatarUpload, RemoveAvatar } from '@/features/upload-avatar'
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
-import { NativeSelect as Select, NativeSelectOption } from '@/shared/ui/native-select'
+import { ROLES } from '@/shared/config/nav'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card'
+import { Separator } from '@/shared/ui/separator'
 import { ScreenHead } from '@/shared/ui/screen-head'
 import { t } from '@/shared/i18n'
 
-const LANGUAGES: Array<[string, string]> = [
-  ['en', 'English'],
-  ['ru', 'Русский'],
-  ['ar', 'العربية'],
-]
+/** Personal settings: profile (photo, name), password, language, theme. */
+export async function AccountPage() {
+  const user = await requireRole(...ROLES)
+  const account = await getAccount(user.email)
+  const [first = '', ...rest] = user.name.split(' ')
+  const firstName = account.found ? account.firstname : first
+  const lastName = account.found ? account.lastname : rest.join(' ')
+  const s = t.account
 
-/** Personal settings: profile photo, language, theme. */
-export function AccountPage() {
-  const user = useSession((s) => s.user)
   return (
-    <div className="flex max-w-[640px] flex-col gap-4">
-      <ScreenHead title={t.account.title} sub={t.account.sub} />
-      <Card>
-        <CardContent className="flex-row items-center gap-4">
-        <AvatarUpload initials={initialsOf(user.name)} color="var(--color-primary)" />
-        <div className="min-w-0 flex-1">
-          <b className="block text-base font-medium">{user.name}</b>
-          <div className="text-xs text-muted-foreground">
-            {t.role[user.role]} · {user.email}
-          </div>
-          <RemoveAvatar />
-        </div>
-        </CardContent>
-      </Card>
+    <div className="flex max-w-2xl flex-col gap-6">
+      <ScreenHead title={s.title} sub={s.sub} />
+
       <Card>
         <CardHeader>
-          <CardTitle>{t.account.language}</CardTitle>
+          <CardTitle>{s.profile}</CardTitle>
+          <CardDescription>{s.profileHint}</CardDescription>
         </CardHeader>
-        <CardContent>
-          <p className="mb-3 mt-1 text-xs text-muted-foreground">{t.account.languageHint}</p>
-          <Select defaultValue="en">
-            {LANGUAGES.map(([code, name]) => (
-              <option key={code} value={code} disabled={code !== 'en'}>
-                {code === 'en' ? name : `${name} — ${t.account.soon}`}
-              </option>
-            ))}
-          </Select>
+        <CardContent className="gap-6">
+          <ProfilePhoto />
+          <Separator />
+          <NameForm firstName={firstName} lastName={lastName} email={user.email} />
         </CardContent>
       </Card>
+
       <Card>
         <CardHeader>
-          <CardTitle>{t.account.theme}</CardTitle>
+          <CardTitle>{s.password}</CardTitle>
+          <CardDescription>{s.passwordHint}</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="mb-3 mt-1 text-xs text-muted-foreground">{t.account.themeHint}</p>
+          <PasswordForm />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{s.theme}</CardTitle>
+          <CardDescription>{s.themeHint}</CardDescription>
+        </CardHeader>
+        <CardContent>
           <ThemePicker />
         </CardContent>
       </Card>
+
       <div>
         <SignOutButton />
       </div>
