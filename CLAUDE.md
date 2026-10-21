@@ -219,6 +219,13 @@ Built and verified:
 - Roles: admin / manager / teacher / student from IOMAD; admin "Tenants" page (live IOMAD data);
   server-side `requireRole`; sessions refresh role every 5 min.
 - Stack upgraded 2026-10-19 (see Running → Versions).
+- Classes (tested 2026-10-21): a class ("Class 10", "11-A") = Moodle cohort in the school's category
+  (component local_budu). Managers create classes, add students, pick optional class teachers and
+  enrol the class into courses (cohort sync: joining/leaving the class enrols/unenrols); the class
+  page shows each course's handed-in % and average grade; the gradebook filters by class. Teachers:
+  "My courses" (`/courses`, tabs Content | Students — enrol a class or single students) and "My
+  classes" (`/teach/classes`, classes they're class teacher of, read-only; hidden outside a school).
+  Students see their class names on home. Solo teachers/students simply have no classes.
 - School manager (live IOMAD data, tested end to end 2026-10-21 with a fresh school): overview
   (`/school`), people with invites + role changes (`/school/people`), courses (`/school/courses`),
   gradebook, grade-scale setting (`/school/settings`). Invites: new people get a 7-day link
@@ -249,7 +256,8 @@ Not built yet (rough priority):
    Admin screens: people, course deals, platform settings (only "Tenants" exists).
 3. Manager follow-ups: course catalog + approvals (paid courses), schedule on real data, remove
    someone from the school, resend an invite.
-4. Class groups (e.g. "Grade 10-A") and bulk enrolment of a class into a course; timetable on real data.
+4. Timetable per class on real data; lesson completion / progress; removing a single student who
+   came in through a class (today: remove them from the class).
 5. BigBlueButton: real live classes (join URLs), recordings → AI summaries.
 6. Account: change email (needs a confirmation flow); remember the language per user in IOMAD
    (today it's per browser, a cookie).
@@ -258,6 +266,11 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-21 Classes = IOMAD-side Moodle cohorts + cohort enrolment (not app-db), so enrolment stays in
+  IOMAD; class teachers live in the plugin table `local_budu_class_teacher` (db/install.xml +
+  db/upgrade.php) so the plugin can authorise them. Teachers usually teach courses, not classes; a
+  class teacher (optional, several allowed) only follows the class. Students and teachers may be solo
+  (no school) — every class feature is optional and school-only.
 - 2026-10-21 Notifications live in app-db (`notifications`: kind + params, text rendered in the
   reader's language) and are emailed via `entities/notification/server` `notify()`; emails are
   best-effort (logged on failure). A user's language is kept in `user_prefs` (saved on sign-in and on
