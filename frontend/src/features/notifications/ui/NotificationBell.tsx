@@ -168,7 +168,7 @@ function Row({ n, when, onOpen }: { n: AppNotification; when: string; onOpen: ()
       </span>
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span className="flex items-start gap-2">
-          <span className={cn('line-clamp-2 flex-1 text-[13px] leading-snug', n.read ? 'text-muted-foreground' : 'font-semibold text-foreground')}>{title}</span>
+          <span className={cn('line-clamp-2 flex-1 text-[13px] leading-snug', n.read ? 'text-muted-foreground' : 'font-medium text-foreground')}>{title}</span>
           <span className="flex-none pt-0.5 text-[11px] text-muted-foreground tabular-nums">{when}</span>
         </span>
         <span className="line-clamp-2 text-xs leading-relaxed text-muted-foreground">{body}</span>
