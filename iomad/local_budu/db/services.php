@@ -434,4 +434,10 @@ $functions = [
         'description' => 'Add / remove people for a school exam (manager).',
         'type' => 'write',
     ],
+    'local_budu_set_course_image' => [
+        'classname' => \local_budu\external\courses::class,
+        'methodname' => 'set_course_image',
+        'description' => 'Set or remove a course cover image (teacher).',
+        'type' => 'write',
+    ],
 ];

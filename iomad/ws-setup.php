@@ -96,6 +96,7 @@ const FUNCTIONS = [
     'local_budu_exam_space',
     'local_budu_exam_audience',
     'local_budu_set_exam_audience',
+    'local_budu_set_course_image',
 ];
 const CAPABILITIES = [
     'webservice/rest:use',

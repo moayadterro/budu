@@ -139,7 +139,22 @@ class courses extends external_api {
             'visible' => new external_value(PARAM_BOOL, 'Published'),
             'lessons' => new external_value(PARAM_INT, 'Number of lessons'),
             'timemodified' => new external_value(PARAM_INT, 'Last change'),
+            'image' => new external_value(PARAM_INT, 'Cover image file id, 0 = none', VALUE_DEFAULT, 0),
         ];
+    }
+
+    /** The course's cover image (Moodle's course image: course/overviewfiles); 0 = none. */
+    public static function image_id(int $courseid): int {
+        $ctx = \context_course::instance($courseid, IGNORE_MISSING);
+        if (!$ctx) {
+            return 0;
+        }
+        foreach (get_file_storage()->get_area_files($ctx->id, 'course', 'overviewfiles', 0, 'id', false) as $f) {
+            if (str_starts_with((string)$f->get_mimetype(), 'image/')) {
+                return (int)$f->get_id();
+            }
+        }
+        return 0;
     }
 
     private static function lesson_count(int $courseid): int {
@@ -175,7 +190,7 @@ class courses extends external_api {
             }
             if (has_capability('moodle/course:manageactivities', \context_course::instance($c->id), $p['userid'])) {
                 $out[] = ['id' => $c->id, 'fullname' => $c->fullname, 'summary' => $c->summary, 'visible' => (bool)$c->visible,
-                    'lessons' => self::lesson_count($c->id), 'timemodified' => $c->timemodified];
+                    'lessons' => self::lesson_count($c->id), 'timemodified' => $c->timemodified, 'image' => self::image_id($c->id)];
             }
         }
         return $out;
@@ -319,6 +334,7 @@ class courses extends external_api {
         return [
             'id' => $course->id, 'fullname' => $course->fullname, 'summary' => $course->summary, 'visible' => (bool)$course->visible,
             'lessons' => count($lessons), 'timemodified' => $course->timemodified, 'canedit' => $canedit, 'lessonlist' => $lessons,
+            'image' => self::image_id($course->id),
         ];
     }
 
@@ -560,6 +576,41 @@ class courses extends external_api {
         return self::ok();
     }
 
+    // ----- set_course_image ------------------------------------------------
+
+    public static function set_course_image_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'courseid' => new external_value(PARAM_INT, 'Course'),
+            'userid' => new external_value(PARAM_INT, 'Acting Budu user (teacher)'),
+            'draftitemid' => new external_value(PARAM_INT, 'Draft area with the new image; 0 = remove the cover'),
+        ]);
+    }
+
+    /** Set (or remove) the course's cover image. Only images are kept, one at most. */
+    public static function set_course_image(int $courseid, int $userid, int $draftitemid): array {
+        $p = self::validate_parameters(self::set_course_image_parameters(), compact('courseid', 'userid', 'draftitemid'));
+        self::setup();
+        $course = self::editable($p['courseid'], $p['userid']);
+        $ctx = \context_course::instance($course->id);
+        $fs = get_file_storage();
+        $fs->delete_area_files($ctx->id, 'course', 'overviewfiles');
+        if ($p['draftitemid']) {
+            file_save_draft_area_files($p['draftitemid'], $ctx->id, 'course', 'overviewfiles', 0,
+                ['subdirs' => 0, 'maxfiles' => 1, 'accepted_types' => ['.jpg', '.jpeg', '.png', '.webp', '.gif']]);
+            foreach ($fs->get_area_files($ctx->id, 'course', 'overviewfiles', 0, 'id', false) as $f) {
+                if (!str_starts_with((string)$f->get_mimetype(), 'image/')) {
+                    $f->delete(); // never keep anything but an image
+                }
+            }
+        }
+        \cache_helper::purge_by_event('changesincourse');
+        return ['id' => self::image_id($course->id)];
+    }
+
+    public static function set_course_image_returns(): external_single_structure {
+        return self::ok();
+    }
+
     // ----- delete_item ---------------------------------------------------
 
     public static function delete_item_parameters(): external_function_parameters {
@@ -614,6 +665,20 @@ class courses extends external_api {
             }
             // user/icon URLs: /{usercontext}/user/icon/{theme}/f1 (Moodle picks the stored extension)
             $path = '/' . $file->get_contextid() . '/user/icon/boost/' . pathinfo($file->get_filename(), PATHINFO_FILENAME);
+            return ['allowed' => true, 'path' => $path] + self::file_info($file);
+        }
+        if ($area === 'course/overviewfiles') {
+            // A course cover: public once the course is published (the marketplace shows it to
+            // visitors, userid 0); a draft's cover only to its teachers.
+            $ctx = \context::instance_by_id($file->get_contextid(), IGNORE_MISSING);
+            if (!$ctx || $ctx->contextlevel != CONTEXT_COURSE || !str_starts_with((string)$file->get_mimetype(), 'image/')) {
+                return $no;
+            }
+            $course = get_course($ctx->instanceid);
+            if (!$course->visible && !($p['userid'] && has_capability('moodle/course:manageactivities', $ctx, $p['userid']))) {
+                return $no;
+            }
+            $path = '/' . $ctx->id . '/course/overviewfiles' . $file->get_filepath() . $file->get_filename();
             return ['allowed' => true, 'path' => $path] + self::file_info($file);
         }
         if ($area === 'assignsubmission_file/submission_files') {
