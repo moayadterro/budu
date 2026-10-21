@@ -18,13 +18,13 @@ export function InviteForm() {
   const [state, action] = useActionState(inviteToSchool, idle)
   const form = useRef<HTMLFormElement>(null)
   useEffect(() => {
-    if (state.status === 'created' || state.status === 'added') form.current?.reset()
+    if (state.status === 'created' || state.status === 'invited') form.current?.reset()
   }, [state])
-  const ok = state.status === 'created' || state.status === 'added'
+  const ok = state.status === 'created' || state.status === 'invited'
   return (
     <form ref={form} action={action}>
       {state.status !== 'idle' && (
-        <Alert key={state.at} variant={ok ? 'success' : state.status === 'already' ? 'info' : 'destructive'} className="mb-4">
+        <Alert key={state.at} variant={ok ? 'success' : state.status === 'already' || state.status === 'pending' ? 'info' : 'destructive'} className="mb-4">
           {s.invited[state.status]}
         </Alert>
       )}

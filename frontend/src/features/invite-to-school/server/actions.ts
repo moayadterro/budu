@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { notify } from '@/entities/notification/server'
 import { requireRole } from '@/entities/session/server'
-import { addToSchool, getTenantName, schoolPeople, setSchoolRole, type SchoolRole } from '@/entities/tenant/server'
+import { addToSchool, createInvite, getTenantName, schoolPeople, setSchoolRole, type SchoolRole } from '@/entities/tenant/server'
 import { createInvitedUser, getAccount } from '@/entities/user/server'
 import { formText } from '@/shared/lib/form'
 import { dirOf } from '@/shared/i18n'
@@ -12,15 +12,16 @@ import { composeMail } from '@/shared/server/mail-layout'
 import { appUrl, sendMail } from '@/shared/server/mailer'
 import { issueToken } from '@/shared/server/tokens'
 
-export type InviteState = { status: 'idle' } | { status: 'created' | 'added' | 'already' | 'invalid' | 'server'; at: number }
+export type InviteState = { status: 'idle' } | { status: 'created' | 'invited' | 'pending' | 'already' | 'invalid' | 'server'; at: number }
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const ROLES: SchoolRole[] = ['teacher', 'student', 'manager']
 const INVITE_DAYS = 7
 
 /**
- * Manager invites someone into their school. Existing Budu account → added at once and notified.
- * New person → a suspended account in IOMAD, added to the school, and an emailed link to choose a password.
+ * Manager invites someone into their school. Existing Budu account → a pending invitation they must
+ * accept (bell + email); they join only then. New person → a suspended account in IOMAD added to the
+ * school, and an emailed link to choose a password (choosing it = accepting).
  */
 export async function inviteToSchool(_prev: InviteState, form: FormData): Promise<InviteState> {
   const user = await requireRole('manager')
@@ -37,15 +38,16 @@ export async function inviteToSchool(_prev: InviteState, form: FormData): Promis
     if (account.found) {
       const people = await schoolPeople(user.userId, user.companyId)
       if (people.some((p) => p.id === account.id)) return { status: 'already', at }
-      await addToSchool(user.companyId, account.id, role)
+      const created = await createInvite(user.companyId, account.id, role, { id: user.userId, name: user.name })
+      if (!created) return { status: 'pending', at }
       await notify(
         [{ id: account.id, email: account.email, name: `${account.firstname} ${account.lastname}`.trim() }],
-        'addedToSchool',
+        'schoolInvite',
         { school, by: user.name, role },
-        '/',
+        '/invites',
       )
       revalidatePath('/', 'layout')
-      return { status: 'added', at }
+      return { status: 'invited', at }
     }
 
     const id = await createInvitedUser({ email, firstname, lastname })

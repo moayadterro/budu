@@ -70,3 +70,12 @@ export async function createInvitedUser(p: { email: string; firstname: string; l
   await updateUser(user.id, { suspended: 1 }) // until they choose a password via the invite link
   return user.id
 }
+
+/** A user's id, email and full name by IOMAD id (null if gone). */
+export async function getUserById(id: number): Promise<{ id: number; email: string; name: string } | null> {
+  const [u] = await iomadCall<Array<{ id: number; email: string; fullname: string }>>(defaultInstance(), 'core_user_get_users_by_field', {
+    field: 'id',
+    values: [id],
+  })
+  return u ? { id: u.id, email: u.email, name: u.fullname } : null
+}

@@ -369,6 +369,17 @@ export const ru: typeof en = {
         title: (p: Record<string, string>) => `Вы в классе «${p.class}»`,
         body: (p: Record<string, string>) => `${p.by} добавил(а) вас в класс «${p.class}» в «${p.school}».`,
       },
+      schoolInvite: {
+        title: (p: Record<string, string>) => `«${p.school}» приглашает вас`,
+        body: (p: Record<string, string>) => `${p.by} приглашает вас в «${p.school}» на Budu. Роль: ${p.role}. Примите или отклоните приглашение.`,
+      },
+      inviteAnswered: {
+        title: (p: Record<string, string>) => (p.answer === 'accepted' ? `${p.name} в «${p.school}»` : `${p.name} отклонил(а) приглашение`),
+        body: (p: Record<string, string>) =>
+          p.answer === 'accepted'
+            ? `${p.name} принял(а) приглашение и теперь в «${p.school}». Роль: ${p.role}.`
+            : `${p.name} отклонил(а) приглашение в «${p.school}».`,
+      },
       addedToSchool: {
         title: (p: Record<string, string>) => `Вы в школе «${p.school}»`,
         body: (p: Record<string, string>) => `${p.by} добавил(а) вас в «${p.school}» как: ${p.role}.`,
@@ -402,7 +413,8 @@ export const ru: typeof en = {
     sending: 'Отправляем…',
     invited: {
       created: '✓ Приглашение отправлено на почту',
-      added: '✓ Добавлен(а) в школу — уведомление отправлено',
+      invited: '✓ Приглашение отправлено — человек вступит, когда примет его',
+      pending: 'У этого человека уже есть приглашение, ждём ответа.',
       already: 'Этот человек уже в вашей школе.',
       invalid: 'Заполните все поля и укажите правильную почту.',
       server: 'Что-то пошло не так. Попробуйте ещё раз.',
@@ -491,6 +503,23 @@ export const ru: typeof en = {
     pickClass: 'Выберите класс',
     classFilter: 'Класс',
     allStudents: 'Все ученики',
+  },
+
+  invites: {
+    title: 'Приглашения',
+    sub: 'Школы, которые вас пригласили. Вы вступите, только если примете приглашение.',
+    empty: 'Сейчас приглашений нет.',
+    from: (p: { school: string; role: string; by: string }) => `${p.by} приглашает вас в «${p.school}». Роль: ${p.role}.`,
+    accept: 'Принять',
+    decline: 'Отклонить',
+    accepted: (school: string) => `✓ Вы в «${school}»`,
+    declined: 'Приглашение отклонено',
+    banner: (school: string) => `«${school}» приглашает вас.`,
+    view: 'Посмотреть приглашение',
+    pendingTitle: 'Ждут ответа',
+    pendingSub: 'Приглашения людям, у которых уже есть аккаунт Budu.',
+    cancel: 'Отменить приглашение',
+    confirmCancel: 'Отменить?',
   },
 
   explore: {

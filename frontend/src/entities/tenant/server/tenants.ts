@@ -132,3 +132,101 @@ export async function isSchool(companyId: number | null): Promise<boolean> {
   ])
   return row?.kind === 'school'
 }
+
+// ----- invitations (existing accounts must accept before joining a school) -----
+
+export type SchoolInvite = {
+  id: number
+  companyId: number
+  school: string
+  userId: number
+  role: SchoolRole
+  invitedBy: string
+  invitedById: number | null
+  /** unix seconds */
+  createdAt: number
+}
+
+type InviteRow = {
+  id: string
+  company_id: number
+  name: string | null
+  iomad_user_id: number
+  role: SchoolRole
+  invited_by: string
+  invited_by_id: number | null
+  created: number
+}
+const toInvite = (r: InviteRow): SchoolInvite => ({
+  id: Number(r.id),
+  companyId: r.company_id,
+  school: r.name ?? '',
+  userId: r.iomad_user_id,
+  role: r.role,
+  invitedBy: r.invited_by,
+  invitedById: r.invited_by_id,
+  createdAt: r.created,
+})
+const INVITE_SELECT = `SELECT i.id, i.company_id, t.name, i.iomad_user_id, i.role, i.invited_by, i.invited_by_id, extract(epoch FROM i.created_at)::int AS created
+    FROM school_invites i LEFT JOIN tenants t ON t.iomad_url = i.iomad_url AND t.company_id = i.company_id`
+
+/** Creates a pending invitation; false if one is already pending for this person and school. */
+export async function createInvite(
+  companyId: number,
+  userId: number,
+  role: SchoolRole,
+  invitedBy: { id: number; name: string },
+): Promise<boolean> {
+  const url = defaultInstance().url
+  const pending = await query(`SELECT 1 FROM school_invites WHERE iomad_url = $1 AND company_id = $2 AND iomad_user_id = $3 AND status = 'pending'`, [
+    url,
+    companyId,
+    userId,
+  ])
+  if (pending.length) return false
+  await query(
+    `INSERT INTO school_invites (iomad_url, company_id, iomad_user_id, role, invited_by, invited_by_id) VALUES ($1, $2, $3, $4, $5, $6)`,
+    [url, companyId, userId, role, invitedBy.name, invitedBy.id],
+  )
+  return true
+}
+
+/** Invitations waiting for this person's answer. */
+export async function invitesFor(userId: number): Promise<SchoolInvite[]> {
+  const rows = await query<InviteRow>(`${INVITE_SELECT} WHERE i.iomad_user_id = $1 AND i.status = 'pending' AND i.iomad_url = $2 ORDER BY i.created_at DESC`, [
+    userId,
+    defaultInstance().url,
+  ])
+  return rows.map(toInvite)
+}
+
+/** The school's invitations still waiting for an answer. */
+export async function pendingInvitesOf(companyId: number): Promise<SchoolInvite[]> {
+  const rows = await query<InviteRow>(`${INVITE_SELECT} WHERE i.company_id = $1 AND i.status = 'pending' AND i.iomad_url = $2 ORDER BY i.created_at DESC`, [
+    companyId,
+    defaultInstance().url,
+  ])
+  return rows.map(toInvite)
+}
+
+/**
+ * The invited person answers. Accept → they join the school in IOMAD with the invited role, and their
+ * sessions re-read their role on the next request. Returns the invite, or null if not theirs / not pending.
+ */
+export async function answerInvite(userId: number, inviteId: number, accept: boolean): Promise<SchoolInvite | null> {
+  const [row] = await query<InviteRow>(`${INVITE_SELECT} WHERE i.id = $1 AND i.iomad_user_id = $2 AND i.status = 'pending'`, [inviteId, userId])
+  if (!row) return null
+  const invite = toInvite(row)
+  if (accept) await addToSchool(invite.companyId, userId, invite.role)
+  await query(`UPDATE school_invites SET status = $2, responded_at = now() WHERE id = $1`, [inviteId, accept ? 'accepted' : 'declined'])
+  if (accept) await query(`UPDATE sessions SET refreshed_at = 'epoch' WHERE iomad_user_id = $1`, [userId])
+  return invite
+}
+
+/** Manager withdraws a pending invitation of their school. */
+export async function cancelInvite(companyId: number, inviteId: number) {
+  await query(`UPDATE school_invites SET status = 'cancelled', responded_at = now() WHERE id = $1 AND company_id = $2 AND status = 'pending'`, [
+    inviteId,
+    companyId,
+  ])
+}

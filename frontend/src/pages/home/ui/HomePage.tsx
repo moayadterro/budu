@@ -13,7 +13,8 @@ import { myClasses } from '@/entities/school-class/server'
 import { STUDENT, SUBJECTS, TIMES, TODAY, WEEK, isLive } from '@/shared/mock'
 import { LocalTime } from '@/shared/ui/local-time'
 import { cn } from '@/shared/lib/cn'
-import { getGradeScale, getTenantName, isSchool } from '@/entities/tenant/server'
+import { getGradeScale, getTenantName, invitesFor, isSchool } from '@/entities/tenant/server'
+import { Alert, AlertDescription } from '@/shared/ui/alert'
 import { getLocale, getT } from '@/shared/i18n/server'
 
 /** Student dashboard. */
@@ -22,11 +23,12 @@ export async function HomePage() {
   const user = await requireRole('student')
   const scale = await getGradeScale(user.companyId)
   const firstName = user.name.split(' ')[0] ?? ''
-  const [courses, homework, classes, locale] = await Promise.all([
+  const [courses, homework, classes, locale, invites] = await Promise.all([
     myCourses(user.userId),
     myHomework(user.userId),
     myClasses(user.userId),
     getLocale(),
+    invitesFor(user.userId),
   ])
   const today = new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date())
   // "School · Class 10": their school and their class (at most one); solo students get no line
@@ -40,6 +42,16 @@ export async function HomePage() {
   return (
     <>
       <ScreenHead eyebrow={today} title={t.home.hi(firstName)} sub={classLine} />
+      {invites.length > 0 && (
+        <Alert variant="info" className="mb-6">
+          <AlertDescription className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            {t.invites.banner(invites[0].school)}
+            <Link href="/invites" className="font-medium underline underline-offset-4">
+              {t.invites.view}
+            </Link>
+          </AlertDescription>
+        </Alert>
+      )}
 
       <div className="grid items-start gap-6 lg:grid-cols-[1.5fr_1fr]">
         <div className="flex min-w-0 flex-col gap-6">

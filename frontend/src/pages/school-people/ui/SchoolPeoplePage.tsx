@@ -1,6 +1,9 @@
 import Link from 'next/link'
 import { requireRole } from '@/entities/session/server'
-import { schoolPeople, type SchoolRole } from '@/entities/tenant/server'
+import { pendingInvitesOf, schoolPeople, type SchoolRole } from '@/entities/tenant/server'
+import { getUserById } from '@/entities/user/server'
+import { cancelInviteAction } from '@/features/respond-to-invite'
+import { ConfirmButton } from '@/shared/ui/confirm-button'
 import { InviteForm, RoleSelect } from '@/features/invite-to-school'
 import { Badge } from '@/shared/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card'
@@ -19,6 +22,8 @@ export async function SchoolPeoplePage({ searchParams }: { searchParams: Promise
   const filter = (['teacher', 'student', 'manager'] as SchoolRole[]).find((r) => r === role) ?? null
   const people = user.companyId ? await schoolPeople(user.userId, user.companyId) : []
   const shown = filter ? people.filter((p) => p.role === filter) : people
+  const invites = user.companyId ? await pendingInvitesOf(user.companyId) : []
+  const invitees = await Promise.all(invites.map(async (i) => ({ invite: i, person: await getUserById(i.userId) })))
 
   return (
     <div className="flex max-w-4xl flex-col gap-6">
@@ -32,6 +37,33 @@ export async function SchoolPeoplePage({ searchParams }: { searchParams: Promise
           <InviteForm />
         </CardContent>
       </Card>
+
+      {invitees.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t.invites.pendingTitle}</CardTitle>
+            <CardDescription>{t.invites.pendingSub}</CardDescription>
+          </CardHeader>
+          <CardContent className="gap-1">
+            {invitees.map(({ invite, person }) => (
+              <Item key={invite.id} size="sm" className="px-0">
+                <ItemContent className="min-w-0">
+                  <ItemTitle className="truncate">{person?.name ?? '—'}</ItemTitle>
+                  <ItemDescription className="truncate">{person?.email}</ItemDescription>
+                </ItemContent>
+                <ItemActions>
+                  <Badge variant="warning">{s.pending}</Badge>
+                  <Badge variant="secondary">{t.role[invite.role]}</Badge>
+                  <form action={cancelInviteAction}>
+                    <input type="hidden" name="inviteId" value={invite.id} />
+                    <ConfirmButton label={t.invites.cancel} confirmLabel={t.invites.confirmCancel} />
+                  </form>
+                </ItemActions>
+              </Item>
+            ))}
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>

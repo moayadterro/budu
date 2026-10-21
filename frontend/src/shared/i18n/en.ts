@@ -362,6 +362,15 @@ export const en = {
         title: (p: Record<string, string>) => `You joined ${p.class}`,
         body: (p: Record<string, string>) => `${p.by} added you to the class ${p.class} at ${p.school}.`,
       },
+      schoolInvite: {
+        title: (p: Record<string, string>) => `${p.school} invites you to join`,
+        body: (p: Record<string, string>) => `${p.by} invites you to join ${p.school} on Budu as ${p.role}. Accept or decline the invitation.`,
+      },
+      inviteAnswered: {
+        title: (p: Record<string, string>) => (p.answer === 'accepted' ? `${p.name} joined ${p.school}` : `${p.name} declined the invitation`),
+        body: (p: Record<string, string>) =>
+          p.answer === 'accepted' ? `${p.name} accepted your invitation and joined ${p.school} as ${p.role}.` : `${p.name} declined the invitation to ${p.school}.`,
+      },
       addedToSchool: {
         title: (p: Record<string, string>) => `You joined ${p.school}`,
         body: (p: Record<string, string>) => `${p.by} added you to ${p.school} as ${p.role}.`,
@@ -395,7 +404,8 @@ export const en = {
     sending: 'Sending…',
     invited: {
       created: '✓ Invite sent by email',
-      added: '✓ Added to your school — they’ve been notified',
+      invited: '✓ Invitation sent — they join when they accept',
+      pending: 'This person already has an invitation waiting for an answer.',
       already: 'This person is already in your school.',
       invalid: 'Fill in every field with a valid email.',
       server: 'Something went wrong. Please try again.',
@@ -484,6 +494,23 @@ export const en = {
     pickClass: 'Choose a class',
     classFilter: 'Class',
     allStudents: 'All students',
+  },
+
+  invites: {
+    title: 'Invitations',
+    sub: 'Schools that invited you. You join only if you accept.',
+    empty: 'No invitations right now.',
+    from: (p: { school: string; role: string; by: string }) => `${p.by} invites you to join ${p.school} as ${p.role}.`,
+    accept: 'Accept',
+    decline: 'Decline',
+    accepted: (school: string) => `✓ You joined ${school}`,
+    declined: 'Invitation declined',
+    banner: (school: string) => `${school} invited you to join.`,
+    view: 'View invitation',
+    pendingTitle: 'Waiting for an answer',
+    pendingSub: 'Invitations sent to people who already have a Budu account.',
+    cancel: 'Cancel invite',
+    confirmCancel: 'Cancel?',
   },
 
   explore: {

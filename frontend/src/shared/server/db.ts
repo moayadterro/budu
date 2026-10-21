@@ -58,6 +58,22 @@ CREATE TABLE IF NOT EXISTS notifications (
 );
 CREATE INDEX IF NOT EXISTS notifications_user ON notifications (iomad_user_id, created_at DESC);
 
+-- invitations into a school for people who already have an account: they join only when they accept
+CREATE TABLE IF NOT EXISTS school_invites (
+  id            bigserial PRIMARY KEY,
+  iomad_url     text NOT NULL,
+  company_id    integer NOT NULL,
+  iomad_user_id integer NOT NULL,
+  role          text NOT NULL,                 -- manager | teacher | student
+  invited_by    text NOT NULL,                 -- inviting manager's name (for the invitation text)
+  status        text NOT NULL DEFAULT 'pending', -- pending | accepted | declined | cancelled
+  created_at    timestamptz NOT NULL DEFAULT now(),
+  responded_at  timestamptz
+);
+CREATE INDEX IF NOT EXISTS school_invites_user ON school_invites (iomad_user_id, status);
+CREATE INDEX IF NOT EXISTS school_invites_company ON school_invites (company_id, status);
+ALTER TABLE school_invites ADD COLUMN IF NOT EXISTS invited_by_id integer;   -- told when they answer
+
 -- per-user preferences kept outside IOMAD (UI language: used for emails and notifications)
 CREATE TABLE IF NOT EXISTS user_prefs (
   iomad_user_id integer PRIMARY KEY,

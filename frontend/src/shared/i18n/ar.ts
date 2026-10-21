@@ -369,6 +369,15 @@ export const ar: typeof en = {
         title: (p: Record<string, string>) => `انضممت إلى ${p.class}`,
         body: (p: Record<string, string>) => `أضافك ${p.by} إلى الفصل ${p.class} في ${p.school}.`,
       },
+      schoolInvite: {
+        title: (p: Record<string, string>) => `${p.school} تدعوك للانضمام`,
+        body: (p: Record<string, string>) => `يدعوك ${p.by} للانضمام إلى ${p.school} على Budu بصفة ${p.role}. اقبل الدعوة أو ارفضها.`,
+      },
+      inviteAnswered: {
+        title: (p: Record<string, string>) => (p.answer === 'accepted' ? `انضم ${p.name} إلى ${p.school}` : `رفض ${p.name} الدعوة`),
+        body: (p: Record<string, string>) =>
+          p.answer === 'accepted' ? `قبل ${p.name} دعوتك وانضم إلى ${p.school} بصفة ${p.role}.` : `رفض ${p.name} الدعوة إلى ${p.school}.`,
+      },
       addedToSchool: {
         title: (p: Record<string, string>) => `انضممت إلى ${p.school}`,
         body: (p: Record<string, string>) => `أضافك ${p.by} إلى ${p.school} بصفة ${p.role}.`,
@@ -402,7 +411,8 @@ export const ar: typeof en = {
     sending: 'جارٍ الإرسال…',
     invited: {
       created: '✓ أُرسلت الدعوة بالبريد',
-      added: '✓ أُضيف إلى مدرستك — تم إشعاره',
+      invited: '✓ أُرسلت الدعوة — سينضم عندما يقبلها',
+      pending: 'لدى هذا الشخص دعوة بانتظار الرد بالفعل.',
       already: 'هذا الشخص موجود في مدرستك بالفعل.',
       invalid: 'املأ كل الحقول ببريد إلكتروني صحيح.',
       server: 'حدث خطأ ما. حاول مرة أخرى.',
@@ -491,6 +501,23 @@ export const ar: typeof en = {
     pickClass: 'اختر فصلًا',
     classFilter: 'الفصل',
     allStudents: 'كل الطلاب',
+  },
+
+  invites: {
+    title: 'الدعوات',
+    sub: 'المدارس التي دعتك. لا تنضم إلا إذا قبلت.',
+    empty: 'لا توجد دعوات الآن.',
+    from: (p: { school: string; role: string; by: string }) => `يدعوك ${p.by} للانضمام إلى ${p.school} بصفة ${p.role}.`,
+    accept: 'قبول',
+    decline: 'رفض',
+    accepted: (school: string) => `✓ انضممت إلى ${school}`,
+    declined: 'تم رفض الدعوة',
+    banner: (school: string) => `${school} تدعوك للانضمام.`,
+    view: 'عرض الدعوة',
+    pendingTitle: 'بانتظار الرد',
+    pendingSub: 'دعوات أُرسلت لأشخاص لديهم حساب Budu بالفعل.',
+    cancel: 'إلغاء الدعوة',
+    confirmCancel: 'تأكيد الإلغاء؟',
   },
 
   explore: {
