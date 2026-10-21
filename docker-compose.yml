@@ -39,12 +39,14 @@ services:
       SMTP_PASSWORD: ${SMTP_PASSWORD:-}
       SMTP_SECURE: ${SMTP_SECURE:-false}
       NEXT_PUBLIC_BBB_URL: ${BBB_URL:-}
+      UPLOAD_DIR: /uploads
       DATABASE_URL: postgres://${APP_DB_USER:?set in .env}:${APP_DB_PASSWORD:?set in .env}@app-db:5432/${APP_DB_NAME:?set in .env}
     ports:
       - '3000:3000'
     volumes:
       - ./frontend:/app          # live reload in dev
       - /app/node_modules        # keep the image's node_modules
+      - upload-chunks:/uploads   # resumable uploads in progress (tus); finished files go to IOMAD
     depends_on:
       - app-db
       - mailpit
@@ -110,3 +112,4 @@ volumes:
   app-db-data-18:
   iomad-db-data:
   iomad-moodledata:
+  upload-chunks:    # unfinished resumable uploads (removed after a day)
