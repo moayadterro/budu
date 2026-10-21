@@ -439,8 +439,10 @@ Not built yet (rough priority):
 - Moodle 4.5: `question_get_default_category($contextid)` has no "create" flag — use
   `question_make_default_categories([$ctx])` when it returns false. A quiz's pass mark lives on its
   grade item, not the quiz row. `quiz_update_events($quiz)` — the 2nd arg is an override, not the cm.
-- Response summaries (`get_response_summary`) come in Moodle's language ("True"), and gapselect ones
-  look like "{mass} {acceleration}" — the review strips the braces.
+- Response summaries (`get_response_summary`) are in Moodle's language ("True"): true/false answers are
+  sent as values and translated in the UI; gapselect ones look like "{mass} {acceleration}" (braces
+  stripped).
+- shadcn `CardContent` is `flex-col`: a row inside it needs `flex-row` explicitly.
 - `<p>` can't contain shadcn NativeSelect (it renders a `<div>` wrapper) → hydration error.
 - Moodle `page_add_instance()` copies `$data->page['text']` into `content` only when given a form —
   from the API set `content`/`contentformat` yourself or pages are saved empty.

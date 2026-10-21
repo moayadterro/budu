@@ -1125,11 +1125,19 @@ class quizzes extends external_api {
             $qa = $attemptobj->get_question_attempt($slot);
             $q = $qa->get_question();
             $state = $qa->get_state();
+            $response = (string)($qa->get_response_summary() ?? '');
+            $right = $showright ? (string)($qa->get_right_answer_summary() ?? '') : '';
+            if ($q->get_type_name() === 'truefalse') {
+                // Moodle's summary is a word in Moodle's language ("True"): send a value, the UI translates it
+                $given = $qa->get_last_qt_data();
+                $response = isset($given['answer']) ? ($given['answer'] ? 'true' : 'false') : '';
+                $right = $showright ? ($q->rightanswer ? 'true' : 'false') : '';
+            }
             $questions[] = [
                 'slot' => (int)$slot, 'type' => $q->get_type_name(),
                 'text' => $plain($q->questiontext, $q->questiontextformat),
-                'response' => (string)($qa->get_response_summary() ?? ''),
-                'rightanswer' => $showright ? (string)($qa->get_right_answer_summary() ?? '') : '',
+                'response' => $response,
+                'rightanswer' => $right,
                 'mark' => $showqmarks && $qa->get_mark() !== null ? (float)$qa->get_mark() : -1.0,
                 'maxmark' => (float)$qa->get_max_mark(),
                 'result' => $showcorrect ? ($state->is_graded() ? $state->get_feedback_class() : ($state == \question_state::$needsgrading ? 'needsgrading' : 'unanswered')) : '',

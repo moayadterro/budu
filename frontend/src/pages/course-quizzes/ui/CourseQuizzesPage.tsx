@@ -45,7 +45,7 @@ export async function CourseQuizzesPage({ params }: { params: Promise<{ courseId
           <div className="flex flex-col gap-3">
             {quizzes.map((q) => (
               <Card key={q.id} size="sm">
-                <CardContent className="flex flex-wrap items-center gap-3">
+                <CardContent className="flex flex-row flex-wrap items-center gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <Link href={`/courses/${course.id}/quizzes/${q.id}`} className="font-medium hover:underline">

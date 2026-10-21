@@ -8,8 +8,12 @@ import { Card, CardContent } from '@/shared/ui/card'
 import { LocalTime } from '@/shared/ui/local-time'
 import { useT } from '@/shared/i18n'
 
-/** Moodle summarises missing-word answers as "{mass} {acceleration}": show the words. */
-const words = (type: string, text: string) => (type === 'gapselect' ? text.replace(/\{([^}]*)\}/g, '$1') : text)
+/**
+ * An answer as the reader should see it: true / false come as values (shown in the UI language);
+ * missing-word answers come as "{mass} {acceleration}" (shown as the words).
+ */
+const answerText = (type: string, text: string, tf: { true: string; false: string }) =>
+  type === 'truefalse' && (text === 'true' || text === 'false') ? tf[text] : type === 'gapselect' ? text.replace(/\{([^}]*)\}/g, '$1') : text
 
 const resultVariant = { correct: 'success', partiallycorrect: 'warning', incorrect: 'destructive', needsgrading: 'secondary', unanswered: 'secondary' } as const
 
@@ -24,8 +28,9 @@ export function QuizReview({ review, gradeLabel, gradeForms }: { review: Review;
   return (
     <div className="flex flex-col gap-4">
       <Card>
-        <CardContent className="flex flex-wrap items-center gap-4">
-          <div className="min-w-0 flex-1">
+        {/* one row: what it is on the start side, the grade on the end side */}
+        <CardContent className="flex flex-row flex-wrap items-center justify-between gap-4">
+          <div className="min-w-0 flex-1 text-start">
             <div className="text-sm text-muted-foreground">
               {s.submitted} <LocalTime seconds={review.submittedAt} />
             </div>
@@ -54,12 +59,12 @@ export function QuizReview({ review, gradeLabel, gradeForms }: { review: Review;
             <dl className="grid gap-2 text-sm">
               <div className={cn('rounded-md border-s-2 bg-muted/40 px-3 py-2', q.result === 'correct' ? 'border-success' : q.result === 'incorrect' ? 'border-destructive' : 'border-border')}>
                 <dt className="text-xs text-muted-foreground">{s.yourAnswer}</dt>
-                <dd className="whitespace-pre-line">{q.response ? words(q.type, q.response) : <span className="text-muted-foreground">{s.noAnswer}</span>}</dd>
+                <dd className="whitespace-pre-line">{q.response ? answerText(q.type, q.response, t.quiz.q) : <span className="text-muted-foreground">{s.noAnswer}</span>}</dd>
               </div>
               {q.rightAnswer && (
                 <div className="rounded-md border-s-2 border-success bg-success/5 px-3 py-2">
                   <dt className="text-xs text-muted-foreground">{s.rightAnswer}</dt>
-                  <dd>{words(q.type, q.rightAnswer)}</dd>
+                  <dd>{answerText(q.type, q.rightAnswer, t.quiz.q)}</dd>
                 </div>
               )}
               {q.explanation && (
