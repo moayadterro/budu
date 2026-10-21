@@ -38,35 +38,39 @@ export function PublishToggle({ course }: { course: Course }) {
       <Badge variant="success">{s.published}</Badge>
       <p className="text-sm text-muted-foreground">{s.publishedHint}</p>
       {course.changes > 0 && (
-        <div className="flex w-full flex-col gap-2 rounded-lg border border-warning/40 bg-warning/10 p-3">
-          <p className="text-sm font-medium">{s.changes(course.changes)}</p>
-          <p className="text-xs text-muted-foreground">{s.changesHint}</p>
+        <div className="flex w-full flex-col gap-3 rounded-lg bg-muted p-3">
+          <p className="flex items-center gap-2 text-sm font-medium">
+            <span className="size-2 flex-none rounded-full bg-warning" aria-hidden />
+            {s.changes(course.changes)}
+          </p>
           <form action={publishChangesAction}>
             <input type="hidden" name="courseId" value={course.id} />
             <SubmitButton label={s.publishChanges} pendingLabel={s.saving} className="w-full" />
           </form>
-          <form action={discardChangesAction}>
+          <form action={discardChangesAction} className="-mt-1 self-center">
             <input type="hidden" name="courseId" value={course.id} />
             <ConfirmButton
+              variant="link"
               icon="undo"
               label={s.discardChanges}
               confirmLabel={s.discardTitle}
               description={s.discardDesc}
               keepLabel={s.keepEditing}
-              className="w-full"
+              className="text-muted-foreground"
             />
           </form>
         </div>
       )}
-      <form action={setCoursePublished} className="w-full">
+      <form action={setCoursePublished} className="self-center">
         {details}
         <input type="hidden" name="published" value="0" />
         <ConfirmButton
+          variant="link"
           icon="eyeOff"
           label={s.unpublish}
           confirmLabel={s.unpublishTitle(course.title)}
           description={course.changes > 0 ? `${s.unpublishDesc} ${s.unpublishApplies}` : s.unpublishDesc}
-          className="w-full"
+          className="text-muted-foreground"
         />
       </form>
     </div>

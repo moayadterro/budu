@@ -89,11 +89,13 @@ Unbuilt screens stay in `shared/config/nav.ts` with `href: null` (rendered disab
   `CardContent` — a bare `<Card>` has no horizontal padding and is `flex-col gap-6`), Item, Empty,
   Sidebar, Badge, Alert, Button (`asChild` for links). Budu-only variants added to generated files:
   Badge `success|warning|info|live`, Alert `success|info`, Button `highlight` (amber CTA).
-  Dangerous actions (delete, remove, cancel, reject) ALWAYS use `ConfirmButton`: a red button that
-  opens an iOS/macOS-style alert — compact centred card, the action's `icon` in a red circle, a title
+  Dangerous actions (delete, remove, cancel, reject) ALWAYS use `ConfirmButton`: a calm NEUTRAL
+  button (outline / link / ghost icon; red only on hover) that opens an iOS/macOS-style alert — compact centred card, the action's `icon` in a red circle, a title
   that NAMES the thing ("Remove Class 10 from “Physics 101”?" — never just "Remove?"), the
   consequence (`description`), then two big stacked buttons: solid red action (icon + verb) and
   "Cancel" (focused). When the action itself is a cancel, pass `keepLabel` ("Keep the invitation").
+  Red is only for the point of no return (the alert's final button, a menu's Delete item) — owner:
+  red everywhere looks alarming. One primary (green) action per card; secondary ones as quiet links.
   Lists with many rows (lessons, lesson items): no red button per row — put the row's actions in a
   quiet "⋯" `MoreMenu` (ordinary actions, a divider, then the red one, which opens `ConfirmDialog`).
   Our own helpers in shared/ui: `Field`, `SubmitButton`, `ConfirmButton`, `PasswordInput`,

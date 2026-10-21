@@ -13,12 +13,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from './alert-dialog'
+import { cn } from '@/shared/lib/cn'
 import { Button } from './button'
 import { Icon, type IconName } from './icon'
 
 /**
- * A dangerous action (delete, remove, cancel, reject): a red button that asks first, in an
- * iOS / macOS-style alert — a compact centred card with the action's icon, a title that NAMES what is
+ * A dangerous action (delete, remove, cancel, reject): a calm, neutral button that asks first, in an
+ * iOS / macOS-style alert (red appears only there — on the final button, the point of no return) — a compact centred card with the action's icon, a title that NAMES what is
  * affected ("Remove Class 10 from this course?"), one line on what happens, and two big stacked
  * buttons: the red action (with its icon) and "Cancel" (focused, so Enter / Esc are safe).
  * Inside a <form> the confirm submits it; or pass `onConfirm`.
@@ -34,7 +35,8 @@ export function ConfirmButton({
   className,
   disabled,
   size = 'sm',
-}: Pick<ComponentProps<typeof Button>, 'className' | 'disabled' | 'size'> & {
+  variant = 'outline',
+}: Pick<ComponentProps<typeof Button>, 'className' | 'disabled' | 'size' | 'variant'> & {
   /** the action, e.g. "Delete" — on the button and on the dialog's confirm */
   label: string
   /** the question naming the thing, e.g. "Delete “Lesson 2”?" — the dialog's title */
@@ -58,13 +60,14 @@ export function ConfirmButton({
       <Button
         ref={trigger}
         type="button"
-        variant={iconOnly ? 'ghost' : 'destructive'}
+        variant={iconOnly ? 'ghost' : variant}
         size={iconOnly ? 'icon-sm' : size}
         disabled={disabled || pending}
         onClick={() => setOpen(true)}
         aria-label={iconOnly ? label : undefined}
         title={iconOnly ? label : undefined}
-        className={iconOnly ? `text-destructive hover:bg-destructive/10 hover:text-destructive ${className ?? ''}` : className}
+        // neutral at rest; a hint of red only on hover
+        className={cn(iconOnly ? 'text-muted-foreground hover:bg-destructive/10 hover:text-destructive' : 'hover:text-destructive', className)}
       >
         {(icon || iconOnly) && <Icon name={glyph} />}
         {!iconOnly && label}
