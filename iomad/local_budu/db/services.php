@@ -146,4 +146,22 @@ $functions = [
         'description' => 'Hand in the answer of the acting student (text and/or files).',
         'type' => 'write',
     ],
+    'local_budu_company_people' => [
+        'classname' => \local_budu\external\school::class,
+        'methodname' => 'company_people',
+        'description' => 'People in a school with their role (managers only).',
+        'type' => 'read',
+    ],
+    'local_budu_company_courses' => [
+        'classname' => \local_budu\external\school::class,
+        'methodname' => 'company_courses',
+        'description' => 'Courses of a school with teachers and counts (managers only).',
+        'type' => 'read',
+    ],
+    'local_budu_set_role' => [
+        'classname' => \local_budu\external\school::class,
+        'methodname' => 'set_role',
+        'description' => 'Change the role of someone in a school (managers only).',
+        'type' => 'write',
+    ],
 ];

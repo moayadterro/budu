@@ -33,13 +33,36 @@ class learning extends external_api {
         return new \moodle_exception('nopermissions', 'error', '', $what);
     }
 
-    /** The course, if $userid teaches it (may grade there). */
+    /** May $userid teach this course: its teacher, or a manager of the school that owns it. */
+    private static function can_teach(\stdClass $course, int $userid): bool {
+        global $DB;
+        if (has_capability('mod/assign:grade', \context_course::instance($course->id), $userid)) {
+            return true;
+        }
+        foreach ($DB->get_fieldset_select('company_course', 'companyid', 'courseid = ?', [$course->id]) as $companyid) {
+            if (school::is_manager((int)$companyid, $userid)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** The course, if $userid may teach it (teacher, or school manager). */
     private static function taught(int $courseid, int $userid): \stdClass {
         $course = get_course($courseid);
-        if ($course->id == SITEID || !has_capability('mod/assign:grade', \context_course::instance($course->id), $userid)) {
+        if ($course->id == SITEID || !self::can_teach($course, $userid)) {
             throw self::deny('teach this course');
         }
         return $course;
+    }
+
+    /** Teachers of a course (editing teacher role) — who gets told about new answers. */
+    private static function teachers_of(int $courseid): array {
+        global $DB;
+        $roleid = $DB->get_field('role', 'id', ['shortname' => 'editingteacher'], MUST_EXIST);
+        return array_values(get_role_users($roleid, \context_course::instance($courseid), false,
+            'u.id, u.firstname, u.lastname, u.email, u.firstnamephonetic, u.lastnamephonetic, u.middlename, u.alternatename',
+            'u.lastname', true));
     }
 
     /** The assign object for a homework, checking it belongs to a course the user teaches. */
@@ -268,8 +291,7 @@ class learning extends external_api {
             WHERE cc.companyid = ?', [$p['companyid']]);
         $rows = [];
         foreach ($courses as $course) {
-            if (($p['courseid'] && $course->id != $p['courseid'])
-                    || !has_capability('mod/assign:grade', \context_course::instance($course->id), $p['userid'])) {
+            if (($p['courseid'] && $course->id != $p['courseid']) || !self::can_teach($course, $p['userid'])) {
                 continue;
             }
             $students = self::students_of($course->id);
@@ -332,6 +354,7 @@ class learning extends external_api {
         }
         return [
             'cmid' => $p['cmid'], 'homework' => $instance->name, 'duedate' => (int)$instance->duedate,
+            'courseid' => (int)$assign->get_course()->id, 'coursename' => $assign->get_course()->fullname,
             'student' => self::person($student), 'text' => $text, 'files' => $files,
         ] + array_diff_key($state, ['submissionid' => 1]);
     }
@@ -341,6 +364,8 @@ class learning extends external_api {
             'cmid' => new external_value(PARAM_INT, 'Homework'),
             'homework' => new external_value(PARAM_TEXT, 'Homework title'),
             'duedate' => new external_value(PARAM_INT, 'Due date, 0 = none'),
+            'courseid' => new external_value(PARAM_INT, 'Course'),
+            'coursename' => new external_value(PARAM_TEXT, 'Course title'),
             'student' => self::person_structure(),
             'text' => new external_value(PARAM_RAW, 'Answer text (plain)'),
             'files' => self::file_structure(),
@@ -612,10 +637,23 @@ class learning extends external_api {
         if (!$ok) {
             throw new \moodle_exception('submissionempty', 'mod_assign', '', null, implode(' ', $notices));
         }
-        return ['id' => $p['cmid']];
+        $course = $assign->get_course();
+        return [
+            'id' => $p['cmid'], 'homework' => $assign->get_instance()->name,
+            'courseid' => (int)$course->id, 'coursename' => $course->fullname,
+            'student' => self::person(\core_user::get_user($p['userid'], '*', MUST_EXIST)),
+            'teachers' => array_map([self::class, 'person'], self::teachers_of($course->id)),
+        ];
     }
 
     public static function submit_returns(): external_single_structure {
-        return new external_single_structure(['id' => new external_value(PARAM_INT, 'Homework')]);
+        return new external_single_structure([
+            'id' => new external_value(PARAM_INT, 'Homework'),
+            'homework' => new external_value(PARAM_TEXT, 'Homework title'),
+            'courseid' => new external_value(PARAM_INT, 'Course'),
+            'coursename' => new external_value(PARAM_TEXT, 'Course title'),
+            'student' => self::person_structure(),
+            'teachers' => new external_multiple_structure(self::person_structure(), 'To notify'),
+        ]);
     }
 }

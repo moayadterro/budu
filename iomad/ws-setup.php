@@ -45,6 +45,10 @@ const FUNCTIONS = [
     'local_budu_my_homework',
     'local_budu_my_submission',
     'local_budu_submit',
+    // School overview for managers (iomad/local_budu/classes/external/school.php).
+    'local_budu_company_people',
+    'local_budu_company_courses',
+    'local_budu_set_role',
 ];
 const CAPABILITIES = [
     'webservice/rest:use',
