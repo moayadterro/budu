@@ -61,7 +61,7 @@ export function ClassDetailsForm({ classId, name, description }: { classId: numb
       </form>
       <form action={deleteClassAction} className="flex flex-wrap items-center gap-3 border-t pt-4">
         <input type="hidden" name="classId" value={classId} />
-        <ConfirmButton label={s.deleteClass} confirmLabel={s.confirmDelete} />
+        <ConfirmButton label={s.deleteClass} confirmLabel={t.confirm.classTitle} description={t.confirm.classDesc} />
         <span className="text-xs text-muted-foreground">{s.deleteHint}</span>
       </form>
     </div>

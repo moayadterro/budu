@@ -6,6 +6,7 @@ import { cn } from '@/shared/lib/cn'
 import { Alert } from '@/shared/ui/alert'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
+import { ConfirmButton } from '@/shared/ui/confirm-button'
 import { Icon } from '@/shared/ui/icon'
 import { Input } from '@/shared/ui/input'
 import { PersonAvatar } from '@/shared/ui/person-avatar'
@@ -150,9 +151,15 @@ export function AudienceEditor({
               </div>
               {!a.member && <Badge variant="info">{s.candidate}</Badge>}
               {a.pending && <Badge variant="secondary">{s.notActivated}</Badge>}
-              <Button variant="ghost" size="icon-sm" disabled={pending} onClick={() => start(() => removeFromAudienceAction(quizId, a.id))} aria-label={s.remove} title={s.remove}>
-                <Icon name="close" />
-              </Button>
+              <ConfirmButton
+                iconOnly
+                icon="close"
+                label={s.remove}
+                confirmLabel={t.confirm.audienceTitle(a.name)}
+                description={t.confirm.audienceDesc}
+                disabled={pending}
+                onConfirm={() => start(() => removeFromAudienceAction(quizId, a.id))}
+              />
             </div>
           ))}
         </div>

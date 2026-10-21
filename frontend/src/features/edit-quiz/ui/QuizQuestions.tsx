@@ -4,6 +4,7 @@ import { useCallback, useState, useTransition } from 'react'
 import type { Question } from '@/entities/quiz'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
+import { ConfirmButton } from '@/shared/ui/confirm-button'
 import { Icon } from '@/shared/ui/icon'
 import { useT } from '@/shared/i18n'
 import { moveQuestionAction } from '../server/actions'
@@ -50,9 +51,7 @@ export function QuizQuestions({ quizId, questions, editable }: { quizId: number;
                   <Button type="button" variant="ghost" size="icon-sm" disabled={pending || i === questions.length - 1} onClick={() => move(q.slot, 1)} aria-label={s.down} title={s.down}>
                     <Icon name="down" />
                   </Button>
-                  <Button type="button" variant="ghost" size="icon-sm" disabled={pending} onClick={() => move(q.slot, 0)} aria-label={s.remove} title={s.remove}>
-                    <Icon name="trash" />
-                  </Button>
+                  <ConfirmButton iconOnly label={s.remove} confirmLabel={t.confirm.questionTitle} disabled={pending} onConfirm={() => move(q.slot, 0)} />
                 </>
               )}
             </div>

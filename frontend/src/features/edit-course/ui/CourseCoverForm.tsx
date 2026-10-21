@@ -4,6 +4,7 @@ import { useActionState, useRef } from 'react'
 import { CourseCover } from '@/entities/course'
 import { Alert } from '@/shared/ui/alert'
 import { Button } from '@/shared/ui/button'
+import { ConfirmButton } from '@/shared/ui/confirm-button'
 import { Icon } from '@/shared/ui/icon'
 import { useT } from '@/shared/i18n'
 import { setCourseCoverAction, type CoverState } from '../server/actions'
@@ -41,9 +42,7 @@ export function CourseCoverForm({ courseId, title, imageId }: { courseId: number
           <form action={action}>
             <input type="hidden" name="courseId" value={courseId} />
             <input type="hidden" name="remove" value="1" />
-            <Button type="submit" variant="ghost" size="sm" className="text-destructive" disabled={pending}>
-              {s.remove}
-            </Button>
+            <ConfirmButton label={s.remove} confirmLabel={t.confirm.coverTitle} disabled={pending} />
           </form>
         )}
       </div>

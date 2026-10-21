@@ -89,6 +89,9 @@ Unbuilt screens stay in `shared/config/nav.ts` with `href: null` (rendered disab
   `CardContent` — a bare `<Card>` has no horizontal padding and is `flex-col gap-6`), Item, Empty,
   Sidebar, Badge, Alert, Button (`asChild` for links). Budu-only variants added to generated files:
   Badge `success|warning|info|live`, Alert `success|info`, Button `highlight` (amber CTA).
+  Dangerous actions (delete, remove, cancel, reject) ALWAYS use `ConfirmButton`: a red button that
+  opens a dialog — title naming what is affected, the consequence (`description`), "Go back" focused,
+  and a solid red (`danger` variant) button named after the action. Never a plain button for these.
   Our own helpers in shared/ui: `Field`, `SubmitButton`, `ConfirmButton`, `PasswordInput`,
   `ScreenHead`, `AuthCard`, `InitialsAvatar`, `LocalTime`, `Icon`.
 - **Icons: Hugeicons** (free set, `@hugeicons/react` + `@hugeicons/core-free-icons`). App code uses

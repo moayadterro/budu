@@ -80,7 +80,7 @@ export async function SchoolPeoplePage({ searchParams }: { searchParams: Promise
                   <Badge variant="secondary">{t.role[invite.role]}</Badge>
                   <form action={cancelInviteAction}>
                     <input type="hidden" name="inviteId" value={invite.id} />
-                    <ConfirmButton label={t.invites.cancel} confirmLabel={t.invites.confirmCancel} />
+                    <ConfirmButton label={t.invites.cancel} confirmLabel={t.confirm.inviteTitle(person?.name ?? '')} description={t.confirm.inviteDesc} />
                   </form>
                 </ItemActions>
               </Item>

@@ -51,7 +51,7 @@ export function ItemActions({
         <form action={deleteItemAction}>
           <input type="hidden" name="courseId" value={courseId} />
           <input type="hidden" name="itemId" value={item.id} />
-          <ConfirmButton label={s.delete} confirmLabel={s.confirmDelete} />
+          <ConfirmButton label={s.delete} confirmLabel={t.confirm.itemTitle} description={t.confirm.itemDesc} />
         </form>
       </ItemActionsSlot>
     </Item>

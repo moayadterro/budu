@@ -1044,6 +1044,25 @@ export const en = {
     },
   },
 
+  confirm: {
+    inviteTitle: (name: string) => `Cancel the invitation for ${name}?`,
+    inviteDesc: 'They won’t be able to accept it. You can invite them again later.',
+    back: 'Go back',
+    cannotUndo: 'This can’t be undone.',
+    lessonTitle: 'Delete this lesson?',
+    lessonDesc: 'Its videos, files, text pages and homework are deleted too — with students’ answers. This can’t be undone.',
+    itemTitle: 'Delete this item?',
+    itemDesc: 'If it’s homework, students’ answers and grades are deleted too. This can’t be undone.',
+    classTitle: 'Delete this class?',
+    classDesc: 'Its students stay in the school and keep their courses; they’re just no longer in this class.',
+    quizDesc: 'Students’ attempts and grades are deleted too. This can’t be undone.',
+    questionTitle: 'Remove this question?',
+    audienceTitle: (name: string) => `Remove ${name} from this exam?`,
+    audienceDesc: 'They won’t see it any more. If they already took it, their answers are kept.',
+    photoTitle: 'Remove your photo?',
+    coverTitle: 'Remove the cover image?',
+  },
+
   landing: {
     navCourses: 'Courses',
     badge: 'Schools · teachers · students · parents',

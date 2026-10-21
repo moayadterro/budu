@@ -109,7 +109,7 @@ export function PublishQuiz({
         <input type="hidden" name="quizId" value={quizId} />
         <input type="hidden" name="courseId" value={courseId} />
         <input type="hidden" name="base" value={base} />
-        <ConfirmButton label={s.delete} confirmLabel={s.confirmDelete} className="w-full" />
+        <ConfirmButton label={s.delete} confirmLabel={s.confirmDelete} description={t.confirm.quizDesc} className="w-full" />
       </form>
     </div>
   )

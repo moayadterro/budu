@@ -64,7 +64,7 @@ export function LessonHeader({
         </Button>
         <form action={deleteLessonAction}>
           {ids}
-          <ConfirmButton label={s.delete} confirmLabel={s.confirmDelete} />
+          <ConfirmButton label={s.delete} confirmLabel={t.confirm.lessonTitle} description={t.confirm.lessonDesc} />
         </form>
       </div>
     </div>

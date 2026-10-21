@@ -4,6 +4,7 @@ import { useActionState, useRef } from 'react'
 import { initialsOf, pictureUrl, useSession } from '@/entities/session'
 import { Alert } from '@/shared/ui/alert'
 import { Button } from '@/shared/ui/button'
+import { ConfirmButton } from '@/shared/ui/confirm-button'
 import { Icon } from '@/shared/ui/icon'
 import { InitialsAvatar } from '@/shared/ui/initials-avatar'
 import { useT } from '@/shared/i18n'
@@ -49,9 +50,7 @@ export function ProfilePhoto() {
             </form>
             {user.pictureId && (
               <form action={removePhoto}>
-                <Button type="submit" variant="ghost" size="sm" className="text-destructive" disabled={pending}>
-                  {s.removePhoto}
-                </Button>
+                <ConfirmButton label={s.removePhoto} confirmLabel={t.confirm.photoTitle} disabled={pending} />
               </form>
             )}
           </div>
