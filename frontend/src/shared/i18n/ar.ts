@@ -392,6 +392,10 @@ export const ar: typeof en = {
   },
 
   notify: {
+    allTab: 'الكل',
+    unreadTab: 'غير المقروءة',
+    groups: { today: 'اليوم', yesterday: 'أمس', earlier: 'سابقًا' },
+    bellUnread: (n: number) => `الإشعارات، ${n} غير مقروءة`,
     title: 'الإشعارات',
     empty: 'لا توجد إشعارات جديدة.',
     markAllRead: 'تعليم الكل كمقروء',

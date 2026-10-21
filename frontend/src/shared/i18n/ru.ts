@@ -392,6 +392,10 @@ export const ru: typeof en = {
   },
 
   notify: {
+    allTab: 'Все',
+    unreadTab: 'Непрочитанные',
+    groups: { today: 'Сегодня', yesterday: 'Вчера', earlier: 'Ранее' },
+    bellUnread: (n: number) => `Уведомления, непрочитанных: ${n}`,
     title: 'Уведомления',
     empty: 'Новых уведомлений нет.',
     markAllRead: 'Отметить все прочитанными',

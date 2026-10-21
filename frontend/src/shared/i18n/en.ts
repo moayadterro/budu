@@ -385,6 +385,10 @@ export const en = {
   },
 
   notify: {
+    allTab: 'All',
+    unreadTab: 'Unread',
+    groups: { today: 'Today', yesterday: 'Yesterday', earlier: 'Earlier' },
+    bellUnread: (n: number) => `Notifications, ${n} unread`,
     title: 'Notifications',
     empty: 'You’re all caught up.',
     markAllRead: 'Mark all as read',
