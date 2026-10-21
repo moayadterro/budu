@@ -221,6 +221,12 @@ Built and verified:
 - Roles: admin / manager / teacher / student from IOMAD; admin "Tenants" page (live IOMAD data);
   server-side `requireRole`; sessions refresh role every 5 min.
 - Stack upgraded 2026-10-19 (see Running → Versions).
+- School exams without a course (tested 2026-10-21, API + browser): managers' nav Exams
+  (`/school/exams`). An exam lives in the school's hidden exam space (`local_budu` `school_exams.php`)
+  and is given to an audience: whole classes (current students), chosen students, or candidates
+  pasted as "Name, email" lines (new people get an invite link naming the exam; existing accounts
+  are added + notified). Results show pass / fail colours; "Invite to school" (one or all who passed)
+  uses the normal school invite (they still accept). Candidates take it from their home page.
 - Quizzes & exams (tested 2026-10-21, API + browser, RU UI): Moodle's quiz engine via `local_budu`
   `quizzes.php`. A quiz belongs to a course (optionally only some classes = their groups). Kinds: quiz
   (practice: unlimited tries, answers right after) / exam (1 try, score after submit, answers after
@@ -316,6 +322,15 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-21 School exams (entrance / placement) = exam-kind quizzes in one hidden "exam space" course
+  per school (idnumber `budu-exams-<companyid>`, skipped by every course list); each exam's audience
+  is its own group (idnumber `budu-exam-<cmid>`) — empty = nobody sees it. Only school managers manage
+  them (teachers of the school cannot).
+- 2026-10-21 Access rule (owner asked about guessing ids in URLs): ids are IOMAD/Postgres numbers
+  (unique across all schools, 64-bit — no per-school numbering needed), and they are NOT secrets.
+  Every read/write checks the acting user against that object (enrolled + visible, own attempt,
+  teaches the course, manages the school, parent of the child, conversation participant); anything
+  else is a 404. Keep it that way for every new function: never trust an id from the URL alone.
 - 2026-10-21 Quizzes/exams use Moodle's quiz engine (owner) — grades land in IOMAD's gradebook. They
   belong to a course (optionally limited to classes). Budu stores nothing quiz-specific except the
   notification bookkeeping (`quiz_reminders`, `quiz_announcements`). Kind = cm idnumber ('exam').
