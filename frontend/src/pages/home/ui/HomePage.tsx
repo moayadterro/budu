@@ -12,12 +12,14 @@ import { myHomework } from '@/entities/homework/server'
 import { STUDENT, SUBJECTS, TIMES, TODAY, WEEK, isLive } from '@/shared/mock'
 import { LocalTime } from '@/shared/ui/local-time'
 import { cn } from '@/shared/lib/cn'
+import { getGradeScale } from '@/entities/tenant/server'
 import { getT } from '@/shared/i18n/server'
 
 /** Student dashboard. */
 export async function HomePage() {
   const t = await getT()
   const user = await requireRole('student')
+  const scale = await getGradeScale(user.companyId)
   const firstName = user.name.split(' ')[0] ?? ''
   const [courses, homework] = await Promise.all([myCourses(user.userId), myHomework(user.userId)])
   // what's still to hand in, soonest due first (no due date last)
@@ -87,7 +89,7 @@ export async function HomePage() {
                         )}
                       </ItemDescription>
                     </ItemContent>
-                    <HomeworkStatusBadge status={hw.status} grade={hw.grade} dueAt={hw.dueAt} submittedAt={hw.submittedAt} />
+                    <HomeworkStatusBadge scale={scale} status={hw.status} grade={hw.grade} dueAt={hw.dueAt} submittedAt={hw.submittedAt} />
                   </Link>
                 </Item>
               ))}

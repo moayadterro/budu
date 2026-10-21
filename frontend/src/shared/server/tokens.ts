@@ -7,7 +7,7 @@ export const newSecret = () => randomBytes(32).toString('base64url')
 /** Only hashes are stored, so a database leak can't be replayed. */
 export const hashSecret = (secret: string) => createHash('sha256').update(secret).digest('hex')
 
-export type TokenPurpose = 'verify_email' | 'reset_password'
+export type TokenPurpose = 'verify_email' | 'reset_password' | 'invite'
 
 /** Issues a single-use token; earlier unused tokens for the same purpose stop working. SERVER-SIDE ONLY. */
 export async function issueToken(purpose: TokenPurpose, userId: number, ttlMinutes: number) {

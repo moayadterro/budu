@@ -13,7 +13,7 @@ import { resendVerification, signIn, SignInState } from '../server/actions'
 
 const idle: SignInState = { status: 'idle' }
 
-export function SignInForm({ next, notice }: { next?: string; notice?: 'verified' | 'reset' }) {
+export function SignInForm({ next, notice }: { next?: string; notice?: 'verified' | 'reset' | 'invited' }) {
   const t = useT()
   const [state, action] = useActionState(signIn, idle)
   const [resendState, resend] = useActionState(resendVerification, idle)
@@ -21,10 +21,10 @@ export function SignInForm({ next, notice }: { next?: string; notice?: 'verified
 
   return (
     <>
-      {notice && state.status === 'idle' && <Alert variant="success">{notice === 'verified' ? s.verified : s.resetDone}</Alert>}
+      {notice && state.status === 'idle' && <Alert variant="success">{notice === 'verified' ? s.verified : notice === 'invited' ? s.invited : s.resetDone}</Alert>}
       {state.status === 'error' && (
         <Appear>
-          <Alert>{s.errors[state.error]}</Alert>
+          <Alert variant="destructive">{s.errors[state.error]}</Alert>
         </Appear>
       )}
       {state.status === 'notVerified' && (

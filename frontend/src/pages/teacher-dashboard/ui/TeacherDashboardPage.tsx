@@ -12,12 +12,14 @@ import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle }
 import { LocalTime } from '@/shared/ui/local-time'
 import { PersonAvatar } from '@/shared/ui/person-avatar'
 import { ScreenHead } from '@/shared/ui/screen-head'
+import { getGradeScale } from '@/entities/tenant/server'
 import { getT } from '@/shared/i18n/server'
 
 /** Teacher home: numbers, answers waiting for a grade, courses. Live IOMAD data. */
 export async function TeacherDashboardPage() {
   const user = await requireRole('teacher')
   const t = await getT()
+  const scale = await getGradeScale(user.companyId)
   const s = t.teach
   const [courses, submissions] = await Promise.all([
     teacherOverview(user.userId, user.companyId),
@@ -70,7 +72,7 @@ export async function TeacherDashboardPage() {
                       </ItemDescription>
                     </ItemContent>
                     <ItemActions className="flex-col items-end gap-1">
-                      <HomeworkStatusBadge status={x.status} grade={x.grade} dueAt={x.dueAt} submittedAt={x.submittedAt} />
+                      <HomeworkStatusBadge scale={scale} status={x.status} grade={x.grade} dueAt={x.dueAt} submittedAt={x.submittedAt} />
                       {x.submittedAt && <LocalTime seconds={x.submittedAt} className="text-xs text-muted-foreground" />}
                     </ItemActions>
                   </Link>

@@ -52,13 +52,13 @@ export const NAV: Record<Role, NavItem[]> = {
     { label: 'live', icon: 'video', href: '/live' },
   ],
   manager: [
-    { label: 'school', icon: 'grid', href: null, bottom: true },
-    { label: 'classes', icon: 'layers', href: null, bottom: true },
-    { label: 'courses', icon: 'store', href: null },
-    { label: 'people', icon: 'users', href: null, bottom: true },
-    { label: 'gradebook', icon: 'report', href: null, bottom: true },
+    { label: 'school', icon: 'grid', href: '/school', bottom: true },
+    { label: 'people', icon: 'users', href: '/school/people', bottom: true },
+    { label: 'courses', icon: 'store', href: '/school/courses' },
+    { label: 'gradebook', icon: 'report', href: '/gradebook', bottom: true },
+    { label: 'classes', icon: 'layers', href: null },
     { label: 'schedule', icon: 'cal', href: '/timetable' },
-    { label: 'settings', icon: 'gear', href: null },
+    { label: 'settings', icon: 'gear', href: '/school/settings' },
   ],
 }
 

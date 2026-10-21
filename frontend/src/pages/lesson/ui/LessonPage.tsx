@@ -11,6 +11,7 @@ import { Icon } from '@/shared/ui/icon'
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/shared/ui/item'
 import { formatBytes } from '@/shared/lib/format'
 import { cn } from '@/shared/lib/cn'
+import { getGradeScale } from '@/entities/tenant/server'
 import { getT } from '@/shared/i18n/server'
 
 /** Student: one lesson — videos (streamed), documents, homework; course contents alongside. */
@@ -27,6 +28,7 @@ export async function LessonPage({ params }: { params: Promise<{ courseId: strin
   const prev = course.lessons[index - 1]
   const next = course.lessons[index + 1]
   const t = await getT()
+  const scale = await getGradeScale(user.companyId)
   const s = t.learn
 
   const videos = lesson.items.filter((x) => x.kind === 'video')
@@ -109,7 +111,7 @@ export async function LessonPage({ params }: { params: Promise<{ courseId: strin
                         <ItemTitle>{h.title}</ItemTitle>
                       </ItemContent>
                       <ItemActions>
-                        <HomeworkStatusBadge status={h.status} grade={h.grade} dueAt={h.dueAt} submittedAt={h.submittedAt} />
+                        <HomeworkStatusBadge scale={scale} status={h.status} grade={h.grade} dueAt={h.dueAt} submittedAt={h.submittedAt} />
                       </ItemActions>
                     </Link>
                   </Item>

@@ -126,7 +126,7 @@ export function SignUpForm() {
 
         {state.status === 'error' && (
           <Appear>
-            <Alert>{t.signUp.errors[state.error]}</Alert>
+            <Alert variant="destructive">{t.signUp.errors[state.error]}</Alert>
           </Appear>
         )}
         <SubmitButton label={t.signUp.submit} pendingLabel={t.signUp.submitting} className="w-full" />

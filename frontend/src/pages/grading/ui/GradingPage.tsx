@@ -14,6 +14,7 @@ import { ScreenHead } from '@/shared/ui/screen-head'
 import { Separator } from '@/shared/ui/separator'
 import { formatBytes } from '@/shared/lib/format'
 import { cn } from '@/shared/lib/cn'
+import { getGradeScale } from '@/entities/tenant/server'
 import { getT } from '@/shared/i18n/server'
 
 type Search = { course?: string; homework?: string; student?: string; view?: string }
@@ -31,6 +32,7 @@ function href(q: Record<string, string | number | undefined>) {
 export async function GradingPage({ searchParams }: { searchParams: Promise<Search> }) {
   const user = await requireRole('teacher')
   const t = await getT()
+  const scale = await getGradeScale(user.companyId)
   const s = t.grading
   const q = await searchParams
   const courseId = num(q.course)
@@ -129,7 +131,7 @@ export async function GradingPage({ searchParams }: { searchParams: Promise<Sear
                           <ItemDescription className="truncate">{x.homeworkTitle}</ItemDescription>
                         </ItemContent>
                         <ItemActions>
-                          <HomeworkStatusBadge status={x.status} grade={x.grade} dueAt={x.dueAt} submittedAt={x.submittedAt} />
+                          <HomeworkStatusBadge scale={scale} status={x.status} grade={x.grade} dueAt={x.dueAt} submittedAt={x.submittedAt} />
                         </ItemActions>
                       </Link>
                     </Item>
@@ -156,7 +158,7 @@ export async function GradingPage({ searchParams }: { searchParams: Promise<Sear
                     </CardDescription>
                   </div>
                   <div className="ms-auto">
-                    <HomeworkStatusBadge
+                    <HomeworkStatusBadge scale={scale}
                       status={selected.status}
                       grade={selected.grade}
                       dueAt={selected.dueAt}

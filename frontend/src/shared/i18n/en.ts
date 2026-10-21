@@ -287,7 +287,7 @@ export const en = {
 
   gradebook: {
     title: 'Gradebook',
-    sub: 'Every student’s grade for every homework, 0–100.',
+    sub: 'Every student’s grade for every homework, in your school’s grade scale.',
     course: 'Course',
     noCourses: 'No courses yet.',
     noStudents: 'No students in this course yet.',
@@ -339,6 +339,98 @@ export const en = {
       closed: 'This homework no longer accepts answers.',
       server: 'Something went wrong. Please try again.',
     },
+  },
+
+  notify: {
+    title: 'Notifications',
+    empty: 'You’re all caught up.',
+    markAllRead: 'Mark all as read',
+    open: 'Open in Budu',
+    emailFooter: 'You get these emails for activity in your Budu courses.',
+    kinds: {
+      enrolled: {
+        title: (p: Record<string, string>) => `You were added to ${p.course}`,
+        body: (p: Record<string, string>) => `${p.by} added you to the course “${p.course}”. Open it to see the lessons and homework.`,
+      },
+      homeworkNew: {
+        title: (p: Record<string, string>) => `New homework: ${p.homework}`,
+        body: (p: Record<string, string>) => `There is new homework in ${p.course}: “${p.homework}”.`,
+      },
+      homeworkSubmitted: {
+        title: (p: Record<string, string>) => `${p.student} handed in ${p.homework}`,
+        body: (p: Record<string, string>) => `${p.student} handed in “${p.homework}” in ${p.course}. It’s waiting for your grade.`,
+      },
+      homeworkGraded: {
+        title: (p: Record<string, string>) => `Graded: ${p.homework} — ${p.grade}`,
+        body: (p: Record<string, string>) => `Your homework “${p.homework}” in ${p.course} was graded: ${p.grade}.`,
+      },
+      addedToSchool: {
+        title: (p: Record<string, string>) => `You joined ${p.school}`,
+        body: (p: Record<string, string>) => `${p.by} added you to ${p.school} as ${p.role}.`,
+      },
+    },
+  },
+
+  school: {
+    overviewSub: 'Your school at a glance.',
+    stats: {
+      teachers: 'Teachers',
+      teachersSub: 'in your school',
+      students: 'Students',
+      studentsSub: 'in your school',
+      courses: 'Courses',
+      coursesSub: (n: number) => `${n} published`,
+      homework: 'Homework',
+      homeworkSub: 'across all courses',
+    },
+    recentPeople: 'People',
+    recentCourses: 'Courses',
+    peopleTitle: 'People',
+    peopleSub: 'Teachers, students and managers of your school.',
+    inviteTitle: 'Invite someone',
+    inviteSub: 'New people get an email to choose a password. People who already have a Budu account are added right away.',
+    firstName: 'First name',
+    lastName: 'Last name',
+    email: 'Email',
+    role: 'Role',
+    sendInvite: 'Send invite',
+    sending: 'Sending…',
+    invited: {
+      created: '✓ Invite sent by email',
+      added: '✓ Added to your school — they’ve been notified',
+      already: 'This person is already in your school.',
+      invalid: 'Fill in every field with a valid email.',
+      server: 'Something went wrong. Please try again.',
+    },
+    filters: { all: 'All', teacher: 'Teachers', student: 'Students', manager: 'Managers' },
+    pending: 'Invite pending',
+    active: 'Active',
+    noPeople: 'No one here yet.',
+    coursesTitle: 'Courses',
+    coursesSub: 'Every course in your school, with its teachers and students.',
+    cols: { course: 'Course', teachers: 'Teachers', students: 'Students', lessons: 'Lessons', homework: 'Homework', status: 'Status' },
+    noCourses: 'No courses yet. Teachers create courses from their Courses page.',
+    settingsTitle: 'School settings',
+    settingsSub: 'Settings for everyone in your school.',
+    gradeScale: 'Grade scale',
+    gradeScaleSub: 'How grades are shown to teachers and students. Teachers always enter 0–100.',
+    example: 'e.g.',
+    save: 'Save',
+    saving: 'Saving…',
+    saved: '✓ Saved',
+  },
+
+  scales: {
+    percent: '0–100',
+    letter: 'Letters A–F',
+    gpa: 'GPA 4.0',
+    ects: 'ECTS A–F',
+    germany: 'Germany 1–5',
+    france: 'France 0–20',
+    russia: 'Russia 1–5',
+    russiaEcts: 'Russia 1–5 + ECTS',
+    ten: '0–10',
+    japan: 'Japan S / A / B / C',
   },
 
   explore: {
@@ -471,6 +563,7 @@ export const en = {
       register: 'Create an account',
       verified: 'Your email is confirmed. You can sign in now.',
       resetDone: 'Your password was changed. Sign in with the new one.',
+      invited: 'Your account is active. Sign in with your new password.',
       notVerified: 'Please confirm your email first — check your inbox for the link.',
       resend: 'Send the link again',
       resent: 'If that account is waiting for confirmation, a new link is on its way.',
@@ -512,10 +605,30 @@ export const en = {
       failBody: 'It may have expired or already been used. Sign in to get a new confirmation link.',
       toSignIn: 'Go to sign in',
     },
+    invite: {
+      title: 'Join your school on Budu',
+      sub: 'Choose a password to activate your account.',
+      password: 'Password',
+      confirm: 'Confirm password',
+      submit: 'Activate account',
+      submitting: 'Activating…',
+      errors: {
+        invalidLink: 'This invite link is invalid or has expired. Ask your school for a new one.',
+        mismatch: 'The two passwords don’t match.',
+        weakPassword: 'The password does not meet the rules below.',
+        server: 'Something went wrong on our side. Please try again.',
+      },
+    },
     signOut: 'Sign out',
   },
 
   email: {
+    invite: {
+      subject: (school: string) => `You’re invited to ${school} on Budu`,
+      body: (p: { school: string; by: string; role: string }) =>
+        `${p.by} invited you to join ${p.school} on Budu as ${p.role}. Choose a password to activate your account. The link works for 7 days.`,
+      action: 'Choose your password',
+    },
     greeting: (name: string) => `Hi ${name},`,
     signature: '— The Budu team',
     verify: {

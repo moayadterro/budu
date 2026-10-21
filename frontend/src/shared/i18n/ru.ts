@@ -294,7 +294,7 @@ export const ru: typeof en = {
 
   gradebook: {
     title: 'Журнал',
-    sub: 'Оценки каждого ученика за каждое задание, 0–100.',
+    sub: 'Оценки каждого ученика за каждое задание по шкале вашей школы.',
     course: 'Курс',
     noCourses: 'Курсов пока нет.',
     noStudents: 'На этом курсе пока нет учеников.',
@@ -346,6 +346,98 @@ export const ru: typeof en = {
       closed: 'Это задание больше не принимает ответы.',
       server: 'Что-то пошло не так. Попробуйте ещё раз.',
     },
+  },
+
+  notify: {
+    title: 'Уведомления',
+    empty: 'Новых уведомлений нет.',
+    markAllRead: 'Отметить все прочитанными',
+    open: 'Открыть в Budu',
+    emailFooter: 'Вы получаете эти письма о событиях в ваших курсах Budu.',
+    kinds: {
+      enrolled: {
+        title: (p: Record<string, string>) => `Вас добавили в курс «${p.course}»`,
+        body: (p: Record<string, string>) => `${p.by} добавил(а) вас в курс «${p.course}». Откройте его, чтобы увидеть уроки и задания.`,
+      },
+      homeworkNew: {
+        title: (p: Record<string, string>) => `Новое задание: ${p.homework}`,
+        body: (p: Record<string, string>) => `В курсе «${p.course}» новое домашнее задание: «${p.homework}».`,
+      },
+      homeworkSubmitted: {
+        title: (p: Record<string, string>) => `${p.student} сдал(а) «${p.homework}»`,
+        body: (p: Record<string, string>) => `${p.student} сдал(а) «${p.homework}» в курсе «${p.course}». Ответ ждёт вашей оценки.`,
+      },
+      homeworkGraded: {
+        title: (p: Record<string, string>) => `Оценено: ${p.homework} — ${p.grade}`,
+        body: (p: Record<string, string>) => `Ваше задание «${p.homework}» в курсе «${p.course}» оценено: ${p.grade}.`,
+      },
+      addedToSchool: {
+        title: (p: Record<string, string>) => `Вы в школе «${p.school}»`,
+        body: (p: Record<string, string>) => `${p.by} добавил(а) вас в «${p.school}» как: ${p.role}.`,
+      },
+    },
+  },
+
+  school: {
+    overviewSub: 'Ваша школа в цифрах.',
+    stats: {
+      teachers: 'Учителя',
+      teachersSub: 'в вашей школе',
+      students: 'Ученики',
+      studentsSub: 'в вашей школе',
+      courses: 'Курсы',
+      coursesSub: (n: number) => `опубликовано: ${n}`,
+      homework: 'Задания',
+      homeworkSub: 'во всех курсах',
+    },
+    recentPeople: 'Люди',
+    recentCourses: 'Курсы',
+    peopleTitle: 'Люди',
+    peopleSub: 'Учителя, ученики и менеджеры вашей школы.',
+    inviteTitle: 'Пригласить',
+    inviteSub: 'Новым людям придёт письмо, чтобы задать пароль. Те, у кого уже есть аккаунт Budu, добавляются сразу.',
+    firstName: 'Имя',
+    lastName: 'Фамилия',
+    email: 'Эл. почта',
+    role: 'Роль',
+    sendInvite: 'Отправить приглашение',
+    sending: 'Отправляем…',
+    invited: {
+      created: '✓ Приглашение отправлено на почту',
+      added: '✓ Добавлен(а) в школу — уведомление отправлено',
+      already: 'Этот человек уже в вашей школе.',
+      invalid: 'Заполните все поля и укажите правильную почту.',
+      server: 'Что-то пошло не так. Попробуйте ещё раз.',
+    },
+    filters: { all: 'Все', teacher: 'Учителя', student: 'Ученики', manager: 'Менеджеры' },
+    pending: 'Ждёт активации',
+    active: 'Активен',
+    noPeople: 'Здесь пока никого нет.',
+    coursesTitle: 'Курсы',
+    coursesSub: 'Все курсы вашей школы, их учителя и ученики.',
+    cols: { course: 'Курс', teachers: 'Учителя', students: 'Ученики', lessons: 'Уроки', homework: 'Задания', status: 'Статус' },
+    noCourses: 'Курсов пока нет. Учителя создают курсы в разделе «Курсы».',
+    settingsTitle: 'Настройки школы',
+    settingsSub: 'Настройки для всех в вашей школе.',
+    gradeScale: 'Шкала оценок',
+    gradeScaleSub: 'Как оценки показываются учителям и ученикам. Учителя всегда ставят 0–100.',
+    example: 'напр.',
+    save: 'Сохранить',
+    saving: 'Сохраняем…',
+    saved: '✓ Сохранено',
+  },
+
+  scales: {
+    percent: '0–100',
+    letter: 'Буквы A–F',
+    gpa: 'GPA 4.0',
+    ects: 'ECTS A–F',
+    germany: 'Германия 1–5',
+    france: 'Франция 0–20',
+    russia: 'Россия 1–5',
+    russiaEcts: 'Россия 1–5 + ECTS',
+    ten: '0–10',
+    japan: 'Япония S / A / B / C',
   },
 
   explore: {
@@ -479,6 +571,7 @@ export const ru: typeof en = {
       register: 'Создать аккаунт',
       verified: 'Почта подтверждена. Теперь можно войти.',
       resetDone: 'Пароль изменён. Войдите с новым паролем.',
+      invited: 'Аккаунт активирован. Войдите с новым паролем.',
       notVerified: 'Сначала подтвердите почту — ссылка в письме.',
       resend: 'Отправить ссылку ещё раз',
       resent: 'Если аккаунт ждёт подтверждения, новая ссылка уже в пути.',
@@ -520,10 +613,30 @@ export const ru: typeof en = {
       failBody: 'Возможно, она устарела или уже использована. Войдите, чтобы получить новую ссылку.',
       toSignIn: 'Ко входу',
     },
+    invite: {
+      title: 'Присоединяйтесь к школе в Budu',
+      sub: 'Задайте пароль, чтобы активировать аккаунт.',
+      password: 'Пароль',
+      confirm: 'Повторите пароль',
+      submit: 'Активировать аккаунт',
+      submitting: 'Активируем…',
+      errors: {
+        invalidLink: 'Ссылка-приглашение недействительна или устарела. Попросите школу прислать новую.',
+        mismatch: 'Пароли не совпадают.',
+        weakPassword: 'Пароль не соответствует требованиям ниже.',
+        server: 'На нашей стороне что-то пошло не так. Попробуйте ещё раз.',
+      },
+    },
     signOut: 'Выйти',
   },
 
   email: {
+    invite: {
+      subject: (school: string) => `Приглашение в «${school}» на Budu`,
+      body: (p: { school: string; by: string; role: string }) =>
+        `${p.by} приглашает вас в «${p.school}» на Budu. Ваша роль: ${p.role}. Задайте пароль, чтобы активировать аккаунт. Ссылка действует 7 дней.`,
+      action: 'Задать пароль',
+    },
     greeting: (name: string) => `Здравствуйте, ${name}!`,
     signature: '— Команда Budu',
     verify: {

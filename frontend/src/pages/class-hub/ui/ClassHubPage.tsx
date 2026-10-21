@@ -10,6 +10,7 @@ import { Icon } from '@/shared/ui/icon'
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/shared/ui/item'
 import { LocalTime } from '@/shared/ui/local-time'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
+import { getGradeScale } from '@/entities/tenant/server'
 import { getT } from '@/shared/i18n/server'
 
 /** Student: one course — its lessons and homework. Live IOMAD data. */
@@ -20,6 +21,7 @@ export async function ClassHubPage({ params }: { params: Promise<{ courseId: str
   const [course, homework, mine] = await Promise.all([getCourse(user.userId, id), myHomework(user.userId, id), myCourses(user.userId)])
   if (!course) notFound()
   const t = await getT()
+  const scale = await getGradeScale(user.companyId)
   const s = t.learn
   const teachers = mine.find((c) => c.id === id)?.teachers ?? ''
   const todo = homework.filter((h) => h.status === 'new').length
@@ -123,7 +125,7 @@ export async function ClassHubPage({ params }: { params: Promise<{ courseId: str
                       </ItemDescription>
                     </ItemContent>
                     <ItemActions>
-                      <HomeworkStatusBadge status={h.status} grade={h.grade} dueAt={h.dueAt} submittedAt={h.submittedAt} />
+                      <HomeworkStatusBadge scale={scale} status={h.status} grade={h.grade} dueAt={h.dueAt} submittedAt={h.submittedAt} />
                     </ItemActions>
                   </Link>
                 </Item>

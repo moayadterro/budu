@@ -45,3 +45,28 @@ export async function setPicture(id: number, email: string, file: File | null): 
   const account = await getAccount(email)
   return account.found && account.picture ? account.picture : null
 }
+
+/** Moodle usernames allow only a-z 0-9 _ - @ . (same rule as sign-up). */
+export const usernameFor = (email: string) => email.toLowerCase().replace(/[^a-z0-9_\-@.]/g, '_')
+
+/**
+ * Creates an IOMAD account for an invited person: suspended, with a random password nobody knows,
+ * until they choose their own through the invite link. Returns the new user id.
+ */
+export async function createInvitedUser(p: { email: string; firstname: string; lastname: string }): Promise<number> {
+  const { randomBytes } = await import('crypto')
+  const [user] = await iomadCall<Array<{ id: number }>>(defaultInstance(), 'core_user_create_users', {
+    users: [
+      {
+        username: usernameFor(p.email),
+        auth: 'manual',
+        password: `${randomBytes(18).toString('base64url')}aA1!`,
+        firstname: p.firstname,
+        lastname: p.lastname,
+        email: p.email,
+      },
+    ],
+  })
+  await updateUser(user.id, { suspended: 1 }) // until they choose a password via the invite link
+  return user.id
+}

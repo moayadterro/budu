@@ -11,6 +11,8 @@ import { Icon } from '@/shared/ui/icon'
 import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/shared/ui/item'
 import { LocalTime } from '@/shared/ui/local-time'
 import { formatBytes } from '@/shared/lib/format'
+import { formatGrade, scaleMax } from '@/shared/lib/grade-scale'
+import { getGradeScale } from '@/entities/tenant/server'
 import { getT } from '@/shared/i18n/server'
 
 function Files({ files }: { files: HomeworkFile[] }) {
@@ -43,6 +45,7 @@ export async function HomeworkPage({ params }: { params: Promise<{ courseId: str
   const hw = await getMyHomework(user.userId, id)
   if (!hw || String(hw.courseId) !== p.courseId) notFound()
   const t = await getT()
+  const scale = await getGradeScale(user.companyId)
   const s = t.learn
 
   return (
@@ -55,7 +58,7 @@ export async function HomeworkPage({ params }: { params: Promise<{ courseId: str
           </Link>
         </Button>
         <div className="flex flex-wrap items-center gap-2">
-          <HomeworkStatusBadge status={hw.status} grade={hw.grade} dueAt={hw.dueAt} submittedAt={hw.submittedAt} />
+          <HomeworkStatusBadge scale={scale} status={hw.status} grade={hw.grade} dueAt={hw.dueAt} submittedAt={hw.submittedAt} />
           <span className="text-sm text-muted-foreground">
             {hw.dueAt ? (
               <>
@@ -74,7 +77,8 @@ export async function HomeworkPage({ params }: { params: Promise<{ courseId: str
           <CardHeader>
             <CardDescription>{s.grade}</CardDescription>
             <CardTitle className="text-4xl font-semibold tabular-nums text-success">
-              {hw.grade} <span className="text-base font-normal text-muted-foreground">{t.hw.outOf}</span>
+              {hw.grade !== null && formatGrade(hw.grade, scale)}{' '}
+              <span className="text-base font-normal text-muted-foreground">{scaleMax(scale)}</span>
             </CardTitle>
           </CardHeader>
           {hw.feedback && (

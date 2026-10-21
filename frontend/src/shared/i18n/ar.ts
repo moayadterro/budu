@@ -294,7 +294,7 @@ export const ar: typeof en = {
 
   gradebook: {
     title: 'سجل الدرجات',
-    sub: 'درجة كل طالب في كل واجب، من 0 إلى 100.',
+    sub: 'درجة كل طالب في كل واجب وفق سُلّم درجات مدرستك.',
     course: 'الدورة',
     noCourses: 'لا توجد دورات بعد.',
     noStudents: 'لا يوجد طلاب في هذه الدورة بعد.',
@@ -346,6 +346,98 @@ export const ar: typeof en = {
       closed: 'لم يعد هذا الواجب يقبل الإجابات.',
       server: 'حدث خطأ ما. حاول مرة أخرى.',
     },
+  },
+
+  notify: {
+    title: 'الإشعارات',
+    empty: 'لا توجد إشعارات جديدة.',
+    markAllRead: 'تعليم الكل كمقروء',
+    open: 'فتح في Budu',
+    emailFooter: 'تصلك هذه الرسائل بسبب نشاط في دوراتك على Budu.',
+    kinds: {
+      enrolled: {
+        title: (p: Record<string, string>) => `أُضفت إلى «${p.course}»`,
+        body: (p: Record<string, string>) => `أضافك ${p.by} إلى دورة «${p.course}». افتحها لترى الدروس والواجبات.`,
+      },
+      homeworkNew: {
+        title: (p: Record<string, string>) => `واجب جديد: ${p.homework}`,
+        body: (p: Record<string, string>) => `يوجد واجب جديد في «${p.course}»: «${p.homework}».`,
+      },
+      homeworkSubmitted: {
+        title: (p: Record<string, string>) => `سلّم ${p.student} «${p.homework}»`,
+        body: (p: Record<string, string>) => `سلّم ${p.student} الواجب «${p.homework}» في «${p.course}». الإجابة بانتظار تصحيحك.`,
+      },
+      homeworkGraded: {
+        title: (p: Record<string, string>) => `تم التصحيح: ${p.homework} — ${p.grade}`,
+        body: (p: Record<string, string>) => `تم تصحيح واجبك «${p.homework}» في «${p.course}»: ${p.grade}.`,
+      },
+      addedToSchool: {
+        title: (p: Record<string, string>) => `انضممت إلى ${p.school}`,
+        body: (p: Record<string, string>) => `أضافك ${p.by} إلى ${p.school} بصفة ${p.role}.`,
+      },
+    },
+  },
+
+  school: {
+    overviewSub: 'مدرستك في لمحة.',
+    stats: {
+      teachers: 'المعلمون',
+      teachersSub: 'في مدرستك',
+      students: 'الطلاب',
+      studentsSub: 'في مدرستك',
+      courses: 'الدورات',
+      coursesSub: (n: number) => `منشورة: ${n}`,
+      homework: 'الواجبات',
+      homeworkSub: 'في كل الدورات',
+    },
+    recentPeople: 'الأشخاص',
+    recentCourses: 'الدورات',
+    peopleTitle: 'الأشخاص',
+    peopleSub: 'معلمو مدرستك وطلابها ومديروها.',
+    inviteTitle: 'دعوة شخص',
+    inviteSub: 'يصل الأشخاص الجدد بريد لاختيار كلمة مرور. ومن لديه حساب Budu بالفعل يُضاف فورًا.',
+    firstName: 'الاسم الأول',
+    lastName: 'اسم العائلة',
+    email: 'البريد الإلكتروني',
+    role: 'الدور',
+    sendInvite: 'إرسال الدعوة',
+    sending: 'جارٍ الإرسال…',
+    invited: {
+      created: '✓ أُرسلت الدعوة بالبريد',
+      added: '✓ أُضيف إلى مدرستك — تم إشعاره',
+      already: 'هذا الشخص موجود في مدرستك بالفعل.',
+      invalid: 'املأ كل الحقول ببريد إلكتروني صحيح.',
+      server: 'حدث خطأ ما. حاول مرة أخرى.',
+    },
+    filters: { all: 'الكل', teacher: 'المعلمون', student: 'الطلاب', manager: 'المديرون' },
+    pending: 'الدعوة معلّقة',
+    active: 'نشط',
+    noPeople: 'لا يوجد أحد هنا بعد.',
+    coursesTitle: 'الدورات',
+    coursesSub: 'كل دورات مدرستك مع معلميها وطلابها.',
+    cols: { course: 'الدورة', teachers: 'المعلمون', students: 'الطلاب', lessons: 'الدروس', homework: 'الواجبات', status: 'الحالة' },
+    noCourses: 'لا توجد دورات بعد. ينشئ المعلمون الدورات من صفحة الدورات.',
+    settingsTitle: 'إعدادات المدرسة',
+    settingsSub: 'إعدادات لكل من في مدرستك.',
+    gradeScale: 'سُلّم الدرجات',
+    gradeScaleSub: 'كيف تظهر الدرجات للمعلمين والطلاب. يُدخل المعلمون الدرجة دائمًا من 0 إلى 100.',
+    example: 'مثال',
+    save: 'حفظ',
+    saving: 'جارٍ الحفظ…',
+    saved: '✓ تم الحفظ',
+  },
+
+  scales: {
+    percent: '0–100',
+    letter: 'حروف A–F',
+    gpa: 'GPA 4.0',
+    ects: 'ECTS A–F',
+    germany: 'ألمانيا 1–5',
+    france: 'فرنسا 0–20',
+    russia: 'روسيا 1–5',
+    russiaEcts: 'روسيا 1–5 + ECTS',
+    ten: '0–10',
+    japan: 'اليابان S / A / B / C',
   },
 
   explore: {
@@ -478,6 +570,7 @@ export const ar: typeof en = {
       register: 'أنشئ حسابًا',
       verified: 'تم تأكيد بريدك. يمكنك تسجيل الدخول الآن.',
       resetDone: 'تم تغيير كلمة المرور. سجّل الدخول بالكلمة الجديدة.',
+      invited: 'تم تفعيل حسابك. سجّل الدخول بكلمة المرور الجديدة.',
       notVerified: 'يرجى تأكيد بريدك أولًا — ابحث عن الرابط في صندوق الوارد.',
       resend: 'إرسال الرابط مرة أخرى',
       resent: 'إذا كان الحساب بانتظار التأكيد، فرابط جديد في الطريق.',
@@ -519,10 +612,30 @@ export const ar: typeof en = {
       failBody: 'ربما انتهت صلاحيته أو استُخدم من قبل. سجّل الدخول للحصول على رابط تأكيد جديد.',
       toSignIn: 'الذهاب إلى تسجيل الدخول',
     },
+    invite: {
+      title: 'انضم إلى مدرستك على Budu',
+      sub: 'اختر كلمة مرور لتفعيل حسابك.',
+      password: 'كلمة المرور',
+      confirm: 'تأكيد كلمة المرور',
+      submit: 'تفعيل الحساب',
+      submitting: 'جارٍ التفعيل…',
+      errors: {
+        invalidLink: 'رابط الدعوة غير صالح أو منتهي الصلاحية. اطلب من مدرستك رابطًا جديدًا.',
+        mismatch: 'كلمتا المرور غير متطابقتين.',
+        weakPassword: 'كلمة المرور لا تستوفي الشروط أدناه.',
+        server: 'حدث خطأ من جهتنا. حاول مرة أخرى.',
+      },
+    },
     signOut: 'تسجيل الخروج',
   },
 
   email: {
+    invite: {
+      subject: (school: string) => `دعوة للانضمام إلى ${school} على Budu`,
+      body: (p: { school: string; by: string; role: string }) =>
+        `دعاك ${p.by} للانضمام إلى ${p.school} على Budu بصفة ${p.role}. اختر كلمة مرور لتفعيل حسابك. يعمل الرابط لمدة 7 أيام.`,
+      action: 'اختيار كلمة المرور',
+    },
     greeting: (name: string) => `مرحبًا ${name}،`,
     signature: '— فريق Budu',
     verify: {

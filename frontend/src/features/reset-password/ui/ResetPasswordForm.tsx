@@ -21,7 +21,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
       <input type="hidden" name="token" value={token} />
       {state.status === 'error' && (
         <Appear>
-          <Alert>
+          <Alert variant="destructive">
             {s.errors[state.error]}{' '}
             {state.error === 'invalidLink' && (
               <Link href="/forgot-password" className="underline underline-offset-2">
