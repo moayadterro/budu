@@ -12,6 +12,7 @@ const plural = (n: number, one: string, two: string, few: string, many: string) 
 /** Arabic UI strings (shown right-to-left). Same keys as en.ts. */
 export const ar: typeof en = {
   appName: 'Budu',
+  pricesIn: 'الأسعار بـ',
   moreActions: 'إجراءات أخرى',
   actionsFor: (name: string) => `إجراءات «${name}»`,
   connection: { offline: 'أنت غير متصل. تحقق من اتصالك بالإنترنت.', back: 'عاد الاتصال' },

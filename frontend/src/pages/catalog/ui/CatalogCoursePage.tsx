@@ -13,7 +13,8 @@ export async function CatalogCoursePage({ params }: { params: Promise<{ courseId
   if (!Number.isSafeInteger(id) || id <= 0) notFound()
   const user = await getSession()
   if (user?.role === 'student') redirect(`/explore/${id}`)
-  const items = await catalogFor(user?.userId ?? 0, user ? await getCurrency(user.userId) : await visitorCurrency())
+  const currency = user ? await getCurrency(user.userId) : await visitorCurrency()
+  const items = await catalogFor(user?.userId ?? 0, currency)
   const item = items.find((i) => i.course.id === id)
   if (!item) notFound()
   const t = await getT()
@@ -22,6 +23,7 @@ export async function CatalogCoursePage({ params }: { params: Promise<{ courseId
     <CourseDetail
       course={item.course}
       price={item.price}
+      currency={currency}
       back={{ href: '/catalog', label: s.all }}
       previewHref={`/catalog/${id}/preview`}
       // visitors: a locked lesson → sign in, then back to this course (students land on its Explore page)

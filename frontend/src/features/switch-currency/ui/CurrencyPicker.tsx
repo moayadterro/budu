@@ -4,12 +4,28 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { CURRENCIES, isCurrency, type Currency } from '@/shared/config/currency'
 import { currencyName } from '@/shared/lib/money'
+import { Icon } from '@/shared/ui/icon'
 import { NativeSelect, NativeSelectOption } from '@/shared/ui/native-select'
 import { useLocale, useT } from '@/shared/i18n'
 import { setCurrencyAction } from '../server/actions'
 
-/** Settings: the currency prices are shown in (saved at once). */
-export function CurrencyPicker({ value, compact = false }: { value: Currency; compact?: boolean }) {
+/** "₽ RUB", "$ USD", "SYP" — the symbol helps people recognise their money. */
+function optionLabel(code: Currency, locale: string) {
+  try {
+    const symbol = new Intl.NumberFormat(locale, { style: 'currency', currency: code, currencyDisplay: 'narrowSymbol' })
+      .formatToParts(0)
+      .find((p) => p.type === 'currency')?.value
+    return symbol && symbol !== code ? `${symbol} ${code}` : code
+  } catch {
+    return code
+  }
+}
+
+/**
+ * The currency prices are shown in (saved at once). Settings: a full-width select with names.
+ * `inline`: a small "💳 Prices in ₽ RUB ▾" control placed next to prices (catalog, course page).
+ */
+export function CurrencyPicker({ value, inline = false }: { value: Currency; inline?: boolean }) {
   const t = useT()
   const locale = useLocale()
   const [current, setCurrent] = useState(value)
@@ -45,13 +61,13 @@ export function CurrencyPicker({ value, compact = false }: { value: Currency; co
       window.removeEventListener('focus', sync)
     }
   }, [router])
-  return (
+  const select = (
     <NativeSelect
       value={current}
       disabled={pending}
       aria-label={t.account.currency}
-      className={compact ? 'w-auto' : 'w-full max-w-xs'}
-      size={compact ? 'sm' : 'default'}
+      className={inline ? 'w-auto' : 'w-full max-w-xs'}
+      size={inline ? 'sm' : 'default'}
       onChange={(e) => {
         const c = e.target.value as Currency
         setCurrent(c)
@@ -60,9 +76,17 @@ export function CurrencyPicker({ value, compact = false }: { value: Currency; co
     >
       {CURRENCIES.map((c) => (
         <NativeSelectOption key={c} value={c}>
-          {compact ? c : `${c} — ${currencyName(c, locale)}`}
+          {inline ? optionLabel(c, locale) : `${c} — ${currencyName(c, locale)}`}
         </NativeSelectOption>
       ))}
     </NativeSelect>
+  )
+  if (!inline) return select
+  return (
+    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+      <Icon name="wallet" className="size-4" />
+      <span>{t.pricesIn}</span>
+      {select}
+    </div>
   )
 }

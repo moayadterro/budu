@@ -12,7 +12,8 @@ export async function ExploreCoursePage({ params }: { params: Promise<{ courseId
   const user = await requireRole('student')
   const id = Number((await params).courseId)
   if (!Number.isSafeInteger(id) || id <= 0) notFound()
-  const [items, order] = await Promise.all([catalogFor(user.userId, await getCurrency(user.userId)), openOrder(user.userId, id)])
+  const currency = await getCurrency(user.userId)
+  const [items, order] = await Promise.all([catalogFor(user.userId, currency), openOrder(user.userId, id)])
   const item = items.find((i) => i.course.id === id)
   if (!item) notFound()
   const t = await getT()
@@ -21,6 +22,7 @@ export async function ExploreCoursePage({ params }: { params: Promise<{ courseId
     <CourseDetail
       course={course}
       price={price}
+      currency={currency}
       back={{ href: '/explore', label: t.shop.back }}
       // not in the course yet: lesson 1 is a free preview, the rest are locked
       previewHref={course.enrolled ? null : `/catalog/${course.id}/preview`}

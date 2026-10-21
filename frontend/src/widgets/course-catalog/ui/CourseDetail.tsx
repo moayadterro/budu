@@ -2,6 +2,8 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { CourseCover, type ShownPrice } from '@/entities/course'
 import type { CatalogCourse } from '@/entities/course/server'
+import { CurrencyPicker } from '@/features/switch-currency'
+import type { Currency } from '@/shared/config/currency'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
@@ -23,6 +25,7 @@ export async function CourseDetail({
   back,
   previewHref,
   lockedHref,
+  currency,
 }: {
   course: CatalogCourse
   price: ShownPrice
@@ -30,6 +33,8 @@ export async function CourseDetail({
   back: { href: string; label: string }
   previewHref?: string | null
   lockedHref?: string | null
+  /** the viewer's price currency — changeable right under the price */
+  currency: Currency
 }) {
   const t = await getT()
   const s = t.shop
@@ -112,6 +117,11 @@ export async function CourseDetail({
               <div>
                 <div className="text-xs text-muted-foreground">{s.price}</div>
                 <div className="text-2xl font-semibold tabular-nums">{price.free ? s.free : price.shown}</div>
+                {!price.free && (
+                  <div className="mt-2">
+                    <CurrencyPicker value={currency} inline />
+                  </div>
+                )}
               </div>
               {action}
             </CardContent>

@@ -1,6 +1,7 @@
 /** English UI strings — the reference dictionary. Every user-facing string lives here; ru.ts / ar.ts mirror it. */
 export const en = {
   appName: 'Budu',
+  pricesIn: 'Prices in',
   moreActions: 'More actions',
   actionsFor: (name: string) => `Actions for “${name}”`,
   connection: { offline: 'You’re offline. Check your connection.', back: 'Back online' },

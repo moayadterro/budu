@@ -1,8 +1,7 @@
 import Link from 'next/link'
 import { ReactNode } from 'react'
 import { getSession } from '@/entities/session/server'
-import { getCurrency, visitorCurrency } from '@/entities/user/server'
-import { CurrencyPicker } from '@/features/switch-currency'
+import { ThemeToggle } from '@/features/switch-theme'
 import { LanguageMenu } from '@/features/switch-language'
 import { Button } from '@/shared/ui/button'
 import { Logo } from '@/shared/ui/logo'
@@ -10,11 +9,10 @@ import { getT } from '@/shared/i18n/server'
 
 /**
  * Public pages anyone can open without an account (the course catalog): a slim header with the
- * Budu logo, language and currency, and Sign in / Sign up — or "Open Budu" when signed in.
+ * Budu logo, theme and language, and Sign in / Sign up — or "Open Budu" when signed in.
  */
 export async function PublicLayout({ children }: { children: ReactNode }) {
   const [t, user] = await Promise.all([getT(), getSession()])
-  const currency = user ? await getCurrency(user.userId) : await visitorCurrency()
   return (
     <div className="min-h-svh bg-background">
       <header className="sticky top-0 z-20 border-b bg-background/90 backdrop-blur">
@@ -28,7 +26,7 @@ export async function PublicLayout({ children }: { children: ReactNode }) {
             </Link>
           </nav>
           <div className="ms-auto flex items-center gap-2">
-            <CurrencyPicker value={currency} compact />
+            <ThemeToggle />
             <LanguageMenu />
             {user ? (
               <Button size="sm" asChild>
