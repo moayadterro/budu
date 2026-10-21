@@ -13,6 +13,10 @@ const plural = (n: number, one: string, two: string, few: string, many: string) 
 export const ar: typeof en = {
   appName: 'Budu',
   pricesIn: 'الأسعار بـ',
+  currencySearch: 'ابحث عن عملة',
+  currencyNone: 'لا توجد نتائج',
+  currencyPopular: 'الأكثر استخدامًا',
+  currencyAll: 'كل العملات',
   moreActions: 'إجراءات أخرى',
   actionsFor: (name: string) => `إجراءات «${name}»`,
   connection: { offline: 'أنت غير متصل. تحقق من اتصالك بالإنترنت.', back: 'عاد الاتصال' },

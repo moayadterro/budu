@@ -1,36 +1,33 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useEffect, useRef, useState, useTransition } from 'react'
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { CURRENCIES, isCurrency, type Currency } from '@/shared/config/currency'
+import { cn } from '@/shared/lib/cn'
 import { currencyName } from '@/shared/lib/money'
 import { Icon } from '@/shared/ui/icon'
-import { NativeSelect, NativeSelectOption } from '@/shared/ui/native-select'
+import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover'
 import { useLocale, useT } from '@/shared/i18n'
 import { setCurrencyAction } from '../server/actions'
 
-/** "₽ RUB", "$ USD", "SYP" — the symbol helps people recognise their money. */
-function optionLabel(code: Currency, locale: string) {
-  try {
-    const symbol = new Intl.NumberFormat(locale, { style: 'currency', currency: code, currencyDisplay: 'narrowSymbol' })
-      .formatToParts(0)
-      .find((p) => p.type === 'currency')?.value
-    return symbol && symbol !== code ? `${symbol} ${code}` : code
-  } catch {
-    return code
-  }
-}
+/** shown first — the rest under "All currencies" */
+const POPULAR: Currency[] = ['RUB', 'USD', 'EUR']
 
 /**
- * The currency prices are shown in (saved at once). Settings: a full-width select with names.
- * `inline`: a small "💳 Prices in ₽ RUB ▾" control placed next to prices (catalog, course page).
+ * The currency prices are shown in (saved at once), as a soft pill that opens a searchable panel:
+ * Popular (RUB, USD, EUR) then all currencies — code and name (owner: just "USD", no symbols here;
+ * prices themselves carry the symbol). `inline`: the
+ * small "Prices in ₽ RUB" pill next to prices (catalog, course page); otherwise a full-width field
+ * (Settings).
  */
 export function CurrencyPicker({ value, inline = false }: { value: Currency; inline?: boolean }) {
   const t = useT()
   const locale = useLocale()
+  const router = useRouter()
   const [current, setCurrent] = useState(value)
   const [pending, start] = useTransition()
-  const router = useRouter()
+  const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState('')
   // follow the server's value when it changes (sign-in, refresh …), or the picker and the prices disagree
   const [seen, setSeen] = useState(value)
   if (value !== seen) {
@@ -61,32 +58,92 @@ export function CurrencyPicker({ value, inline = false }: { value: Currency; inl
       window.removeEventListener('focus', sync)
     }
   }, [router])
-  const select = (
-    <NativeSelect
-      value={current}
-      disabled={pending}
-      aria-label={t.account.currency}
-      className={inline ? 'w-auto' : 'w-full max-w-xs'}
-      size={inline ? 'sm' : 'default'}
-      onChange={(e) => {
-        const c = e.target.value as Currency
-        setCurrent(c)
-        start(() => setCurrencyAction(c))
-      }}
+
+  const rows = useMemo(() => CURRENCIES.map((code) => ({ code, name: currencyName(code, locale) })), [locale])
+  const q = query.trim().toLowerCase()
+  const found = q ? rows.filter((r) => r.code.toLowerCase().includes(q) || r.name.toLowerCase().includes(q)) : null
+
+  const choose = (c: Currency) => {
+    setOpen(false)
+    setQuery('')
+    if (c === current) return
+    setCurrent(c)
+    start(() => setCurrencyAction(c))
+  }
+
+  const row = (r: { code: Currency; name: string }) => (
+    <button
+      key={r.code}
+      type="button"
+      role="option"
+      aria-selected={r.code === current}
+      onClick={() => choose(r.code)}
+      className={cn(
+        'flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-start text-sm outline-none transition-colors hover:bg-muted focus-visible:bg-muted',
+        r.code === current && 'bg-primary/5',
+      )}
     >
-      {CURRENCIES.map((c) => (
-        <NativeSelectOption key={c} value={c}>
-          {inline ? optionLabel(c, locale) : `${c} — ${currencyName(c, locale)}`}
-        </NativeSelectOption>
-      ))}
-    </NativeSelect>
+      <span className="w-10 flex-none font-semibold tabular-nums">{r.code}</span>
+      <span className="min-w-0 flex-1 truncate text-muted-foreground">{r.name}</span>
+      {r.code === current && <Icon name="tick" className="size-4 text-primary" />}
+    </button>
   )
-  if (!inline) return select
+
   return (
-    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-      <Icon name="wallet" className="size-4" />
-      <span>{t.pricesIn}</span>
-      {select}
-    </div>
+    <Popover open={open} onOpenChange={(o) => (setOpen(o), o || setQuery(''))}>
+      <div className={cn('flex items-center gap-2', !inline && 'w-full max-w-xs')}>
+        {inline && <span className="text-sm text-muted-foreground">{t.pricesIn}</span>}
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            disabled={pending}
+            aria-label={`${t.account.currency}: ${currencyName(current, locale)}`}
+            className={cn(
+              'group inline-flex items-center gap-2 border bg-background text-sm font-medium shadow-xs transition-all outline-none',
+              'hover:border-foreground/20 hover:shadow-sm focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-60',
+              'data-[state=open]:border-foreground/20 data-[state=open]:shadow-sm',
+              inline ? 'h-9 rounded-full px-3.5' : 'h-10 w-full rounded-lg px-3',
+            )}
+          >
+            <span className={cn('tabular-nums', !inline && 'flex-1 truncate text-start')}>
+              {inline ? current : `${currencyName(current, locale)} · ${current}`}
+            </span>
+            <Icon name="down" className="size-3.5 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+          </button>
+        </PopoverTrigger>
+      </div>
+      <PopoverContent align="end" className="w-72 rounded-2xl p-1.5 shadow-lg">
+        <div className="flex items-center gap-2 border-b px-2 pb-1.5">
+          <Icon name="search" className="size-4 text-muted-foreground" />
+          <input
+            autoFocus
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t.currencySearch}
+            aria-label={t.currencySearch}
+            className="h-9 w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && found?.length) choose(found[0].code)
+            }}
+          />
+        </div>
+        <div role="listbox" aria-label={t.account.currency} className="mt-1 max-h-80 overflow-y-auto">
+          {found ? (
+            found.length ? (
+              found.map(row)
+            ) : (
+              <p className="px-2 py-6 text-center text-sm text-muted-foreground">{t.currencyNone}</p>
+            )
+          ) : (
+            <>
+              <p className="px-2 pt-1.5 pb-1 text-xs font-medium text-muted-foreground">{t.currencyPopular}</p>
+              {rows.filter((r) => POPULAR.includes(r.code)).map(row)}
+              <p className="px-2 pt-3 pb-1 text-xs font-medium text-muted-foreground">{t.currencyAll}</p>
+              {rows.filter((r) => !POPULAR.includes(r.code)).map(row)}
+            </>
+          )}
+        </div>
+      </PopoverContent>
+    </Popover>
   )
 }

@@ -26,6 +26,7 @@ export function formatMoney(amount: number, currency: string, locale: string) {
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
+    currencyDisplay: 'narrowSymbol', // "$15", "1 240 ₽" — not "US$" (codes stay for currencies without a symbol)
     maximumFractionDigits: Math.abs(amount) >= 100 ? 0 : 2,
   }).format(amount)
 }
