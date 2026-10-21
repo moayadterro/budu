@@ -43,9 +43,10 @@ export function ResultSummary({
   return (
     <div className="flex flex-col items-center gap-5 text-center sm:flex-row sm:text-start">
       <ProgressRing value={grade} className={tone === 'success' ? 'text-success' : 'text-destructive'} label={`${s[outcome]} · ${pct}%`}>
-        <div className="leading-none">
-          <div className="text-3xl font-semibold tabular-nums">{label}</div>
-          {outOf && <div className="mt-1 text-xs text-muted-foreground">{outOf}</div>}
+        {/* "3/5" on one line: the grade big, its "out of" small on the same baseline */}
+        <div className="flex items-baseline whitespace-nowrap leading-none" dir="ltr">
+          <span className={cn('font-semibold tabular-nums', (label + (outOf ?? '')).length > 5 ? 'text-2xl' : 'text-3xl')}>{label}</span>
+          {outOf && <span className="text-sm font-medium text-muted-foreground tabular-nums">{outOf.replace(/\s+/g, '')}</span>}
         </div>
       </ProgressRing>
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
