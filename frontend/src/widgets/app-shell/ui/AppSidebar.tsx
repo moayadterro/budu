@@ -7,7 +7,7 @@ import { ArrowUpDownIcon, UserCircleIcon } from '@hugeicons/core-free-icons'
 import { initialsOf, pictureUrl, useSession } from '@/entities/session'
 import { SignOutMenuItem } from '@/features/sign-out'
 import { NAV, activeHref } from '@/shared/config/nav'
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
+import { InitialsAvatar } from '@/shared/ui/initials-avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -89,10 +89,12 @@ export function AppSidebar({ inSchool }: { inSchool: boolean }) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent">
-                  <Avatar className="size-8 rounded-lg">
-                    {user.pictureId && <AvatarImage src={pictureUrl(user.pictureId)!} alt="" />}
-                    <AvatarFallback className="rounded-lg">{initialsOf(user.name)}</AvatarFallback>
-                  </Avatar>
+                  <InitialsAvatar
+                    initials={initialsOf(user.name)}
+                    color="var(--color-primary)"
+                    photo={pictureUrl(user.pictureId)}
+                    className="size-8 rounded-lg"
+                  />
                   <div className="grid flex-1 text-start text-sm leading-tight">
                     <span className="truncate font-medium">{user.name}</span>
                     <span className="truncate text-xs text-muted-foreground">{user.email}</span>

@@ -17,9 +17,14 @@ export function InitialsAvatar({
   className?: string
 }) {
   return (
-    <Avatar className={className}>
+    // @container: the initials scale with the circle (~38% of its width), so "TT" never crowds a small
+    // avatar or looks lost in a big one
+    <Avatar className={cn('@container', className)}>
       {photo && <AvatarImage src={photo} alt="" />}
-      <AvatarFallback className="rounded-[inherit] font-semibold text-primary-foreground" style={{ background: color }}>
+      <AvatarFallback
+        className="rounded-[inherit] text-[length:38cqi] leading-none font-semibold tracking-tight text-primary-foreground"
+        style={{ background: color }}
+      >
         {initials}
       </AvatarFallback>
     </Avatar>
