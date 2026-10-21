@@ -12,8 +12,8 @@ export type CourseSummary = {
 
 export type CourseFile = { id: number; name: string; size: number; mime: string }
 
-/** video / file = a lesson material (mod_resource); task = an assignment (mod_assign). */
-export type LessonItemKind = 'video' | 'file' | 'task'
+/** video / file = a lesson material (mod_resource); text = a rich-text page (mod_page); task = an assignment (mod_assign). */
+export type LessonItemKind = 'video' | 'file' | 'text' | 'task'
 
 export type LessonItem = {
   /** IOMAD course-module id */
@@ -25,6 +25,8 @@ export type LessonItem = {
   /** tasks only: unix seconds, or null */
   dueAt: number | null
   files: CourseFile[]
+  /** text pages only: HTML, already cleaned by IOMAD (HTMLPurifier) — safe to render */
+  content: string
 }
 
 export type CourseLesson = {
@@ -41,7 +43,7 @@ export type Course = CourseSummary & { canEdit: boolean; lessons: CourseLesson[]
 export const fileUrl = (file: CourseFile) => `/files/${file.id}`
 
 /** Limits shared by forms and server actions. */
-export const COURSE_LIMITS = { title: 200, text: 5000 } as const
+export const COURSE_LIMITS = { title: 200, text: 5000, page: 200_000 } as const
 
 /** A course the signed-in student is enrolled in. */
 export type StudentCourse = {

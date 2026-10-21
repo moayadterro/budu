@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { COURSE_LIMITS } from '@/entities/course'
-import { addMaterial, deleteLessonItem, getCourse, listStudents, saveTask } from '@/entities/course/server'
+import { addMaterial, deleteLessonItem, getCourse, listStudents, savePage, saveTask } from '@/entities/course/server'
 import { notify } from '@/entities/notification/server'
 import { requireRole } from '@/entities/session/server'
 import { MAX_UPLOAD_BYTES } from '@/shared/config/upload'
@@ -65,6 +65,26 @@ export async function saveTaskAction(_prev: ContentFormState, form: FormData): P
     }
   } catch (e) {
     console.error('save task failed', e)
+    return fail('server')
+  }
+  revalidatePath(`/courses/${courseId}`)
+  return saved()
+}
+
+/** Adds a text page to a lesson, or edits one (pageId). IOMAD cleans the HTML (no scripts / unsafe links). */
+export async function saveTextAction(_prev: ContentFormState, form: FormData): Promise<ContentFormState> {
+  const user = await requireRole('teacher')
+  const courseId = formId(form, 'courseId')
+  const lessonId = formId(form, 'lessonId')
+  const pageId = formId(form, 'pageId')
+  const name = formText(form, 'name')
+  const html = String(form.get('html') ?? '')
+  if (!courseId || !lessonId || !name) return fail('invalid')
+  if (name.length > COURSE_LIMITS.title || html.length > COURSE_LIMITS.page) return fail('tooLong')
+  try {
+    await savePage(user.userId, courseId, lessonId, pageId, { name, html })
+  } catch (e) {
+    console.error('save text failed', e)
     return fail('server')
   }
   revalidatePath(`/courses/${courseId}`)

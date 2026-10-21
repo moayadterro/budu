@@ -10,11 +10,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { Icon } from '@/shared/ui/icon'
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/shared/ui/item'
 import { formatBytes } from '@/shared/lib/format'
+import { RichText } from '@/shared/ui/rich-text-editor'
 import { cn } from '@/shared/lib/cn'
 import { getGradeScale } from '@/entities/tenant/server'
 import { getT } from '@/shared/i18n/server'
 
-/** Student: one lesson — videos (streamed), documents, homework; course contents alongside. */
+/** Student: one lesson — videos (streamed), text pages, documents, homework; course contents alongside. */
 export async function LessonPage({ params }: { params: Promise<{ courseId: string; lessonId: string }> }) {
   const user = await requireRole('student')
   const p = await params
@@ -33,6 +34,7 @@ export async function LessonPage({ params }: { params: Promise<{ courseId: strin
 
   const videos = lesson.items.filter((x) => x.kind === 'video')
   const docs = lesson.items.filter((x) => x.kind === 'file')
+  const texts = lesson.items.filter((x) => x.kind === 'text')
   const tasks = homework.filter((h) => h.lessonId === lesson.id)
 
   return (
@@ -68,6 +70,18 @@ export async function LessonPage({ params }: { params: Promise<{ courseId: strin
               </figure>
             ) : null,
           )}
+
+          {texts.map((p) => (
+            <Card key={p.id}>
+              <CardHeader>
+                <CardTitle>{p.name}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {/* cleaned by IOMAD (HTMLPurifier) when saved and when read */}
+                <RichText html={p.content} />
+              </CardContent>
+            </Card>
+          ))}
 
           {docs.length > 0 && (
             <Card>

@@ -22,7 +22,7 @@ export function LessonItemView({ item }: { item: LessonItem }) {
         <ItemTitle className="max-w-full truncate">{item.name}</ItemTitle>
         <ItemDescription>
           {s.kind[item.kind]}
-          {item.kind !== 'task' && first && <> · {formatBytes(first.size)}</>}
+          {(item.kind === 'video' || item.kind === 'file') && first && <> · {formatBytes(first.size)}</>}
           {item.kind === 'task' &&
             (item.dueAt ? (
               <>
@@ -32,6 +32,10 @@ export function LessonItemView({ item }: { item: LessonItem }) {
               <> · {s.noDue}</>
             ))}
         </ItemDescription>
+        {item.kind === 'text' && item.content && (
+          // a plain-text preview of the page (the HTML is cleaned by IOMAD; tags dropped here)
+          <p className="line-clamp-2 text-sm text-muted-foreground">{item.content.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()}</p>
+        )}
         {item.kind === 'task' && item.instructions && (
           <p className="line-clamp-2 whitespace-pre-line text-sm text-muted-foreground">{item.instructions}</p>
         )}
