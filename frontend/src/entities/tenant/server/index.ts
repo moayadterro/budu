@@ -5,6 +5,7 @@ export {
   getGradeScale,
   setGradeScale,
   getTenantName,
+  isSchool,
   schoolPeople,
   schoolCourses,
   addToSchool,

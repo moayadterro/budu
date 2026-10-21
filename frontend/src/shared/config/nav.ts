@@ -17,6 +17,8 @@ export type NavItem = {
   href: string | null
   /** also shown in the mobile bottom bar */
   bottom?: boolean
+  /** only for people in a school (hidden for solo teachers / students) */
+  schoolOnly?: boolean
 }
 
 /** The nav item for `path`: the longest href that is `path` or a parent of it ('/teach' vs '/teach/classes'). */
@@ -45,8 +47,8 @@ export const NAV: Record<Role, NavItem[]> = {
   ],
   teacher: [
     { label: 'dashboard', icon: 'grid', href: '/teach', bottom: true },
-    { label: 'myClasses', icon: 'book', href: '/teach/classes', bottom: true },
-    { label: 'courses', icon: 'store', href: '/courses' },
+    { label: 'myCourses', icon: 'book', href: '/courses', bottom: true },
+    { label: 'myClasses', icon: 'layers', href: '/teach/classes', schoolOnly: true },
     { label: 'grading', icon: 'check', href: '/grading', bottom: true },
     { label: 'gradebook', icon: 'report', href: '/gradebook', bottom: true },
     { label: 'live', icon: 'video', href: '/live' },
@@ -56,7 +58,7 @@ export const NAV: Record<Role, NavItem[]> = {
     { label: 'people', icon: 'users', href: '/school/people', bottom: true },
     { label: 'courses', icon: 'store', href: '/school/courses' },
     { label: 'gradebook', icon: 'report', href: '/gradebook', bottom: true },
-    { label: 'classes', icon: 'layers', href: null },
+    { label: 'classes', icon: 'layers', href: '/school/classes', bottom: true },
     { label: 'schedule', icon: 'cal', href: '/timetable' },
     { label: 'settings', icon: 'gear', href: '/school/settings' },
   ],

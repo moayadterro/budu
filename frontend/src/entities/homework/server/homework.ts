@@ -145,14 +145,15 @@ export async function getSubmission(userId: number, homeworkId: number, studentI
 export const gradeSubmission = (userId: number, homeworkId: number, studentId: number, grade: number, feedback: string) =>
   call<{ id: number }>('grade', { userid: userId, cmid: homeworkId, studentid: studentId, grade, feedback })
 
-export async function getGradebook(userId: number, courseId: number): Promise<Gradebook | null> {
+/** Students × homework of a course; `classId` keeps only that class's students. */
+export async function getGradebook(userId: number, courseId: number, classId = 0): Promise<Gradebook | null> {
   const r = await orNull(
     call<{
       courseid: number
       coursename: string
       homework: Array<{ cmid: number; name: string; duedate: number }>
       rows: Array<{ student: RawPerson; cells: Array<{ cmid: number; status: StudentHomework['status']; grade: number }> }>
-    }>('gradebook', { courseid: courseId, userid: userId }),
+    }>('gradebook', { courseid: courseId, userid: userId, classid: classId }),
   )
   if (!r) return null
   return {

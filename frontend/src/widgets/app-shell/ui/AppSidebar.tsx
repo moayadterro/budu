@@ -34,14 +34,15 @@ import {
 import { dirOf, useLocale, useT } from '@/shared/i18n'
 
 /** App sidebar: tenant, the role's screens, signed-in user menu. Becomes a sheet on mobile. */
-export function AppSidebar() {
+export function AppSidebar({ inSchool }: { inSchool: boolean }) {
   const t = useT()
   const user = useSession((s) => s.user)
   const path = usePathname()
   const { isMobile, setOpenMobile } = useSidebar()
   const locale = useLocale()
   const closeOnMobile = () => isMobile && setOpenMobile(false)
-  const active = activeHref(NAV[user.role], path)
+  const items = NAV[user.role].filter((i) => !i.schoolOnly || inSchool)
+  const active = activeHref(items, path)
 
   return (
     <Sidebar collapsible="icon" side={dirOf(locale) === 'rtl' ? 'right' : 'left'}>
@@ -67,7 +68,7 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel>{t.role[user.role]}</SidebarGroupLabel>
           <SidebarMenu>
-            {NAV[user.role].map((item) => (
+            {items.map((item) => (
               <SidebarMenuItem key={item.label}>
                 {item.href ? (
                   <SidebarMenuButton asChild isActive={item.href === active} tooltip={t.nav[item.label]}>

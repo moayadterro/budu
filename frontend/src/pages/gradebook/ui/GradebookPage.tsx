@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { listTeacherCourses } from '@/entities/course/server'
-import { getGradeScale, schoolCourses } from '@/entities/tenant/server'
+import { listClasses } from '@/entities/school-class/server'
+import { getGradeScale, isSchool, schoolCourses } from '@/entities/tenant/server'
 import { getGradebook } from '@/entities/homework/server'
 import { requireRole } from '@/entities/session/server'
 import { StatTile } from '@/widgets/teacher-overview'
@@ -21,20 +22,32 @@ const tone = (g: number) =>
 const shown = (g: number | null, scale: GradeScale) => (g === null ? '—' : formatGrade(g, scale))
 
 /** Teacher / school manager: students × homework grades of one course, in the school's grade scale. */
-export async function GradebookPage({ searchParams }: { searchParams: Promise<{ course?: string }> }) {
+export async function GradebookPage({ searchParams }: { searchParams: Promise<{ course?: string; class?: string }> }) {
   const user = await requireRole('teacher', 'manager')
   const t = await getT()
   const s = t.gradebook
   const scale = await getGradeScale(user.companyId)
   // managers see every course of their school; teachers the ones they teach
-  const courses = !user.companyId
+  const courses: Array<{ id: number; title: string }> = !user.companyId
     ? []
-    : user.role === 'manager'
-      ? (await schoolCourses(user.userId, user.companyId)).map((c) => ({ id: c.id, title: c.title }))
-      : await listTeacherCourses(user.userId, user.companyId)
-  const wanted = Number((await searchParams).course)
-  const courseId = courses.find((c) => c.id === wanted)?.id ?? courses[0]?.id
-  const gb = courseId ? await getGradebook(user.userId, courseId) : null
+    : (user.role === 'manager'
+        ? await schoolCourses(user.userId, user.companyId)
+        : await listTeacherCourses(user.userId, user.companyId)
+      ).map((c) => ({ id: c.id, title: c.title }))
+  const q = await searchParams
+  const wanted = Number(q.course)
+  const classId = Number(q.class) > 0 ? Number(q.class) : 0
+  // a class teacher may open a course they don't teach, for their class (the plugin checks it)
+  const viaClass = classId > 0 && !courses.some((c) => c.id === wanted) && wanted > 0
+  const courseId = viaClass ? wanted : (courses.find((c) => c.id === wanted)?.id ?? courses[0]?.id)
+  const gb = courseId ? await getGradebook(user.userId, courseId, classId) : null
+  if (viaClass && gb) courses.push({ id: gb.courseId, title: gb.courseTitle })
+  // classes of the school enrolled into this course → class filter
+  const classes =
+    courseId && user.companyId && (await isSchool(user.companyId))
+      ? (await listClasses(user.userId, user.companyId)).filter((k) => k.courseIds.includes(courseId))
+      : []
+  const here = (course: number, cls?: number) => (cls ? `/gradebook?course=${course}&class=${cls}` : `/gradebook?course=${course}`)
 
   const cells = gb?.rows.flatMap((r) => r.cells) ?? []
   const grades = cells.filter((c) => c.grade !== null).map((c) => c.grade!)
@@ -44,14 +57,27 @@ export async function GradebookPage({ searchParams }: { searchParams: Promise<{ 
     <>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <ScreenHead title={s.title} sub={s.sub} />
-        {courses.length > 0 && (
-          <LinkSelect
-            className="w-full sm:w-72"
-            label={s.course}
-            value={`/gradebook?course=${courseId}`}
-            options={courses.map((c) => ({ href: `/gradebook?course=${c.id}`, label: c.title }))}
-          />
-        )}
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+          {courses.length > 0 && courseId && (
+            <LinkSelect
+              className="w-full sm:w-64"
+              label={s.course}
+              value={here(courseId)}
+              options={courses.map((c) => ({ href: here(c.id), label: c.title }))}
+            />
+          )}
+          {classes.length > 0 && courseId && (
+            <LinkSelect
+              className="w-full sm:w-48"
+              label={t.classes.classFilter}
+              value={here(courseId, classId || undefined)}
+              options={[
+                { href: here(courseId), label: t.classes.allStudents },
+                ...classes.map((k) => ({ href: here(courseId, k.id), label: k.name })),
+              ]}
+            />
+          )}
+        </div>
       </div>
 
       {!gb ? (

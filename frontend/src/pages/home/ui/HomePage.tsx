@@ -9,11 +9,12 @@ import { StudentCourseCard } from '@/entities/course'
 import { myCourses } from '@/entities/course/server'
 import { HomeworkStatusBadge } from '@/entities/homework'
 import { myHomework } from '@/entities/homework/server'
+import { myClasses } from '@/entities/school-class/server'
 import { STUDENT, SUBJECTS, TIMES, TODAY, WEEK, isLive } from '@/shared/mock'
 import { LocalTime } from '@/shared/ui/local-time'
 import { cn } from '@/shared/lib/cn'
 import { getGradeScale } from '@/entities/tenant/server'
-import { getT } from '@/shared/i18n/server'
+import { getLocale, getT } from '@/shared/i18n/server'
 
 /** Student dashboard. */
 export async function HomePage() {
@@ -21,7 +22,15 @@ export async function HomePage() {
   const user = await requireRole('student')
   const scale = await getGradeScale(user.companyId)
   const firstName = user.name.split(' ')[0] ?? ''
-  const [courses, homework] = await Promise.all([myCourses(user.userId), myHomework(user.userId)])
+  const [courses, homework, classes, locale] = await Promise.all([
+    myCourses(user.userId),
+    myHomework(user.userId),
+    myClasses(user.userId),
+    getLocale(),
+  ])
+  const today = new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date())
+  // a solo student has no class: then no class line at all
+  const classLine = classes.member.map((c) => c.name).join(' · ') || undefined
   // what's still to hand in, soonest due first (no due date last)
   const due = homework
     .filter((h) => h.status === 'new')
@@ -29,7 +38,7 @@ export async function HomePage() {
     .slice(0, 5)
   return (
     <>
-      <ScreenHead eyebrow={t.home.todayDate} title={t.home.hi(firstName)} sub={t.home.classLine} />
+      <ScreenHead eyebrow={today} title={t.home.hi(firstName)} sub={classLine} />
 
       <div className="grid items-start gap-6 lg:grid-cols-[1.5fr_1fr]">
         <div className="flex min-w-0 flex-col gap-6">

@@ -117,3 +117,13 @@ export async function addToSchool(companyId: number, userId: number, role: Schoo
 export async function setSchoolRole(managerId: number, companyId: number, userId: number, role: SchoolRole) {
   await iomadCall(defaultInstance(), 'local_budu_set_role', { companyid: companyId, userid: managerId, targetid: userId, role })
 }
+
+/** Is this company registered as a school (vs. a solo teacher's own tenant / none)? */
+export async function isSchool(companyId: number | null): Promise<boolean> {
+  if (!companyId) return false
+  const [row] = await query<{ kind: string }>(`SELECT kind FROM tenants WHERE iomad_url = $1 AND company_id = $2`, [
+    defaultInstance().url,
+    companyId,
+  ])
+  return row?.kind === 'school'
+}
