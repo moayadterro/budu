@@ -10,6 +10,17 @@ export function convert(amount: number, from: string, to: string, rates: Rates):
   return (amount / a) * b
 }
 
+/**
+ * A converted price rounded UP to a tidy figure: 1 239 → 1 240, 152 345 → 153 000, 15.37 → 16,
+ * 0.193 → 0.2. Three significant digits from 100 up, whole units from 1, cents below.
+ */
+export function roundUpPrice(amount: number) {
+  if (amount <= 0) return 0
+  const step = amount >= 100 ? 10 ** (Math.floor(Math.log10(amount)) - 2) : amount >= 1 ? 1 : 0.01
+  // tiny epsilon: 1240.0000001 must stay 1240, not become 1250
+  return Math.round(Math.ceil(amount / step - 1e-9) * step * 100) / 100
+}
+
 /** "1 200 ₽", "$15", "١٥٠٬٠٠٠ ل.س." — in the UI language; whole units once the number is large. */
 export function formatMoney(amount: number, currency: string, locale: string) {
   return new Intl.NumberFormat(locale, {

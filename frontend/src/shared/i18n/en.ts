@@ -1221,7 +1221,7 @@ export const en = {
 
   account: {
     currency: 'Currency',
-    currencyHint: 'Prices are shown in this currency — converted from the teacher’s price, so approximate.',
+    currencyHint: 'Prices are shown in this currency — converted from the teacher’s price at today’s rate and rounded up.',
     title: 'Settings',
     sub: 'Your profile, password, language and appearance.',
     profile: 'Profile',

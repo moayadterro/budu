@@ -252,7 +252,9 @@ Built and verified:
   by Moodle's HTMLPurifier on save AND read, shown with `RichText`). Teachers list a course in
   Explore with a price in any currency (`course_listings`; empty/0 = free). Students see prices in
   their Settings currency (default RUB), converted with daily rates (`shared/server/fx.ts`, admin
-  overrides at `/admin/settings`). Free → "Enrol for free" (no school step). Paid → order
+  overrides at `/admin/settings`) and rounded UP to a tidy figure, no "≈" (`roundUpPrice`: 1 239 → 1 240;
+  the RUB transfer amount uses the same figure). The Settings currency is mirrored into the
+  `budu_currency` cookie (on change and at sign-in), so the signed-out catalog matches. Free → "Enrol for free" (no school step). Paid → order
   (`orders`, number BU-000001) + popup: transfer the RUB amount to +79219263517 via Sberbank / SBP
   with the order number, receipt to billing@budu.ru (`shared/config/payment.ts`) → "I've paid" →
   platform admin confirms at `/admin/payments` → enrolled + notified. Admin confirm step not
