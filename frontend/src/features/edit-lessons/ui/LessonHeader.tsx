@@ -1,15 +1,13 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import type { CourseLesson } from '@/entities/course'
-import { Button } from '@/shared/ui/button'
-import { ConfirmButton } from '@/shared/ui/confirm-button'
-import { Icon } from '@/shared/ui/icon'
+import { MoreMenu } from '@/shared/ui/more-menu'
 import { useT } from '@/shared/i18n'
 import { deleteLessonAction, moveLessonAction } from '../server/actions'
 import { LessonForm } from './LessonForm'
 
-/** Lesson number + title + description, with move / edit / delete controls (edit opens inline). */
+/** Lesson number + title + description, with its actions in a "⋯" menu: rename (inline), move up / down, delete. */
 export function LessonHeader({
   courseId,
   lesson,
@@ -26,6 +24,9 @@ export function LessonHeader({
   const t = useT()
   const [editing, setEditing] = useState(false)
   const close = useCallback(() => setEditing(false), [])
+  const up = useRef<HTMLFormElement>(null)
+  const down = useRef<HTMLFormElement>(null)
+  const del = useRef<HTMLFormElement>(null)
   const s = t.courses
   if (editing) return <LessonForm courseId={courseId} lesson={lesson} onDone={close} />
 
@@ -36,7 +37,7 @@ export function LessonHeader({
     </>
   )
   return (
-    <div className="flex flex-wrap items-start gap-3">
+    <div className="flex items-start gap-3">
       <span className="grid size-7 flex-none place-items-center rounded-md bg-primary/10 text-xs font-semibold text-primary">
         {number}
       </span>
@@ -44,29 +45,32 @@ export function LessonHeader({
         <h3 className="font-medium leading-7">{lesson.title}</h3>
         {lesson.description && <p className="whitespace-pre-line text-sm text-muted-foreground">{lesson.description}</p>}
       </div>
-      <div className="flex items-center gap-1">
-        <form action={moveLessonAction}>
-          {ids}
-          <input type="hidden" name="direction" value="up" />
-          <Button size="icon-sm" variant="ghost" type="submit" disabled={isFirst} aria-label={s.moveUp} title={s.moveUp}>
-            <Icon name="up" />
-          </Button>
-        </form>
-        <form action={moveLessonAction}>
-          {ids}
-          <input type="hidden" name="direction" value="down" />
-          <Button size="icon-sm" variant="ghost" type="submit" disabled={isLast} aria-label={s.moveDown} title={s.moveDown}>
-            <Icon name="down" />
-          </Button>
-        </form>
-        <Button size="icon-sm" variant="ghost" type="button" onClick={() => setEditing(true)} aria-label={s.rename} title={s.rename}>
-          <Icon name="pencil" />
-        </Button>
-        <form action={deleteLessonAction}>
-          {ids}
-          <ConfirmButton label={s.delete} confirmLabel={t.confirm.lessonTitle} description={t.confirm.lessonDesc} />
-        </form>
-      </div>
+      {/* the menu's actions submit these (server actions stay plain forms) */}
+      <form ref={up} action={moveLessonAction} hidden>
+        {ids}
+        <input type="hidden" name="direction" value="up" />
+      </form>
+      <form ref={down} action={moveLessonAction} hidden>
+        {ids}
+        <input type="hidden" name="direction" value="down" />
+      </form>
+      <form ref={del} action={deleteLessonAction} hidden>
+        {ids}
+      </form>
+      <MoreMenu
+        label={t.actionsFor(lesson.title)}
+        actions={[
+          { label: s.rename, icon: 'pencil', onSelect: () => setEditing(true) },
+          { label: s.moveUp, icon: 'up', disabled: isFirst, onSelect: () => up.current?.requestSubmit() },
+          { label: s.moveDown, icon: 'down', disabled: isLast, onSelect: () => down.current?.requestSubmit() },
+        ]}
+        danger={{
+          label: s.delete,
+          confirmLabel: t.confirm.lessonTitle(lesson.title),
+          description: t.confirm.lessonDesc,
+          onConfirm: () => del.current?.requestSubmit(),
+        }}
+      />
     </div>
   )
 }

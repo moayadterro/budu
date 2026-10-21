@@ -12,6 +12,8 @@ const plural = (n: number, one: string, few: string, many: string) => {
 /** Russian UI strings. Same keys as en.ts. */
 export const ru: typeof en = {
   appName: 'Budu',
+  moreActions: 'Ещё действия',
+  actionsFor: (name: string) => `Действия: «${name}»`,
   connection: { offline: 'Нет подключения к интернету. Проверьте соединение.', back: 'Снова в сети' },
   searchPh: 'Поиск…',
   settings: 'Настройки',
@@ -1087,10 +1089,11 @@ export const ru: typeof en = {
     rejectOrderTitle: (num: string) => `Отклонить заказ ${num}?`,
     rejectOrderDesc: 'Ученик не будет записан, ему предложат написать в бухгалтерию.',
     cannotUndo: 'Это действие нельзя отменить.',
-    lessonTitle: 'Удалить этот урок?',
+    lessonTitle: (name: string) => `Удалить «${name}»?`,
     lessonDesc: 'Вместе с ним удалятся видео, файлы, тексты и задания — с ответами учеников. Это нельзя отменить.',
-    itemTitle: 'Удалить этот элемент?',
-    itemDesc: 'Если это домашнее задание, ответы и оценки учеников тоже удалятся. Это нельзя отменить.',
+    itemTitle: (name: string) => `Удалить «${name}»?`,
+    itemDesc: 'Ученики больше не увидят его. Это нельзя отменить.',
+    taskDesc: 'Ответы и оценки учеников по нему тоже удалятся. Это нельзя отменить.',
     classTitle: 'Удалить этот класс?',
     classDesc: 'Ученики останутся в школе и на своих курсах — просто больше не будут в этом классе.',
     quizDesc: 'Попытки и оценки учеников тоже удалятся. Это нельзя отменить.',

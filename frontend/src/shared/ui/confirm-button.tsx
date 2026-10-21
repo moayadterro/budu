@@ -49,18 +49,12 @@ export function ConfirmButton({
   iconOnly?: boolean
   onConfirm?: () => void
 }) {
-  const t = useT()
   const [open, setOpen] = useState(false)
   const trigger = useRef<HTMLButtonElement>(null)
   const { pending } = useFormStatus()
   const glyph = icon ?? 'trash'
-  const confirm = () => {
-    setOpen(false)
-    if (onConfirm) onConfirm()
-    else trigger.current?.form?.requestSubmit()
-  }
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
+    <>
       <Button
         ref={trigger}
         type="button"
@@ -75,18 +69,66 @@ export function ConfirmButton({
         {(icon || iconOnly) && <Icon name={glyph} />}
         {!iconOnly && label}
       </Button>
+      <ConfirmDialog
+        open={open}
+        onOpenChange={setOpen}
+        label={label}
+        confirmLabel={confirmLabel}
+        description={description}
+        icon={glyph}
+        keepLabel={keepLabel}
+        onConfirm={() => (onConfirm ? onConfirm() : trigger.current?.form?.requestSubmit())}
+      />
+    </>
+  )
+}
+
+/**
+ * The alert on its own (controlled) — for a dangerous action started from somewhere else, e.g. a
+ * "⋯" menu item (`MoreMenu`). Same look and rules as `ConfirmButton`.
+ */
+export function ConfirmDialog({
+  open,
+  onOpenChange,
+  label,
+  confirmLabel,
+  description,
+  icon = 'trash',
+  keepLabel,
+  onConfirm,
+}: {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  label: string
+  confirmLabel: string
+  description?: string
+  icon?: IconName
+  keepLabel?: string
+  onConfirm: () => void
+}) {
+  const t = useT()
+  return (
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent className="gap-0 overflow-hidden rounded-3xl p-0 shadow-2xl data-[size=default]:max-w-[calc(100%-2rem)] data-[size=default]:sm:max-w-sm">
         <AlertDialogHeader className="flex flex-col items-center gap-2 px-6 pt-7 pb-5 text-center sm:group-data-[size=default]/alert-dialog-content:place-items-center sm:group-data-[size=default]/alert-dialog-content:text-center">
           <div className="mb-2 grid size-14 place-items-center rounded-full bg-destructive/10 text-destructive" aria-hidden>
-            <Icon name={glyph} className="size-7" />
+            <Icon name={icon} className="size-7" />
           </div>
           <AlertDialogTitle className="text-lg leading-snug font-semibold text-balance">{confirmLabel}</AlertDialogTitle>
           <AlertDialogDescription className="text-pretty">{description ?? t.confirm.cannotUndo}</AlertDialogDescription>
         </AlertDialogHeader>
         {/* stacked, full width (like macOS / iOS alerts): big targets, long labels never wrap awkwardly */}
         <AlertDialogFooter className="flex-col gap-2 px-6 pb-6 sm:flex-col">
-          <AlertDialogAction size="lg" variant="danger" className="h-12 w-full rounded-xl text-base" onClick={confirm}>
-            <Icon name={glyph} />
+          <AlertDialogAction
+            size="lg"
+            variant="danger"
+            className="h-12 w-full rounded-xl text-base"
+            onClick={() => {
+              onOpenChange(false)
+              onConfirm()
+            }}
+          >
+            <Icon name={icon} />
             {label}
           </AlertDialogAction>
           <AlertDialogCancel size="lg" variant="secondary" className="h-12 w-full rounded-xl text-base" autoFocus>

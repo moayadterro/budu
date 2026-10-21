@@ -94,6 +94,8 @@ Unbuilt screens stay in `shared/config/nav.ts` with `href: null` (rendered disab
   that NAMES the thing ("Remove Class 10 from “Physics 101”?" — never just "Remove?"), the
   consequence (`description`), then two big stacked buttons: solid red action (icon + verb) and
   "Cancel" (focused). When the action itself is a cancel, pass `keepLabel` ("Keep the invitation").
+  Lists with many rows (lessons, lesson items): no red button per row — put the row's actions in a
+  quiet "⋯" `MoreMenu` (ordinary actions, a divider, then the red one, which opens `ConfirmDialog`).
   Our own helpers in shared/ui: `Field`, `SubmitButton`, `ConfirmButton`, `PasswordInput`,
   `ScreenHead`, `AuthCard`, `InitialsAvatar`, `LocalTime`, `Icon`.
 - **Icons: Hugeicons** (free set, `@hugeicons/react` + `@hugeicons/core-free-icons`). App code uses

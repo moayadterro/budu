@@ -1,6 +1,8 @@
 /** English UI strings — the reference dictionary. Every user-facing string lives here; ru.ts / ar.ts mirror it. */
 export const en = {
   appName: 'Budu',
+  moreActions: 'More actions',
+  actionsFor: (name: string) => `Actions for “${name}”`,
   connection: { offline: 'You’re offline. Check your connection.', back: 'Back online' },
   searchPh: 'Search…',
   settings: 'Settings',
@@ -1078,10 +1080,11 @@ export const en = {
     rejectOrderTitle: (num: string) => `Reject order ${num}?`,
     rejectOrderDesc: 'The student isn’t enrolled and is told to contact billing.',
     cannotUndo: 'This can’t be undone.',
-    lessonTitle: 'Delete this lesson?',
+    lessonTitle: (name: string) => `Delete “${name}”?`,
     lessonDesc: 'Its videos, files, text pages and homework are deleted too — with students’ answers. This can’t be undone.',
-    itemTitle: 'Delete this item?',
-    itemDesc: 'If it’s homework, students’ answers and grades are deleted too. This can’t be undone.',
+    itemTitle: (name: string) => `Delete “${name}”?`,
+    itemDesc: 'Students won’t see it any more. This can’t be undone.',
+    taskDesc: 'Students’ answers and grades for it are deleted too. This can’t be undone.',
     classTitle: 'Delete this class?',
     classDesc: 'Its students stay in the school and keep their courses; they’re just no longer in this class.',
     quizDesc: 'Students’ attempts and grades are deleted too. This can’t be undone.',

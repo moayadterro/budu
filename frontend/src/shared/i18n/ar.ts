@@ -12,6 +12,8 @@ const plural = (n: number, one: string, two: string, few: string, many: string) 
 /** Arabic UI strings (shown right-to-left). Same keys as en.ts. */
 export const ar: typeof en = {
   appName: 'Budu',
+  moreActions: 'إجراءات أخرى',
+  actionsFor: (name: string) => `إجراءات «${name}»`,
   connection: { offline: 'أنت غير متصل. تحقق من اتصالك بالإنترنت.', back: 'عاد الاتصال' },
   searchPh: 'بحث…',
   settings: 'الإعدادات',
@@ -1085,10 +1087,11 @@ export const ar: typeof en = {
     rejectOrderTitle: (num: string) => `رفض الطلب ${num}؟`,
     rejectOrderDesc: 'لن يُسجَّل الطالب، وسيُطلب منه مراسلة قسم الفواتير.',
     cannotUndo: 'لا يمكن التراجع عن هذا.',
-    lessonTitle: 'حذف هذا الدرس؟',
+    lessonTitle: (name: string) => `حذف «${name}»؟`,
     lessonDesc: 'ستُحذف معه مقاطع الفيديو والملفات والنصوص والواجبات — مع إجابات الطلاب. لا يمكن التراجع عن هذا.',
-    itemTitle: 'حذف هذا العنصر؟',
-    itemDesc: 'إن كان واجبًا فستُحذف إجابات الطلاب ودرجاتهم أيضًا. لا يمكن التراجع عن هذا.',
+    itemTitle: (name: string) => `حذف «${name}»؟`,
+    itemDesc: 'لن يراه الطلاب بعد الآن. لا يمكن التراجع عن هذا.',
+    taskDesc: 'ستُحذف إجابات الطلاب ودرجاتهم عليه أيضًا. لا يمكن التراجع عن هذا.',
     classTitle: 'حذف هذا الصف؟',
     classDesc: 'يبقى طلابه في المدرسة وفي مقرراتهم؛ فقط لن يكونوا في هذا الصف.',
     quizDesc: 'ستُحذف محاولات الطلاب ودرجاتهم أيضًا. لا يمكن التراجع عن هذا.',

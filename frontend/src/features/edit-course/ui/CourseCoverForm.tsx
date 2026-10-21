@@ -42,7 +42,8 @@ export function CourseCoverForm({ courseId, title, imageId }: { courseId: number
           <form action={action}>
             <input type="hidden" name="courseId" value={courseId} />
             <input type="hidden" name="remove" value="1" />
-            <ConfirmButton label={s.remove} confirmLabel={t.confirm.coverTitle} disabled={pending} />
+            {/* quiet icon button next to "Change" — still asks first */}
+            <ConfirmButton iconOnly label={s.remove} confirmLabel={t.confirm.coverTitle} disabled={pending} />
           </form>
         )}
       </div>
