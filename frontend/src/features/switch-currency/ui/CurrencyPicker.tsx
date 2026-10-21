@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useTransition } from 'react'
-import { CURRENCIES, type Currency } from '@/shared/config/currency'
+import { useRouter } from 'next/navigation'
+import { useEffect, useRef, useState, useTransition } from 'react'
+import { CURRENCIES, isCurrency, type Currency } from '@/shared/config/currency'
 import { currencyName } from '@/shared/lib/money'
 import { NativeSelect, NativeSelectOption } from '@/shared/ui/native-select'
 import { useLocale, useT } from '@/shared/i18n'
@@ -13,6 +14,37 @@ export function CurrencyPicker({ value, compact = false }: { value: Currency; co
   const locale = useLocale()
   const [current, setCurrent] = useState(value)
   const [pending, start] = useTransition()
+  const router = useRouter()
+  // follow the server's value when it changes (sign-in, refresh …), or the picker and the prices disagree
+  const [seen, setSeen] = useState(value)
+  if (value !== seen) {
+    setSeen(value)
+    setCurrent(value)
+  }
+  // changed in another tab? The browser cookie mirrors the choice (also for signed-in users), and
+  // clicking around doesn't re-render this header — so when the cookie changes (or this tab comes
+  // back into view and it changed meanwhile), show it and re-render the prices.
+  const lastCookie = useRef<string | null>(null)
+  useEffect(() => {
+    const read = () => document.cookie.match(/(?:^|; )budu_currency=([^;]+)/)?.[1] ?? null
+    lastCookie.current = read()
+    const sync = () => {
+      const c = read()
+      if (c === lastCookie.current || !isCurrency(c)) return
+      lastCookie.current = c
+      setCurrent(c)
+      router.refresh()
+    }
+    const store = (window as { cookieStore?: EventTarget }).cookieStore // Chrome, Safari 18.4+
+    store?.addEventListener('change', sync)
+    document.addEventListener('visibilitychange', sync)
+    window.addEventListener('focus', sync)
+    return () => {
+      store?.removeEventListener('change', sync)
+      document.removeEventListener('visibilitychange', sync)
+      window.removeEventListener('focus', sync)
+    }
+  }, [router])
   return (
     <NativeSelect
       value={current}
