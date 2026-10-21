@@ -168,6 +168,18 @@ export const ar: typeof en = {
   },
 
   courses: {
+    uploadState: {
+      uploading: 'جارٍ الرفع…',
+      resuming: 'نتابع من حيث توقف…',
+      processing: 'جارٍ المعالجة — أوشكنا…',
+      offline: 'بانتظار الاتصال…',
+      offlineHint: 'انقطع الإنترنت. سيتابع الرفع تلقائيًا عند عودة الاتصال — أبقِ هذه الصفحة مفتوحة.',
+      offlineStopped: 'انقطع الاتصال طويلًا. اضغط «متابعة» عند عودة الإنترنت.',
+      failed: 'توقف الرفع. اضغط «متابعة» للاستمرار من حيث توقف.',
+      retry: (pct: number) => `متابعة (${pct}%)`,
+      cancel: 'إلغاء الرفع',
+      left: (s: number) => (s < 60 ? `بقي ${s} ث` : `بقي ${Math.round(s / 60)} د`),
+    },
     cover: {
       title: 'صورة الغلاف',
       upload: 'رفع صورة',

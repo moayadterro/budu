@@ -65,7 +65,7 @@ Slice layout: `ui/` (components), `model/` (types, client state, validation), `l
 `import { SubjectCard } from '@/entities/subject'` — never `@/entities/subject/ui/SubjectCard`.
 `shared` is the exception: import per segment (`@/shared/ui/button`, `@/shared/lib/cn`).
 
-**Server code & security — there are NO API routes; the browser only talks to server actions.**
+**Server code & security — NO API routes (two exceptions: `/files`, `/uploads`, see Decision log); the browser talks to server actions.**
 - `server/actions.ts` (file starts with `'use server'`) = **server actions**: the only server code the
   browser can call. Each one is a public endpoint — validate input, check the session/role inside it.
 - Every other file in a `server/` folder is a **private helper** (db, tokens, IOMAD, mail, cookies) and
@@ -306,6 +306,8 @@ Built and verified:
 - Teacher course builder (live IOMAD data): `/courses` (my courses), `/courses/new`, `/courses/:id`
   (details, publish/draft, lessons add/rename/move/delete, upload video/PDF/files, tasks with due date
   + attachment). Files via `/files/:id`. Tested in the browser 2026-10-20.
+- Resumable lesson-material uploads (tus, 5 MB pieces, progress / speed / time left, continues after
+  a dropped connection or a reload, cancel). Protocol + ownership tested 2026-10-21.
 
 Not built yet (rough priority):
 1. Still mock: live classroom. Live courses at a set time (BBB) — later. Real payment provider (then
@@ -313,7 +315,7 @@ Not built yet (rough priority):
    Video: transcoding / CDN (Kinescope, Bunny Stream or self-hosted HLS) behind `/files` later —
    NOT YouTube/RuTube (their terms require their branded player; see Decision log).
 2. Teacher follow-ups: invite link for students without an account, lesson completion / progress,
-   pricing / audience / subject fields (prototype), upload progress bar, AI feedback draft.
+   pricing / audience / subject fields (prototype), AI feedback draft.
    Admin screens: people, course deals, platform settings (only "Tenants" exists).
 3. Manager follow-ups: course catalog + approvals (paid courses), remove
    someone from the school, resend an invite.
@@ -331,6 +333,15 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-21 Lesson materials upload resumably (owner: "it just need to be resumable", storage stays
+  in IOMAD). tus protocol: tus-js-client in the browser, @tus/server + @tus/file-store behind the
+  SECOND route-handler exception `/uploads` (`app/uploads/[[...tus]]/route.ts` →
+  `features/upload-material/server/tus.ts`). Creating checks session + course edit rights + lesson;
+  the uploader's id is stored in the upload's metadata and every later request must come from them
+  (else 404). Pieces sit in the `upload-chunks` volume (`UPLOAD_DIR`); when complete the file goes to
+  IOMAD via `addMaterial` and is deleted; unfinished ones expire after a day (`cleanUpUploads`, run
+  from AppShell `after()`). With several frontend servers, `/uploads` needs a shared volume or sticky
+  routing. Homework/cover/avatar uploads stay plain server actions (small files).
 - 2026-10-21 The course catalog is public (owner: visitors browse, then sign up to enrol). `/files` is
   reachable without a session but then asks IOMAD as user 0, which allows ONLY covers of published
   courses (everything else 404). `/catalog` and `/files` are in PUBLIC_PATHS; nothing else is.

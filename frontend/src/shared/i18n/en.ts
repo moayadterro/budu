@@ -157,6 +157,18 @@ export const en = {
   },
 
   courses: {
+    uploadState: {
+      uploading: 'Uploading…',
+      resuming: 'Continuing where it stopped…',
+      processing: 'Processing — almost done…',
+      offline: 'Waiting for connection…',
+      offlineHint: 'Your internet dropped. The upload continues by itself when you’re back online — keep this page open.',
+      offlineStopped: 'The connection was lost for too long. Press Continue when you’re back online.',
+      failed: 'The upload stopped. Press Continue to go on from where it stopped.',
+      retry: (pct: number) => `Continue (${pct}%)`,
+      cancel: 'Cancel upload',
+      left: (s: number) => (s < 60 ? `${s} s left` : `${Math.round(s / 60)} min left`),
+    },
     cover: {
       title: 'Cover image',
       upload: 'Upload image',
