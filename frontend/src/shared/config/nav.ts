@@ -6,8 +6,8 @@ import type { Messages } from '@/shared/i18n'
  * (NAV, t.role …) and the resolution rules in entities/user/lib/role.ts.
  * See CLAUDE.md → "Roles".
  */
-export type Role = 'admin' | 'manager' | 'teacher' | 'student'
-export const ROLES: Role[] = ['admin', 'manager', 'teacher', 'student']
+export type Role = 'admin' | 'manager' | 'teacher' | 'student' | 'parent'
+export const ROLES: Role[] = ['admin', 'manager', 'teacher', 'student', 'parent']
 
 export type NavItem = {
   /** key into t.nav (the label is translated where it's rendered) */
@@ -53,6 +53,11 @@ export const NAV: Record<Role, NavItem[]> = {
     { label: 'grading', icon: 'check', href: '/grading', bottom: true },
     { label: 'gradebook', icon: 'report', href: '/gradebook', bottom: true },
     { label: 'live', icon: 'video', href: '/live' },
+    { label: 'messages', icon: 'chat', href: '/messages', bottom: true },
+  ],
+  parent: [
+    { label: 'family', icon: 'grid', href: '/family', bottom: true },
+    { label: 'messages', icon: 'chat', href: '/messages', bottom: true },
   ],
   manager: [
     { label: 'school', icon: 'grid', href: '/school', bottom: true },

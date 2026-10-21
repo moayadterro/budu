@@ -12,6 +12,8 @@ type State = {
   feedback: string
   /** unix seconds, or null */
   submittedAt: number | null
+  /** unix seconds, or null */
+  gradedAt: number | null
 }
 
 /** One homework in the student's list. */

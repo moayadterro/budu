@@ -8,7 +8,8 @@ export type Membership = { companyid: number; companyname: string; managertype: 
  *   2. manager of a company registered as a school    → manager (runs a school/company)
  *   3. educator in a company                           → teacher (incl. a solo teacher's own tenant)
  *   4. manager of any other company                    → manager
- *   5. anyone else                                     → student
+ *   5. parent of at least one (accepted) child          → parent
+ *   6. anyone else                                     → student
  * `schoolTenants` = company ids registered as kind 'school' in app-db. Needed because IOMAD flags
  * every company manager as an educator too, so "educator" alone can't tell a school manager from a teacher.
  * New roles get a rule here (most powerful first).
@@ -17,6 +18,7 @@ export function roleFor(
   memberships: Membership[],
   siteadmin = false,
   schoolTenants: ReadonlySet<number> = new Set(),
+  children = 0,
 ): { role: Role; companyId: number | null } {
   if (siteadmin) return { role: 'admin', companyId: null }
   const runsSchool = memberships.find((m) => m.managertype > 0 && schoolTenants.has(m.companyid))
@@ -25,5 +27,6 @@ export function roleFor(
   if (teaching) return { role: 'teacher', companyId: teaching.companyid }
   const managing = memberships.find((m) => m.managertype > 0)
   if (managing) return { role: 'manager', companyId: managing.companyid }
+  if (children > 0) return { role: 'parent', companyId: null }
   return { role: 'student', companyId: memberships[0]?.companyid ?? null }
 }

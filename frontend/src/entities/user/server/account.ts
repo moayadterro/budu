@@ -17,6 +17,8 @@ export type Account =
       siteadmin: boolean
       /** profile picture file id, 0 = none */
       picture: number
+      /** how many children this user is the parent of (IOMAD parent role) */
+      children?: number
       memberships: Membership[]
     }
   | { found: false; memberships: [] }

@@ -21,7 +21,7 @@ export const ru: typeof en = {
   showPassword: 'Показать пароль',
   hidePassword: 'Скрыть пароль',
 
-  role: { admin: 'Администратор', manager: 'Менеджер', teacher: 'Учитель', student: 'Ученик' },
+  role: { admin: 'Администратор', manager: 'Менеджер', teacher: 'Учитель', student: 'Ученик', parent: 'Родитель' },
 
   nav: {
     myCourses: 'Мои курсы',
@@ -42,6 +42,8 @@ export const ru: typeof en = {
     people: 'Люди',
     schedule: 'Расписание',
     settings: 'Настройки',
+    family: 'Мои дети',
+    messages: 'Сообщения',
   },
 
   subject: {
@@ -414,6 +416,26 @@ export const ru: typeof en = {
         title: (p: Record<string, string>) => `${p.school}: ${p.event}`,
         body: (p: Record<string, string>) => `Новое событие школы: «${p.event}». Смотрите в расписании.`,
       },
+      parentRequest: {
+        title: (p: Record<string, string>) => `${p.child} просит подтвердить, что вы родитель`,
+        body: (p: Record<string, string>) =>
+          `${p.child} указал(а) вас как родителя на Budu. Подтвердите, чтобы следить за домашними заданиями и оценками и общаться с учителями.`,
+      },
+      parentAnswered: {
+        title: (p: Record<string, string>) => (p.answer === 'accepted' ? `${p.parent} теперь ваш родитель на Budu` : `${p.parent} отклонил(а) запрос`),
+        body: (p: Record<string, string>) =>
+          p.answer === 'accepted'
+            ? `${p.parent} подтвердил(а) запрос и теперь видит ваши успехи и может писать учителям.`
+            : `${p.parent} отклонил(а) запрос. Вы можете добавить другого родителя в настройках.`,
+      },
+      newMessage: {
+        title: (p: Record<string, string>) => `Новое сообщение от ${p.from}`,
+        body: (p: Record<string, string>) => `${p.from} пишет вам об ученике ${p.child}: «${p.preview}»`,
+      },
+      announcement: {
+        title: (p: Record<string, string>) => `${p.school}: ${p.title}`,
+        body: (p: Record<string, string>) => p.body || `Новое объявление от «${p.school}»: «${p.title}».`,
+      },
       addedToSchool: {
         title: (p: Record<string, string>) => `Вы в школе «${p.school}»`,
         body: (p: Record<string, string>) => `${p.by} добавил(а) вас в «${p.school}» как: ${p.role}.`,
@@ -541,7 +563,7 @@ export const ru: typeof en = {
 
   invites: {
     title: 'Приглашения',
-    sub: 'Школы, которые вас пригласили. Вы вступите, только если примете приглашение.',
+    sub: 'Приглашения от школ и запросы от детей. Ничего не изменится, пока вы не примете их.',
     empty: 'Сейчас приглашений нет.',
     from: (p: { school: string; role: string; by: string }) => `${p.by} приглашает вас в «${p.school}». Роль: ${p.role}.`,
     accept: 'Принять',
@@ -582,6 +604,96 @@ export const ru: typeof en = {
       tooMany: 'Это больше 200 уроков — сократите период.',
       server: 'Что-то пошло не так. Попробуйте ещё раз.',
     },
+  },
+
+  family: {
+    stepTitle: 'Добавьте родителя',
+    stepSub: 'Родитель сможет следить за вашими заданиями и оценками и общаться с учителями. Так учиться легче.',
+    parentFirst: 'Имя родителя',
+    parentLast: 'Фамилия родителя',
+    parentEmail: 'Email родителя',
+    send: 'Отправить запрос',
+    continue: 'Продолжить',
+    skip: 'Пропустить',
+    sent: (email: string) => `Запрос отправлен на ${email}. Родитель получит письмо для подтверждения.`,
+    errors: {
+      invalid: 'Проверьте имя и email.',
+      self: 'Нельзя добавить самого себя.',
+      pending: 'Запрос этому человеку уже ждёт ответа.',
+      already: 'Этот человек уже ваш родитель.',
+      server: 'Что-то пошло не так. Попробуйте ещё раз.',
+    },
+    cardTitle: 'Добавьте родителя',
+    cardSub: 'Учиться легче, когда родитель в курсе. Пригласите его в Budu.',
+    cardAction: 'Добавить родителя',
+    parentsTitle: 'Родители',
+    parentsSub: 'Те, кто видит ваши успехи и может писать вашим учителям.',
+    noParents: 'Родитель ещё не добавлен.',
+    waiting: 'Ждём подтверждения',
+    cancel: 'Отменить запрос',
+    remove: 'Удалить',
+    confirmRemove: 'Удалить?',
+    requestsTitle: 'Запросы от детей',
+    requestFrom: (child: string) =>
+      `${child} просит подтвердить, что вы родитель. Вы будете видеть задания, оценки и новости школы и сможете писать учителям.`,
+    requestBanner: (child: string) => `${child} просит подтвердить, что вы родитель.`,
+    accept: 'Подтвердить',
+    decline: 'Отклонить',
+    homeTitle: 'Мои дети',
+    homeSub: 'Как дела у ваших детей в школе.',
+    noChildren: 'Пока нет связанных детей. Когда ребёнок добавит вас как родителя, он появится здесь.',
+    viewProgress: 'Подробнее',
+    thisWeek: 'За 7 дней',
+    periods: { day: 'За 24 часа', week: 'За 7 дней', month: 'За 30 дней' },
+    stats: { handedIn: 'Сдано', late: 'Сдано с опозданием', overdue: 'Просрочено', average: 'Средняя оценка' },
+    feedbackTitle: 'Оценки и отзывы учителей',
+    noFeedback: 'За этот период оценок нет.',
+    overdueTitle: 'Просроченные задания',
+    noOverdue: 'Просроченных заданий нет.',
+    wasDue: 'срок',
+    coursesTitle: 'Курсы',
+    average: 'Средняя',
+    homeworkDone: (done: number, total: number) => `Сдано ${done} из ${total}`,
+    noCourses: 'Пока не записан(а) ни на один курс.',
+    message: 'Написать',
+    eventsTitle: 'События школы',
+    back: 'Мои дети',
+    late: 'С опозданием',
+  },
+
+  messages: {
+    title: 'Сообщения',
+    sub: 'Переписка родителей и учителей.',
+    empty: 'Переписок пока нет.',
+    emptyParent: 'Откройте страницу ребёнка, выберите учителя и нажмите «Написать».',
+    emptyTeacher: 'Родители могут написать вам. Начать можно и со вкладки «Ученики» курса.',
+    about: (child: string) => `Об ученике: ${child}`,
+    placeholder: 'Напишите сообщение…',
+    send: 'Отправить',
+    noMessages: 'Сообщений пока нет. Поздоровайтесь.',
+    pick: 'Выберите переписку.',
+    parentsOf: (name: string) => `Родители: ${name}`,
+    parentsOfSub: 'Напишите родителю об этом ученике.',
+    noParentsOf: (name: string) => `У ученика ${name} пока нет родителя на Budu.`,
+    messageParents: 'Написать родителям',
+    you: 'Вы',
+    back: 'Все переписки',
+    tooLong: 'Сообщение слишком длинное.',
+  },
+
+  announcements: {
+    title: 'Объявления',
+    sub: 'Новости для всей школы — учеников, учителей и родителей.',
+    new: 'Новое объявление',
+    titleLabel: 'Заголовок',
+    bodyLabel: 'Текст',
+    post: 'Опубликовать',
+    posted: '✓ Опубликовано',
+    empty: 'Объявлений пока нет.',
+    delete: 'Удалить',
+    confirmDelete: 'Удалить?',
+    by: (name: string) => `автор: ${name}`,
+    invalid: 'Добавьте заголовок.',
   },
 
   explore: {
@@ -775,6 +887,12 @@ export const ru: typeof en = {
   },
 
   email: {
+    parentInvite: {
+      subject: (child: string) => `${child} приглашает вас в Budu как родителя`,
+      body: (child: string) =>
+        `${child} просит вас стать родителем на Budu: вы сможете следить за домашними заданиями и оценками и общаться с учителями. Задайте пароль, чтобы подтвердить и активировать аккаунт. Ссылка действует 7 дней.`,
+      action: 'Подтвердить и задать пароль',
+    },
     invite: {
       subject: (school: string) => `Приглашение в «${school}» на Budu`,
       body: (p: { school: string; by: string; role: string }) =>

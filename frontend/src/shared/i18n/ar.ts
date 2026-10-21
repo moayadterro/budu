@@ -21,7 +21,7 @@ export const ar: typeof en = {
   showPassword: 'إظهار كلمة المرور',
   hidePassword: 'إخفاء كلمة المرور',
 
-  role: { admin: 'مدير المنصة', manager: 'مدير', teacher: 'معلم', student: 'طالب' },
+  role: { admin: 'مدير المنصة', manager: 'مدير', teacher: 'معلم', student: 'طالب', parent: 'ولي أمر' },
 
   nav: {
     myCourses: 'دوراتي',
@@ -42,6 +42,8 @@ export const ar: typeof en = {
     people: 'الأشخاص',
     schedule: 'الجدول',
     settings: 'الإعدادات',
+    family: 'أبنائي',
+    messages: 'الرسائل',
   },
 
   subject: {
@@ -412,6 +414,26 @@ export const ar: typeof en = {
         title: (p: Record<string, string>) => `${p.school}: ${p.event}`,
         body: (p: Record<string, string>) => `فعالية مدرسية جديدة: «${p.event}». تجدها في جدولك.`,
       },
+      parentRequest: {
+        title: (p: Record<string, string>) => `${p.child} يطلب إضافتك كولي أمر`,
+        body: (p: Record<string, string>) =>
+          `أضافك ${p.child} كولي أمر على Budu. اقبل الطلب لمتابعة الواجبات والدرجات والتواصل مع المعلمين.`,
+      },
+      parentAnswered: {
+        title: (p: Record<string, string>) => (p.answer === 'accepted' ? `${p.parent} أصبح ولي أمرك على Budu` : `رفض ${p.parent} طلبك`),
+        body: (p: Record<string, string>) =>
+          p.answer === 'accepted'
+            ? `قبل ${p.parent} الطلب، ويمكنه الآن متابعة تقدمك والتواصل مع معلميك.`
+            : `رفض ${p.parent} طلب ولي الأمر. يمكنك إضافة ولي أمر آخر من الإعدادات.`,
+      },
+      newMessage: {
+        title: (p: Record<string, string>) => `رسالة جديدة من ${p.from}`,
+        body: (p: Record<string, string>) => `كتب إليك ${p.from} بخصوص ${p.child}: «${p.preview}»`,
+      },
+      announcement: {
+        title: (p: Record<string, string>) => `${p.school}: ${p.title}`,
+        body: (p: Record<string, string>) => p.body || `إعلان جديد من ${p.school}: «${p.title}».`,
+      },
       addedToSchool: {
         title: (p: Record<string, string>) => `انضممت إلى ${p.school}`,
         body: (p: Record<string, string>) => `أضافك ${p.by} إلى ${p.school} بصفة ${p.role}.`,
@@ -539,7 +561,7 @@ export const ar: typeof en = {
 
   invites: {
     title: 'الدعوات',
-    sub: 'المدارس التي دعتك. لا تنضم إلا إذا قبلت.',
+    sub: 'دعوات المدارس وطلبات الأبناء لإضافتك كولي أمر. لا يتغير شيء حتى تقبل.',
     empty: 'لا توجد دعوات الآن.',
     from: (p: { school: string; role: string; by: string }) => `يدعوك ${p.by} للانضمام إلى ${p.school} بصفة ${p.role}.`,
     accept: 'قبول',
@@ -580,6 +602,96 @@ export const ar: typeof en = {
       tooMany: 'هذا أكثر من 200 درس — قصّر المدة.',
       server: 'حدث خطأ ما. حاول مرة أخرى.',
     },
+  },
+
+  family: {
+    stepTitle: 'أضف ولي أمرك',
+    stepSub: 'يستطيع ولي الأمر متابعة واجباتك ودرجاتك والتواصل مع معلميك، وهذا يجعل التعلم أفضل.',
+    parentFirst: 'الاسم الأول لولي الأمر',
+    parentLast: 'اسم عائلة ولي الأمر',
+    parentEmail: 'البريد الإلكتروني لولي الأمر',
+    send: 'إرسال الطلب',
+    continue: 'متابعة',
+    skip: 'تخطَّ الآن',
+    sent: (email: string) => `أُرسل الطلب إلى ${email}. سيصله بريد للتأكيد.`,
+    errors: {
+      invalid: 'تحقق من الاسم والبريد الإلكتروني.',
+      self: 'لا يمكنك إضافة نفسك.',
+      pending: 'يوجد طلب بانتظار رد هذا الشخص.',
+      already: 'هذا الشخص ولي أمرك بالفعل.',
+      server: 'حدث خطأ ما. حاول مرة أخرى.',
+    },
+    cardTitle: 'أضف ولي أمر',
+    cardSub: 'يكون التعلم أفضل عندما يتابع ولي الأمر. ادعُه للانضمام إلى Budu.',
+    cardAction: 'إضافة ولي أمر',
+    parentsTitle: 'أولياء الأمور',
+    parentsSub: 'من يمكنهم رؤية تقدمك والتواصل مع معلميك.',
+    noParents: 'لم تتم إضافة ولي أمر بعد.',
+    waiting: 'بانتظار القبول',
+    cancel: 'إلغاء الطلب',
+    remove: 'إزالة',
+    confirmRemove: 'إزالة؟',
+    requestsTitle: 'طلبات أولياء الأمور',
+    requestFrom: (child: string) =>
+      `يطلب ${child} إضافتك كولي أمر. سترى واجباته ودرجاته وأخبار المدرسة، ويمكنك مراسلة معلميه.`,
+    requestBanner: (child: string) => `يطلب ${child} إضافتك كولي أمر.`,
+    accept: 'قبول',
+    decline: 'رفض',
+    homeTitle: 'أبنائي',
+    homeSub: 'كيف يسير أبناؤك في المدرسة.',
+    noChildren: 'لا يوجد أبناء مرتبطون بعد. عندما يضيفك ابنك كولي أمر سيظهر هنا.',
+    viewProgress: 'عرض التقدم',
+    thisWeek: 'آخر 7 أيام',
+    periods: { day: 'آخر 24 ساعة', week: 'آخر 7 أيام', month: 'آخر 30 يومًا' },
+    stats: { handedIn: 'تم التسليم', late: 'سُلِّم متأخرًا', overdue: 'متأخر', average: 'متوسط الدرجات' },
+    feedbackTitle: 'الدرجات وملاحظات المعلمين',
+    noFeedback: 'لا توجد درجات في هذه الفترة.',
+    overdueTitle: 'واجبات متأخرة',
+    noOverdue: 'لا يوجد شيء متأخر.',
+    wasDue: 'كان موعده',
+    coursesTitle: 'المقررات',
+    average: 'المتوسط',
+    homeworkDone: (done: number, total: number) => `سُلِّم ${done} من ${total}`,
+    noCourses: 'غير مسجل في أي مقرر بعد.',
+    message: 'مراسلة',
+    eventsTitle: 'فعاليات المدرسة',
+    back: 'أبنائي',
+    late: 'متأخر',
+  },
+
+  messages: {
+    title: 'الرسائل',
+    sub: 'محادثات بين أولياء الأمور والمعلمين.',
+    empty: 'لا توجد محادثات بعد.',
+    emptyParent: 'افتح صفحة ابنك، واختر معلمًا، ثم اضغط «مراسلة».',
+    emptyTeacher: 'يمكن لأولياء الأمور مراسلتك. ويمكنك البدء أيضًا من تبويب «الطلاب» في المقرر.',
+    about: (child: string) => `بخصوص ${child}`,
+    placeholder: 'اكتب رسالة…',
+    send: 'إرسال',
+    noMessages: 'لا توجد رسائل بعد. ابدأ بالتحية.',
+    pick: 'اختر محادثة.',
+    parentsOf: (name: string) => `أولياء أمور ${name}`,
+    parentsOfSub: 'راسل ولي أمر بخصوص هذا الطالب.',
+    noParentsOf: (name: string) => `ليس لدى ${name} ولي أمر على Budu بعد.`,
+    messageParents: 'مراسلة أولياء الأمور',
+    you: 'أنت',
+    back: 'كل المحادثات',
+    tooLong: 'الرسالة طويلة جدًا.',
+  },
+
+  announcements: {
+    title: 'الإعلانات',
+    sub: 'أخبار لكل من في المدرسة — الطلاب والمعلمين وأولياء الأمور.',
+    new: 'إعلان جديد',
+    titleLabel: 'العنوان',
+    bodyLabel: 'النص',
+    post: 'نشر',
+    posted: '✓ تم النشر',
+    empty: 'لا توجد إعلانات بعد.',
+    delete: 'حذف',
+    confirmDelete: 'حذف؟',
+    by: (name: string) => `بواسطة ${name}`,
+    invalid: 'أضف عنوانًا.',
   },
 
   explore: {
@@ -772,6 +884,12 @@ export const ar: typeof en = {
   },
 
   email: {
+    parentInvite: {
+      subject: (child: string) => `${child} يدعوك إلى Budu كولي أمر`,
+      body: (child: string) =>
+        `يطلب منك ${child} أن تكون ولي أمره على Budu، لتتابع واجباته ودرجاته وتتواصل مع معلميه. اختر كلمة مرور لقبول الطلب وتفعيل حسابك. الرابط صالح لمدة 7 أيام.`,
+      action: 'القبول واختيار كلمة المرور',
+    },
     invite: {
       subject: (school: string) => `دعوة للانضمام إلى ${school} على Budu`,
       body: (p: { school: string; by: string; role: string }) =>

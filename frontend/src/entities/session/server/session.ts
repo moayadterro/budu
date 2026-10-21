@@ -77,7 +77,7 @@ async function refresh(hash: string, user: SessionUser): Promise<SessionUser | n
       await query(`DELETE FROM sessions WHERE token_hash = $1`, [hash])
       return null
     }
-    const { role, companyId } = await resolveRole(account.memberships, account.siteadmin)
+    const { role, companyId } = await resolveRole(account.memberships, account.siteadmin, account.children)
     const name = `${account.firstname} ${account.lastname}`.trim()
     const pictureId = account.picture || null
     await query(
@@ -126,4 +126,9 @@ export async function revokeOtherSessions(userId: number) {
 /** Sign the user out everywhere (e.g. after a password reset). */
 export async function revokeUserSessions(userId: number) {
   await query(`DELETE FROM sessions WHERE iomad_user_id = $1`, [userId])
+}
+
+/** Re-read the user's role from IOMAD on their next request (e.g. they just became someone's parent). */
+export async function refreshSessionsOf(userId: number) {
+  await query(`UPDATE sessions SET refreshed_at = 'epoch' WHERE iomad_user_id = $1`, [userId])
 }

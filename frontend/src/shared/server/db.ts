@@ -80,6 +80,56 @@ CREATE TABLE IF NOT EXISTS user_prefs (
   locale        text,
   updated_at    timestamptz NOT NULL DEFAULT now()
 );
+-- a student who skipped the "add your parent" step after signing up (the home card still reminds them)
+ALTER TABLE user_prefs ADD COLUMN IF NOT EXISTS parent_prompt_skipped_at timestamptz;
+
+-- a student asks someone to be their parent; the link itself lives in IOMAD once the parent accepts
+CREATE TABLE IF NOT EXISTS parent_requests (
+  id           bigserial PRIMARY KEY,
+  child_id     integer NOT NULL,
+  parent_id    integer NOT NULL,
+  status       text NOT NULL DEFAULT 'pending',  -- pending | accepted | declined | cancelled
+  created_at   timestamptz NOT NULL DEFAULT now(),
+  responded_at timestamptz
+);
+CREATE INDEX IF NOT EXISTS parent_requests_parent ON parent_requests (parent_id, status);
+CREATE INDEX IF NOT EXISTS parent_requests_child ON parent_requests (child_id, status);
+
+-- parent ↔ teacher chat, one conversation per parent + teacher + child
+CREATE TABLE IF NOT EXISTS conversations (
+  id              bigserial PRIMARY KEY,
+  parent_id       integer NOT NULL,
+  teacher_id      integer NOT NULL,
+  child_id        integer NOT NULL,
+  created_at      timestamptz NOT NULL DEFAULT now(),
+  last_message_at timestamptz NOT NULL DEFAULT now(),
+  parent_read_at  timestamptz NOT NULL DEFAULT 'epoch',
+  teacher_read_at timestamptz NOT NULL DEFAULT 'epoch',
+  UNIQUE (parent_id, teacher_id, child_id)
+);
+CREATE INDEX IF NOT EXISTS conversations_parent ON conversations (parent_id, last_message_at DESC);
+CREATE INDEX IF NOT EXISTS conversations_teacher ON conversations (teacher_id, last_message_at DESC);
+CREATE TABLE IF NOT EXISTS messages (
+  id              bigserial PRIMARY KEY,
+  conversation_id bigint NOT NULL REFERENCES conversations (id) ON DELETE CASCADE,
+  sender_id       integer NOT NULL,
+  body            text NOT NULL,
+  created_at      timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS messages_conversation ON messages (conversation_id, id);
+
+-- school announcements (posted by managers; shown to students, teachers and parents of the school)
+CREATE TABLE IF NOT EXISTS announcements (
+  id          bigserial PRIMARY KEY,
+  iomad_url   text NOT NULL,
+  company_id  integer NOT NULL,
+  author_id   integer NOT NULL,
+  author_name text NOT NULL,
+  title       text NOT NULL,
+  body        text NOT NULL DEFAULT '',
+  created_at  timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS announcements_company ON announcements (company_id, created_at DESC);
 `
 
 // One pool per server process (survives dev hot reloads). The schema check re-runs whenever SCHEMA

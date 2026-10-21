@@ -6,7 +6,8 @@ import { notify } from '@/entities/notification/server'
 import { answerInvite, cancelInvite } from '@/entities/tenant/server'
 import { getUserById } from '@/entities/user/server'
 import { formId } from '@/shared/lib/form'
-import { getSession, requireRole } from '@/entities/session/server'
+import { getSession, refreshSessionsOf, requireRole } from '@/entities/session/server'
+import { answerParentRequest } from '@/entities/family/server'
 
 /** The invited person accepts or declines; the inviting manager is told. Accept → their new home. */
 export async function answerInviteAction(form: FormData) {
@@ -39,4 +40,20 @@ export async function cancelInviteAction(form: FormData) {
   if (!inviteId || !user.companyId) return
   await cancelInvite(user.companyId, inviteId)
   revalidatePath('/', 'layout')
+}
+
+/** A parent accepts or declines a child's request; the child is told. Accept → their (parent) home. */
+export async function answerParentRequestAction(form: FormData) {
+  const user = await getSession()
+  if (!user) redirect('/login')
+  const requestId = formId(form, 'requestId')
+  const accept = form.get('answer') === 'accept'
+  if (!requestId) return
+  const answered = await answerParentRequest(user.userId, requestId, accept)
+  if (!answered) return
+  const child = await getUserById(answered.childId)
+  if (child) await notify([child], 'parentAnswered', { parent: user.name, answer: accept ? 'accepted' : 'declined' }, '/account')
+  if (accept) await refreshSessionsOf(user.userId) // may become a parent now
+  revalidatePath('/', 'layout')
+  if (accept) redirect('/')
 }

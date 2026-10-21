@@ -11,13 +11,14 @@ import type { Gradebook, HomeworkDetail, HomeworkFile, StudentHomework, Submissi
 const call = <T>(fn: string, params: Record<string, unknown>) => iomadCall<T>(defaultInstance(), `local_budu_${fn}`, params)
 
 type RawFile = { id: number; filename: string; filesize: number; mimetype: string }
-type RawState = { status: StudentHomework['status']; grade: number; feedback: string; submittedat: number }
+type RawState = { status: StudentHomework['status']; grade: number; feedback: string; submittedat: number; gradedat?: number }
 const file = (f: RawFile): HomeworkFile => ({ id: f.id, name: f.filename, size: f.filesize, mime: f.mimetype })
 const state = (r: RawState) => ({
   status: r.status,
   grade: r.grade >= 0 ? Math.round(r.grade * 10) / 10 : null,
   feedback: r.feedback,
   submittedAt: r.submittedat || null,
+  gradedAt: r.gradedat || null,
 })
 
 /** Not found / no permission → null, so pages can 404. */

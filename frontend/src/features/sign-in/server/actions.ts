@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { rememberLocale } from '@/entities/notification/server'
+import { needsParentStep } from '@/entities/family/server'
 import { createSession } from '@/entities/session/server'
 import { getLocale } from '@/shared/i18n/server'
 import { getAccount, resolveRole, sendVerificationEmail } from '@/entities/user/server'
@@ -39,7 +40,7 @@ export async function signIn(_prev: SignInState, form: FormData): Promise<SignIn
     }
     const check = await iomadCheckPassword(defaultInstance(), account.username, password)
     if (!check.ok) return { status: 'error', error: check.reason === 'locked' ? 'locked' : 'invalid' }
-    const { role, companyId } = await resolveRole(account.memberships, account.siteadmin)
+    const { role, companyId } = await resolveRole(account.memberships, account.siteadmin, account.children)
     await createSession({
       userId: account.id,
       role,
@@ -49,7 +50,9 @@ export async function signIn(_prev: SignInState, form: FormData): Promise<SignIn
       pictureId: account.picture || null,
     })
     await rememberLocale(account.id, await getLocale()) // their emails follow the language they use
-    destination = safeNext(form.get('next')) ?? homeFor(role)
+    // a student without a parent gets the "add your parent" step once (they can skip it)
+    const step = role === 'student' && (await needsParentStep(account.id)) ? '/welcome/parent' : null
+    destination = safeNext(form.get('next')) ?? step ?? homeFor(role)
   } catch (e) {
     console.error('sign-in failed', e)
     return { status: 'error', error: 'server' }

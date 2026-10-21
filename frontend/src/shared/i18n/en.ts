@@ -10,7 +10,7 @@ export const en = {
   showPassword: 'Show password',
   hidePassword: 'Hide password',
 
-  role: { admin: 'Administrator', manager: 'Manager', teacher: 'Teacher', student: 'Student' },
+  role: { admin: 'Administrator', manager: 'Manager', teacher: 'Teacher', student: 'Student', parent: 'Parent' },
 
   nav: {
     myCourses: 'My courses',
@@ -31,6 +31,8 @@ export const en = {
     people: 'People',
     schedule: 'Schedule',
     settings: 'Settings',
+    family: 'My children',
+    messages: 'Messages',
   },
 
   subject: {
@@ -405,6 +407,26 @@ export const en = {
         title: (p: Record<string, string>) => `${p.school}: ${p.event}`,
         body: (p: Record<string, string>) => `New school event: “${p.event}”. See it in your timetable.`,
       },
+      parentRequest: {
+        title: (p: Record<string, string>) => `${p.child} asked you to be their parent`,
+        body: (p: Record<string, string>) =>
+          `${p.child} added you as their parent on Budu. Accept to follow their homework and grades and talk to their teachers.`,
+      },
+      parentAnswered: {
+        title: (p: Record<string, string>) => (p.answer === 'accepted' ? `${p.parent} is now your parent on Budu` : `${p.parent} declined your request`),
+        body: (p: Record<string, string>) =>
+          p.answer === 'accepted'
+            ? `${p.parent} accepted. They can now follow your progress and talk to your teachers.`
+            : `${p.parent} declined your parent request. You can ask another parent in Settings.`,
+      },
+      newMessage: {
+        title: (p: Record<string, string>) => `New message from ${p.from}`,
+        body: (p: Record<string, string>) => `${p.from} wrote to you about ${p.child}: “${p.preview}”`,
+      },
+      announcement: {
+        title: (p: Record<string, string>) => `${p.school}: ${p.title}`,
+        body: (p: Record<string, string>) => p.body || `New announcement from ${p.school}: “${p.title}”.`,
+      },
       addedToSchool: {
         title: (p: Record<string, string>) => `You joined ${p.school}`,
         body: (p: Record<string, string>) => `${p.by} added you to ${p.school} as ${p.role}.`,
@@ -532,7 +554,7 @@ export const en = {
 
   invites: {
     title: 'Invitations',
-    sub: 'Schools that invited you. You join only if you accept.',
+    sub: 'Schools that invited you and children who asked you to be their parent. Nothing changes until you accept.',
     empty: 'No invitations right now.',
     from: (p: { school: string; role: string; by: string }) => `${p.by} invites you to join ${p.school} as ${p.role}.`,
     accept: 'Accept',
@@ -573,6 +595,96 @@ export const en = {
       tooMany: 'That is more than 200 lessons — shorten the period.',
       server: 'Something went wrong. Please try again.',
     },
+  },
+
+  family: {
+    stepTitle: 'Add your parent',
+    stepSub: 'A parent can follow your homework and grades and talk to your teachers. It makes learning better.',
+    parentFirst: 'Parent’s first name',
+    parentLast: 'Parent’s last name',
+    parentEmail: 'Parent’s email',
+    send: 'Send request',
+    continue: 'Continue',
+    skip: 'Skip for now',
+    sent: (email: string) => `Request sent to ${email}. They’ll get an email to confirm.`,
+    errors: {
+      invalid: 'Check the name and email.',
+      self: 'You can’t add yourself.',
+      pending: 'A request to this person is already waiting.',
+      already: 'This person is already your parent.',
+      server: 'Something went wrong. Try again.',
+    },
+    cardTitle: 'Add a parent',
+    cardSub: 'Learning goes better when a parent can follow along. Ask yours to join Budu.',
+    cardAction: 'Add parent',
+    parentsTitle: 'Parents',
+    parentsSub: 'People who can see your progress and talk to your teachers.',
+    noParents: 'No parent added yet.',
+    waiting: 'Waiting for them to accept',
+    cancel: 'Cancel request',
+    remove: 'Remove',
+    confirmRemove: 'Remove?',
+    requestsTitle: 'Parent requests',
+    requestFrom: (child: string) =>
+      `${child} asked you to be their parent. You’ll see their homework, grades and school news, and can message their teachers.`,
+    requestBanner: (child: string) => `${child} asked you to be their parent.`,
+    accept: 'Accept',
+    decline: 'Decline',
+    homeTitle: 'My children',
+    homeSub: 'How your children are doing at school.',
+    noChildren: 'No children linked yet. When your child adds you as a parent, you’ll see them here.',
+    viewProgress: 'View progress',
+    thisWeek: 'Last 7 days',
+    periods: { day: 'Last 24 hours', week: 'Last 7 days', month: 'Last 30 days' },
+    stats: { handedIn: 'Handed in', late: 'Handed in late', overdue: 'Overdue', average: 'Average grade' },
+    feedbackTitle: 'Grades and teacher feedback',
+    noFeedback: 'No grades in this period.',
+    overdueTitle: 'Overdue homework',
+    noOverdue: 'Nothing overdue.',
+    wasDue: 'was due',
+    coursesTitle: 'Courses',
+    average: 'Average',
+    homeworkDone: (done: number, total: number) => `${done} of ${total} handed in`,
+    noCourses: 'Not enrolled in any course yet.',
+    message: 'Message',
+    eventsTitle: 'School events',
+    back: 'My children',
+    late: 'Late',
+  },
+
+  messages: {
+    title: 'Messages',
+    sub: 'Conversations between parents and teachers.',
+    empty: 'No conversations yet.',
+    emptyParent: 'Open your child’s page, pick a teacher and press Message.',
+    emptyTeacher: 'Parents can write to you. You can also start from a course’s Students tab.',
+    about: (child: string) => `About ${child}`,
+    placeholder: 'Write a message…',
+    send: 'Send',
+    noMessages: 'No messages yet. Say hello.',
+    pick: 'Pick a conversation.',
+    parentsOf: (name: string) => `Parents of ${name}`,
+    parentsOfSub: 'Write to a parent about this student.',
+    noParentsOf: (name: string) => `${name} has no parent on Budu yet.`,
+    messageParents: 'Message parents',
+    you: 'You',
+    back: 'All conversations',
+    tooLong: 'The message is too long.',
+  },
+
+  announcements: {
+    title: 'Announcements',
+    sub: 'News for everyone in your school — students, teachers and parents.',
+    new: 'New announcement',
+    titleLabel: 'Title',
+    bodyLabel: 'Message',
+    post: 'Post',
+    posted: '✓ Posted',
+    empty: 'No announcements yet.',
+    delete: 'Delete',
+    confirmDelete: 'Delete?',
+    by: (name: string) => `by ${name}`,
+    invalid: 'Add a title.',
   },
 
   explore: {
@@ -765,6 +877,12 @@ export const en = {
   },
 
   email: {
+    parentInvite: {
+      subject: (child: string) => `${child} invited you to Budu as their parent`,
+      body: (child: string) =>
+        `${child} asked you to be their parent on Budu, so you can follow their homework and grades and talk to their teachers. Choose a password to accept and activate your account. The link works for 7 days.`,
+      action: 'Accept and choose a password',
+    },
     invite: {
       subject: (school: string) => `You’re invited to ${school} on Budu`,
       body: (p: { school: string; by: string; role: string }) =>

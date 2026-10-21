@@ -8,4 +8,5 @@ export {
   revokeUserSessions,
   revokeOtherSessions,
   updateSessionProfile,
+  refreshSessionsOf,
 } from './session'

@@ -4,7 +4,7 @@ import { defaultInstance } from '@/shared/server/iomad'
 import { roleFor, type Membership } from '../lib/role'
 
 /** roleFor with the school tenants looked up in app-db. SERVER-SIDE ONLY. */
-export async function resolveRole(memberships: Membership[], siteadmin: boolean) {
+export async function resolveRole(memberships: Membership[], siteadmin: boolean, children = 0) {
   const ids = memberships.map((m) => m.companyid)
   const rows = ids.length
     ? await query<{ company_id: number }>(
@@ -12,5 +12,5 @@ export async function resolveRole(memberships: Membership[], siteadmin: boolean)
         [defaultInstance().url, ids],
       )
     : []
-  return roleFor(memberships, siteadmin, new Set(rows.map((r) => r.company_id)))
+  return roleFor(memberships, siteadmin, new Set(rows.map((r) => r.company_id)), children)
 }
