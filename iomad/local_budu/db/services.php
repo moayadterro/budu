@@ -80,6 +80,12 @@ $functions = [
         'description' => 'Check whether the acting user may open a lesson file; return its location.',
         'type' => 'read',
     ],
+    'local_budu_preview_lesson' => [
+        'classname' => \local_budu\external\courses::class,
+        'methodname' => 'preview_lesson',
+        'description' => 'The free preview (first lesson) of a published course, for visitors.',
+        'type' => 'read',
+    ],
     'local_budu_list_students' => [
         'classname' => \local_budu\external\learning::class,
         'methodname' => 'list_students',

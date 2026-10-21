@@ -59,6 +59,31 @@ class courses extends external_api {
         return $section;
     }
 
+    /**
+     * The free preview of a published course: its FIRST lesson (lowest visible section, no access
+     * restrictions). Anyone — even a visitor (user 0) — may see its videos, files and text pages.
+     */
+    private static function preview_section(\stdClass $course): ?\stdClass {
+        global $DB;
+        if (!$course->visible || school_exams::is_exam_space($course)) {
+            return null;
+        }
+        $first = $DB->get_records_select('course_sections', 'course = ? AND section > 0 AND component IS NULL',
+            [$course->id], 'section', '*', 0, 1);
+        $first = $first ? reset($first) : null;
+        return $first && $first->visible && empty($first->availability) ? $first : null;
+    }
+
+    /** Is this module part of the course's free preview (a material in lesson 1, shown to everyone)? */
+    private static function in_preview(\stdClass $course, $cm): bool {
+        if (!in_array($cm->modname, ['resource', 'page']) || !$cm->visible || !empty($cm->availability)
+                || !empty($cm->deletioninprogress)) {
+            return false;
+        }
+        $first = self::preview_section($course);
+        return $first && (int)$cm->section === (int)$first->id;
+    }
+
     private static function cm(\stdClass $course, int $cmid): \stdClass {
         $cm = get_coursemodule_from_id('', $cmid, $course->id, false, MUST_EXIST);
         if (!in_array($cm->modname, ['resource', 'assign', 'page'])) {
@@ -339,6 +364,14 @@ class courses extends external_api {
     }
 
     public static function get_course_returns(): external_single_structure {
+        return new external_single_structure(self::course_structure() + [
+            'canedit' => new external_value(PARAM_BOOL, 'The user may edit'),
+            'lessonlist' => new external_multiple_structure(self::lesson_structure()),
+        ]);
+    }
+
+    /** One lesson with its items (get_course, preview_lesson). */
+    private static function lesson_structure(): external_single_structure {
         $file = new external_single_structure([
             'id' => new external_value(PARAM_INT, 'File id (for local_budu_file_access)'),
             'filename' => new external_value(PARAM_FILE, 'File name'),
@@ -354,16 +387,60 @@ class courses extends external_api {
             'files' => new external_multiple_structure($file),
             'content' => new external_value(PARAM_RAW, 'Text pages: cleaned HTML', VALUE_OPTIONAL),
         ]);
-        $lesson = new external_single_structure([
+        return new external_single_structure([
             'id' => new external_value(PARAM_INT, 'Section id'),
             'name' => new external_value(PARAM_RAW, 'Lesson title (plain text)'),
             'summary' => new external_value(PARAM_RAW, 'Lesson description (plain text)'),
             'items' => new external_multiple_structure($item),
         ]);
-        return new external_single_structure(self::course_structure() + [
-            'canedit' => new external_value(PARAM_BOOL, 'The user may edit'),
-            'lessonlist' => new external_multiple_structure($lesson),
+    }
+
+    // ----- preview_lesson --------------------------------------------------
+
+    public static function preview_lesson_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'courseid' => new external_value(PARAM_INT, 'A published course'),
         ]);
+    }
+
+    /**
+     * The free preview (lesson 1) of a published course, for anyone — no user needed. Only its
+     * videos, files and text pages; homework needs an account. id 0 = no preview available.
+     */
+    public static function preview_lesson(int $courseid): array {
+        global $DB;
+        $p = self::validate_parameters(self::preview_lesson_parameters(), compact('courseid'));
+        self::setup();
+        $course = $DB->get_record('course', ['id' => $p['courseid']]);
+        $section = $course && $course->id != SITEID ? self::preview_section($course) : null;
+        if (!$section) {
+            return ['id' => 0, 'name' => '', 'summary' => '', 'items' => []];
+        }
+        $modinfo = get_fast_modinfo($course);
+        $items = [];
+        foreach ($modinfo->sections[$section->section] ?? [] as $cmid) {
+            $cm = $modinfo->get_cm($cmid);
+            if (!self::in_preview($course, $cm)) {
+                continue;
+            }
+            $ctx = \context_module::instance($cm->id);
+            if ($cm->modname === 'resource') {
+                $files = self::files_of($ctx->id, 'mod_resource', 'content');
+                $kind = $files && str_starts_with($files[0]['mimetype'], 'video/') ? 'video' : 'file';
+                $items[] = ['cmid' => $cm->id, 'kind' => $kind, 'name' => $cm->name, 'instructions' => '', 'duedate' => 0, 'files' => $files];
+            } else {
+                $content = (string)$DB->get_field('page', 'content', ['id' => $cm->instance]);
+                $items[] = ['cmid' => $cm->id, 'kind' => 'text', 'name' => $cm->name, 'instructions' => '', 'duedate' => 0,
+                    'files' => [], 'content' => self::clean_html($content)];
+            }
+        }
+        $name = $section->name ?? '';
+        $name = $name !== '' ? $name : html_entity_decode(get_section_name($course, $section), ENT_QUOTES);
+        return ['id' => (int)$section->id, 'name' => $name, 'summary' => (string)$section->summary, 'items' => $items];
+    }
+
+    public static function preview_lesson_returns(): external_single_structure {
+        return self::lesson_structure();
     }
 
     // ----- save_lesson / delete_lesson / move_lesson ---------------------
@@ -645,7 +722,8 @@ class courses extends external_api {
 
     /**
      * May this user open this file? If so, where it is (for webservice/pluginfile.php).
-     * Served: lesson materials and task attachments (course viewers), and profile
+     * Served: lesson materials and task attachments (course viewers), lesson 1's materials of a
+     * published course to anyone (the free preview, flagged `preview`), and profile
      * pictures (any user — they appear next to names everywhere).
      */
     public static function file_access(int $userid, int $fileid): array {
@@ -704,11 +782,13 @@ class courses extends external_api {
             return $no;
         }
         $course = get_course($cm->course);
-        if (!self::can_view($course, $p['userid'])) {
+        // not in the course (a visitor, or not enrolled): only the free preview — lesson 1's materials
+        $preview = !self::can_view($course, $p['userid']);
+        if ($preview && ($area !== 'mod_resource/content' || !self::in_preview($course, $cm))) {
             return $no;
         }
-        $editor = has_capability('moodle/course:manageactivities', \context_course::instance($course->id), $p['userid']);
-        if (!$editor && !get_fast_modinfo($course, $p['userid'])->get_cm($cm->id)->uservisible) {
+        $editor = !$preview && has_capability('moodle/course:manageactivities', \context_course::instance($course->id), $p['userid']);
+        if (!$preview && !$editor && !get_fast_modinfo($course, $p['userid'])->get_cm($cm->id)->uservisible) {
             return $no;
         }
 
@@ -716,7 +796,8 @@ class courses extends external_api {
         $itemid = $file->get_component() === 'mod_resource' ? 1 : $file->get_itemid();
         $path = '/' . $file->get_contextid() . '/' . $file->get_component() . '/' . $file->get_filearea() . '/' . $itemid
             . $file->get_filepath() . $file->get_filename();
-        return ['allowed' => true, 'path' => $path] + self::file_info($file);
+        // preview files: the frontend also checks the course is in the marketplace
+        return ['allowed' => true, 'path' => $path, 'courseid' => (int)$course->id, 'preview' => $preview] + self::file_info($file);
     }
 
     public static function file_access_returns(): external_single_structure {
@@ -727,6 +808,8 @@ class courses extends external_api {
             'filename' => new external_value(PARAM_RAW, 'File name'),
             'filesize' => new external_value(PARAM_INT, 'Bytes'),
             'mimetype' => new external_value(PARAM_RAW, 'MIME type'),
+            'courseid' => new external_value(PARAM_INT, 'Course of a lesson material', VALUE_OPTIONAL),
+            'preview' => new external_value(PARAM_BOOL, 'Allowed only as the course’s free preview (lesson 1)', VALUE_OPTIONAL),
         ]);
     }
 }
