@@ -1126,6 +1126,7 @@ export const ar: typeof en = {
   preview: {
     tag: 'درس مجاني',
     locked: 'يُفتح بعد الانضمام',
+    signInToOpen: 'سجّل الدخول لفتح هذا الدرس',
     watch: 'درس مجاني',
     lessonOf: (n: number) => `الدرس 1 من ${n}`,
     back: 'عن الدورة',

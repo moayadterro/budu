@@ -1119,6 +1119,7 @@ export const en = {
   preview: {
     tag: 'Free preview',
     locked: 'Opens after you join',
+    signInToOpen: 'Sign in to open this lesson',
     watch: 'Free preview',
     lessonOf: (n: number) => `Lesson 1 of ${n}`,
     back: 'About the course',

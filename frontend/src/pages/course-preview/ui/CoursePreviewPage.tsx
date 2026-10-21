@@ -71,7 +71,7 @@ export async function CoursePreviewPage({ params }: { params: Promise<{ courseId
                   </Button>
                   <Button variant="ghost" asChild>
                     {/* signing in comes back to this course, ready to enrol */}
-                    <Link href={`/login?next=${encodeURIComponent(`/explore/${id}`)}`}>{t.catalog.haveAccount}</Link>
+                    <Link href={`/login?next=${encodeURIComponent(`/catalog/${id}`)}`}>{t.catalog.haveAccount}</Link>
                   </Button>
                 </>
               ) : student && course.enrolled ? (
@@ -91,21 +91,36 @@ export async function CoursePreviewPage({ params }: { params: Promise<{ courseId
               <CardTitle>{t.learn.contents}</CardTitle>
             </CardHeader>
             <CardContent className="gap-1">
-              {course.lessons.map((title, i) => (
-                <div
-                  key={i}
-                  aria-current={i === 0 ? 'page' : undefined}
-                  className={
-                    i === 0
-                      ? 'flex items-center gap-3 rounded-md bg-primary/10 px-2 py-2 text-sm font-medium text-primary'
-                      : 'flex items-center gap-3 px-2 py-2 text-sm text-muted-foreground'
-                  }
-                >
-                  <span className="grid size-6 flex-none place-items-center rounded-md bg-muted text-xs tabular-nums">{i + 1}</span>
-                  <span className="min-w-0 flex-1 truncate">{title}</span>
-                  {i > 0 && <Icon name="lock" className="size-4 flex-none" aria-label={s.locked} />}
-                </div>
-              ))}
+              {course.lessons.map((title, i) => {
+                const row = (
+                  <>
+                    <span className="grid size-6 flex-none place-items-center rounded-md bg-muted text-xs tabular-nums">{i + 1}</span>
+                    <span className="min-w-0 flex-1 truncate">{title}</span>
+                    {i > 0 && <Icon name="lock" className="size-4 flex-none" aria-label={user ? s.locked : s.signInToOpen} />}
+                  </>
+                )
+                if (i === 0)
+                  return (
+                    <div key={i} aria-current="page" className="flex items-center gap-3 rounded-md bg-primary/10 px-2 py-2 text-sm font-medium text-primary">
+                      {row}
+                    </div>
+                  )
+                // visitors: a locked lesson → sign in, then back to this course
+                return user ? (
+                  <div key={i} className="flex items-center gap-3 px-2 py-2 text-sm text-muted-foreground">
+                    {row}
+                  </div>
+                ) : (
+                  <Link
+                    key={i}
+                    href={`/login?next=${encodeURIComponent(`/catalog/${id}`)}`}
+                    title={s.signInToOpen}
+                    className="flex items-center gap-3 rounded-md px-2 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  >
+                    {row}
+                  </Link>
+                )
+              })}
             </CardContent>
           </Card>
         </aside>

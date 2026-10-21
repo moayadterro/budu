@@ -13,7 +13,8 @@ import { getT } from '@/shared/i18n/server'
 /**
  * One marketplace course: cover, what's inside, who teaches it, the price — and `action` (Enrol /
  * Buy / Sign up). `previewHref`: lesson 1 opens as a free preview there and the rest show a lock
- * (people not in the course yet).
+ * (people not in the course yet). `lockedHref`: where a locked lesson leads (visitors: sign in, then
+ * back to this course).
  */
 export async function CourseDetail({
   course,
@@ -21,12 +22,14 @@ export async function CourseDetail({
   action,
   back,
   previewHref,
+  lockedHref,
 }: {
   course: CatalogCourse
   price: ShownPrice
   action: ReactNode
   back: { href: string; label: string }
   previewHref?: string | null
+  lockedHref?: string | null
 }) {
   const t = await getT()
   const s = t.shop
@@ -76,6 +79,18 @@ export async function CourseDetail({
                           </span>
                           <span className="min-w-0 flex-1 font-medium">{l}</span>
                           <Badge variant="success">{t.preview.tag}</Badge>
+                        </Link>
+                      </li>
+                    ) : previewHref && lockedHref ? (
+                      <li key={i}>
+                        <Link
+                          href={lockedHref}
+                          title={t.preview.signInToOpen}
+                          className="-mx-2 flex items-center gap-3 rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                        >
+                          <span className="grid size-7 flex-none place-items-center rounded-md bg-muted text-xs font-semibold tabular-nums">{i + 1}</span>
+                          <span className="min-w-0 flex-1">{l}</span>
+                          <Icon name="lock" className="size-4 flex-none" aria-label={t.preview.signInToOpen} />
                         </Link>
                       </li>
                     ) : (

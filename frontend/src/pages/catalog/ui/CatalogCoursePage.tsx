@@ -24,6 +24,8 @@ export async function CatalogCoursePage({ params }: { params: Promise<{ courseId
       price={item.price}
       back={{ href: '/catalog', label: s.all }}
       previewHref={`/catalog/${id}/preview`}
+      // visitors: a locked lesson → sign in, then back to this course (students land on its Explore page)
+      lockedHref={user ? null : `/login?next=${encodeURIComponent(`/catalog/${id}`)}`}
       action={
         user ? (
           <p className="text-sm text-muted-foreground">{s.studentsOnly}</p>
@@ -34,7 +36,7 @@ export async function CatalogCoursePage({ params }: { params: Promise<{ courseId
             </Button>
             <Button variant="ghost" asChild>
               {/* signing in comes back to this course, ready to enrol */}
-              <Link href={`/login?next=${encodeURIComponent(`/explore/${id}`)}`}>{s.haveAccount}</Link>
+              <Link href={`/login?next=${encodeURIComponent(`/catalog/${id}`)}`}>{s.haveAccount}</Link>
             </Button>
           </div>
         )

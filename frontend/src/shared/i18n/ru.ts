@@ -1128,6 +1128,7 @@ export const ru: typeof en = {
   preview: {
     tag: 'Бесплатный урок',
     locked: 'Откроется после записи',
+    signInToOpen: 'Войдите, чтобы открыть урок',
     watch: 'Бесплатный урок',
     lessonOf: (n: number) => `Урок 1 из ${n}`,
     back: 'О курсе',
