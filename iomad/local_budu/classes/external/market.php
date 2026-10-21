@@ -56,6 +56,7 @@ class market extends external_api {
                 'lessons' => array_values(array_map(fn($s) => (string)($s->name ?: html_entity_decode(get_section_name($course, (int)$s->section), ENT_QUOTES)), $lessons)),
                 'enrolled' => $p['userid'] > 0 && is_enrolled($ctx, $p['userid'], '', true),
                 'image' => courses::image_id($course->id),
+                'students' => count(learning::students_of($course->id)), // how many took the course
             ];
         }
         return $out;
@@ -76,6 +77,7 @@ class market extends external_api {
             'lessons' => new external_multiple_structure(new external_value(PARAM_RAW, 'Lesson title')),
             'enrolled' => new external_value(PARAM_BOOL, 'The viewer is enrolled'),
             'image' => new external_value(PARAM_INT, 'Cover image file id, 0 = none'),
+            'students' => new external_value(PARAM_INT, 'Students enrolled (active)'),
         ]));
     }
 
