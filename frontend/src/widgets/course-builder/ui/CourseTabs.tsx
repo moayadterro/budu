@@ -5,13 +5,14 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/shared/lib/cn'
 import { useT } from '@/shared/i18n'
 
-/** Content | Students tabs of a teacher's course (two routes). */
+/** Content | Students | Schedule tabs of a teacher's course. */
 export function CourseTabs({ courseId }: { courseId: number }) {
   const t = useT()
   const path = usePathname()
   const tabs = [
     { href: `/courses/${courseId}`, label: t.courses.tabs.content },
     { href: `/courses/${courseId}/students`, label: t.courses.tabs.students },
+    { href: `/courses/${courseId}/schedule`, label: t.courses.tabs.schedule },
   ]
   return (
     <nav className="mb-6 inline-flex rounded-lg bg-muted p-1 text-sm">
