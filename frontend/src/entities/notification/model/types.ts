@@ -2,6 +2,7 @@
 export type NotificationKind = 'enrolled' | 'homeworkNew' | 'homeworkSubmitted' | 'homeworkGraded' | 'addedToSchool' | 'addedToClass' | 'schoolInvite' | 'inviteAnswered' | 'schoolEvent'
   | 'parentRequest' | 'parentAnswered' | 'newMessage' | 'announcement'
   | 'orderConfirmed' | 'orderRejected'
+  | 'quizPublished' | 'quizToGrade' | 'quizGraded' | 'examResult' | 'quizReminder'
 
 export type NotificationParams = Record<string, string>
 

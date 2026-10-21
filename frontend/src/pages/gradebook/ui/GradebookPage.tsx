@@ -108,9 +108,19 @@ export async function GradebookPage({ searchParams }: { searchParams: Promise<{ 
                     <th className="sticky start-0 z-10 border-b bg-card px-4 py-3 text-start font-medium">{s.student}</th>
                     {gb.homework.map((h) => (
                       <th key={h.id} className="max-w-40 border-b px-3 py-3 text-center font-medium" title={h.title}>
-                        <Link href={`/grading?course=${gb.courseId}&homework=${h.id}`} className="line-clamp-2 hover:text-foreground">
-                          {h.title}
-                        </Link>
+                        {h.kind === 'homework' ? (
+                          <Link href={`/grading?course=${gb.courseId}&homework=${h.id}`} className="line-clamp-2 hover:text-foreground">
+                            {h.title}
+                          </Link>
+                        ) : user.role === 'teacher' ? (
+                          // quizzes / exams: their own results page (teachers)
+                          <Link href={`/courses/${gb.courseId}/quizzes/${h.id}/results`} className="line-clamp-2 hover:text-foreground">
+                            {h.title}
+                          </Link>
+                        ) : (
+                          <span className="line-clamp-2">{h.title}</span>
+                        )}
+                        {h.kind !== 'homework' && <span className="mt-0.5 block text-[10px] uppercase tracking-wide text-primary">{t.quiz.kind[h.kind]}</span>}
                       </th>
                     ))}
                     <th className="border-b px-4 py-3 text-center font-medium">{s.average}</th>
@@ -128,9 +138,17 @@ export async function GradebookPage({ searchParams }: { searchParams: Promise<{ 
                             <span className="truncate font-medium">{row.student.name}</span>
                           </div>
                         </td>
-                        {row.cells.map((c) => (
+                        {row.cells.map((c, ci) => (
                           <td key={c.homeworkId} className="border-b px-3 py-2.5 text-center tabular-nums">
-                            {c.grade !== null ? (
+                            {gb.homework[ci]?.kind !== 'homework' ? (
+                              c.grade !== null ? (
+                                <span className={cn('inline-block min-w-10 rounded-md px-2 py-0.5 font-medium', tone(c.grade))}>{shown(c.grade, scale)}</span>
+                              ) : c.status === 'submitted' ? (
+                                <span className="inline-block rounded-md bg-info/10 px-2 py-0.5 text-xs font-medium text-info">{t.quiz.state.waiting}</span>
+                              ) : (
+                                <span className="text-muted-foreground">—</span>
+                              )
+                            ) : c.grade !== null ? (
                               <Link
                                 href={`/grading?course=${gb.courseId}&homework=${c.homeworkId}&student=${row.student.id}&view=graded`}
                                 className={cn('inline-block min-w-10 rounded-md px-2 py-0.5 font-medium', tone(c.grade))}

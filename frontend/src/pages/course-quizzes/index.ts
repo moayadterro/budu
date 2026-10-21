@@ -1,0 +1,5 @@
+export { CourseQuizzesPage } from './ui/CourseQuizzesPage'
+export { QuizNewPage } from './ui/QuizNewPage'
+export { QuizEditorPage } from './ui/QuizEditorPage'
+export { QuizResultsPage } from './ui/QuizResultsPage'
+export { QuizAttemptPage } from './ui/QuizAttemptPage'

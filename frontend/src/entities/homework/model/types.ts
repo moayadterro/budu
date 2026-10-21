@@ -65,7 +65,8 @@ export type SubmissionDetail = State & {
 export type Gradebook = {
   courseId: number
   courseTitle: string
-  homework: Array<{ id: number; title: string; dueAt: number | null }>
+  /** columns: homework, and published quizzes / exams of the course */
+  homework: Array<{ id: number; title: string; dueAt: number | null; kind: 'homework' | 'quiz' | 'exam' }>
   rows: Array<{ student: Person; cells: Array<{ homeworkId: number; status: HomeworkStatus; grade: number | null }> }>
 }
 

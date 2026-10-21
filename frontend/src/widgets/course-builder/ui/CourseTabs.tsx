@@ -5,13 +5,17 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/shared/lib/cn'
 import { useT } from '@/shared/i18n'
 
-/** Content | Students | Schedule | Announcements tabs of a teacher's course. */
+/** The tab for `href` is active on it and its sub-pages (the content tab only on itself). */
+const isTab = (href: string, path: string | null) => path === href || (!!path && /\/(quizzes|schedule|students|announcements)$/.test(href) && path.startsWith(href + '/'))
+
+/** Content | Students | Quizzes | Schedule | Announcements tabs of a teacher's course. */
 export function CourseTabs({ courseId }: { courseId: number }) {
   const t = useT()
   const path = usePathname()
   const tabs = [
     { href: `/courses/${courseId}`, label: t.courses.tabs.content },
     { href: `/courses/${courseId}/students`, label: t.courses.tabs.students },
+    { href: `/courses/${courseId}/quizzes`, label: t.courses.tabs.quizzes },
     { href: `/courses/${courseId}/schedule`, label: t.courses.tabs.schedule },
     { href: `/courses/${courseId}/announcements`, label: t.courses.tabs.announcements },
   ]
@@ -21,10 +25,10 @@ export function CourseTabs({ courseId }: { courseId: number }) {
         <Link
           key={tab.href}
           href={tab.href}
-          aria-current={path === tab.href ? 'page' : undefined}
+          aria-current={isTab(tab.href, path) ? 'page' : undefined}
           className={cn(
             'rounded-md px-4 py-1.5 font-medium whitespace-nowrap transition-colors',
-            path === tab.href ? 'bg-background shadow-xs' : 'text-muted-foreground hover:text-foreground',
+            isTab(tab.href, path) ? 'bg-background shadow-xs' : 'text-muted-foreground hover:text-foreground',
           )}
         >
           {tab.label}

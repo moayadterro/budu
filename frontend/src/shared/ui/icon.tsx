@@ -67,6 +67,8 @@ import {
   TextStrikethroughIcon,
   UndoIcon,
   Wallet01Icon,
+  Cancel01Icon,
+  Clock01Icon,
 } from '@hugeicons/core-free-icons'
 
 /** App icon names → Hugeicons (free set). One place to swap an icon everywhere. */
@@ -106,6 +108,8 @@ const icons = {
   eyeOff: ViewOffIcon,
   chevRight: ArrowRight01Icon,
   plus: Add01Icon,
+  clock: Clock01Icon,
+  close: Cancel01Icon,
   text: Note01Icon,
   bold: TextBoldIcon,
   italic: TextItalicIcon,

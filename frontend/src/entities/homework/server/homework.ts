@@ -152,7 +152,7 @@ export async function getGradebook(userId: number, courseId: number, classId = 0
     call<{
       courseid: number
       coursename: string
-      homework: Array<{ cmid: number; name: string; duedate: number }>
+      homework: Array<{ cmid: number; name: string; duedate: number; kind?: 'homework' | 'quiz' | 'exam' }>
       rows: Array<{ student: RawPerson; cells: Array<{ cmid: number; status: StudentHomework['status']; grade: number }> }>
     }>('gradebook', { courseid: courseId, userid: userId, classid: classId }),
   )
@@ -160,7 +160,7 @@ export async function getGradebook(userId: number, courseId: number, classId = 0
   return {
     courseId: r.courseid,
     courseTitle: r.coursename,
-    homework: r.homework.map((h) => ({ id: h.cmid, title: h.name, dueAt: h.duedate || null })),
+    homework: r.homework.map((h) => ({ id: h.cmid, title: h.name, dueAt: h.duedate || null, kind: h.kind ?? 'homework' })),
     rows: r.rows.map((row) => ({
       student: toPerson(row.student),
       cells: row.cells.map((c) => ({ homeworkId: c.cmid, status: c.status, grade: c.grade >= 0 ? c.grade : null })),
