@@ -2,7 +2,7 @@ import 'server-only'
 import { cookies } from 'next/headers'
 import { notFound, redirect } from 'next/navigation'
 import { cache } from 'react'
-import { getAccount, roleFor } from '@/entities/user/@x/session'
+import { getAccount, resolveRole } from '@/entities/user/@x/session'
 import { query } from '@/shared/server/db'
 import { hashSecret, newSecret } from '@/shared/server/tokens'
 import { SESSION_COOKIE } from '@/shared/config/auth'
@@ -77,7 +77,7 @@ async function refresh(hash: string, user: SessionUser): Promise<SessionUser | n
       await query(`DELETE FROM sessions WHERE token_hash = $1`, [hash])
       return null
     }
-    const { role, companyId } = roleFor(account.memberships, account.siteadmin)
+    const { role, companyId } = await resolveRole(account.memberships, account.siteadmin)
     const name = `${account.firstname} ${account.lastname}`.trim()
     const pictureId = account.picture || null
     await query(
