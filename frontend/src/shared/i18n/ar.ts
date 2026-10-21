@@ -22,7 +22,6 @@ export const ar: typeof en = {
   hidePassword: 'إخفاء كلمة المرور',
 
   role: { admin: 'مدير المنصة', manager: 'مدير', teacher: 'معلم', student: 'طالب' },
-  ctx: { admin: 'المنصة', manager: '420 / 500 مقعد', teacher: '4 فصول', student: 'الصف 10-أ' },
 
   nav: {
     myCourses: 'دوراتي',

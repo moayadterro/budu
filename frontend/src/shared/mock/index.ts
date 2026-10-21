@@ -43,8 +43,6 @@ export const SUBJECT_KEYS = Object.keys(SUBJECTS) as SubjectKey[]
 export const isSubject = (k: string): k is SubjectKey => k in SUBJECTS
 
 export const STUDENT = { firstName: 'Yusuf', fullName: 'Yusuf Khan', initials: 'YK', className: '10-A' }
-export const ORG = { name: 'Lincoln Online', initial: 'L' }
-
 
 export const HOMEWORK = [
   { title: 'Homework 3: Derivatives', meta: 'Mathematics · Omar Haddad', due: 'Today', urgent: true },

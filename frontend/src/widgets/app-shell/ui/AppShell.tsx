@@ -3,7 +3,7 @@ import { ReactNode } from 'react'
 import { SessionProvider } from '@/entities/session'
 import { listNotifications, unreadCount } from '@/entities/notification/server'
 import { getSession } from '@/entities/session/server'
-import { isSchool } from '@/entities/tenant/server'
+import { getTenantName, isSchool } from '@/entities/tenant/server'
 import { PageTransition } from '@/shared/ui/motion'
 import { SidebarInset, SidebarProvider } from '@/shared/ui/sidebar'
 import { AppSidebar } from './AppSidebar'
@@ -18,11 +18,13 @@ export async function AppShell({ children }: { children: ReactNode }) {
     unreadCount(user.userId),
     isSchool(user.companyId),
   ])
+  // under the Budu logo: the school's name for school members; solo users see their role instead
+  const schoolName = inSchool ? await getTenantName(user.companyId) : null
 
   return (
     <SessionProvider user={user}>
       <SidebarProvider>
-        <AppSidebar inSchool={inSchool} />
+        <AppSidebar inSchool={inSchool} schoolName={schoolName} />
         <SidebarInset>
           <SiteHeader inbox={{ items, unread }} />
           <main className="flex-1 p-4 md:p-6">

@@ -22,7 +22,6 @@ export const ru: typeof en = {
   hidePassword: 'Скрыть пароль',
 
   role: { admin: 'Администратор', manager: 'Менеджер', teacher: 'Учитель', student: 'Ученик' },
-  ctx: { admin: 'Платформа', manager: '420 / 500 мест', teacher: '4 класса', student: '10-А класс' },
 
   nav: {
     myCourses: 'Мои курсы',

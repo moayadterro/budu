@@ -11,7 +11,6 @@ export const en = {
   hidePassword: 'Hide password',
 
   role: { admin: 'Administrator', manager: 'Manager', teacher: 'Teacher', student: 'Student' },
-  ctx: { admin: 'Platform', manager: '420 / 500 seats', teacher: '4 classes', student: 'Grade 10-A' },
 
   nav: {
     myCourses: 'My courses',

@@ -7,7 +7,6 @@ import { ArrowUpDownIcon, UserCircleIcon } from '@hugeicons/core-free-icons'
 import { initialsOf, pictureUrl, useSession } from '@/entities/session'
 import { SignOutMenuItem } from '@/features/sign-out'
 import { NAV, activeHref } from '@/shared/config/nav'
-import { ORG } from '@/shared/mock'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import {
   DropdownMenu,
@@ -33,8 +32,8 @@ import {
 } from '@/shared/ui/sidebar'
 import { dirOf, useLocale, useT } from '@/shared/i18n'
 
-/** App sidebar: tenant, the role's screens, signed-in user menu. Becomes a sheet on mobile. */
-export function AppSidebar({ inSchool }: { inSchool: boolean }) {
+/** App sidebar: Budu brand (+ the user's school), the role's screens, signed-in user menu. */
+export function AppSidebar({ inSchool, schoolName }: { inSchool: boolean; schoolName: string | null }) {
   const t = useT()
   const user = useSession((s) => s.user)
   const path = usePathname()
@@ -53,10 +52,8 @@ export function AppSidebar({ inSchool }: { inSchool: boolean }) {
               <Link href="/" onClick={closeOnMobile}>
                 <BrandMark />
                 <div className="grid flex-1 text-start text-sm leading-tight">
-                  <span className="truncate font-semibold">{ORG.name}</span>
-                  <span className="truncate text-xs text-muted-foreground">
-                    {t.appName} · {t.ctx[user.role]}
-                  </span>
+                  <span className="truncate font-semibold">{t.appName}</span>
+                  <span className="truncate text-xs text-muted-foreground">{schoolName ?? t.role[user.role]}</span>
                 </div>
               </Link>
             </SidebarMenuButton>

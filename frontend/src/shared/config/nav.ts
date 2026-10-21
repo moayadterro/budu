@@ -3,7 +3,7 @@ import type { Messages } from '@/shared/i18n'
 
 /**
  * Budu roles. Adding one: extend this union + ROLES, then fix every compile error
- * (NAV, t.role, t.ctx …) and the resolution rules in entities/user/lib/role.ts.
+ * (NAV, t.role …) and the resolution rules in entities/user/lib/role.ts.
  * See CLAUDE.md → "Roles".
  */
 export type Role = 'admin' | 'manager' | 'teacher' | 'student'
