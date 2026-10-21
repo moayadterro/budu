@@ -221,6 +221,16 @@ Built and verified:
 - Roles: admin / manager / teacher / student from IOMAD; admin "Tenants" page (live IOMAD data);
   server-side `requireRole`; sessions refresh role every 5 min.
 - Stack upgraded 2026-10-19 (see Running → Versions).
+- Courses & marketplace (tested 2026-10-21 in the browser): lessons hold videos, files, homework and
+  rich-text pages (Tiptap editor `shared/ui/rich-text-editor`; stored as Moodle mod_page, HTML cleaned
+  by Moodle's HTMLPurifier on save AND read, shown with `RichText`). Teachers list a course in
+  Explore with a price in any currency (`course_listings`; empty/0 = free). Students see prices in
+  their Settings currency (default RUB), converted with daily rates (`shared/server/fx.ts`, admin
+  overrides at `/admin/settings`). Free → "Enrol for free" (no school step). Paid → order
+  (`orders`, number BU-000001) + popup: transfer the RUB amount to +79219263517 via Sberbank / SBP
+  with the order number, receipt to billing@budu.ru (`shared/config/payment.ts`) → "I've paid" →
+  platform admin confirms at `/admin/payments` → enrolled + notified. Admin confirm step not
+  browser-tested (needs the IOMAD admin password).
 - Parents (tested 2026-10-21 in the browser, all paths): after sign-in a student without a parent
   gets the "Add your parent" step (`/welcome/parent`, skippable; home keeps an "Add a parent" card
   until one accepts; Settings → Parents to add / cancel / remove). Existing account → request in
@@ -272,7 +282,8 @@ Built and verified:
   + attachment). Files via `/files/:id`. Tested in the browser 2026-10-20.
 
 Not built yet (rough priority):
-1. Still mock: live classroom, explore (marketplace).
+1. Still mock: live classroom. Live courses at a set time (BBB) — later. Real payment provider (then
+   orders confirm themselves); images in rich text; course search / filters in Explore.
    Video: transcoding / CDN (Kinescope, Bunny Stream or self-hosted HLS) behind `/files` later —
    NOT YouTube/RuTube (their terms require their branded player; see Decision log).
 2. Teacher follow-ups: invite link for students without an account, lesson completion / progress,
@@ -294,6 +305,14 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-21 Marketplace & money (owner): prices in the teacher's currency, shown converted to each
+  user's currency (Settings; platform default RUB). Rates: free daily service (open.er-api.com, USD
+  base) + admin overrides (e.g. a market rate for SYP). No payment provider yet: manual transfer to
+  the platform's phone (Sberbank/SBP) + receipt to billing@budu.ru; orders tracked, admin confirms →
+  auto-enrol. Free courses: students enrol themselves, no school approval. Listing/price/orders live
+  in app-db; enrolment stays in IOMAD (`local_budu_enrol_learner`).
+- 2026-10-21 Lesson text = Moodle mod_page edited with Tiptap (`@tiptap/react` 3.31.4, owner chose a
+  rich editor over Markdown). The browser's HTML is never trusted: IOMAD `clean_text()` on save/read.
 - 2026-10-21 New role `parent`. The parent ↔ child link lives in IOMAD as the role `budu_parent` in
   the child's user context (Moodle's parent-role pattern; `local_budu` `family.php`); requests and
   their status in app-db `parent_requests`. A student asks, the parent must accept (owner rule).
@@ -400,6 +419,10 @@ Not built yet (rough priority):
   ("use zustand", "use motion") count as approval for that dependency.
 
 ## Gotchas we hit
+- Moodle `page_add_instance()` copies `$data->page['text']` into `content` only when given a form —
+  from the API set `content`/`contentformat` yourself or pages are saved empty.
+- Exchange rates: the feed gave ≈ 122 SYP per USD on 2026-10-21 (looks like the redenominated pound,
+  not the old ≈ 13 000) — check admin overrides for currencies whose official and market rates differ.
 - PHP: an apostrophe inside a single-quoted string (`'A user's …'`) breaks the whole plugin, so EVERY
   IOMAD call fails with "syntax error". Use ’ or double quotes; `php -l` new plugin files.
 - Next dev (Turbopack) can get stuck on "The default export is not a React Component in …/page"
