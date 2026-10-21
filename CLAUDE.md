@@ -142,10 +142,12 @@ fixed dark live-classroom stage (`bg-live`, `text-live-foreground` …). Rules:
 - Keep it **simple-first** — minimal implementations, no premature complexity.
 
 ## Roles
-`admin` (platform administrator) · `manager` (runs a school/company) · `teacher` · `student`.
+`admin` (platform administrator) · `manager` (runs a school/company) · `teacher` · `student` ·
+`parent` (follows their children; linked in IOMAD, see Decision log).
 - Resolved at sign-in **from IOMAD**, first match wins (`entities/user/lib/role.ts` → `roleFor`):
-  IOMAD site admin → admin; educator in a company → teacher; company/department manager → manager;
-  else → student. One role per session for now (multi-role switching = future).
+  IOMAD site admin → admin; school manager → manager; educator → teacher; other manager → manager;
+  parent of ≥ 1 child → parent; else → student. One role per session for now (multi-role switching =
+  future; today a student or teacher who is also a parent sees only one side).
 - Each role has its nav in `shared/config/nav.ts` (`NAV`, `homeFor`); unbuilt screens `href: null`.
 - **Authorization is server-side:** pages/actions that need a role call
   `await requireRole('admin', …)` (`@/entities/session/server`) — wrong role → 404. Hiding a nav item
@@ -219,6 +221,16 @@ Built and verified:
 - Roles: admin / manager / teacher / student from IOMAD; admin "Tenants" page (live IOMAD data);
   server-side `requireRole`; sessions refresh role every 5 min.
 - Stack upgraded 2026-10-19 (see Running → Versions).
+- Parents (tested 2026-10-21 in the browser, all paths): after sign-in a student without a parent
+  gets the "Add your parent" step (`/welcome/parent`, skippable; home keeps an "Add a parent" card
+  until one accepts; Settings → Parents to add / cancel / remove). Existing account → request in
+  `/invites` (bell + email); no account → suspended account + emailed link, choosing a password =
+  accepting. Parent home `/family` (per child: last 7 days, overdue, averages; announcements, school
+  events), `/family/:id` (24 h / 7 d / 30 d: handed in, late, overdue, feedback, course averages,
+  teachers + Message). Parent ↔ teacher chat `/messages` (polls every 5 s; teachers start from a
+  course's Students tab → `/messages/new?student=`); the first unread message is emailed, not every
+  line. School announcements: managers post on `/school`; students, teachers and parents see them
+  on their home and get bell + email.
 - Timetable (tested 2026-10-21, all roles): `/timetable` = week calendar on real IOMAD calendar
   events (`widgets/week-calendar`): lessons of the user's courses positioned by time, one colour per
   course, school events in an all-day/amber lane, now-line, popover details, mobile day strip +
@@ -267,14 +279,28 @@ Not built yet (rough priority):
 4. Timetable: edit/cancel a single lesson (today: delete the whole series), rooms/online links,
    month view. Lesson completion / progress; removing a single student who
    came in through a class (today: remove them from the class).
-5. BigBlueButton: real live classes (join URLs), recordings → AI summaries.
-6. Account: change email (needs a confirmation flow); remember the language per user in IOMAD
+5. Push notifications for the mobile app (add a channel in `entities/notification/server/channels.ts`),
+   live chat (websockets instead of polling), unread badge on the Messages nav item, parent-side
+   "remove child", multi-role accounts (parent + teacher).
+6. BigBlueButton: real live classes (join URLs), recordings → AI summaries.
+7. Account: change email (needs a confirmation flow); remember the language per user in IOMAD
    (today it's per browser, a cookie).
-7. Abuse protection for public sign-up/forgot (rate limit, captcha). Translate the mock data.
-8. Move IOMAD to Moodle 5.3 LTS when IOMAD publishes `IOMAD_503_STABLE` (5.1+ moves the web root
+8. Abuse protection for public sign-up/forgot (rate limit, captcha). Translate the mock data.
+9. Move IOMAD to Moodle 5.3 LTS when IOMAD publishes `IOMAD_503_STABLE` (5.1+ moves the web root
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-21 New role `parent`. The parent ↔ child link lives in IOMAD as the role `budu_parent` in
+  the child's user context (Moodle's parent-role pattern; `local_budu` `family.php`); requests and
+  their status in app-db `parent_requests`. A student asks, the parent must accept (owner rule).
+  Parents join only through a child's request (no "parent" option on the register page).
+- 2026-10-21 Parent ↔ teacher chat in app-db (`conversations` per parent + teacher + child,
+  `messages`), polled; both sides may start one (parent → a teacher of the child's course; teacher →
+  a parent of a student they teach). Owner chose app-db over Moodle messaging so it can move into a
+  separate backend later: the logic sits in plain `entities/*/server` modules, not in actions.
+- 2026-10-21 Notifications go through delivery channels (`CHANNELS`: email today; mobile push will be
+  one more channel). School announcements in app-db (`announcements`), for everyone in the school
+  incl. students' parents (owner's choice).
 - 2026-10-21 Timetable data = Moodle calendar events (no app-db table): a lesson = course event, or
   a group event for one class (group created on demand from the class cohort), component local_budu,
   `repeatid` = the series; a school event = category event of the company's category. All via
@@ -368,6 +394,12 @@ Not built yet (rough priority):
   ("use zustand", "use motion") count as approval for that dependency.
 
 ## Gotchas we hit
+- PHP: an apostrophe inside a single-quoted string (`'A user's …'`) breaks the whole plugin, so EVERY
+  IOMAD call fails with "syntax error". Use ’ or double quotes; `php -l` new plugin files.
+- Next dev (Turbopack) can get stuck on "The default export is not a React Component in …/page"
+  after many edits even though the code is fine: `docker compose restart frontend`.
+- Chrome's `scrollIntoView()` returns a promise: `useEffect(() => el.scrollIntoView())` then "returns"
+  it and React crashes ("destroy is not a function"). Use a block body in effects.
 - IOMAD/Moodle redirects any request whose host ≠ `wwwroot`. Server-to-server calls use
   `http://iomad`, allowed by an exact-match rule in `iomad/config.php`.
 - Send the WS token in a POST body (never the query string — it lands in access logs).
