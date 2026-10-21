@@ -106,6 +106,12 @@ export async function CourseStudentsPage({ params }: { params: Promise<{ courseI
                     <ItemDescription className="truncate">{st.email}</ItemDescription>
                   </ItemContent>
                   <ItemActions>
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link href={`/messages/new?student=${st.id}`}>
+                        <Icon name="chat" />
+                        <span className="sr-only sm:not-sr-only">{t.messages.messageParents}</span>
+                      </Link>
+                    </Button>
                     <RemoveStudentButton courseId={id} studentId={st.id} />
                   </ItemActions>
                 </Item>
