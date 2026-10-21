@@ -5,12 +5,12 @@ import { getCurrency, visitorCurrency } from '@/entities/user/server'
 import { CurrencyPicker } from '@/features/switch-currency'
 import { LanguageMenu } from '@/features/switch-language'
 import { Button } from '@/shared/ui/button'
-import { BrandMark } from '@/shared/ui/icon'
+import { Logo } from '@/shared/ui/logo'
 import { getT } from '@/shared/i18n/server'
 
 /**
  * Public pages anyone can open without an account (the course catalog): a slim header with the
- * Budu mark, language and currency, and Sign in / Sign up — or "Open Budu" when signed in.
+ * Budu logo, language and currency, and Sign in / Sign up — or "Open Budu" when signed in.
  */
 export async function PublicLayout({ children }: { children: ReactNode }) {
   const [t, user] = await Promise.all([getT(), getSession()])
@@ -19,9 +19,8 @@ export async function PublicLayout({ children }: { children: ReactNode }) {
     <div className="min-h-svh bg-background">
       <header className="sticky top-0 z-20 border-b bg-background/90 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4">
-          <Link href="/" className="flex items-center gap-2 font-semibold">
-            <BrandMark />
-            {t.appName}
+          <Link href="/" className="flex items-center" aria-label={t.appName}>
+            <Logo className="h-7 w-auto" label={t.appName} />
           </Link>
           <nav className="ms-4 hidden sm:block">
             <Link href="/catalog" className="text-sm font-medium text-muted-foreground hover:text-foreground">

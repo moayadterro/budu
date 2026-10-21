@@ -156,15 +156,3 @@ export const StarIcon = ({ className }: SimpleIconProps) => <HugeiconsIcon icon=
 export const RecIcon = ({ className }: SimpleIconProps) => <HugeiconsIcon icon={RecordIcon} className={className} aria-hidden />
 export const HangUpIcon = ({ className }: SimpleIconProps) => <HugeiconsIcon icon={CallEnd01Icon} className={className} aria-hidden />
 export const PlayIcon = ({ className }: SimpleIconProps) => <HugeiconsIcon icon={HugePlayIcon} className={className} aria-hidden />
-
-/** Budu brand mark (graduation cap on the brand gradient). */
-export function BrandMark({ className }: SimpleIconProps) {
-  return (
-    <span className={className ?? 'grid size-8 flex-none place-items-center rounded-lg bg-brand text-primary-foreground'}>
-      <svg viewBox="0 0 24 24" fill="none" className="size-4" aria-hidden>
-        <path d="M12 3 3 8l9 5 9-5-9-5Z" fill="currentColor" />
-        <path d="M7 11v4c0 1.4 2.2 2.5 5 2.5s5-1.1 5-2.5v-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-      </svg>
-    </span>
-  )
-}

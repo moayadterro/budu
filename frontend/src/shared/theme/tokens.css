@@ -58,6 +58,8 @@
   --warning: oklch(0.666 0.157 58.318);
   --info: oklch(0.546 0.142 251.7);
   --highlight: oklch(0.769 0.165 70.08); /* amber call-to-action on the brand gradient */
+  --logo-mark: #0b7a4a; /* the logo's own colours (src/assets/logo.svg) */
+  --logo-text: #0b2e1f;
   --highlight-foreground: oklch(0.279 0.077 45.635);
   --subject-purple: oklch(0.558 0.163 302.3);
   --subject-terra: oklch(0.604 0.13 34.6);
@@ -118,6 +120,8 @@
   --warning: oklch(0.769 0.165 70.08);
   --info: oklch(0.685 0.169 237.323);
   --highlight: oklch(0.769 0.165 70.08);
+  --logo-mark: oklch(0.696 0.17 162.48); /* brighter so it reads on the dark background */
+  --logo-text: oklch(0.985 0 0);
   --subject-purple: oklch(0.714 0.143 302.3);
   --subject-terra: oklch(0.7 0.13 34.6);
   color-scheme: dark;
@@ -171,6 +175,8 @@
   --color-warning: var(--warning);
   --color-info: var(--info);
   --color-highlight: var(--highlight);
+  --color-logo-mark: var(--logo-mark);
+  --color-logo-text: var(--logo-text);
   --color-highlight-foreground: var(--highlight-foreground);
   --color-subject-purple: var(--subject-purple);
   --color-subject-terra: var(--subject-terra);

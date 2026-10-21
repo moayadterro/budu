@@ -16,7 +16,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu'
-import { BrandMark, Icon } from '@/shared/ui/icon'
+import { Icon } from '@/shared/ui/icon'
+import { Logo } from '@/shared/ui/logo'
 import {
   Sidebar,
   SidebarContent,
@@ -49,9 +50,13 @@ export function AppSidebar({ inSchool }: { inSchool: boolean }) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/" onClick={closeOnMobile}>
-                <BrandMark />
-                <span className="flex-1 truncate text-start text-base font-semibold">{t.appName}</span>
+              <Link href="/" onClick={closeOnMobile} aria-label={t.appName}>
+                {/* full logo; only the steps mark when the sidebar is collapsed to icons
+                    (`!`: the menu button shrinks every <svg> inside it to icon size) */}
+                <span className="flex w-full group-data-[collapsible=icon]:justify-center">
+                  <Logo className="h-7! w-auto! group-data-[collapsible=icon]:hidden!" label={t.appName} />
+                  <Logo mark className="hidden! size-5! group-data-[collapsible=icon]:block!" label={t.appName} />
+                </span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
