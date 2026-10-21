@@ -29,8 +29,8 @@ export async function HomePage() {
     getLocale(),
   ])
   const today = new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date())
-  // a solo student has no class: then no class line at all
-  const classLine = classes.member.map((c) => c.name).join(' · ') || undefined
+  // their class (at most one per school); a solo student or one without a class: no line at all
+  const classLine = classes.member[0]?.name
   // what's still to hand in, soonest due first (no due date last)
   const due = homework
     .filter((h) => h.status === 'new')

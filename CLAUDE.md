@@ -266,6 +266,8 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-21 A student is in at most ONE class per school (a class = a year group). Adding a student
+  who is in another class moves them (enforced in `local_budu_set_students`); solo students have none.
 - 2026-10-21 Classes = IOMAD-side Moodle cohorts + cohort enrolment (not app-db), so enrolment stays in
   IOMAD; class teachers live in the plugin table `local_budu_class_teacher` (db/install.xml +
   db/upgrade.php) so the plugin can authorise them. Teachers usually teach courses, not classes; a

@@ -18,7 +18,7 @@ import {
 const idle: ClassFormState = { status: 'idle' }
 
 /** A checkbox row for a person. */
-function PersonCheck({ name, person, checked }: { name: string; person: Person; checked?: boolean }) {
+function PersonCheck({ name, person, checked }: { name: string; person: Person & { note?: string }; checked?: boolean }) {
   return (
     <label className="flex cursor-pointer items-center gap-3 rounded-md px-2 py-1.5 hover:bg-muted/60">
       <input type="checkbox" name={name} value={person.id} defaultChecked={checked} className="size-4 accent-primary" />
@@ -27,12 +27,13 @@ function PersonCheck({ name, person, checked }: { name: string; person: Person; 
         <span className="block truncate text-sm font-medium">{person.name}</span>
         <span className="block truncate text-xs text-muted-foreground">{person.email}</span>
       </span>
+      {person.note && <span className="flex-none rounded-full bg-warning/10 px-2 py-0.5 text-xs text-warning">{person.note}</span>}
     </label>
   )
 }
 
 /** Manager: pick school students (not yet in the class) to add. */
-export function AddStudentsForm({ classId, candidates }: { classId: number; candidates: Person[] }) {
+export function AddStudentsForm({ classId, candidates }: { classId: number; candidates: Array<Person & { note?: string }> }) {
   const t = useT()
   const s = t.classes
   const [state, action] = useActionState(addStudentsAction, idle)

@@ -60,7 +60,10 @@ export async function ClassPage({ params }: { params: Promise<{ classId: string 
     ? await Promise.all([schoolPeople(user.userId, cls.companyId), schoolCourses(user.userId, cls.companyId)])
     : [[], []]
   const inClass = new Set(cls.students.map((p) => p.id))
-  const candidates = people.filter((p) => p.role === 'student' && !inClass.has(p.id))
+  // a student is in one class: students of another class are offered too, marked as a move
+  const candidates = people
+    .filter((p) => p.role === 'student' && !inClass.has(p.id))
+    .map((p) => ({ ...p, note: p.className ? s.willMove(p.className) : undefined }))
   const teachers = people.filter((p) => p.role === 'teacher' || p.role === 'manager')
   const courseOptions = courses.filter((c) => !cls.courseIds.includes(c.id)).map((c) => ({ id: c.id, label: c.title }))
   const back = cls.canManage ? '/school/classes' : '/teach/classes'

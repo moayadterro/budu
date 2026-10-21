@@ -439,6 +439,7 @@ export const ar: typeof en = {
   },
 
   classes: {
+    willMove: (from: string) => `في ${from} — سيُنقل`,
     courseCount: (n: number) => plural(n, 'دورة واحدة', 'دورتان', 'دورات', 'دورة'),
     title: 'الفصول',
     sub: 'مجموعات من الطلاب، مثل سنة دراسية. سجّل الفصل كله في دوراته دفعة واحدة.',

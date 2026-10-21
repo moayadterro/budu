@@ -439,6 +439,7 @@ export const ru: typeof en = {
   },
 
   classes: {
+    willMove: (from: string) => `Сейчас в «${from}» — перейдёт`,
     courseCount: (n: number) => `${n} ${plural(n, 'курс', 'курса', 'курсов')}`,
     title: 'Классы',
     sub: 'Группы учеников, например год обучения. Записывайте весь класс на его курсы сразу.',

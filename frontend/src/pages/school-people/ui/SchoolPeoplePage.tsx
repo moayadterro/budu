@@ -64,6 +64,7 @@ export async function SchoolPeoplePage({ searchParams }: { searchParams: Promise
               </ItemContent>
               <ItemActions>
                 {p.pending && <Badge variant="warning">{s.pending}</Badge>}
+                {p.className && <Badge variant="outline">{p.className}</Badge>}
                 {p.id === user.userId ? <Badge variant="secondary">{t.role[p.role]}</Badge> : <RoleSelect userId={p.id} role={p.role} />}
               </ItemActions>
             </Item>

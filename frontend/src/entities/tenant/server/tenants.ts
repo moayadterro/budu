@@ -71,7 +71,8 @@ export async function getTenantName(companyId: number | null): Promise<string | 
 // ----- school (company) people & courses, for managers -----
 
 export type SchoolRole = 'manager' | 'teacher' | 'student'
-export type SchoolPerson = Person & { role: SchoolRole; pending: boolean }
+/** `className`: their class in this school ('' = none; a student is in at most one). */
+export type SchoolPerson = Person & { role: SchoolRole; pending: boolean; classId: number | null; className: string }
 export type SchoolCourse = {
   id: number
   title: string
@@ -84,11 +85,15 @@ export type SchoolCourse = {
 
 /** Everyone in the school with their role; `pending` = invited, not activated yet. */
 export async function schoolPeople(userId: number, companyId: number): Promise<SchoolPerson[]> {
-  const rows = await iomadCall<Array<RawPerson & { role: SchoolRole; suspended: boolean }>>(defaultInstance(), 'local_budu_company_people', {
-    companyid: companyId,
-    userid: userId,
-  })
-  return rows.map((r) => ({ ...toPerson(r), role: r.role, pending: r.suspended }))
+  const rows = await iomadCall<Array<RawPerson & { role: SchoolRole; suspended: boolean; classid: number; classname: string }>>(
+    defaultInstance(),
+    'local_budu_company_people',
+    {
+      companyid: companyId,
+      userid: userId,
+    },
+  )
+  return rows.map((r) => ({ ...toPerson(r), role: r.role, pending: r.suspended, classId: r.classid || null, className: r.classname }))
 }
 
 export async function schoolCourses(userId: number, companyId: number): Promise<SchoolCourse[]> {

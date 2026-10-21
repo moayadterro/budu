@@ -432,6 +432,7 @@ export const en = {
   },
 
   classes: {
+    willMove: (from: string) => `In ${from} — will move`,
     courseCount: (n: number) => `${n} ${n === 1 ? 'course' : 'courses'}`,
     title: 'Classes',
     sub: 'Groups of students, e.g. a school year. Enrol a whole class into its courses at once.',
