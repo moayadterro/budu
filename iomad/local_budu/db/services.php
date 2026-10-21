@@ -164,4 +164,52 @@ $functions = [
         'description' => 'Change the role of someone in a school (managers only).',
         'type' => 'write',
     ],
+    'local_budu_list_classes' => [
+        'classname' => \local_budu\external\classes::class,
+        'methodname' => 'list_classes',
+        'description' => 'Classes of a school (managers and teachers).',
+        'type' => 'read',
+    ],
+    'local_budu_save_class' => [
+        'classname' => \local_budu\external\classes::class,
+        'methodname' => 'save_class',
+        'description' => 'Create or rename a class (managers).',
+        'type' => 'write',
+    ],
+    'local_budu_delete_class' => [
+        'classname' => \local_budu\external\classes::class,
+        'methodname' => 'delete_class',
+        'description' => 'Delete a class (managers).',
+        'type' => 'write',
+    ],
+    'local_budu_get_class' => [
+        'classname' => \local_budu\external\classes::class,
+        'methodname' => 'get_class',
+        'description' => 'A class with students, class teachers and courses.',
+        'type' => 'read',
+    ],
+    'local_budu_set_students' => [
+        'classname' => \local_budu\external\classes::class,
+        'methodname' => 'set_students',
+        'description' => 'Add or remove students of a class (managers).',
+        'type' => 'write',
+    ],
+    'local_budu_set_teachers' => [
+        'classname' => \local_budu\external\classes::class,
+        'methodname' => 'set_teachers',
+        'description' => 'Set the class teachers (managers).',
+        'type' => 'write',
+    ],
+    'local_budu_link_course' => [
+        'classname' => \local_budu\external\classes::class,
+        'methodname' => 'link_course',
+        'description' => 'Enrol a class into a course or remove it (manager or course teacher).',
+        'type' => 'write',
+    ],
+    'local_budu_my_classes' => [
+        'classname' => \local_budu\external\classes::class,
+        'methodname' => 'my_classes',
+        'description' => 'Classes the acting user is in or teaches as class teacher.',
+        'type' => 'read',
+    ],
 ];

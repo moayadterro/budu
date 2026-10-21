@@ -49,6 +49,15 @@ const FUNCTIONS = [
     'local_budu_company_people',
     'local_budu_company_courses',
     'local_budu_set_role',
+    // School classes (iomad/local_budu/classes/external/classes.php).
+    'local_budu_list_classes',
+    'local_budu_save_class',
+    'local_budu_delete_class',
+    'local_budu_get_class',
+    'local_budu_set_students',
+    'local_budu_set_teachers',
+    'local_budu_link_course',
+    'local_budu_my_classes',
 ];
 const CAPABILITIES = [
     'webservice/rest:use',
@@ -84,6 +93,11 @@ const CAPABILITIES = [
     'mod/assign:submit',
     'moodle/grade:edit',
     'enrol/manual:unenrol',
+    // Classes = cohorts in the school's category, enrolled into courses with cohort sync.
+    'moodle/cohort:manage',
+    'moodle/cohort:assign',
+    'moodle/cohort:view',
+    'enrol/cohort:config',
 ];
 
 $system = context_system::instance();

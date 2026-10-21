@@ -413,16 +413,29 @@ class learning extends external_api {
     public static function gradebook_parameters(): external_function_parameters {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course'),
-            'userid' => new external_value(PARAM_INT, 'Acting Budu user (teacher)'),
+            'userid' => new external_value(PARAM_INT, 'Acting Budu user (teacher, manager, or class teacher of classid)'),
+            'classid' => new external_value(PARAM_INT, 'Only students of this class (0 = everyone)', VALUE_DEFAULT, 0),
         ]);
     }
 
-    /** Students × homework grid of a course. */
-    public static function gradebook(int $courseid, int $userid): array {
+    /**
+     * Students × homework grid of a course, optionally only one class's students. A class teacher may
+     * read it for their class when that class is enrolled into the course.
+     */
+    public static function gradebook(int $courseid, int $userid, int $classid = 0): array {
         global $DB;
-        $p = self::validate_parameters(self::gradebook_parameters(), compact('courseid', 'userid'));
+        $p = self::validate_parameters(self::gradebook_parameters(), compact('courseid', 'userid', 'classid'));
         self::setup();
-        $course = self::taught($p['courseid'], $p['userid']);
+        $course = get_course($p['courseid']);
+        $classteacher = $p['classid']
+            && $DB->record_exists('local_budu_class_teacher', ['cohortid' => $p['classid'], 'userid' => $p['userid']])
+            && $DB->record_exists('enrol', ['enrol' => 'cohort', 'courseid' => $course->id, 'customint1' => $p['classid']]);
+        if ($course->id == SITEID || (!$classteacher && !self::can_teach($course, $p['userid']))) {
+            throw self::deny('see this gradebook');
+        }
+        $members = $p['classid']
+            ? array_flip($DB->get_fieldset_select('cohort_members', 'userid', 'cohortid = ?', [$p['classid']]))
+            : null;
         $homework = [];
         $instances = [];
         foreach (self::homework_of($course, $p['userid']) as $cm) {
@@ -431,6 +444,9 @@ class learning extends external_api {
         }
         $rows = [];
         foreach (self::students_of($course->id) as $s) {
+            if ($members !== null && !isset($members[$s->id])) {
+                continue;
+            }
             $cells = [];
             foreach ($instances as $cmid => $instance) {
                 $st = self::state($instance, $s->id);
