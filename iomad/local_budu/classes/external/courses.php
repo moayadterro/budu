@@ -9,8 +9,8 @@ use core_external\external_value;
 
 /**
  * Course builder for Budu teachers: courses (IOMAD company courses), lessons
- * (course sections), materials (mod_resource: video / PDF / any file) and tasks
- * (mod_assign, graded 0–100).
+ * (course sections), materials (mod_resource: video / PDF / any file), text pages
+ * (mod_page: rich text, HTML cleaned by Moodle's purifier) and tasks (mod_assign, graded 0–100).
  *
  * The integration token performs the changes; every function takes the acting
  * Budu user (`userid`) and checks THAT user's rights in Moodle first:
@@ -61,10 +61,15 @@ class courses extends external_api {
 
     private static function cm(\stdClass $course, int $cmid): \stdClass {
         $cm = get_coursemodule_from_id('', $cmid, $course->id, false, MUST_EXIST);
-        if (!in_array($cm->modname, ['resource', 'assign'])) {
+        if (!in_array($cm->modname, ['resource', 'assign', 'page'])) {
             throw new \moodle_exception('invalidrecord', 'error', '', 'item');
         }
         return $cm;
+    }
+
+    /** Teacher HTML → safe HTML (Moodle's HTMLPurifier: no scripts, event handlers or unsafe URLs). */
+    private static function clean_html(string $html): string {
+        return clean_text($html, FORMAT_HTML);
     }
 
     private static function intro(string $text): array {
@@ -284,7 +289,7 @@ class courses extends external_api {
             $items = [];
             foreach ($modinfo->sections[$section->section] ?? [] as $cmid) {
                 $cm = $modinfo->get_cm($cmid);
-                if ($cm->deletioninprogress || !in_array($cm->modname, ['resource', 'assign']) || (!$canedit && !$cm->uservisible)) {
+                if ($cm->deletioninprogress || !in_array($cm->modname, ['resource', 'assign', 'page']) || (!$canedit && !$cm->uservisible)) {
                     continue;
                 }
                 $ctx = \context_module::instance($cm->id);
@@ -292,6 +297,10 @@ class courses extends external_api {
                     $files = self::files_of($ctx->id, 'mod_resource', 'content');
                     $kind = $files && str_starts_with($files[0]['mimetype'], 'video/') ? 'video' : 'file';
                     $items[] = ['cmid' => $cm->id, 'kind' => $kind, 'name' => $cm->name, 'instructions' => '', 'duedate' => 0, 'files' => $files];
+                } else if ($cm->modname === 'page') {
+                    $content = (string)$DB->get_field('page', 'content', ['id' => $cm->instance]);
+                    $items[] = ['cmid' => $cm->id, 'kind' => 'text', 'name' => $cm->name, 'instructions' => '', 'duedate' => 0,
+                        'files' => [], 'content' => self::clean_html($content)];
                 } else {
                     $assign = $DB->get_record('assign', ['id' => $cm->instance], 'intro, duedate', MUST_EXIST);
                     $items[] = ['cmid' => $cm->id, 'kind' => 'task', 'name' => $cm->name, 'instructions' => $assign->intro,
@@ -319,11 +328,12 @@ class courses extends external_api {
         ]);
         $item = new external_single_structure([
             'cmid' => new external_value(PARAM_INT, 'Course module id'),
-            'kind' => new external_value(PARAM_ALPHA, 'video | file | task'),
+            'kind' => new external_value(PARAM_ALPHA, 'video | file | text | task'),
             'name' => new external_value(PARAM_TEXT, 'Name'),
             'instructions' => new external_value(PARAM_RAW, 'Task instructions (plain text)'),
             'duedate' => new external_value(PARAM_INT, 'Task due date (0 = none)'),
             'files' => new external_multiple_structure($file),
+            'content' => new external_value(PARAM_RAW, 'Text pages: cleaned HTML', VALUE_OPTIONAL),
         ]);
         $lesson = new external_single_structure([
             'id' => new external_value(PARAM_INT, 'Section id'),
@@ -494,6 +504,56 @@ class courses extends external_api {
     }
 
     public static function save_task_returns(): external_single_structure {
+        return self::ok();
+    }
+
+    // ----- save_page -----------------------------------------------------
+
+    public static function save_page_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'courseid' => new external_value(PARAM_INT, 'Course'),
+            'userid' => new external_value(PARAM_INT, 'Acting Budu user'),
+            'sectionid' => new external_value(PARAM_INT, 'Lesson (used when adding)'),
+            'cmid' => new external_value(PARAM_INT, 'Text page to change; 0 = add a new one'),
+            'name' => new external_value(PARAM_TEXT, 'Title'),
+            'content' => new external_value(PARAM_RAW, 'HTML from the editor (cleaned here)'),
+        ]);
+    }
+
+    /** A text page (mod_page) in a lesson: rich text written in Budu's editor. */
+    public static function save_page(int $courseid, int $userid, int $sectionid, int $cmid, string $name, string $content): array {
+        $p = self::validate_parameters(self::save_page_parameters(), compact('courseid', 'userid', 'sectionid', 'cmid', 'name', 'content'));
+        self::setup();
+        $course = self::editable($p['courseid'], $p['userid']);
+        $html = self::clean_html($p['content']);
+        $settings = function (\stdClass $data) use ($p, $html): \stdClass {
+            $data->name = trim($p['name']);
+            $data->introeditor = self::intro('');
+            $data->page = ['text' => $html, 'format' => FORMAT_HTML, 'itemid' => 0];
+            // page_add_instance() reads `page` only when given a Moodle form (never, from the API)
+            $data->content = $html;
+            $data->contentformat = FORMAT_HTML;
+            $data->display = RESOURCELIB_DISPLAY_OPEN;
+            $data->printintro = 0;
+            $data->printlastmodified = 0;
+            $data->printheading = 0;
+            return $data;
+        };
+        if (!$p['cmid']) {
+            $section = self::lesson($course, $p['sectionid']);
+            $data = (object)['modulename' => 'page', 'course' => $course->id, 'section' => $section->section, 'visible' => 1];
+            return ['id' => create_module($settings($data))->coursemodule];
+        }
+        $cm = self::cm($course, $p['cmid']);
+        if ($cm->modname !== 'page') {
+            throw new \moodle_exception('invalidrecord', 'error', '', 'text page');
+        }
+        [, , , $data] = get_moduleinfo_data($cm, $course);
+        update_module($settings($data));
+        return ['id' => $cm->id];
+    }
+
+    public static function save_page_returns(): external_single_structure {
         return self::ok();
     }
 

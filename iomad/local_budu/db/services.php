@@ -290,4 +290,22 @@ $functions = [
         'description' => 'The IOMAD company that owns a course.',
         'type' => 'read',
     ],
+    'local_budu_save_page' => [
+        'classname' => \local_budu\external\courses::class,
+        'methodname' => 'save_page',
+        'description' => 'Add or change a lesson text page (rich text, cleaned).',
+        'type' => 'write',
+    ],
+    'local_budu_catalog' => [
+        'classname' => \local_budu\external\market::class,
+        'methodname' => 'catalog',
+        'description' => 'Public facts of published marketplace courses.',
+        'type' => 'read',
+    ],
+    'local_budu_enrol_learner' => [
+        'classname' => \local_budu\external\market::class,
+        'methodname' => 'enrol_learner',
+        'description' => 'Enrol a learner in a published course (free, or payment confirmed).',
+        'type' => 'write',
+    ],
 ];

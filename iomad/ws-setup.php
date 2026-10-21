@@ -72,6 +72,9 @@ const FUNCTIONS = [
     'local_budu_company_parents',
     'local_budu_parents_of',
     'local_budu_course_company',
+    'local_budu_save_page',
+    'local_budu_catalog',
+    'local_budu_enrol_learner',
 ];
 const CAPABILITIES = [
     'webservice/rest:use',
@@ -99,6 +102,7 @@ const CAPABILITIES = [
     'mod/resource:addinstance',
     'mod/resource:view',
     'mod/assign:addinstance',
+    'mod/page:addinstance',           // lesson text pages
     'mod/assign:view',
     // Homework: hand in for a student, grade, read grades (after local_budu checked the real user).
     'mod/assign:editothersubmission',
