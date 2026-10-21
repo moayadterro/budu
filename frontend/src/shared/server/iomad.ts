@@ -36,20 +36,34 @@ function flatten(value: unknown, key: string, out: URLSearchParams) {
   }
 }
 
+/**
+ * Moodle builds per-course caches on first use and takes a lock to do it; when several requests hit
+ * a fresh cache at once, the losers fail with this instead of waiting. It happens before the function
+ * does anything, so it is safe to retry.
+ */
+const CACHE_LOCK = /unable to acquire a lock for caching/i
+const LOCK_RETRIES = 3
+
 export async function iomadCall<T>(inst: IomadInstance, fn: string, params: Record<string, unknown> = {}): Promise<T> {
   // POST body, not query string, so the token stays out of access logs
   const body = new URLSearchParams({ wstoken: inst.token, wsfunction: fn, moodlewsrestformat: 'json' })
   for (const [k, v] of Object.entries(params)) flatten(v, k, body)
 
-  const res = await fetch(`${inst.url}/webservice/rest/server.php`, { method: 'POST', body, cache: 'no-store' })
-  if (!res.ok) throw new IomadError('http', `IOMAD ${fn}: HTTP ${res.status}`)
+  for (let attempt = 0; ; attempt++) {
+    const res = await fetch(`${inst.url}/webservice/rest/server.php`, { method: 'POST', body, cache: 'no-store' })
+    if (!res.ok) throw new IomadError('http', `IOMAD ${fn}: HTTP ${res.status}`)
 
-  const data = await res.json()
-  // Moodle reports errors as HTTP 200 with an exception payload
-  if (data && typeof data === 'object' && 'exception' in data) {
-    throw new IomadError(data.errorcode ?? 'exception', `IOMAD ${fn}: ${data.message}`)
+    const data = await res.json()
+    // Moodle reports errors as HTTP 200 with an exception payload
+    if (data && typeof data === 'object' && 'exception' in data) {
+      if (CACHE_LOCK.test(String(data.message)) && attempt < LOCK_RETRIES) {
+        await new Promise((r) => setTimeout(r, 150 * (attempt + 1)))
+        continue
+      }
+      throw new IomadError(data.errorcode ?? 'exception', `IOMAD ${fn}: ${data.message}`)
+    }
+    return data as T
   }
-  return data as T
 }
 
 /**
