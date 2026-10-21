@@ -90,8 +90,10 @@ Unbuilt screens stay in `shared/config/nav.ts` with `href: null` (rendered disab
   Sidebar, Badge, Alert, Button (`asChild` for links). Budu-only variants added to generated files:
   Badge `success|warning|info|live`, Alert `success|info`, Button `highlight` (amber CTA).
   Dangerous actions (delete, remove, cancel, reject) ALWAYS use `ConfirmButton`: a red button that
-  opens a dialog — title naming what is affected, the consequence (`description`), "Go back" focused,
-  and a solid red (`danger` variant) button named after the action. Never a plain button for these.
+  opens an iOS/macOS-style alert — compact centred card, the action's `icon` in a red circle, a title
+  that NAMES the thing ("Remove Class 10 from “Physics 101”?" — never just "Remove?"), the
+  consequence (`description`), then two big stacked buttons: solid red action (icon + verb) and
+  "Cancel" (focused). When the action itself is a cancel, pass `keepLabel` ("Keep the invitation").
   Our own helpers in shared/ui: `Field`, `SubmitButton`, `ConfirmButton`, `PasswordInput`,
   `ScreenHead`, `AuthCard`, `InitialsAvatar`, `LocalTime`, `Icon`.
 - **Icons: Hugeicons** (free set, `@hugeicons/react` + `@hugeicons/core-free-icons`). App code uses

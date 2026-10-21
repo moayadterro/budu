@@ -55,13 +55,13 @@ export function AddStudentsForm({ classId, candidates }: { classId: number; cand
   )
 }
 
-export function RemoveFromClassButton({ classId, studentId }: { classId: number; studentId: number }) {
+export function RemoveFromClassButton({ classId, studentId, name }: { classId: number; studentId: number; name: string }) {
   const t = useT()
   return (
     <form action={removeFromClassAction}>
       <input type="hidden" name="classId" value={classId} />
       <input type="hidden" name="studentId" value={studentId} />
-      <ConfirmButton label={t.classes.remove} confirmLabel={t.classes.confirmRemove} />
+      <ConfirmButton icon="userRemove" label={t.classes.remove} confirmLabel={t.confirm.leaveClassTitle(name)} description={t.confirm.leaveClassDesc} />
     </form>
   )
 }

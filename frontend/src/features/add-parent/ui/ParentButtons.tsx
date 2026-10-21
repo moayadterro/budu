@@ -25,22 +25,28 @@ export function SkipParentStepButton() {
   )
 }
 
-export function CancelParentRequestButton({ requestId }: { requestId: number }) {
+export function CancelParentRequestButton({ requestId, email }: { requestId: number; email: string }) {
   const t = useT()
   return (
     <form action={cancelParentRequestAction}>
       <input type="hidden" name="requestId" value={requestId} />
-      <ConfirmButton label={t.family.cancel} confirmLabel={t.family.confirmRemove} />
+      <ConfirmButton
+        icon="cancel"
+        label={t.family.cancel}
+        confirmLabel={t.confirm.parentRequestTitle(email)}
+        description={t.confirm.parentRequestDesc}
+        keepLabel={t.confirm.keepRequest}
+      />
     </form>
   )
 }
 
-export function RemoveParentButton({ parentId }: { parentId: number }) {
+export function RemoveParentButton({ parentId, name }: { parentId: number; name: string }) {
   const t = useT()
   return (
     <form action={removeParentAction}>
       <input type="hidden" name="parentId" value={parentId} />
-      <ConfirmButton label={t.family.remove} confirmLabel={t.family.confirmRemove} />
+      <ConfirmButton icon="userRemove" label={t.family.remove} confirmLabel={t.confirm.parentTitle(name)} description={t.confirm.parentDesc} />
     </form>
   )
 }

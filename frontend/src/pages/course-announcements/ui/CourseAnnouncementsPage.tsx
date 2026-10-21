@@ -37,7 +37,7 @@ export async function CourseAnnouncementsPage({ params }: { params: Promise<{ co
         showEmpty
         sub={t.announcements.courseSub}
         action={<NewAnnouncementDialog courseId={id} />}
-        itemActions={Object.fromEntries(news.map((a) => [a.id, <DeleteAnnouncementButton key={a.id} announcementId={a.id} />]))}
+        itemActions={Object.fromEntries(news.map((a) => [a.id, <DeleteAnnouncementButton key={a.id} announcementId={a.id} title={a.title} />]))}
       />
     </div>
   )

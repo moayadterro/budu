@@ -50,7 +50,7 @@ export async function AdminPaymentsPage() {
                   </ItemDescription>
                 </ItemContent>
                 <ItemActions>
-                  <DecideOrder orderId={o.id} />
+                  <DecideOrder orderId={o.id} number={o.number} />
                 </ItemActions>
               </Item>
             )

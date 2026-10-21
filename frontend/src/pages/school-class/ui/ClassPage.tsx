@@ -130,7 +130,7 @@ export async function ClassPage({ params }: { params: Promise<{ classId: string 
                           <Button variant="outline" size="sm" asChild>
                             <Link href={`/gradebook?course=${c.id}&class=${cls.id}`}>{s.gradebook}</Link>
                           </Button>
-                          {cls.canManage && <UnenrolClassButton classId={cls.id} courseId={c.id} />}
+                          {cls.canManage && <UnenrolClassButton classId={cls.id} courseId={c.id} classTitle={cls.name} courseName={c.title} />}
                         </div>
                       </td>
                     </tr>
@@ -164,7 +164,7 @@ export async function ClassPage({ params }: { params: Promise<{ classId: string 
                   </ItemContent>
                   {cls.canManage && (
                     <ItemActions>
-                      <RemoveFromClassButton classId={cls.id} studentId={p.id} />
+                      <RemoveFromClassButton classId={cls.id} studentId={p.id} name={p.name} />
                     </ItemActions>
                   )}
                 </Item>

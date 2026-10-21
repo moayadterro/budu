@@ -64,7 +64,7 @@ export async function CourseSchedulePage({ params }: { params: Promise<{ courseI
                 </ItemDescription>
               </ItemContent>
               <ItemActions>
-                <DeleteSeriesButton courseId={id} seriesId={x.id} />
+                <DeleteSeriesButton courseId={id} seriesId={x.id} count={x.count} />
               </ItemActions>
             </Item>
           ))}

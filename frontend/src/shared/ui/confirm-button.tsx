@@ -11,22 +11,24 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogMedia,
   AlertDialogTitle,
 } from './alert-dialog'
 import { Button } from './button'
 import { Icon, type IconName } from './icon'
 
 /**
- * A dangerous action (delete, remove, cancel, reject): a red button that asks first in a dialog —
- * what will happen, that it can't be undone, "Go back" (focused, so Enter is safe) and a solid red
- * button named after the action. Inside a <form> the confirm submits it; or pass `onConfirm`.
+ * A dangerous action (delete, remove, cancel, reject): a red button that asks first, in an
+ * iOS / macOS-style alert — a compact centred card with the action's icon, a title that NAMES what is
+ * affected ("Remove Class 10 from this course?"), one line on what happens, and two big stacked
+ * buttons: the red action (with its icon) and "Cancel" (focused, so Enter / Esc are safe).
+ * Inside a <form> the confirm submits it; or pass `onConfirm`.
  */
 export function ConfirmButton({
   label,
   confirmLabel,
   description,
   icon,
+  keepLabel,
   iconOnly = false,
   onConfirm,
   className,
@@ -35,11 +37,14 @@ export function ConfirmButton({
 }: Pick<ComponentProps<typeof Button>, 'className' | 'disabled' | 'size'> & {
   /** the action, e.g. "Delete" — on the button and on the dialog's confirm */
   label: string
-  /** the question, e.g. "Delete this lesson?" — the dialog's title */
+  /** the question naming the thing, e.g. "Delete “Lesson 2”?" — the dialog's title */
   confirmLabel: string
   /** what happens, e.g. "Its videos and homework are deleted too." (default: it can't be undone) */
   description?: string
+  /** the action's icon (trigger, dialog and confirm button); default: a bin */
   icon?: IconName
+  /** the "don't do it" button when "Cancel" would be confusing — e.g. for "Cancel invite": "Keep invite" */
+  keepLabel?: string
   /** an icon button (the label becomes its accessible name) */
   iconOnly?: boolean
   onConfirm?: () => void
@@ -48,6 +53,7 @@ export function ConfirmButton({
   const [open, setOpen] = useState(false)
   const trigger = useRef<HTMLButtonElement>(null)
   const { pending } = useFormStatus()
+  const glyph = icon ?? 'trash'
   const confirm = () => {
     setOpen(false)
     if (onConfirm) onConfirm()
@@ -66,25 +72,26 @@ export function ConfirmButton({
         title={iconOnly ? label : undefined}
         className={iconOnly ? `text-destructive hover:bg-destructive/10 hover:text-destructive ${className ?? ''}` : className}
       >
-        {(icon || iconOnly) && <Icon name={icon ?? 'trash'} />}
+        {(icon || iconOnly) && <Icon name={glyph} />}
         {!iconOnly && label}
       </Button>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogMedia className="bg-destructive/10 text-destructive">
-            <Icon name="alert" />
-          </AlertDialogMedia>
-          <AlertDialogTitle>{confirmLabel}</AlertDialogTitle>
-          <AlertDialogDescription>{description ?? t.confirm.cannotUndo}</AlertDialogDescription>
+      <AlertDialogContent className="gap-0 overflow-hidden rounded-3xl p-0 shadow-2xl data-[size=default]:max-w-[calc(100%-2rem)] data-[size=default]:sm:max-w-sm">
+        <AlertDialogHeader className="flex flex-col items-center gap-2 px-6 pt-7 pb-5 text-center sm:group-data-[size=default]/alert-dialog-content:place-items-center sm:group-data-[size=default]/alert-dialog-content:text-center">
+          <div className="mb-2 grid size-14 place-items-center rounded-full bg-destructive/10 text-destructive" aria-hidden>
+            <Icon name={glyph} className="size-7" />
+          </div>
+          <AlertDialogTitle className="text-lg leading-snug font-semibold text-balance">{confirmLabel}</AlertDialogTitle>
+          <AlertDialogDescription className="text-pretty">{description ?? t.confirm.cannotUndo}</AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          {/* large: a decision this important deserves comfortable targets */}
-          <AlertDialogCancel size="lg" autoFocus>
-            {t.confirm.back}
-          </AlertDialogCancel>
-          <AlertDialogAction size="lg" variant="danger" onClick={confirm}>
+        {/* stacked, full width (like macOS / iOS alerts): big targets, long labels never wrap awkwardly */}
+        <AlertDialogFooter className="flex-col gap-2 px-6 pb-6 sm:flex-col">
+          <AlertDialogAction size="lg" variant="danger" className="h-12 w-full rounded-xl text-base" onClick={confirm}>
+            <Icon name={glyph} />
             {label}
           </AlertDialogAction>
+          <AlertDialogCancel size="lg" variant="secondary" className="h-12 w-full rounded-xl text-base" autoFocus>
+            {keepLabel ?? t.confirm.dismiss}
+          </AlertDialogCancel>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

@@ -67,7 +67,7 @@ export async function AccountPage() {
                       <ItemDescription className="truncate">{p.email}</ItemDescription>
                     </ItemContent>
                     <ItemActions>
-                      <RemoveParentButton parentId={p.id} />
+                      <RemoveParentButton parentId={p.id} name={p.name} />
                     </ItemActions>
                   </Item>
                 ))}
@@ -83,7 +83,7 @@ export async function AccountPage() {
                       </ItemDescription>
                     </ItemContent>
                     <ItemActions>
-                      <CancelParentRequestButton requestId={r.id} />
+                      <CancelParentRequestButton requestId={r.id} email={r.parentEmail} />
                     </ItemActions>
                   </Item>
                 ))}

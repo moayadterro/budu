@@ -6,7 +6,7 @@ import { useT } from '@/shared/i18n'
 import { decideOrderAction } from '../server/actions'
 
 /** Confirm & enrol / Reject an order. */
-export function DecideOrder({ orderId }: { orderId: number }) {
+export function DecideOrder({ orderId, number }: { orderId: number; number: string }) {
   const t = useT()
   const s = t.payments
   return (
@@ -14,7 +14,7 @@ export function DecideOrder({ orderId }: { orderId: number }) {
       <form action={decideOrderAction}>
         <input type="hidden" name="orderId" value={orderId} />
         <input type="hidden" name="decision" value="reject" />
-        <ConfirmButton label={s.reject} confirmLabel={s.confirmReject} />
+        <ConfirmButton icon="cancel" label={s.reject} confirmLabel={t.confirm.rejectOrderTitle(number)} description={t.confirm.rejectOrderDesc} />
       </form>
       <form action={decideOrderAction}>
         <input type="hidden" name="orderId" value={orderId} />

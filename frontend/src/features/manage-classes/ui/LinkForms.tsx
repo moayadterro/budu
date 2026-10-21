@@ -50,13 +50,18 @@ export function EnrolClassForm({
   )
 }
 
-export function UnenrolClassButton({ classId, courseId }: { classId: number; courseId: number }) {
+export function UnenrolClassButton({ classId, courseId, classTitle, courseName }: { classId: number; courseId: number; classTitle: string; courseName: string }) {
   const t = useT()
   return (
     <form action={unlinkClassAction}>
       <input type="hidden" name="classId" value={classId} />
       <input type="hidden" name="courseId" value={courseId} />
-      <ConfirmButton label={t.classes.remove} confirmLabel={t.classes.confirmRemove} />
+      <ConfirmButton
+        icon="unlink"
+        label={t.classes.remove}
+        confirmLabel={t.confirm.unlinkClassTitle(classTitle, courseName)}
+        description={t.confirm.unlinkClassDesc}
+      />
     </form>
   )
 }

@@ -73,7 +73,7 @@ export async function CourseStudentsPage({ params }: { params: Promise<{ courseI
                   <Button variant="outline" size="sm" asChild>
                     <Link href={`/gradebook?course=${id}&class=${k.id}`}>{c.gradebook}</Link>
                   </Button>
-                  <UnenrolClassButton classId={k.id} courseId={id} />
+                  <UnenrolClassButton classId={k.id} courseId={id} classTitle={k.name} courseName={course.title} />
                 </ItemActions>
               </Item>
             ))}
@@ -112,7 +112,7 @@ export async function CourseStudentsPage({ params }: { params: Promise<{ courseI
                         <span className="sr-only sm:not-sr-only">{t.messages.messageParents}</span>
                       </Link>
                     </Button>
-                    <RemoveStudentButton courseId={id} studentId={st.id} />
+                    <RemoveStudentButton courseId={id} studentId={st.id} name={st.name} />
                   </ItemActions>
                 </Item>
               ))}

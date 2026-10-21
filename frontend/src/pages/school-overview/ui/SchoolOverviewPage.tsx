@@ -99,7 +99,7 @@ export async function SchoolOverviewPage() {
             items={news}
             sub={t.announcements.sub}
             action={<NewAnnouncementDialog classes={classes.map((k) => ({ id: k.id, name: k.name }))} />}
-            itemActions={Object.fromEntries(news.map((a) => [a.id, <DeleteAnnouncementButton key={a.id} announcementId={a.id} />]))}
+            itemActions={Object.fromEntries(news.map((a) => [a.id, <DeleteAnnouncementButton key={a.id} announcementId={a.id} title={a.title} />]))}
           />
         </div>
       )}

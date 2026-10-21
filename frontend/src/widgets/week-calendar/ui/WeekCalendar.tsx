@@ -137,7 +137,7 @@ function ItemDetails({ item, role, canManageEvents }: { item: CalendarItem; role
           <Link href={courseHref(role, item.courseId)}>{s.openCourse}</Link>
         </Button>
       )}
-      {item.kind === 'event' && canManageEvents && <DeleteEventButton eventId={item.id} />}
+      {item.kind === 'event' && canManageEvents && <DeleteEventButton eventId={item.id} title={item.title} />}
     </div>
   )
 }
