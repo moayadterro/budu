@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getConversation, listConversations, listMessages, markConversationRead } from '@/entities/conversation/server'
 import { requireRole } from '@/entities/session/server'
-import { ChatThread } from '@/features/chat'
+import { ChatThread, LiveConversations } from '@/features/chat'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
@@ -31,6 +31,7 @@ export async function MessagesPage(props: { params?: Promise<{ conversationId?: 
   return (
     <div data-wide className="flex flex-col">
       <ScreenHead title={s.title} sub={s.sub} />
+      {!open && <LiveConversations />}
       <Card className="grid h-[calc(100svh-13rem)] min-h-96 grid-cols-1 gap-0 overflow-hidden p-0 md:grid-cols-[320px_1fr]">
         <nav className={cn('min-h-0 overflow-y-auto border-e', open && 'hidden md:block')} aria-label={s.title}>
           {conversations.length === 0 && (

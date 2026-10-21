@@ -1,5 +1,6 @@
 import 'server-only'
 import { query } from '@/shared/server/db'
+import { publish } from '@/shared/server/realtime'
 import { defaultInstance, iomadCall } from '@/shared/server/iomad'
 import type { Conversation, Message } from '../model/types'
 
@@ -112,6 +113,8 @@ export async function sendMessage(c: Conversation, senderId: number, body: strin
      RETURNING (SELECT id FROM m) AS id, extract(epoch FROM (SELECT created_at FROM m))::int AS created`,
     [c.id, senderId, body],
   )
+  // live: both participants' open pages hear about it at once (ids only — they fetch through the usual checks)
+  await publish('budu_chat', { conversationId: c.id, users: [c.parentId, c.teacherId] }).catch((e) => console.error('chat publish failed', e))
   return {
     message: { id: Number(row.id), senderId, body, createdAt: row.created },
     recipientHadUnread: (prior?.n ?? 0) > 0,

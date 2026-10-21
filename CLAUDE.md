@@ -343,6 +343,14 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-22 Real-time chat (owner asked for it, "websocket"): Server-Sent Events, not WebSockets —
+  Next has no WebSocket server without a custom one, and the chat only needs server → browser pushes
+  (sending stays a server action). Postgres LISTEN/NOTIFY is the bus (`shared/server/realtime.ts`:
+  `publish` / `subscribe`, one listening connection per server process, works with several servers);
+  THIRD route-handler exception `GET /events` (`src/app/routes/events.ts`) streams the signed-in
+  user's events (today `chat` = { conversationId }, ids only, participants only); the browser keeps
+  ONE EventSource per tab (`shared/lib/live-events.ts`, `useLiveEvent`), reconnects and catches up;
+  a 30 s fallback poll covers strict proxies. Behind nginx: `X-Accel-Buffering: no` is set.
 - 2026-10-21 Course language + ratings (owner). The teacher picks the language a course is taught in
   (`course_listings.language`, list in `shared/config/course-language.ts`), shown on cards and the
   course page. Students rate 1–5 stars (+ optional comment) once they FINISH a course = open its last

@@ -1,18 +1,23 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useEffect, useRef, useState, useTransition } from 'react'
+import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
 import { MAX_MESSAGE, type Message } from '@/entities/conversation'
 import { Button } from '@/shared/ui/button'
 import { Icon } from '@/shared/ui/icon'
 import { Textarea } from '@/shared/ui/textarea'
 import { cn } from '@/shared/lib/cn'
+import { useLiveEvent } from '@/shared/lib/live-events'
 import { useLocale, useT } from '@/shared/i18n'
 import { pollMessagesAction, sendMessageAction } from '../server/actions'
 
-const POLL_MS = 5000
+/** a slow safety net in case live events can't get through (a strict proxy) — normally they arrive at once */
+const FALLBACK_MS = 30_000
 
-/** An open conversation: messages (polled every few seconds) and a composer. Enter sends, Shift+Enter = new line. */
+/**
+ * An open conversation: messages arrive LIVE (pushed over /events the moment they're sent) and a
+ * composer. Enter sends, Shift+Enter = new line.
+ */
 export function ChatThread({ conversationId, meId, initial }: { conversationId: number; meId: number; initial: Message[] }) {
   const t = useT()
   const locale = useLocale()
@@ -37,17 +42,28 @@ export function ChatThread({ conversationId, meId, initial }: { conversationId: 
       return fresh.length ? [...cur, ...fresh] : cur
     })
 
-  useEffect(() => {
-    const id = setInterval(async () => {
-      if (document.hidden) return
-      const more = await pollMessagesAction(conversationId, last.current)
-      if (more.length) {
-        add(more)
-        router.refresh() // the conversation list (last message, unread)
-      }
-    }, POLL_MS)
-    return () => clearInterval(id)
+  const fetchNew = useCallback(async () => {
+    const more = await pollMessagesAction(conversationId, last.current)
+    if (more.length) {
+      add(more)
+      router.refresh() // the conversation list (last message, unread)
+    }
   }, [conversationId, router])
+
+  // live: a message in THIS conversation → fetch it now; in another one → refresh the list
+  useLiveEvent(
+    'chat',
+    (d) => {
+      if ((d as { conversationId?: number })?.conversationId === conversationId) void fetchNew()
+      else router.refresh()
+    },
+    () => void fetchNew(), // back online: catch up
+  )
+
+  useEffect(() => {
+    const id = setInterval(() => !document.hidden && void fetchNew(), FALLBACK_MS)
+    return () => clearInterval(id)
+  }, [fetchNew])
 
   // braces: scrollIntoView may return a promise, and an effect must return nothing or a cleanup
   useEffect(() => {

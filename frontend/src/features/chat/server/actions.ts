@@ -51,7 +51,7 @@ export async function sendMessageAction(conversationId: number, text: string): P
   return { ok: true, message }
 }
 
-/** New messages since `afterId` (the open thread polls this); marks the conversation read. */
+/** New messages since `afterId` (the open thread asks when /events says one arrived); marks the conversation read. */
 export async function pollMessagesAction(conversationId: number, afterId: number): Promise<Message[]> {
   const user = await getSession()
   if (!user || !Number.isSafeInteger(conversationId) || !Number.isSafeInteger(afterId)) return []
