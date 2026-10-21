@@ -343,6 +343,15 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-22 Public site (owner): /about (+ #values), /pricing, /schools, /help, /contact, /privacy
+  in the `(public)` group with a shared footer; header nav Courses · Pricing · Schools · About. ALL
+  public facts live in `shared/config/site.ts` (emails, Telegram/WhatsApp, legal details, free
+  school limits) — null = not shown; nothing invented. Plans: students free; teachers free (AI
+  features paid later); schools free up to `SITE.freeSchool` (placeholder 5 teachers / 50 students —
+  owner to confirm), then a quote via Contact. Schools are listed only when a manager turns it on
+  (Settings → "Show your school", `tenants.public_listing`, off by default). Contact form: stored in
+  `contact_messages`, emailed to CONTACT_EMAIL if set; honeypot + 5/hour per IP hash. Privacy
+  policy describes what Budu really stores — have a lawyer review it (152-FZ) and add legal details.
 - 2026-10-22 Real-time chat (owner asked for it, "websocket"): Server-Sent Events, not WebSockets —
   Next has no WebSocket server without a custom one, and the chat only needs server → browser pushes
   (sending stays a server action). Postgres LISTEN/NOTIFY is the bus (`shared/server/realtime.ts`:
@@ -502,6 +511,8 @@ Not built yet (rough priority):
   official `mariadb` image.
 
 ## Open questions (ask the owner)
+- Public site facts still empty in `shared/config/site.ts`: support/hello emails, Telegram, WhatsApp,
+  company legal details (INN, OGRN, address); and the real free-school limits (placeholder 5 / 50).
 - Old Postgres 16 volume `budu_app-db-data` is kept for rollback; delete it once 18 is confirmed fine
   (`docker volume rm budu_app-db-data`). Backups from the upgrade were only in the session scratchpad.
 - Owner (2026-10-20): all current data is test data — a full wipe is acceptable when useful.
