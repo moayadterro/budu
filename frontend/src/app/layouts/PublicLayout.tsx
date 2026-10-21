@@ -19,10 +19,15 @@ export async function PublicLayout({ children }: { children: ReactNode }) {
     <div className="min-h-svh bg-background">
       <header className="sticky top-0 z-20 border-b bg-background/90 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4">
-          <Link href="/catalog" className="flex items-center gap-2 font-semibold">
+          <Link href="/" className="flex items-center gap-2 font-semibold">
             <BrandMark />
             {t.appName}
           </Link>
+          <nav className="ms-4 hidden sm:block">
+            <Link href="/catalog" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+              {t.landing.navCourses}
+            </Link>
+          </nav>
           <div className="ms-auto flex items-center gap-2">
             <CurrencyPicker value={currency} compact />
             <LanguageMenu />

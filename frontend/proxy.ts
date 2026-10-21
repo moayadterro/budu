@@ -8,13 +8,13 @@ import { PUBLIC_PATHS, SESSION_COOKIE } from '@/shared/config/auth'
  */
 export function proxy(req: NextRequest) {
   const { pathname, search } = req.nextUrl
-  if (PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'))) return NextResponse.next()
+  // "/" is the public landing page (signed-in users are sent home by the page itself)
+  if (pathname === '/' || PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'))) return NextResponse.next()
   if (req.cookies.has(SESSION_COOKIE)) return NextResponse.next()
 
   const url = req.nextUrl.clone()
-  // a visitor at the front door sees the public course catalog; anything else asks them to sign in
-  url.pathname = pathname === '/' ? '/catalog' : '/login'
-  url.search = pathname === '/' ? '' : `?next=${encodeURIComponent(pathname + search)}`
+  url.pathname = '/login'
+  url.search = `?next=${encodeURIComponent(pathname + search)}`
   return NextResponse.redirect(url)
 }
 

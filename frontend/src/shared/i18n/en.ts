@@ -1042,6 +1042,27 @@ export const en = {
     },
   },
 
+  landing: {
+    navCourses: 'Courses',
+    badge: 'Schools · teachers · students · parents',
+    title: 'Learning that brings school, teachers and families together',
+    sub: 'Courses with video lessons, homework, quizzes and live classes — with a timetable, grades, and parents who can follow along.',
+    browse: 'Browse courses',
+    start: 'Create a free account',
+    forTitle: 'Made for everyone in learning',
+    for: {
+      schools: { title: 'Schools', text: 'Classes, timetables, entrance exams, a gradebook in your own scale, and announcements to families.' },
+      teachers: { title: 'Teachers', text: 'Build courses with video, text and homework, run quizzes and exams, and sell your courses.' },
+      students: { title: 'Students', text: 'Your week at a glance, lessons and homework in one place, results the moment they’re ready.' },
+      parents: { title: 'Parents', text: 'See how your child is doing each week and talk to their teachers directly.' },
+    },
+    coursesTitle: 'Popular courses',
+    coursesSub: 'Start one today — free courses need just an account.',
+    allCourses: 'All courses',
+    ctaTitle: 'Ready to start learning — or teaching?',
+    ctaSub: 'It takes a minute. Schools and teachers can bring their students right after.',
+  },
+
   catalog: {
     heroTitle: 'Learn with teachers and schools you trust',
     heroSub: 'Browse every course on Budu — no account needed. Free courses start right away; paid ones in a few steps.',
