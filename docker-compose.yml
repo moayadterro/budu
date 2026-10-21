@@ -33,6 +33,7 @@ services:
       # links in emails, and where email goes (Mailpit in dev; a real SMTP provider in prod)
       APP_URL: ${APP_URL:-http://localhost:3000}
       MAIL_FROM: ${MAIL_FROM:-Budu <no-reply@budu.local>}
+      CONTACT_EMAIL: ${CONTACT_EMAIL:-}   # where the public Contact form sends (empty = only stored)
       SMTP_HOST: ${SMTP_HOST:-mailpit}
       SMTP_PORT: ${SMTP_PORT:-1025}
       SMTP_USER: ${SMTP_USER:-}

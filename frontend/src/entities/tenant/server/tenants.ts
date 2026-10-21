@@ -58,6 +58,33 @@ export async function setGradeScale(companyId: number, scale: GradeScale) {
   await query(`UPDATE tenants SET grade_scale = $3 WHERE iomad_url = $1 AND company_id = $2`, [defaultInstance().url, companyId, scale])
 }
 
+/** Schools that chose to appear on the public "Schools on Budu" page. */
+export async function publicSchools(): Promise<Array<{ name: string; city: string; since: number }>> {
+  const rows = await query<{ name: string; city: string; since: number }>(
+    `SELECT name, city, extract(epoch FROM created_at)::int AS since FROM tenants
+      WHERE iomad_url = $1 AND kind = 'school' AND public_listing ORDER BY created_at`,
+    [defaultInstance().url],
+  )
+  return rows
+}
+
+export async function getPublicListing(companyId: number): Promise<{ on: boolean; city: string }> {
+  const [row] = await query<{ public_listing: boolean; city: string }>(
+    `SELECT public_listing, city FROM tenants WHERE iomad_url = $1 AND company_id = $2`,
+    [defaultInstance().url, companyId],
+  )
+  return { on: !!row?.public_listing, city: row?.city ?? '' }
+}
+
+export async function setPublicListing(companyId: number, on: boolean, city: string) {
+  await query(`UPDATE tenants SET public_listing = $3, city = $4 WHERE iomad_url = $1 AND company_id = $2 AND kind = 'school'`, [
+    defaultInstance().url,
+    companyId,
+    on,
+    city,
+  ])
+}
+
 /** The tenant's display name as registered in app-db (null if not registered). */
 export async function getTenantName(companyId: number | null): Promise<string | null> {
   if (!companyId) return null

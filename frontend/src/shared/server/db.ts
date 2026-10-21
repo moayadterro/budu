@@ -45,6 +45,22 @@ CREATE TABLE IF NOT EXISTS tenants (
 );
 -- the school's grade display scale (grades are always stored 0–100; see shared/lib/grade-scale)
 ALTER TABLE tenants ADD COLUMN IF NOT EXISTS grade_scale text NOT NULL DEFAULT 'percent';
+-- the school agreed to appear on Budu's public "Schools on Budu" page (off until a manager turns it on)
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS public_listing boolean NOT NULL DEFAULT false;
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS city text NOT NULL DEFAULT '';
+
+-- messages from the public Contact form (also emailed to CONTACT_EMAIL when set)
+CREATE TABLE IF NOT EXISTS contact_messages (
+  id         bigserial PRIMARY KEY,
+  name       text NOT NULL,
+  email      text NOT NULL,
+  topic      text NOT NULL,
+  message    text NOT NULL,
+  locale     text NOT NULL DEFAULT 'en',
+  ip_hash    text NOT NULL DEFAULT '',          -- sha256 of the sender's IP (rate limit only)
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS contact_messages_ip ON contact_messages (ip_hash, created_at);
 
 -- in-app notifications (bell); text is rendered from kind + params in the reader's language
 CREATE TABLE IF NOT EXISTS notifications (

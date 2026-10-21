@@ -5,12 +5,20 @@ import { ThemeToggle } from '@/features/switch-theme'
 import { LanguageMenu } from '@/features/switch-language'
 import { Button } from '@/shared/ui/button'
 import { Logo } from '@/shared/ui/logo'
+import { PublicFooter } from './PublicFooter'
 import { getT } from '@/shared/i18n/server'
 
 /**
  * Public pages anyone can open without an account (the course catalog): a slim header with the
  * Budu logo, theme and language, and Sign in / Sign up — or "Open Budu" when signed in.
  */
+const NAV = [
+  { key: 'courses', href: '/catalog' },
+  { key: 'pricing', href: '/pricing' },
+  { key: 'schools', href: '/schools' },
+  { key: 'about', href: '/about' },
+] as const
+
 export async function PublicLayout({ children }: { children: ReactNode }) {
   const [t, user] = await Promise.all([getT(), getSession()])
   return (
@@ -20,10 +28,12 @@ export async function PublicLayout({ children }: { children: ReactNode }) {
           <Link href="/" className="flex items-center" aria-label={t.appName}>
             <Logo className="h-7 w-auto" label={t.appName} />
           </Link>
-          <nav className="ms-4 hidden sm:block">
-            <Link href="/catalog" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-              {t.landing.navCourses}
-            </Link>
+          <nav className="ms-4 hidden items-center gap-5 md:flex" aria-label={t.appName}>
+            {NAV.map((n) => (
+              <Link key={n.href} href={n.href} className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+                {t.site.nav[n.key]}
+              </Link>
+            ))}
           </nav>
           <div className="ms-auto flex items-center gap-2">
             <ThemeToggle />
@@ -46,6 +56,7 @@ export async function PublicLayout({ children }: { children: ReactNode }) {
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>
+      <PublicFooter />
     </div>
   )
 }
