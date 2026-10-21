@@ -66,6 +66,7 @@ export const NAV: Record<Role, NavItem[]> = {
     { label: 'courses', icon: 'store', href: '/school/courses' },
     { label: 'gradebook', icon: 'report', href: '/gradebook', bottom: true },
     { label: 'classes', icon: 'layers', href: '/school/classes', bottom: true },
+    { label: 'exams', icon: 'check', href: '/school/exams' },
     { label: 'schedule', icon: 'cal', href: '/timetable' },
     { label: 'settings', icon: 'gear', href: '/school/settings' },
   ],

@@ -1,6 +1,7 @@
 import 'server-only'
 import { defaultInstance, iomadCall, IomadError } from '@/shared/server/iomad'
 import type {
+  ExamTaker,
   Attempt,
   AttemptQuestion,
   Question,
@@ -43,6 +44,7 @@ type RawInfo = {
   attempts: number
   gradepass: number
   classids: number[]
+  schoolexam?: boolean
 }
 const info = (r: RawInfo): QuizInfo => ({
   id: r.cmid,
@@ -57,6 +59,7 @@ const info = (r: RawInfo): QuizInfo => ({
   attempts: r.attempts,
   passMark: r.gradepass,
   classIds: r.classids,
+  schoolExam: !!r.schoolexam,
 })
 const grade = (g: number) => (g >= 0 ? Math.round(g * 10) / 10 : null)
 
@@ -280,6 +283,25 @@ export async function reviewAttempt(userId: number, attemptId: number) {
   const r = await orNull(call<RawReview>('review_attempt', { attemptid: attemptId, userid: userId }))
   return r ? review(r) : null
 }
+
+// ----- school exams (no course) -----
+
+/** The school's exam space (a hidden course holding its exams); created on first use. */
+export const examSpace = (userId: number, companyId: number) =>
+  call<{ courseid: number }>('exam_space', { companyid: companyId, userid: userId }).then((r) => r.courseid)
+
+export async function examAudience(userId: number, companyId: number, quizId: number): Promise<ExamTaker[]> {
+  const rows = await call<Array<{ id: number; name: string; email: string; picture: number; member: boolean; pending: boolean }>>('exam_audience', {
+    companyid: companyId,
+    userid: userId,
+    cmid: quizId,
+  })
+  return rows.map((r) => ({ id: r.id, name: r.name, email: r.email, pictureId: r.picture || null, member: r.member, pending: r.pending }))
+}
+
+/** Give the exam to / take it from people. Returns who was newly added. */
+export const setExamAudience = (userId: number, companyId: number, quizId: number, add: number[], remove: number[]) =>
+  call<{ added: number[] }>('set_exam_audience', { companyid: companyId, userid: userId, cmid: quizId, add, remove }).then((r) => r.added)
 
 // ----- reminders / scheduled publishing -----
 

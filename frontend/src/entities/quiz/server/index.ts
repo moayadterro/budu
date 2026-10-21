@@ -18,6 +18,9 @@ export {
   saveAttempt,
   reviewAttempt,
   closingSoon,
+  examSpace,
+  examAudience,
+  setExamAudience,
   openingNow,
   type QuizSettings,
 } from './quizzes'

@@ -45,6 +45,7 @@ export const ar: typeof en = {
     family: 'أبنائي',
     messages: 'الرسائل',
     payments: 'المدفوعات',
+    exams: 'الامتحانات',
   },
 
   subject: {
@@ -468,6 +469,10 @@ export const ar: typeof en = {
       quizReminder: {
         title: (p: Record<string, string>) => `${p.kind === 'exam' ? 'الامتحان' : 'الاختبار'} يُغلق قريبًا: ${p.quiz}`,
         body: (p: Record<string, string>) => `«${p.quiz}» في ${p.course} يُغلق خلال يوم ولم تبدأه بعد.`,
+      },
+      examInvite: {
+        title: (p: Record<string, string>) => `${p.school}: ${p.exam}`,
+        body: (p: Record<string, string>) => `أنت مدعو لأداء امتحان «${p.exam}» في ${p.school}. افتحه لمعرفة موعده والوقت المتاح.`,
       },
       addedToSchool: {
         title: (p: Record<string, string>) => `انضممت إلى ${p.school}`,
@@ -992,6 +997,49 @@ export const ar: typeof en = {
     },
   },
 
+  exams: {
+    title: 'الامتحانات',
+    sub: 'امتحانات بلا مقرر — امتحانات القبول وتحديد المستوى. اختر من يؤديها: صفوف أو طلاب أو مرشحون عبر البريد.',
+    new: 'امتحان جديد',
+    newSub: 'العنوان وموعد الإغلاق والمدة ودرجة النجاح. بعدها تضيف الأسئلة ومن يؤديه.',
+    emptyTitle: 'لا توجد امتحانات بعد',
+    empty: 'أنشئ امتحان قبول وادعُ المرشحين عبر البريد، أو خصّص امتحانًا لصفوف كاملة.',
+    passMark: (p: number) => `درجة النجاح ${p}%`,
+    audience: {
+      title: 'من يؤديه',
+      sub: 'لا يرى الامتحان إلا هؤلاء. لا يلزم أن يكون المرشحون في المدرسة.',
+      classes: 'الصفوف',
+      students: 'الطلاب',
+      candidates: 'المرشحون',
+      classesHint: 'يضيف كل من في الصف الآن (لا يُضاف من ينضم لاحقًا).',
+      search: 'ابحث عن طالب',
+      noMatch: 'لا يوجد طلاب مطابقون.',
+      add: 'إضافة',
+      addCount: (n: number) => (n ? `إضافة (${n})` : 'إضافة'),
+      candidatesHint: 'شخص واحد في كل سطر: الاسم والبريد. يصل الأشخاص الجدد بريد لتفعيل حساباتهم؛ ومن لديه حساب يحصل على الامتحان مباشرة.',
+      candidatesPh: 'آنا بتروفا، anna@example.com\nعمر حداد، omar@example.com',
+      invite: 'دعوة',
+      list: (n: number) => `يؤديه ${n}`,
+      empty: 'لا أحد بعد — أضف صفوفًا أو طلابًا أو مرشحين.',
+      candidate: 'مرشح',
+      notActivated: 'لم يُفعَّل بعد',
+      remove: 'إزالة',
+      failed: 'حدث خطأ ما. حاول مرة أخرى.',
+      result: (added: number, invited: number, skipped: number) =>
+        [`أُضيف ${added}.`, invited ? `دُعي ${invited} عبر البريد.` : '', skipped ? `تم تخطي ${skipped} (تحقق من البريد واسم الأشخاص الجدد).` : '']
+          .filter(Boolean)
+          .join(' '),
+    },
+    results: {
+      passedCount: (p: number, n: number) => `نجح ${p} من ${n}`,
+      invite: 'دعوة إلى المدرسة',
+      inviteAll: (n: number) => `دعوة كل الناجحين (${n})`,
+      invited: (n: number) => (n === 1 ? '✓ تمت الدعوة' : `✓ دُعي ${n}`),
+      alreadyInvited: 'مدعو',
+      inSchool: 'في المدرسة',
+    },
+  },
+
   market: {
     title: 'المتجر',
     sub: 'اعرض هذا المقرر في «استكشاف» ليجده أي طالب، مجانًا أو بسعر.',
@@ -1249,6 +1297,12 @@ export const ar: typeof en = {
   },
 
   email: {
+    examInvite: {
+      subject: (school: string) => `${school} يدعوك إلى امتحان على Budu`,
+      body: (p: { school: string; exam: string; by: string }) =>
+        `دعاك ${p.by} لأداء «${p.exam}» في ${p.school}. اختر كلمة مرور لتفعيل حسابك في Budu — سيظهر الامتحان في صفحتك الرئيسية. الرابط صالح لمدة 7 أيام.`,
+      action: 'اختر كلمة المرور',
+    },
     parentInvite: {
       subject: (child: string) => `${child} يدعوك إلى Budu كولي أمر`,
       body: (child: string) =>

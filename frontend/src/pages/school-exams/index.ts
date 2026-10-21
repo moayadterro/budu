@@ -1,0 +1,5 @@
+export { SchoolExamsPage } from './ui/SchoolExamsPage'
+export { SchoolExamNewPage } from './ui/SchoolExamNewPage'
+export { SchoolExamPage } from './ui/SchoolExamPage'
+export { SchoolExamResultsPage } from './ui/SchoolExamResultsPage'
+export { SchoolExamAttemptPage } from './ui/SchoolExamAttemptPage'

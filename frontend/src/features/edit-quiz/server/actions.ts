@@ -14,6 +14,12 @@ export type QuizFormState = { status: 'idle' } | { status: 'saved'; at: number }
 
 const LIMITS = { name: 200, intro: 5000, text: 5000, timeLimitMin: 600 }
 
+/** Where the quiz screens live: a course's quizzes or the school's exams (never an arbitrary URL). */
+const baseOf = (form: FormData, courseId: number) => {
+  const base = formText(form, 'base')
+  return base === '/school/exams' || base === `/courses/${courseId}/quizzes` ? base : `/courses/${courseId}/quizzes`
+}
+
 /** Create (→ the editor) or change a quiz's settings. The close time comes from the browser (its local time → unix). */
 export async function saveQuizAction(_prev: QuizFormState, form: FormData): Promise<QuizFormState> {
   const user = await requireRole('teacher', 'manager')
@@ -45,8 +51,9 @@ export async function saveQuizAction(_prev: QuizFormState, form: FormData): Prom
     console.error('save quiz failed', e)
     return { status: 'error', error: 'server', at }
   }
-  revalidatePath(`/courses/${courseId}/quizzes`, 'layout')
-  if (!quizId) redirect(`/courses/${courseId}/quizzes/${id}`)
+  const base = baseOf(form, courseId)
+  revalidatePath(base, 'layout')
+  if (!quizId) redirect(`${base}/${id}`)
   return { status: 'saved', at }
 }
 
@@ -79,7 +86,7 @@ export async function publishQuizAction(quizId: number, published: boolean, publ
     console.error('publish quiz failed', e)
     return 'server'
   }
-  revalidatePath(`/courses/${quiz.courseId}/quizzes`, 'layout')
+  revalidatePath('/', 'layout')
   return null
 }
 
@@ -89,8 +96,9 @@ export async function deleteQuizAction(form: FormData) {
   const courseId = formId(form, 'courseId')
   if (!quizId || !courseId) return
   await deleteQuiz(user.userId, quizId)
-  revalidatePath(`/courses/${courseId}/quizzes`, 'layout')
-  redirect(`/courses/${courseId}/quizzes`)
+  const base = baseOf(form, courseId)
+  revalidatePath(base, 'layout')
+  redirect(base)
 }
 
 export type QuestionInput = { text: string; mark: number; data: QuestionData & { explanation?: string } }
@@ -109,7 +117,7 @@ export async function saveQuestionAction(quizId: number, slot: number, q: Questi
     console.error('save question failed', e)
     return 'server'
   }
-  revalidatePath('/courses', 'layout')
+  revalidatePath('/', 'layout')
   return null
 }
 
@@ -118,5 +126,5 @@ export async function moveQuestionAction(quizId: number, slot: number, direction
   const user = await requireRole('teacher', 'manager')
   if (!Number.isSafeInteger(quizId) || !Number.isSafeInteger(slot) || ![-1, 0, 1].includes(direction)) return
   await moveQuestion(user.userId, quizId, slot, direction)
-  revalidatePath('/courses', 'layout')
+  revalidatePath('/', 'layout')
 }

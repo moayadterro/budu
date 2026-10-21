@@ -14,7 +14,20 @@ import { deleteQuizAction, publishQuizAction } from '../server/actions'
  * Publish now, schedule publishing for a date and time (hidden from students until then; they're told
  * then), or hide. Also delete.
  */
-export function PublishQuiz({ quizId, courseId, published, opensAt }: { quizId: number; courseId: number; published: boolean; opensAt: number | null }) {
+export function PublishQuiz({
+  quizId,
+  courseId,
+  published,
+  opensAt,
+  base,
+}: {
+  quizId: number
+  courseId: number
+  published: boolean
+  opensAt: number | null
+  /** where to go after deleting: `/courses/:id/quizzes` or `/school/exams` */
+  base: string
+}) {
   const t = useT()
   const s = t.quiz.publish
   const [pending, start] = useTransition()
@@ -95,6 +108,7 @@ export function PublishQuiz({ quizId, courseId, published, opensAt }: { quizId: 
       <form action={deleteQuizAction}>
         <input type="hidden" name="quizId" value={quizId} />
         <input type="hidden" name="courseId" value={courseId} />
+        <input type="hidden" name="base" value={base} />
         <ConfirmButton label={s.delete} confirmLabel={s.confirmDelete} className="w-full" />
       </form>
     </div>

@@ -19,4 +19,5 @@ export type {
   Review,
   ReviewResult,
   QuizResults,
+  ExamTaker,
 } from './model/types'

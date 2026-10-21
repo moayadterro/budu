@@ -34,6 +34,7 @@ export const en = {
     family: 'My children',
     messages: 'Messages',
     payments: 'Payments',
+    exams: 'Exams',
   },
 
   subject: {
@@ -461,6 +462,10 @@ export const en = {
       quizReminder: {
         title: (p: Record<string, string>) => `${p.kind === 'exam' ? 'Exam' : 'Quiz'} closes soon: ${p.quiz}`,
         body: (p: Record<string, string>) => `“${p.quiz}” in ${p.course} closes within a day and you haven’t started it yet.`,
+      },
+      examInvite: {
+        title: (p: Record<string, string>) => `${p.school}: ${p.exam}`,
+        body: (p: Record<string, string>) => `You’re invited to take the exam “${p.exam}” at ${p.school}. Open it to see when it’s open and how long you have.`,
       },
       addedToSchool: {
         title: (p: Record<string, string>) => `You joined ${p.school}`,
@@ -985,6 +990,49 @@ export const en = {
     },
   },
 
+  exams: {
+    title: 'Exams',
+    sub: 'Exams without a course — entrance and placement exams. Choose who takes each one: classes, students or candidates by email.',
+    new: 'New exam',
+    newSub: 'Title, closing time, time limit and pass mark. Next you add the questions and who takes it.',
+    emptyTitle: 'No exams yet',
+    empty: 'Create an entrance exam and invite candidates by email, or give an exam to whole classes.',
+    passMark: (p: number) => `pass mark ${p}%`,
+    audience: {
+      title: 'Who takes it',
+      sub: 'Only these people can see the exam. Candidates don’t need to be in the school.',
+      classes: 'Classes',
+      students: 'Students',
+      candidates: 'Candidates',
+      classesHint: 'Adds everyone in the class now (later joiners aren’t added).',
+      search: 'Search students',
+      noMatch: 'No matching students.',
+      add: 'Add',
+      addCount: (n: number) => (n ? `Add ${n}` : 'Add'),
+      candidatesHint: 'One person per line: name and email. New people get an email to activate their account; people with an account just get the exam.',
+      candidatesPh: 'Anna Petrova, anna@example.com\nOmar Haddad, omar@example.com',
+      invite: 'Invite',
+      list: (n: number) => (n === 1 ? '1 person takes it' : `${n} people take it`),
+      empty: 'Nobody yet — add classes, students or candidates.',
+      candidate: 'Candidate',
+      notActivated: 'Not activated yet',
+      remove: 'Remove',
+      failed: 'Something went wrong. Try again.',
+      result: (added: number, invited: number, skipped: number) =>
+        [`Added ${added}.`, invited ? `Invited ${invited} new ${invited === 1 ? 'person' : 'people'} by email.` : '', skipped ? `Skipped ${skipped} (check the email, and a name for new people).` : '']
+          .filter(Boolean)
+          .join(' '),
+    },
+    results: {
+      passedCount: (p: number, n: number) => `${p} of ${n} passed`,
+      invite: 'Invite to school',
+      inviteAll: (n: number) => `Invite all who passed (${n})`,
+      invited: (n: number) => (n === 1 ? '✓ Invited' : `✓ Invited ${n}`),
+      alreadyInvited: 'Invited',
+      inSchool: 'In the school',
+    },
+  },
+
   market: {
     title: 'Marketplace',
     sub: 'Show this course in Explore so any student can find it, free or for a price.',
@@ -1242,6 +1290,12 @@ export const en = {
   },
 
   email: {
+    examInvite: {
+      subject: (school: string) => `${school} invites you to an exam on Budu`,
+      body: (p: { school: string; exam: string; by: string }) =>
+        `${p.by} invited you to take “${p.exam}” at ${p.school}. Choose a password to activate your Budu account — the exam will be on your home page. The link works for 7 days.`,
+      action: 'Choose your password',
+    },
     parentInvite: {
       subject: (child: string) => `${child} invited you to Budu as their parent`,
       body: (child: string) =>

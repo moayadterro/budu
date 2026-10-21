@@ -17,7 +17,7 @@ export async function QuizNewPage({ params }: { params: Promise<{ courseId: stri
           <CardDescription>{t.quiz.settings.newSub}</CardDescription>
         </CardHeader>
         <CardContent>
-          <QuizSettingsForm courseId={course.id} classes={classes} />
+          <QuizSettingsForm courseId={course.id} classes={classes} base={`/courses/${course.id}/quizzes`} />
         </CardContent>
       </Card>
     </div>

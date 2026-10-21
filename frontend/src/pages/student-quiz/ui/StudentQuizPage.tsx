@@ -33,9 +33,10 @@ export async function StudentQuizPage({ params }: { params: Promise<{ courseId: 
   return (
     <div className="mx-auto flex max-w-xl flex-col gap-4">
       <Button variant="ghost" size="sm" className="-ms-2 self-start" asChild>
-        <Link href={`/classes/${quiz.courseId}`}>
+        {/* a school exam has no course page: back home */}
+        <Link href={quiz.schoolExam ? '/home' : `/classes/${quiz.courseId}`}>
           <Icon name="back" className="rtl:-scale-x-100" />
-          {quiz.courseTitle}
+          {quiz.schoolExam ? t.nav.home : quiz.courseTitle}
         </Link>
       </Button>
       <Card>

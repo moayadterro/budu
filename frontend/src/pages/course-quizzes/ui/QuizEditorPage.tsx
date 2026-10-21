@@ -38,7 +38,7 @@ export async function QuizEditorPage({ params }: { params: Promise<{ courseId: s
               <CardTitle>{t.quiz.publish.title}</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-3">
-              <PublishQuiz quizId={quiz.id} courseId={course.id} published={quiz.published} opensAt={quiz.opensAt} />
+              <PublishQuiz quizId={quiz.id} courseId={course.id} published={quiz.published} opensAt={quiz.opensAt} base={`/courses/${course.id}/quizzes`} />
               <Button variant="outline" asChild>
                 <Link href={`/courses/${course.id}/quizzes/${quiz.id}/results`}>{t.quiz.list.results}</Link>
               </Button>
@@ -49,7 +49,7 @@ export async function QuizEditorPage({ params }: { params: Promise<{ courseId: s
               <CardTitle>{t.quiz.settings.title}</CardTitle>
             </CardHeader>
             <CardContent>
-              <QuizSettingsForm key={`${quiz.id}`} courseId={course.id} quiz={quiz} classes={classes} />
+              <QuizSettingsForm key={`${quiz.id}`} courseId={course.id} quiz={quiz} classes={classes} base={`/courses/${course.id}/quizzes`} />
             </CardContent>
           </Card>
         </aside>

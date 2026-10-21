@@ -47,7 +47,12 @@ export type QuizInfo = {
   passMark: number
   /** [] = every student of the course */
   classIds: number[]
+  /** a school exam (no course: the school's exam space; its own audience) */
+  schoolExam: boolean
 }
+
+/** Someone who takes a school exam. */
+export type ExamTaker = { id: number; name: string; email: string; pictureId: number | null; member: boolean; pending: boolean }
 
 /** In the teacher's list. */
 export type TeacherQuiz = QuizInfo & { questionCount: number; attemptCount: number; toGrade: number }

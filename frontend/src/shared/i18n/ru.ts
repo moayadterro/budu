@@ -45,6 +45,7 @@ export const ru: typeof en = {
     family: 'Мои дети',
     messages: 'Сообщения',
     payments: 'Платежи',
+    exams: 'Экзамены',
   },
 
   subject: {
@@ -470,6 +471,10 @@ export const ru: typeof en = {
       quizReminder: {
         title: (p: Record<string, string>) => `${p.kind === 'exam' ? 'Экзамен' : 'Тест'} скоро закроется: ${p.quiz}`,
         body: (p: Record<string, string>) => `«${p.quiz}» в курсе «${p.course}» закроется в течение суток, а вы ещё не начали.`,
+      },
+      examInvite: {
+        title: (p: Record<string, string>) => `${p.school}: ${p.exam}`,
+        body: (p: Record<string, string>) => `Вас пригласили сдать экзамен «${p.exam}» в «${p.school}». Откройте, чтобы узнать, когда он открыт и сколько времени у вас будет.`,
       },
       addedToSchool: {
         title: (p: Record<string, string>) => `Вы в школе «${p.school}»`,
@@ -994,6 +999,49 @@ export const ru: typeof en = {
     },
   },
 
+  exams: {
+    title: 'Экзамены',
+    sub: 'Экзамены без курса — вступительные и входные. Выберите, кто сдаёт: классы, ученики или кандидаты по email.',
+    new: 'Новый экзамен',
+    newSub: 'Название, время закрытия, время на решение и проходной балл. Затем добавите вопросы и участников.',
+    emptyTitle: 'Экзаменов пока нет',
+    empty: 'Создайте вступительный экзамен и пригласите кандидатов по email или назначьте экзамен целым классам.',
+    passMark: (p: number) => `проходной балл ${p}%`,
+    audience: {
+      title: 'Кто сдаёт',
+      sub: 'Экзамен видят только эти люди. Кандидатам не нужно быть в школе.',
+      classes: 'Классы',
+      students: 'Ученики',
+      candidates: 'Кандидаты',
+      classesHint: 'Добавляет всех, кто сейчас в классе (пришедшие позже не добавятся).',
+      search: 'Поиск учеников',
+      noMatch: 'Никого не найдено.',
+      add: 'Добавить',
+      addCount: (n: number) => (n ? `Добавить (${n})` : 'Добавить'),
+      candidatesHint: 'По одному человеку в строке: имя и email. Новые люди получат письмо для активации аккаунта; у кого аккаунт есть — просто получат экзамен.',
+      candidatesPh: 'Анна Петрова, anna@example.com\nОмар Хаддад, omar@example.com',
+      invite: 'Пригласить',
+      list: (n: number) => `Сдают: ${n}`,
+      empty: 'Пока никого — добавьте классы, учеников или кандидатов.',
+      candidate: 'Кандидат',
+      notActivated: 'Ещё не активирован',
+      remove: 'Убрать',
+      failed: 'Что-то пошло не так. Попробуйте ещё раз.',
+      result: (added: number, invited: number, skipped: number) =>
+        [`Добавлено: ${added}.`, invited ? `Приглашено по email: ${invited}.` : '', skipped ? `Пропущено: ${skipped} (проверьте email и имя для новых людей).` : '']
+          .filter(Boolean)
+          .join(' '),
+    },
+    results: {
+      passedCount: (p: number, n: number) => `сдали ${p} из ${n}`,
+      invite: 'Пригласить в школу',
+      inviteAll: (n: number) => `Пригласить всех сдавших (${n})`,
+      invited: (n: number) => (n === 1 ? '✓ Приглашён' : `✓ Приглашено: ${n}`),
+      alreadyInvited: 'Приглашён',
+      inSchool: 'В школе',
+    },
+  },
+
   market: {
     title: 'Маркетплейс',
     sub: 'Покажите курс в «Каталоге», чтобы его нашёл любой ученик — бесплатно или за плату.',
@@ -1252,6 +1300,12 @@ export const ru: typeof en = {
   },
 
   email: {
+    examInvite: {
+      subject: (school: string) => `«${school}» приглашает вас на экзамен в Budu`,
+      body: (p: { school: string; exam: string; by: string }) =>
+        `${p.by} приглашает вас сдать «${p.exam}» в «${p.school}». Задайте пароль, чтобы активировать аккаунт Budu — экзамен будет на главной странице. Ссылка действует 7 дней.`,
+      action: 'Задать пароль',
+    },
     parentInvite: {
       subject: (child: string) => `${child} приглашает вас в Budu как родителя`,
       body: (child: string) =>
