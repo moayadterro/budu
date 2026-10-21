@@ -58,6 +58,13 @@ const FUNCTIONS = [
     'local_budu_set_teachers',
     'local_budu_link_course',
     'local_budu_my_classes',
+    // Timetable (iomad/local_budu/classes/external/schedule.php).
+    'local_budu_add_lessons',
+    'local_budu_course_series',
+    'local_budu_delete_series',
+    'local_budu_add_school_event',
+    'local_budu_delete_school_event',
+    'local_budu_my_week',
 ];
 const CAPABILITIES = [
     'webservice/rest:use',
@@ -98,6 +105,10 @@ const CAPABILITIES = [
     'moodle/cohort:assign',
     'moodle/cohort:view',
     'enrol/cohort:config',
+    // Timetable: lessons are course / class-group events, school events are category events.
+    'moodle/calendar:manageentries',
+    'moodle/calendar:managegroupentries',
+    'moodle/course:managegroups',
 ];
 
 $system = context_system::instance();

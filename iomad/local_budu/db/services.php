@@ -212,4 +212,40 @@ $functions = [
         'description' => 'Classes the acting user is in or teaches as class teacher.',
         'type' => 'read',
     ],
+    'local_budu_add_lessons' => [
+        'classname' => \local_budu\external\schedule::class,
+        'methodname' => 'add_lessons',
+        'description' => 'Add a weekly lesson series to a course (teacher or school manager).',
+        'type' => 'write',
+    ],
+    'local_budu_course_series' => [
+        'classname' => \local_budu\external\schedule::class,
+        'methodname' => 'course_series',
+        'description' => 'Lesson series of a course.',
+        'type' => 'read',
+    ],
+    'local_budu_delete_series' => [
+        'classname' => \local_budu\external\schedule::class,
+        'methodname' => 'delete_series',
+        'description' => 'Delete a lesson series.',
+        'type' => 'write',
+    ],
+    'local_budu_add_school_event' => [
+        'classname' => \local_budu\external\schedule::class,
+        'methodname' => 'add_school_event',
+        'description' => 'Add a school event (managers).',
+        'type' => 'write',
+    ],
+    'local_budu_delete_school_event' => [
+        'classname' => \local_budu\external\schedule::class,
+        'methodname' => 'delete_school_event',
+        'description' => 'Delete a school event (managers).',
+        'type' => 'write',
+    ],
+    'local_budu_my_week' => [
+        'classname' => \local_budu\external\schedule::class,
+        'methodname' => 'my_week',
+        'description' => 'Lessons and school events a user should see in a date range.',
+        'type' => 'read',
+    ],
 ];
