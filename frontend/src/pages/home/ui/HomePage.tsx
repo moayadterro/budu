@@ -1,18 +1,18 @@
 import Link from 'next/link'
 import { ScreenHead } from '@/shared/ui/screen-head'
-import { Button, buttonVariants } from '@/shared/ui/button'
+import { Button } from '@/shared/ui/button'
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/shared/ui/item'
-import { Icon, PlayIcon } from '@/shared/ui/icon'
+import { Icon } from '@/shared/ui/icon'
 import { requireRole } from '@/entities/session/server'
 import { StudentCourseCard } from '@/entities/course'
 import { myCourses } from '@/entities/course/server'
 import { HomeworkStatusBadge } from '@/entities/homework'
 import { myHomework } from '@/entities/homework/server'
 import { myClasses } from '@/entities/school-class/server'
-import { STUDENT, SUBJECTS, TIMES, TODAY, WEEK, isLive } from '@/shared/mock'
+import { myWeek } from '@/entities/schedule/server'
+import { NextLessonCard, SchoolEventsCard, TodayCard } from '@/widgets/week-calendar'
 import { LocalTime } from '@/shared/ui/local-time'
-import { cn } from '@/shared/lib/cn'
 import { getGradeScale, getTenantName, invitesFor, isSchool } from '@/entities/tenant/server'
 import { Alert, AlertDescription } from '@/shared/ui/alert'
 import { getLocale, getT } from '@/shared/i18n/server'
@@ -23,12 +23,14 @@ export async function HomePage() {
   const user = await requireRole('student')
   const scale = await getGradeScale(user.companyId)
   const firstName = user.name.split(' ')[0] ?? ''
-  const [courses, homework, classes, locale, invites] = await Promise.all([
+  const nowSec = Math.floor(Date.now() / 1000)
+  const [courses, homework, classes, locale, invites, agenda] = await Promise.all([
     myCourses(user.userId),
     myHomework(user.userId),
     myClasses(user.userId),
     getLocale(),
     invitesFor(user.userId),
+    myWeek(user.userId, nowSec - 86400, nowSec + 8 * 86400),
   ])
   const today = new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date())
   // "School · Class 10": their school and their class (at most one); solo students get no line
@@ -55,20 +57,8 @@ export async function HomePage() {
 
       <div className="grid items-start gap-6 lg:grid-cols-[1.5fr_1fr]">
         <div className="flex min-w-0 flex-col gap-6">
-          <NextClass />
-          <Card>
-            <CardHeader>
-              <CardTitle>{t.home.today}</CardTitle>
-              <CardAction>
-                <Button variant="link" size="sm" className="h-auto p-0" asChild>
-                  <Link href="/timetable">{t.home.fullWeek}</Link>
-                </Button>
-              </CardAction>
-            </CardHeader>
-            <CardContent>
-              <TodayStrip />
-            </CardContent>
-          </Card>
+          <NextLessonCard items={agenda} />
+          <TodayCard items={agenda} />
           <Card>
             <CardHeader>
               <CardTitle>{t.learn.coursesTitle}</CardTitle>
@@ -117,85 +107,9 @@ export async function HomePage() {
               ))}
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>{t.home.annTitle}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm leading-relaxed text-muted-foreground">{t.home.ann}</p>
-            </CardContent>
-          </Card>
+          <SchoolEventsCard items={agenda} />
         </div>
       </div>
     </>
-  )
-}
-
-async function NextClass() {
-  const t = await getT()
-  return (
-    <div className="overflow-hidden rounded-xl bg-brand p-6 text-primary-foreground shadow-sm">
-      <div className="flex items-center gap-2 text-xs font-bold opacity-90">
-        <span className="dot-live bg-primary-foreground text-primary-foreground" />
-        {t.home.yourNext}
-      </div>
-      <h3 className="mt-2.5 text-xl font-bold">{t.home.nextSubject}</h3>
-      <div className="mt-[3px] text-[13px] opacity-85">
-        {t.withTeacher} {SUBJECTS.math.teacher} · {t.room} {STUDENT.className}
-      </div>
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <Link href="/live" className={buttonVariants({ variant: 'highlight' })}>
-          <PlayIcon />
-          {t.joinNow}
-        </Link>
-        <span className="inline-flex h-9 items-center gap-1.5 rounded-md bg-primary-foreground/15 px-3 text-sm font-semibold tabular-nums">
-          ⏱ 12:00
-        </span>
-        <span className="text-xs opacity-85">{t.home.startsAt}</span>
-      </div>
-      <div className="mt-3.5 flex items-center gap-2 border-t border-primary-foreground/20 pt-3 text-xs opacity-85">
-        <Icon name="chevRight" className="h-3.5 w-3.5" strokeWidth={2} />
-        {t.home.then}
-      </div>
-    </div>
-  )
-}
-
-async function TodayStrip() {
-  const t = await getT()
-  return (
-    <div className="flex gap-2.5 overflow-x-auto pb-1">
-      {TIMES.map((time, row) => {
-        const key = WEEK[row][TODAY]
-        if (!key) return null
-        const s = SUBJECTS[key]
-        const now = isLive(row, TODAY)
-        return (
-          <div
-            key={time}
-            className={cn(
-              'w-40 flex-none rounded-lg border bg-card p-3',
-              now ? 'border-primary ring-[3px] ring-primary/10' : 'border-border',
-            )}
-          >
-            <div className="text-[11.5px] font-bold tabular-nums text-muted-foreground">
-              {time}
-              {now && ` · ${t.nowShort}`}
-            </div>
-            <b className="mt-[5px] block text-[13.5px]">
-              <span className="me-[5px] inline-block h-[9px] w-[9px] rounded-[3px] align-middle" style={{ background: s.color }} />
-              {t.subject[key]}
-            </b>
-            <div className="mt-0.5 text-[11.5px] text-muted-foreground">{s.teacher}</div>
-            {now && (
-              <Link href="/live" className={cn(buttonVariants({ size: 'sm' }), 'mt-2')}>
-                <PlayIcon />
-                {t.joinNow}
-              </Link>
-            )}
-          </div>
-        )
-      })}
-    </div>
   )
 }
