@@ -290,7 +290,11 @@ class classes extends external_api {
         ]);
     }
 
-    /** Adds / removes students (must belong to the school). Cohort sync updates course enrolments. */
+    /**
+     * Adds / removes students (must belong to the school). A student is in at most ONE class of a school:
+     * adding someone who is in another class moves them (they leave that class and its courses).
+     * Cohort sync updates course enrolments.
+     */
     public static function set_students(int $userid, int $classid, array $add = [], array $remove = []): array {
         global $DB;
         $p = self::validate_parameters(self::set_students_parameters(), compact('userid', 'classid', 'add', 'remove'));
@@ -299,9 +303,15 @@ class classes extends external_api {
         if (!school::is_manager($companyid, $p['userid'])) {
             throw self::deny('manage this class');
         }
+        $schoolclasses = $DB->get_fieldset_select('cohort', 'id', "contextid = ? AND component = 'local_budu'", [$cohort->contextid]);
         foreach (array_unique($p['add']) as $id) {
             if (!$DB->record_exists('company_users', ['companyid' => $companyid, 'userid' => $id])) {
                 throw self::deny('add someone from another school');
+            }
+            foreach ($schoolclasses as $other) {
+                if ($other != $cohort->id && $DB->record_exists('cohort_members', ['cohortid' => $other, 'userid' => $id])) {
+                    cohort_remove_member($other, $id); // one class per student: move
+                }
             }
             cohort_add_member($cohort->id, $id);
         }

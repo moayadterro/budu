@@ -51,6 +51,13 @@ class school extends external_api {
            GROUP BY u.id, u.firstname, u.lastname, u.firstnamephonetic, u.lastnamephonetic, u.middlename, u.alternatename,
                     u.email, u.suspended, u.lastaccess
            ORDER BY u.lastname, u.firstname', [$p['companyid']]);
+        // each person's class in this school (a student is in at most one)
+        $categoryctx = \context_coursecat::instance($DB->get_field('company', 'category', ['id' => $p['companyid']], MUST_EXIST));
+        $classof = [];
+        foreach ($DB->get_records_sql("SELECT m.id, m.userid, c.id AS classid, c.name FROM {cohort_members} m
+                JOIN {cohort} c ON c.id = m.cohortid WHERE c.contextid = ? AND c.component = 'local_budu'", [$categoryctx->id]) as $m) {
+            $classof[$m->userid] = $m;
+        }
         $out = [];
         foreach ($rows as $u) {
             $ctx = \context_user::instance($u->id, IGNORE_MISSING);
@@ -62,6 +69,8 @@ class school extends external_api {
                 // managers first: IOMAD also flags every company manager as an educator
                 'role' => $u->managertype > 0 ? 'manager' : ($u->educator ? 'teacher' : 'student'),
                 'suspended' => (bool)$u->suspended, 'lastaccess' => (int)$u->lastaccess,
+                'classid' => isset($classof[$u->id]) ? (int)$classof[$u->id]->classid : 0,
+                'classname' => isset($classof[$u->id]) ? $classof[$u->id]->name : '',
             ];
         }
         return $out;
@@ -76,6 +85,8 @@ class school extends external_api {
             'role' => new external_value(PARAM_ALPHA, 'manager | teacher | student'),
             'suspended' => new external_value(PARAM_BOOL, 'Suspended (e.g. invite not accepted yet)'),
             'lastaccess' => new external_value(PARAM_INT, 'Last access to IOMAD itself (0 = never)'),
+            'classid' => new external_value(PARAM_INT, 'Their class in this school, 0 = none'),
+            'classname' => new external_value(PARAM_TEXT, 'That class name'),
         ]));
     }
 
