@@ -13,7 +13,7 @@ import { myClasses } from '@/entities/school-class/server'
 import { STUDENT, SUBJECTS, TIMES, TODAY, WEEK, isLive } from '@/shared/mock'
 import { LocalTime } from '@/shared/ui/local-time'
 import { cn } from '@/shared/lib/cn'
-import { getGradeScale } from '@/entities/tenant/server'
+import { getGradeScale, getTenantName, isSchool } from '@/entities/tenant/server'
 import { getLocale, getT } from '@/shared/i18n/server'
 
 /** Student dashboard. */
@@ -29,8 +29,9 @@ export async function HomePage() {
     getLocale(),
   ])
   const today = new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date())
-  // their class (at most one per school); a solo student or one without a class: no line at all
-  const classLine = classes.member[0]?.name
+  // "School · Class 10": their school and their class (at most one); solo students get no line
+  const school = (await isSchool(user.companyId)) ? await getTenantName(user.companyId) : null
+  const classLine = [school, classes.member[0]?.name].filter(Boolean).join(' · ') || undefined
   // what's still to hand in, soonest due first (no due date last)
   const due = homework
     .filter((h) => h.status === 'new')

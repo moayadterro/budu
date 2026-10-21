@@ -32,8 +32,8 @@ import {
 } from '@/shared/ui/sidebar'
 import { dirOf, useLocale, useT } from '@/shared/i18n'
 
-/** App sidebar: Budu brand (+ the user's school), the role's screens, signed-in user menu. */
-export function AppSidebar({ inSchool, schoolName }: { inSchool: boolean; schoolName: string | null }) {
+/** App sidebar: the Budu brand (app only — never a school's name), the role's screens, signed-in user menu. */
+export function AppSidebar({ inSchool }: { inSchool: boolean }) {
   const t = useT()
   const user = useSession((s) => s.user)
   const path = usePathname()
@@ -51,10 +51,7 @@ export function AppSidebar({ inSchool, schoolName }: { inSchool: boolean; school
             <SidebarMenuButton size="lg" asChild>
               <Link href="/" onClick={closeOnMobile}>
                 <BrandMark />
-                <div className="grid flex-1 text-start text-sm leading-tight">
-                  <span className="truncate font-semibold">{t.appName}</span>
-                  <span className="truncate text-xs text-muted-foreground">{schoolName ?? t.role[user.role]}</span>
-                </div>
+                <span className="flex-1 truncate text-start text-base font-semibold">{t.appName}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
