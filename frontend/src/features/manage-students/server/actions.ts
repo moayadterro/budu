@@ -1,7 +1,9 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { enrolStudent, unenrolStudent, type EnrolResult } from '@/entities/course/server'
+import { enrolStudent, getCourse, unenrolStudent, type EnrolResult } from '@/entities/course/server'
+import { notify } from '@/entities/notification/server'
+import { getAccount } from '@/entities/user/server'
 import { requireRole } from '@/entities/session/server'
 import { formId, formText } from '@/shared/lib/form'
 
@@ -17,7 +19,18 @@ export async function enrolStudentAction(_prev: EnrolState, form: FormData): Pro
   if (!courseId || !EMAIL.test(email) || email.length > 254) return { status: 'invalid', at: Date.now() }
   try {
     const result = await enrolStudent(user.userId, courseId, email)
-    if (result === 'enrolled') revalidatePath('/', 'layout')
+    if (result === 'enrolled') {
+      const [account, course] = await Promise.all([getAccount(email), getCourse(user.userId, courseId)])
+      if (account.found && course) {
+        await notify(
+          [{ id: account.id, email: account.email, name: `${account.firstname} ${account.lastname}`.trim() }],
+          'enrolled',
+          { course: course.title, by: user.name },
+          `/classes/${courseId}`,
+        )
+      }
+      revalidatePath('/', 'layout')
+    }
     return { status: result, at: Date.now() }
   } catch (e) {
     console.error('enrol student failed', e)

@@ -1,8 +1,10 @@
 'use server'
 
 import { redirect } from 'next/navigation'
+import { rememberLocale } from '@/entities/notification/server'
 import { createSession } from '@/entities/session/server'
-import { getAccount, roleFor, sendVerificationEmail } from '@/entities/user/server'
+import { getLocale } from '@/shared/i18n/server'
+import { getAccount, resolveRole, sendVerificationEmail } from '@/entities/user/server'
 import { defaultInstance, iomadCheckPassword } from '@/shared/server/iomad'
 import { hasPendingToken, issuedRecently } from '@/shared/server/tokens'
 import { homeFor } from '@/shared/config/nav'
@@ -37,7 +39,7 @@ export async function signIn(_prev: SignInState, form: FormData): Promise<SignIn
     }
     const check = await iomadCheckPassword(defaultInstance(), account.username, password)
     if (!check.ok) return { status: 'error', error: check.reason === 'locked' ? 'locked' : 'invalid' }
-    const { role, companyId } = roleFor(account.memberships, account.siteadmin)
+    const { role, companyId } = await resolveRole(account.memberships, account.siteadmin)
     await createSession({
       userId: account.id,
       role,
@@ -46,6 +48,7 @@ export async function signIn(_prev: SignInState, form: FormData): Promise<SignIn
       email: account.email,
       pictureId: account.picture || null,
     })
+    await rememberLocale(account.id, await getLocale()) // their emails follow the language they use
     destination = safeNext(form.get('next')) ?? homeFor(role)
   } catch (e) {
     console.error('sign-in failed', e)

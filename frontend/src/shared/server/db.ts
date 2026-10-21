@@ -26,7 +26,7 @@ ALTER TABLE sessions ADD COLUMN IF NOT EXISTS picture_id integer;
 
 CREATE TABLE IF NOT EXISTS auth_tokens (
   token_hash    text PRIMARY KEY,              -- sha256; the raw token only travels in the email
-  purpose       text NOT NULL,                 -- verify_email | reset_password
+  purpose       text NOT NULL,                 -- verify_email | reset_password | invite
   iomad_user_id integer NOT NULL,
   expires_at    timestamptz NOT NULL,
   used_at       timestamptz,
@@ -42,6 +42,27 @@ CREATE TABLE IF NOT EXISTS tenants (
   name       text NOT NULL,
   created_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE (iomad_url, company_id)
+);
+-- the school's grade display scale (grades are always stored 0–100; see shared/lib/grade-scale)
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS grade_scale text NOT NULL DEFAULT 'percent';
+
+-- in-app notifications (bell); text is rendered from kind + params in the reader's language
+CREATE TABLE IF NOT EXISTS notifications (
+  id            bigserial PRIMARY KEY,
+  iomad_user_id integer NOT NULL,
+  kind          text NOT NULL,
+  params        jsonb NOT NULL DEFAULT '{}',
+  link          text,
+  created_at    timestamptz NOT NULL DEFAULT now(),
+  read_at       timestamptz
+);
+CREATE INDEX IF NOT EXISTS notifications_user ON notifications (iomad_user_id, created_at DESC);
+
+-- per-user preferences kept outside IOMAD (UI language: used for emails and notifications)
+CREATE TABLE IF NOT EXISTS user_prefs (
+  iomad_user_id integer PRIMARY KEY,
+  locale        text,
+  updated_at    timestamptz NOT NULL DEFAULT now()
 );
 `
 

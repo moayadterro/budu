@@ -2,7 +2,10 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { gradeSubmission } from '@/entities/homework/server'
+import { getSubmission, gradeSubmission } from '@/entities/homework/server'
+import { notify } from '@/entities/notification/server'
+import { getGradeScale } from '@/entities/tenant/server'
+import { formatGrade } from '@/shared/lib/grade-scale'
 import { requireRole } from '@/entities/session/server'
 import { formId, formText } from '@/shared/lib/form'
 
@@ -20,7 +23,18 @@ export async function gradeAction(_prev: GradeState, form: FormData): Promise<Gr
     return { status: 'error', error: 'invalid' }
   }
   try {
-    await gradeSubmission(user.userId, homeworkId, studentId, Math.round(grade * 10) / 10, feedback)
+    const value = Math.round(grade * 10) / 10
+    await gradeSubmission(user.userId, homeworkId, studentId, value, feedback)
+    const sub = await getSubmission(user.userId, homeworkId, studentId)
+    if (sub) {
+      const scale = await getGradeScale(user.companyId)
+      await notify(
+        [{ id: sub.student.id, email: sub.student.email, name: sub.student.name }],
+        'homeworkGraded',
+        { homework: sub.homeworkTitle, course: sub.courseTitle, grade: formatGrade(value, scale) },
+        `/classes/${sub.courseId}/homework/${homeworkId}`,
+      )
+    }
   } catch (e) {
     console.error('grade failed', e)
     return { status: 'error', error: 'server' }

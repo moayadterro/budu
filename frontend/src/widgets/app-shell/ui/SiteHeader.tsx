@@ -1,6 +1,7 @@
 'use client'
 
 import { LanguageMenu } from '@/features/switch-language'
+import { NotificationBell, type Inbox } from '@/features/notifications'
 import { ThemeToggle } from '@/features/switch-theme'
 import { Button } from '@/shared/ui/button'
 import { Icon } from '@/shared/ui/icon'
@@ -9,7 +10,7 @@ import { SidebarTrigger } from '@/shared/ui/sidebar'
 import { useT } from '@/shared/i18n'
 
 /** Top bar of the signed-in app: sidebar toggle, search, theme, notifications. */
-export function SiteHeader() {
+export function SiteHeader({ inbox }: { inbox: Inbox }) {
   const t = useT()
   return (
     <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center gap-2 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -22,10 +23,7 @@ export function SiteHeader() {
       <div className="ms-auto flex items-center gap-1">
         <LanguageMenu />
         <ThemeToggle />
-        <Button variant="ghost" size="icon" className="relative" aria-label={t.notifications}>
-          <Icon name="bell" />
-          <span className="absolute end-2 top-2 size-1.5 rounded-full bg-primary" />
-        </Button>
+        <NotificationBell initial={inbox} />
       </div>
     </header>
   )

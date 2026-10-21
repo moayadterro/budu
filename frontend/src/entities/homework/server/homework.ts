@@ -79,11 +79,22 @@ export async function getMyHomework(userId: number, homeworkId: number): Promise
   }
 }
 
-/** Hands in the student's answer; `files` (if any) replace the files handed in before. */
+/** Hands in the student's answer; `files` (if any) replace the files handed in before. Returns who to notify. */
 export async function submitHomework(userId: number, homeworkId: number, answer: string, files: File[]) {
   let draft = 0
   for (const f of files) draft = await iomadUpload(defaultInstance(), f, draft)
-  return call<{ id: number }>('submit', { userid: userId, cmid: homeworkId, text: answer, draftitemid: draft })
+  const r = await call<{ id: number; homework: string; courseid: number; coursename: string; student: RawPerson; teachers: RawPerson[] }>(
+    'submit',
+    { userid: userId, cmid: homeworkId, text: answer, draftitemid: draft },
+  )
+  return {
+    homeworkId: r.id,
+    homeworkTitle: r.homework,
+    courseId: r.courseid,
+    courseTitle: r.coursename,
+    student: toPerson(r.student),
+    teachers: r.teachers.map(toPerson),
+  }
 }
 
 // ----- teacher -----
@@ -110,7 +121,9 @@ export async function listSubmissions(
 
 export async function getSubmission(userId: number, homeworkId: number, studentId: number): Promise<SubmissionDetail | null> {
   const r = await orNull(
-    call<RawState & { cmid: number; homework: string; duedate: number; student: RawPerson; text: string; files: RawFile[] }>(
+    call<
+      RawState & { cmid: number; homework: string; duedate: number; courseid: number; coursename: string; student: RawPerson; text: string; files: RawFile[] }
+    >(
       'get_submission',
       { userid: userId, cmid: homeworkId, studentid: studentId },
     ),
@@ -120,6 +133,8 @@ export async function getSubmission(userId: number, homeworkId: number, studentI
     homeworkId: r.cmid,
     homeworkTitle: r.homework,
     dueAt: r.duedate || null,
+    courseId: r.courseid,
+    courseTitle: r.coursename,
     student: toPerson(r.student),
     answer: r.text,
     files: r.files.map(file),

@@ -53,6 +53,8 @@ export type SubmissionDetail = State & {
   homeworkId: number
   homeworkTitle: string
   dueAt: number | null
+  courseId: number
+  courseTitle: string
   student: Person
   answer: string
   files: HomeworkFile[]

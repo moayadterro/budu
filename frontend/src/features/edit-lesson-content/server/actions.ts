@@ -2,7 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import { COURSE_LIMITS } from '@/entities/course'
-import { addMaterial, deleteLessonItem, saveTask } from '@/entities/course/server'
+import { addMaterial, deleteLessonItem, getCourse, listStudents, saveTask } from '@/entities/course/server'
+import { notify } from '@/entities/notification/server'
 import { requireRole } from '@/entities/session/server'
 import { MAX_UPLOAD_BYTES } from '@/shared/config/upload'
 import { formFile, formId, formText } from '@/shared/lib/form'
@@ -48,7 +49,20 @@ export async function saveTaskAction(_prev: ContentFormState, form: FormData): P
   if (name.length > COURSE_LIMITS.title || instructions.length > COURSE_LIMITS.text) return fail('tooLong')
   if (file && file.size > MAX_UPLOAD_BYTES) return fail('tooBig')
   try {
-    await saveTask(user.userId, courseId, lessonId, taskId, { name, instructions, dueAt, file })
+    const saved = await saveTask(user.userId, courseId, lessonId, taskId, { name, instructions, dueAt, file })
+    if (!taskId) {
+      // new homework → tell the course's students (only once the course is published)
+      const course = await getCourse(user.userId, courseId)
+      if (course?.published) {
+        const students = await listStudents(user.userId, courseId)
+        await notify(
+          students.map((s) => ({ id: s.id, email: s.email, name: s.name })),
+          'homeworkNew',
+          { course: course.title, homework: name },
+          `/classes/${courseId}/homework/${saved.id}`,
+        )
+      }
+    }
   } catch (e) {
     console.error('save task failed', e)
     return fail('server')

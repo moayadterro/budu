@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { submitHomework } from '@/entities/homework/server'
+import { notify } from '@/entities/notification/server'
 import { requireRole } from '@/entities/session/server'
 import { MAX_UPLOAD_BYTES } from '@/shared/config/upload'
 import { formFiles, formId } from '@/shared/lib/form'
@@ -24,7 +25,13 @@ export async function submitHomeworkAction(_prev: SubmitState, form: FormData): 
   if (!homeworkId || (!answer && !files.length && !hadFiles)) return { status: 'error', error: 'empty' }
   if (files.some((f) => f.size > MAX_UPLOAD_BYTES)) return { status: 'error', error: 'tooBig' }
   try {
-    await submitHomework(user.userId, homeworkId, answer, files)
+    const r = await submitHomework(user.userId, homeworkId, answer, files)
+    await notify(
+      r.teachers.map((p) => ({ id: p.id, email: p.email, name: p.name })),
+      'homeworkSubmitted',
+      { student: r.student.name, homework: r.homeworkTitle, course: r.courseTitle },
+      `/grading?homework=${r.homeworkId}&student=${r.student.id}`,
+    )
   } catch (e) {
     if (e instanceof IomadError && /submissionsclosed/.test(e.code + e.message)) return { status: 'error', error: 'closed' }
     console.error('submit homework failed', e)
