@@ -6,5 +6,6 @@ export const dynamic = 'force-dynamic'
 
 export default async function Root() {
   const session = await getSession()
-  redirect(session ? homeFor(session.role) : '/login')
+  // visitors first see what Budu offers: the public course catalog
+  redirect(session ? homeFor(session.role) : '/catalog')
 }

@@ -157,6 +157,15 @@ export const en = {
   },
 
   courses: {
+    cover: {
+      title: 'Cover image',
+      upload: 'Upload image',
+      change: 'Change image',
+      uploading: 'Uploading…',
+      remove: 'Remove',
+      hint: 'Shown on the course card in Explore. PNG, JPG or WebP, up to 5 MB; wide images (16:9) look best.',
+      errors: { notImage: 'Choose a PNG, JPG, GIF or WebP image.', tooBig: 'The image is larger than 5 MB.', server: 'Couldn’t save the image. Try again.' },
+    },
     tabs: { content: 'Content', students: 'Students', schedule: 'Schedule', announcements: 'Announcements', quizzes: 'Quizzes' },
     title: 'My courses',
     sub: 'Courses you publish — for the marketplace or for schools.',
@@ -1031,6 +1040,20 @@ export const en = {
       alreadyInvited: 'Invited',
       inSchool: 'In the school',
     },
+  },
+
+  catalog: {
+    heroTitle: 'Learn with teachers and schools you trust',
+    heroSub: 'Browse every course on Budu — no account needed. Free courses start right away; paid ones in a few steps.',
+    all: 'All courses',
+    browse: 'Browse courses without an account',
+    signIn: 'Sign in',
+    signUp: 'Sign up',
+    openApp: 'Open Budu',
+    signUpFree: 'Sign up to start — it’s free',
+    signUpBuy: 'Sign up to buy this course',
+    haveAccount: 'I have an account — sign in',
+    studentsOnly: 'Students enrol from their account (Explore).',
   },
 
   market: {

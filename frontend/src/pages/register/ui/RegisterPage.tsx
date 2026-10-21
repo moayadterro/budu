@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getSession } from '@/entities/session/server'
 import { SignUpForm } from '@/features/sign-up'
@@ -12,6 +13,11 @@ export async function RegisterPage() {
   return (
     <AuthCard wide title={t.signUp.title} sub={t.signUp.sub}>
       <SignUpForm />
+      <p className="mt-6 text-center text-sm text-muted-foreground">
+        <Link href="/catalog" className="font-medium text-primary underline-offset-4 hover:underline">
+          {t.catalog.browse}
+        </Link>
+      </p>
     </AuthCard>
   )
 }

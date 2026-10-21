@@ -12,7 +12,8 @@ export function proxy(req: NextRequest) {
   if (req.cookies.has(SESSION_COOKIE)) return NextResponse.next()
 
   const url = req.nextUrl.clone()
-  url.pathname = '/login'
+  // a visitor at the front door sees the public course catalog; anything else asks them to sign in
+  url.pathname = pathname === '/' ? '/catalog' : '/login'
   url.search = pathname === '/' ? '' : `?next=${encodeURIComponent(pathname + search)}`
   return NextResponse.redirect(url)
 }

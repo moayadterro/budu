@@ -8,7 +8,7 @@ import { useLocale, useT } from '@/shared/i18n'
 import { setCurrencyAction } from '../server/actions'
 
 /** Settings: the currency prices are shown in (saved at once). */
-export function CurrencyPicker({ value }: { value: Currency }) {
+export function CurrencyPicker({ value, compact = false }: { value: Currency; compact?: boolean }) {
   const t = useT()
   const locale = useLocale()
   const [current, setCurrent] = useState(value)
@@ -18,7 +18,8 @@ export function CurrencyPicker({ value }: { value: Currency }) {
       value={current}
       disabled={pending}
       aria-label={t.account.currency}
-      className="w-full max-w-xs"
+      className={compact ? 'w-auto' : 'w-full max-w-xs'}
+      size={compact ? 'sm' : 'default'}
       onChange={(e) => {
         const c = e.target.value as Currency
         setCurrent(c)
@@ -27,7 +28,7 @@ export function CurrencyPicker({ value }: { value: Currency }) {
     >
       {CURRENCIES.map((c) => (
         <NativeSelectOption key={c} value={c}>
-          {c} — {currencyName(c, locale)}
+          {compact ? c : `${c} — ${currencyName(c, locale)}`}
         </NativeSelectOption>
       ))}
     </NativeSelect>

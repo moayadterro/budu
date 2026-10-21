@@ -168,6 +168,15 @@ export const ar: typeof en = {
   },
 
   courses: {
+    cover: {
+      title: 'صورة الغلاف',
+      upload: 'رفع صورة',
+      change: 'تغيير الصورة',
+      uploading: 'جارٍ الرفع…',
+      remove: 'إزالة',
+      hint: 'تظهر على بطاقة المقرر في «استكشاف». PNG أو JPG أو WebP حتى 5 ميغابايت؛ الصور العريضة (16:9) أفضل.',
+      errors: { notImage: 'اختر صورة PNG أو JPG أو GIF أو WebP.', tooBig: 'الصورة أكبر من 5 ميغابايت.', server: 'تعذّر حفظ الصورة. حاول مرة أخرى.' },
+    },
     tabs: { content: 'المحتوى', students: 'الطلاب', schedule: 'الجدول', announcements: 'الإعلانات', quizzes: 'الاختبارات' },
     title: 'دوراتي',
     sub: 'الدورات التي تنشرها — للسوق أو للمدارس.',
@@ -1038,6 +1047,20 @@ export const ar: typeof en = {
       alreadyInvited: 'مدعو',
       inSchool: 'في المدرسة',
     },
+  },
+
+  catalog: {
+    heroTitle: 'تعلّم مع معلمين ومدارس تثق بها',
+    heroSub: 'تصفّح كل مقررات Budu — بلا حساب. المجانية تبدأ فورًا، والمدفوعة بخطوات قليلة.',
+    all: 'كل المقررات',
+    browse: 'تصفّح المقررات بلا حساب',
+    signIn: 'تسجيل الدخول',
+    signUp: 'إنشاء حساب',
+    openApp: 'افتح Budu',
+    signUpFree: 'أنشئ حسابًا وابدأ — مجانًا',
+    signUpBuy: 'أنشئ حسابًا لشراء المقرر',
+    haveAccount: 'لدي حساب — تسجيل الدخول',
+    studentsOnly: 'يسجّل الطلاب من حساباتهم (استكشاف).',
   },
 
   market: {

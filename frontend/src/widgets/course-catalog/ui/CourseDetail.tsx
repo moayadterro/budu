@@ -1,0 +1,100 @@
+import Link from 'next/link'
+import type { ReactNode } from 'react'
+import { CourseCover, type ShownPrice } from '@/entities/course'
+import type { CatalogCourse } from '@/entities/course/server'
+import { Button } from '@/shared/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
+import { Icon } from '@/shared/ui/icon'
+import { PersonAvatar } from '@/shared/ui/person-avatar'
+import { getT } from '@/shared/i18n/server'
+
+/** One marketplace course: cover, what's inside, who teaches it, the price — and `action` (Enrol / Buy / Sign up). */
+export async function CourseDetail({
+  course,
+  price,
+  action,
+  back,
+}: {
+  course: CatalogCourse
+  price: ShownPrice
+  action: ReactNode
+  back: { href: string; label: string }
+}) {
+  const t = await getT()
+  const s = t.shop
+  return (
+    <div className="flex flex-col gap-4">
+      <Button variant="ghost" size="sm" className="-ms-2 self-start" asChild>
+        <Link href={back.href}>
+          <Icon name="back" className="rtl:-scale-x-100" />
+          {back.label}
+        </Link>
+      </Button>
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="flex min-w-0 flex-col gap-6">
+          <CourseCover courseId={course.id} title={course.title} imageId={course.imageId} className="rounded-xl" />
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">{course.title}</h1>
+            {course.school && <p className="mt-1 text-sm text-muted-foreground">{course.school}</p>}
+          </div>
+          {course.description && (
+            <Card>
+              <CardHeader>
+                <CardTitle>{s.about}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="whitespace-pre-line text-sm text-muted-foreground">{course.description}</p>
+              </CardContent>
+            </Card>
+          )}
+          <Card>
+            <CardHeader>
+              <CardTitle>{s.program}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {course.lessons.length === 0 ? (
+                <p className="text-sm text-muted-foreground">{t.courses.noLessons}</p>
+              ) : (
+                <ol className="flex flex-col gap-2">
+                  {course.lessons.map((l, i) => (
+                    <li key={i} className="flex items-center gap-3 text-sm">
+                      <span className="grid size-7 flex-none place-items-center rounded-md bg-muted text-xs font-semibold tabular-nums">{i + 1}</span>
+                      {l}
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+        <aside className="flex flex-col gap-4 lg:sticky lg:top-20">
+          <Card>
+            <CardContent className="flex flex-col gap-4">
+              <div>
+                <div className="text-xs text-muted-foreground">{s.price}</div>
+                <div className="text-2xl font-semibold tabular-nums">{price.free ? s.free : price.shown}</div>
+                {price.original && <div className="text-xs text-muted-foreground">{s.teacherPrice(price.original)}</div>}
+              </div>
+              {action}
+            </CardContent>
+          </Card>
+          {course.teachers.length > 0 && (
+            <Card size="sm">
+              <CardHeader>
+                <CardTitle>{s.teachers}</CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-3">
+                {course.teachers.map((x) => (
+                  <div key={x.id} className="flex items-center gap-3">
+                    <PersonAvatar person={x} />
+                    <span className="text-sm font-medium">{x.name}</span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+        </aside>
+      </div>
+    </div>
+  )
+}
