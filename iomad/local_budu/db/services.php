@@ -80,6 +80,18 @@ $functions = [
         'description' => 'Check whether the acting user may open a lesson file; return its location.',
         'type' => 'read',
     ],
+    'local_budu_publish_changes' => [
+        'classname' => \local_budu\external\courses::class,
+        'methodname' => 'publish_changes',
+        'description' => 'Make a published course’s pending changes live.',
+        'type' => 'write',
+    ],
+    'local_budu_discard_changes' => [
+        'classname' => \local_budu\external\courses::class,
+        'methodname' => 'discard_changes',
+        'description' => 'Drop a published course’s pending changes (all, or one lesson / item).',
+        'type' => 'write',
+    ],
     'local_budu_preview_lesson' => [
         'classname' => \local_budu\external\courses::class,
         'methodname' => 'preview_lesson',

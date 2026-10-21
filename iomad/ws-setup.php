@@ -34,6 +34,8 @@ const FUNCTIONS = [
     'local_budu_delete_item',
     'local_budu_file_access',
     'local_budu_preview_lesson',
+    'local_budu_publish_changes',
+    'local_budu_discard_changes',
     // Students, homework and grades (iomad/local_budu/classes/external/learning.php).
     'local_budu_list_students',
     'local_budu_enrol_student',

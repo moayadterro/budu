@@ -44,7 +44,7 @@ class market extends external_api {
             $ctx = \context_course::instance($course->id);
             $company = $DB->get_field_sql('SELECT c.name FROM {company_course} cc JOIN {company} c ON c.id = cc.companyid
                 WHERE cc.courseid = ?', [$course->id], IGNORE_MULTIPLE);
-            $lessons = $DB->get_records_select('course_sections', 'course = ? AND section > 0 AND component IS NULL',
+            $lessons = $DB->get_records_select('course_sections', 'course = ? AND section > 0 AND component IS NULL AND visible = 1',
                 [$course->id], 'section', 'id, section, name');
             $out[] = [
                 'id' => (int)$course->id,

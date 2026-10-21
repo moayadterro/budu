@@ -6,6 +6,7 @@ use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
+use local_budu\drafts;
 
 /**
  * Course builder for Budu teachers: courses (IOMAD company courses), lessons
@@ -68,10 +69,11 @@ class courses extends external_api {
         if (!$course->visible || school_exams::is_exam_space($course)) {
             return null;
         }
-        $first = $DB->get_records_select('course_sections', 'course = ? AND section > 0 AND component IS NULL',
+        // the first lesson students see (a new, unpublished lesson moved to the top doesn't count)
+        $first = $DB->get_records_select('course_sections', 'course = ? AND section > 0 AND component IS NULL AND visible = 1',
             [$course->id], 'section', '*', 0, 1);
         $first = $first ? reset($first) : null;
-        return $first && $first->visible && empty($first->availability) ? $first : null;
+        return $first && empty($first->availability) ? $first : null;
     }
 
     /** Is this module part of the course's free preview (a material in lesson 1, shown to everyone)? */
@@ -82,6 +84,44 @@ class courses extends external_api {
         }
         $first = self::preview_section($course);
         return $first && (int)$cm->section === (int)$first->id;
+    }
+
+    /** A new item in a published course waits hidden — unless its whole lesson is new (hidden already). */
+    private static function new_item_visible(\stdClass $course, \stdClass $section): int {
+        return drafts::live($course) && !drafts::added('section', $section->id) ? 0 : 1;
+    }
+
+    private static function note_new_item(\stdClass $course, \stdClass $section, int $cmid, int $userid): void {
+        if (drafts::live($course) && !drafts::added('section', $section->id)) {
+            drafts::put($course->id, 'cm', $cmid, 'add', [], $userid);
+        }
+    }
+
+    /** Do changes to this item go into the draft (it is live: published course, visible, not itself new)? */
+    private static function drafted(\stdClass $course, \stdClass $cm): bool {
+        return drafts::live($course) && $cm->visible && !drafts::added('cm', $cm->id);
+    }
+
+    /** Change a task now. $draftitemid 0 = keep its current attachment. */
+    private static function apply_task(\stdClass $course, \stdClass $cm, string $name, string $instructions, int $duedate, int $draftitemid): void {
+        [, , , $data] = get_moduleinfo_data($cm, $course);
+        if (!$draftitemid) {
+            // Keep the current attachment: copy it into a fresh draft area for the update.
+            file_prepare_draft_area($draftitemid, \context_module::instance($cm->id)->id, 'mod_assign', 'introattachment', 0);
+        }
+        update_module(self::task_settings($data, $name, $instructions, $duedate, $draftitemid));
+    }
+
+    /** Change a text page now. */
+    private static function apply_page(\stdClass $course, \stdClass $cm, string $name, string $html): void {
+        global $DB;
+        [, , , $data] = get_moduleinfo_data($cm, $course);
+        $data->name = $name;
+        $data->introeditor = self::intro('');
+        $data->page = ['text' => $html, 'format' => FORMAT_HTML, 'itemid' => 0];
+        $data->content = $html;
+        $data->contentformat = FORMAT_HTML;
+        update_module($data);
     }
 
     private static function cm(\stdClass $course, int $cmid): \stdClass {
@@ -289,6 +329,9 @@ class courses extends external_api {
         $p = self::validate_parameters(self::update_course_parameters(), compact('courseid', 'userid', 'fullname', 'summary', 'visible'));
         self::setup();
         $course = self::editable($p['courseid'], $p['userid']);
+        if ($course->visible && !$p['visible']) {
+            self::apply_changes($course); // unpublished: nobody sees it, so pending changes simply apply
+        }
         update_course((object)[
             'id' => $course->id,
             'fullname' => trim($p['fullname']),
@@ -323,6 +366,9 @@ class courses extends external_api {
         }
         $canedit = has_capability('moodle/course:manageactivities', \context_course::instance($course->id), $p['userid']);
         $modinfo = get_fast_modinfo($course, $p['userid']);
+        // editors see their unpublished changes (drafts.php); students only the published version
+        $rows = $canedit ? drafts::of_course($course->id) : [];
+        $edit = fn(?\stdClass $row): array => $row && $row->action === 'edit' ? drafts::data($row) : [];
 
         $lessons = [];
         foreach ($modinfo->get_section_info_all() as $section) {
@@ -336,30 +382,38 @@ class courses extends external_api {
                     continue;
                 }
                 $ctx = \context_module::instance($cm->id);
+                $row = $rows['cm:' . $cm->id] ?? null;
+                $d = $edit($row);
+                $state = drafts::state($row);
                 if ($cm->modname === 'resource') {
                     $files = self::files_of($ctx->id, 'mod_resource', 'content');
                     $kind = $files && str_starts_with($files[0]['mimetype'], 'video/') ? 'video' : 'file';
-                    $items[] = ['cmid' => $cm->id, 'kind' => $kind, 'name' => $cm->name, 'instructions' => '', 'duedate' => 0, 'files' => $files];
+                    $items[] = ['cmid' => $cm->id, 'kind' => $kind, 'name' => $cm->name, 'instructions' => '', 'duedate' => 0, 'files' => $files,
+                        'draft' => $state];
                 } else if ($cm->modname === 'page') {
-                    $content = (string)$DB->get_field('page', 'content', ['id' => $cm->instance]);
-                    $items[] = ['cmid' => $cm->id, 'kind' => 'text', 'name' => $cm->name, 'instructions' => '', 'duedate' => 0,
-                        'files' => [], 'content' => self::clean_html($content)];
+                    $content = $d['content'] ?? (string)$DB->get_field('page', 'content', ['id' => $cm->instance]);
+                    $items[] = ['cmid' => $cm->id, 'kind' => 'text', 'name' => $d['name'] ?? $cm->name, 'instructions' => '', 'duedate' => 0,
+                        'files' => [], 'content' => self::clean_html($content), 'draft' => $state];
                 } else {
                     $assign = $DB->get_record('assign', ['id' => $cm->instance], 'intro, duedate', MUST_EXIST);
-                    $items[] = ['cmid' => $cm->id, 'kind' => 'task', 'name' => $cm->name, 'instructions' => $assign->intro,
-                        'duedate' => (int)$assign->duedate, 'files' => self::files_of($ctx->id, 'mod_assign', 'introattachment')];
+                    $items[] = ['cmid' => $cm->id, 'kind' => 'task', 'name' => $d['name'] ?? $cm->name,
+                        'instructions' => $d['instructions'] ?? $assign->intro, 'duedate' => (int)($d['duedate'] ?? $assign->duedate),
+                        'files' => self::files_of($ctx->id, 'mod_assign', 'introattachment'), 'draft' => $state];
                 }
             }
             // Raw name: get_section_name() returns HTML-escaped text; the frontend escapes on output itself.
             $name = $section->name ?? '';
             $name = $name !== '' ? $name : html_entity_decode(get_section_name($course, $section), ENT_QUOTES);
-            $lessons[] = ['id' => $section->id, 'name' => $name, 'summary' => (string)$section->summary, 'items' => $items];
+            $row = $rows['section:' . $section->id] ?? null;
+            $d = $edit($row);
+            $lessons[] = ['id' => $section->id, 'name' => $d['name'] ?? $name, 'summary' => (string)($d['summary'] ?? $section->summary),
+                'items' => $items, 'draft' => drafts::state($row)];
         }
 
         return [
             'id' => $course->id, 'fullname' => $course->fullname, 'summary' => $course->summary, 'visible' => (bool)$course->visible,
             'lessons' => count($lessons), 'timemodified' => $course->timemodified, 'canedit' => $canedit, 'lessonlist' => $lessons,
-            'image' => self::image_id($course->id),
+            'image' => self::image_id($course->id), 'changes' => count($rows),
         ];
     }
 
@@ -367,6 +421,7 @@ class courses extends external_api {
         return new external_single_structure(self::course_structure() + [
             'canedit' => new external_value(PARAM_BOOL, 'The user may edit'),
             'lessonlist' => new external_multiple_structure(self::lesson_structure()),
+            'changes' => new external_value(PARAM_INT, 'Unpublished changes (editors; 0 for others)'),
         ]);
     }
 
@@ -386,12 +441,14 @@ class courses extends external_api {
             'duedate' => new external_value(PARAM_INT, 'Task due date (0 = none)'),
             'files' => new external_multiple_structure($file),
             'content' => new external_value(PARAM_RAW, 'Text pages: cleaned HTML', VALUE_OPTIONAL),
+            'draft' => new external_value(PARAM_ALPHA, 'Editors: new | changed | removed | empty = published as is', VALUE_DEFAULT, ''),
         ]);
         return new external_single_structure([
             'id' => new external_value(PARAM_INT, 'Section id'),
             'name' => new external_value(PARAM_RAW, 'Lesson title (plain text)'),
             'summary' => new external_value(PARAM_RAW, 'Lesson description (plain text)'),
             'items' => new external_multiple_structure($item),
+            'draft' => new external_value(PARAM_ALPHA, 'Editors: new | changed | removed | empty = published as is', VALUE_DEFAULT, ''),
         ]);
     }
 
@@ -459,8 +516,23 @@ class courses extends external_api {
         $p = self::validate_parameters(self::save_lesson_parameters(), compact('courseid', 'userid', 'sectionid', 'name', 'summary'));
         self::setup();
         $course = self::editable($p['courseid'], $p['userid']);
-        $section = $p['sectionid'] ? self::lesson($course, $p['sectionid']) : course_create_section($course);
-        course_update_section($course, $section, ['name' => trim($p['name']), 'summary' => $p['summary'], 'summaryformat' => FORMAT_PLAIN]);
+        $values = ['name' => trim($p['name']), 'summary' => $p['summary']];
+        if (!$p['sectionid']) {
+            $section = course_create_section($course);
+            course_update_section($course, $section, $values + ['summaryformat' => FORMAT_PLAIN]);
+            if (drafts::live($course)) {
+                // published course: the new lesson stays hidden until "Publish changes"
+                set_section_visible($course->id, $section->section, 0);
+                drafts::put($course->id, 'section', $section->id, 'add', [], $p['userid']);
+            }
+            return ['id' => $section->id];
+        }
+        $section = self::lesson($course, $p['sectionid']);
+        if (drafts::live($course) && !drafts::added('section', $section->id)) {
+            drafts::put($course->id, 'section', $section->id, 'edit', $values, $p['userid']);
+            return ['id' => $section->id];
+        }
+        course_update_section($course, $section, $values + ['summaryformat' => FORMAT_PLAIN]);
         return ['id' => $section->id];
     }
 
@@ -482,6 +554,11 @@ class courses extends external_api {
         self::setup();
         $course = self::editable($p['courseid'], $p['userid']);
         $section = self::lesson($course, $p['sectionid']);
+        if (drafts::live($course) && !drafts::added('section', $section->id)) {
+            drafts::put($course->id, 'section', $section->id, 'remove', [], $p['userid']); // removed on "Publish changes"
+            return ['id' => $section->id];
+        }
+        drafts::drop_section($section->id);
         course_delete_section($course, $section, true);
         return ['id' => $section->id];
     }
@@ -517,6 +594,150 @@ class courses extends external_api {
         return self::ok();
     }
 
+    // ----- unpublished changes (drafts.php) ---------------------------------
+
+    /**
+     * Make every pending change of the course live. Returns the homework that students can see
+     * now for the first time (to notify them).
+     */
+    private static function apply_changes(\stdClass $course): array {
+        global $DB;
+        $rows = drafts::of_course($course->id);
+        $newtasks = [];
+        // removals last, so an edit never touches something already gone
+        uasort($rows, fn($a, $b) => ($a->action === 'remove') <=> ($b->action === 'remove'));
+        foreach ($rows as $row) {
+            try {
+                self::apply_row($course, $row, $newtasks);
+            } catch (\Throwable $e) {
+                debugging('local_budu: could not apply change ' . $row->id . ': ' . $e->getMessage(), DEBUG_DEVELOPER);
+            }
+            drafts::drop($row->kind, (int)$row->objectid);
+            get_file_storage()->delete_area_files(\context_course::instance($course->id)->id, 'local_budu', 'taskdraft', $row->objectid);
+        }
+        rebuild_course_cache($course->id, true);
+        return $newtasks;
+    }
+
+    private static function apply_row(\stdClass $course, \stdClass $row, array &$newtasks): void {
+        global $DB;
+        $d = drafts::data($row);
+        if ($row->kind === 'section') {
+            $section = $DB->get_record('course_sections', ['id' => $row->objectid, 'course' => $course->id]);
+            if (!$section) {
+                return;
+            }
+            if ($row->action === 'add') {
+                set_section_visible($course->id, $section->section, 1);
+                foreach ($DB->get_records('course_modules', ['section' => $section->id, 'deletioninprogress' => 0]) as $cm) {
+                    $cm = get_coursemodule_from_id('', $cm->id, $course->id, false, IGNORE_MISSING);
+                    if ($cm && $cm->modname === 'assign') {
+                        $newtasks[] = ['cmid' => (int)$cm->id, 'name' => $cm->name];
+                    }
+                }
+            } else if ($row->action === 'edit') {
+                course_update_section($course, $section, ['name' => $d['name'] ?? $section->name,
+                    'summary' => $d['summary'] ?? $section->summary, 'summaryformat' => FORMAT_PLAIN]);
+            } else {
+                course_delete_section($course, $section, true);
+            }
+            return;
+        }
+        $cm = get_coursemodule_from_id('', $row->objectid, $course->id, false, IGNORE_MISSING);
+        if (!$cm) {
+            return;
+        }
+        if ($row->action === 'add') {
+            set_coursemodule_visible($cm->id, 1);
+            if ($cm->modname === 'assign') {
+                $newtasks[] = ['cmid' => (int)$cm->id, 'name' => $cm->name];
+            }
+        } else if ($row->action === 'edit' && $cm->modname === 'page') {
+            self::apply_page($course, $cm, $d['name'] ?? $cm->name, self::clean_html($d['content'] ?? ''));
+        } else if ($row->action === 'edit' && $cm->modname === 'assign') {
+            $draft = 0;
+            if (!empty($d['attachment'])) {
+                file_prepare_draft_area($draft, \context_course::instance($course->id)->id, 'local_budu', 'taskdraft', $cm->id);
+            }
+            $assign = $DB->get_record('assign', ['id' => $cm->instance], 'intro, duedate', MUST_EXIST);
+            self::apply_task($course, $cm, $d['name'] ?? $cm->name, $d['instructions'] ?? $assign->intro,
+                (int)($d['duedate'] ?? $assign->duedate), $draft);
+        } else if ($row->action === 'remove') {
+            course_delete_module($cm->id);
+        }
+    }
+
+    /** Throw away one pending change: a new lesson / item is deleted, an edit or removal forgotten. */
+    private static function revert_row(\stdClass $course, \stdClass $row): void {
+        global $DB;
+        if ($row->action === 'add' && $row->kind === 'section') {
+            $section = $DB->get_record('course_sections', ['id' => $row->objectid, 'course' => $course->id]);
+            if ($section) {
+                drafts::drop_section($section->id);
+                course_delete_section($course, $section, true);
+            }
+        } else if ($row->action === 'add') {
+            if (get_coursemodule_from_id('', $row->objectid, $course->id, false, IGNORE_MISSING)) {
+                course_delete_module($row->objectid);
+            }
+        }
+        drafts::drop($row->kind, (int)$row->objectid);
+        get_file_storage()->delete_area_files(\context_course::instance($course->id)->id, 'local_budu', 'taskdraft', $row->objectid);
+    }
+
+    public static function publish_changes_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'courseid' => new external_value(PARAM_INT, 'Course'),
+            'userid' => new external_value(PARAM_INT, 'Acting Budu user'),
+        ]);
+    }
+
+    /** "Publish changes": students now see the edited course. */
+    public static function publish_changes(int $courseid, int $userid): array {
+        $p = self::validate_parameters(self::publish_changes_parameters(), compact('courseid', 'userid'));
+        self::setup();
+        $course = self::editable($p['courseid'], $p['userid']);
+        return ['newtasks' => self::apply_changes($course)];
+    }
+
+    public static function publish_changes_returns(): external_single_structure {
+        return new external_single_structure([
+            'newtasks' => new external_multiple_structure(new external_single_structure([
+                'cmid' => new external_value(PARAM_INT, 'Homework'),
+                'name' => new external_value(PARAM_TEXT, 'Title'),
+            ]), 'Homework students see for the first time'),
+        ]);
+    }
+
+    public static function discard_changes_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'courseid' => new external_value(PARAM_INT, 'Course'),
+            'userid' => new external_value(PARAM_INT, 'Acting Budu user'),
+            'kind' => new external_value(PARAM_ALPHA, 'section | cm — only this one change; empty = all', VALUE_DEFAULT, ''),
+            'objectid' => new external_value(PARAM_INT, 'Lesson / item id (with kind)', VALUE_DEFAULT, 0),
+        ]);
+    }
+
+    /** "Discard changes" (all, or one lesson / item): back to the published version. */
+    public static function discard_changes(int $courseid, int $userid, string $kind = '', int $objectid = 0): array {
+        $p = self::validate_parameters(self::discard_changes_parameters(), compact('courseid', 'userid', 'kind', 'objectid'));
+        self::setup();
+        $course = self::editable($p['courseid'], $p['userid']);
+        $rows = drafts::of_course($course->id);
+        if ($p['kind'] !== '') {
+            $rows = array_filter($rows, fn($r) => $r->kind === $p['kind'] && (int)$r->objectid === $p['objectid']);
+        }
+        foreach ($rows as $row) {
+            self::revert_row($course, $row);
+        }
+        rebuild_course_cache($course->id, true);
+        return ['id' => $course->id];
+    }
+
+    public static function discard_changes_returns(): external_single_structure {
+        return self::ok();
+    }
+
     // ----- add_material --------------------------------------------------
 
     public static function add_material_parameters(): external_function_parameters {
@@ -539,7 +760,7 @@ class courses extends external_api {
             'modulename' => 'resource',
             'course' => $course->id,
             'section' => $section->section,
-            'visible' => 1,
+            'visible' => self::new_item_visible($course, $section),
             'name' => trim($p['name']),
             'introeditor' => self::intro(''),
             'files' => $p['draftitemid'],
@@ -548,6 +769,7 @@ class courses extends external_api {
             'showsize' => 1,
             'showtype' => 1,
         ]);
+        self::note_new_item($course, $section, (int)$info->coursemodule, $p['userid']);
         return ['id' => $info->coursemodule];
     }
 
@@ -580,8 +802,10 @@ class courses extends external_api {
 
         if (!$p['cmid']) {
             $section = self::lesson($course, $p['sectionid']);
-            $data = (object)['modulename' => 'assign', 'course' => $course->id, 'section' => $section->section, 'visible' => 1];
+            $data = (object)['modulename' => 'assign', 'course' => $course->id, 'section' => $section->section,
+                'visible' => self::new_item_visible($course, $section)];
             $info = create_module(self::task_settings($data, trim($p['name']), $p['instructions'], $p['duedate'], $p['draftitemid']));
+            self::note_new_item($course, $section, (int)$info->coursemodule, $p['userid']);
             return ['id' => $info->coursemodule];
         }
 
@@ -589,13 +813,17 @@ class courses extends external_api {
         if ($cm->modname !== 'assign') {
             throw new \moodle_exception('invalidrecord', 'error', '', 'task');
         }
-        [, , , $data] = get_moduleinfo_data($cm, $course);
-        $draft = $p['draftitemid'];
-        if (!$draft) {
-            // Keep the current attachment: copy it into a fresh draft area for the update.
-            file_prepare_draft_area($draft, \context_module::instance($cm->id)->id, 'mod_assign', 'introattachment', 0);
+        if (self::drafted($course, $cm)) {
+            // published: keep the edit (and a new attachment, in our own file area) until "Publish changes"
+            $values = ['name' => trim($p['name']), 'instructions' => $p['instructions'], 'duedate' => $p['duedate']];
+            if ($p['draftitemid']) {
+                file_save_draft_area_files($p['draftitemid'], \context_course::instance($course->id)->id, 'local_budu', 'taskdraft', $cm->id);
+                $values['attachment'] = 1;
+            }
+            drafts::put($course->id, 'cm', $cm->id, 'edit', $values, $p['userid']);
+            return ['id' => $cm->id];
         }
-        update_module(self::task_settings($data, trim($p['name']), $p['instructions'], $p['duedate'], $draft));
+        self::apply_task($course, $cm, trim($p['name']), $p['instructions'], $p['duedate'], $p['draftitemid']);
         return ['id' => $cm->id];
     }
 
@@ -637,12 +865,19 @@ class courses extends external_api {
         };
         if (!$p['cmid']) {
             $section = self::lesson($course, $p['sectionid']);
-            $data = (object)['modulename' => 'page', 'course' => $course->id, 'section' => $section->section, 'visible' => 1];
-            return ['id' => create_module($settings($data))->coursemodule];
+            $data = (object)['modulename' => 'page', 'course' => $course->id, 'section' => $section->section,
+                'visible' => self::new_item_visible($course, $section)];
+            $cmid = (int)create_module($settings($data))->coursemodule;
+            self::note_new_item($course, $section, $cmid, $p['userid']);
+            return ['id' => $cmid];
         }
         $cm = self::cm($course, $p['cmid']);
         if ($cm->modname !== 'page') {
             throw new \moodle_exception('invalidrecord', 'error', '', 'text page');
+        }
+        if (self::drafted($course, $cm)) {
+            drafts::put($course->id, 'cm', $cm->id, 'edit', ['name' => trim($p['name']), 'content' => $html], $p['userid']);
+            return ['id' => $cm->id];
         }
         [, , , $data] = get_moduleinfo_data($cm, $course);
         update_module($settings($data));
@@ -703,6 +938,11 @@ class courses extends external_api {
         self::setup();
         $course = self::editable($p['courseid'], $p['userid']);
         $cm = self::cm($course, $p['cmid']);
+        if (self::drafted($course, $cm)) {
+            drafts::put($course->id, 'cm', $cm->id, 'remove', [], $p['userid']); // removed on "Publish changes"
+            return ['id' => $cm->id];
+        }
+        drafts::drop('cm', $cm->id);
         course_delete_module($cm->id);
         return ['id' => $cm->id];
     }

@@ -535,7 +535,7 @@ class learning extends external_api {
             $out[] = [
                 'id' => (int)$course->id, 'fullname' => $course->fullname, 'summary' => (string)$course->summary,
                 'teachers' => implode(', ', array_map('fullname', $teachers)),
-                'lessons' => $DB->count_records_select('course_sections', 'course = ? AND section > 0 AND component IS NULL', [$course->id]),
+                'lessons' => $DB->count_records_select('course_sections', 'course = ? AND section > 0 AND component IS NULL AND visible = 1', [$course->id]),
                 'homework' => count($homework), 'todo' => $todo,
             ];
         }
