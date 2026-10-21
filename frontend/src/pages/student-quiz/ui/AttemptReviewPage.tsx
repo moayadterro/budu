@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import { quizForStudent, reviewAttempt } from '@/entities/quiz/server'
 import { requireRole } from '@/entities/session/server'
 import { getGradeScale } from '@/entities/tenant/server'
+import { outcomeOf } from '@/entities/quiz'
+import { StartQuiz } from '@/features/take-quiz'
 import { QuizReview } from '@/widgets/quiz-review'
 import { formatGrade, scaleMax } from '@/shared/lib/grade-scale'
 import { Button } from '@/shared/ui/button'
@@ -39,10 +41,19 @@ export async function AttemptReviewPage({ params }: { params: Promise<{ attemptI
       <h1 className="text-2xl font-semibold tracking-tight">{review.name}</h1>
       <QuizReview
         review={review}
+        passMark={quiz?.passMark ?? 0}
+        action={
+          // practice again — only after a result below the line (no "try again" on a pass)
+          quiz?.canStart && review.grade !== null && outcomeOf(review.grade, quiz.passMark) === 'failed' ? (
+            <div className="w-40">
+              <StartQuiz quizId={quiz.id} inProgress={false} label={t.quiz.outcome.tryAgain} />
+            </div>
+          ) : undefined
+        }
         grade={
           review.grade === null
             ? undefined
-            : { label: formatGrade(review.grade, scale), outOf: scaleMax(scale), scaleName: scale === 'percent' ? null : t.scales[scale] }
+            : { label: formatGrade(review.grade, scale), outOf: scaleMax(scale) }
         }
       />
     </div>

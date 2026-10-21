@@ -5,13 +5,13 @@ import { useT } from '@/shared/i18n'
 import { startAttemptAction } from '../server/actions'
 
 /** Start / Continue a quiz. */
-export function StartQuiz({ quizId, inProgress }: { quizId: number; inProgress: boolean }) {
+export function StartQuiz({ quizId, inProgress, label }: { quizId: number; inProgress: boolean; label?: string }) {
   const t = useT()
   const s = t.quiz.take
   return (
     <form action={startAttemptAction}>
       <input type="hidden" name="quizId" value={quizId} />
-      <SubmitButton className="w-full" label={inProgress ? s.continue : s.start} pendingLabel={s.starting} />
+      <SubmitButton className="w-full" label={label ?? (inProgress ? s.continue : s.start)} pendingLabel={s.starting} />
     </form>
   )
 }

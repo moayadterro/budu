@@ -746,6 +746,15 @@ export const en = {
   },
 
   quiz: {
+    outcome: {
+      excellent: 'Excellent!',
+      passed: 'Passed',
+      failed: 'Not passed',
+      excellentMsg: 'Outstanding work — keep it up.',
+      passedMsg: (p: number) => `You reached the pass mark (${p}%).`,
+      failedMsg: (p: number) => `The pass mark is ${p}%.`,
+      tryAgain: 'Try again',
+    },
     homeTitle: 'Quizzes & exams',
     noneOpen: 'Nothing to take right now.',
     examsTitle: 'Exams',
@@ -943,7 +952,6 @@ export const en = {
       gap: (n: number) => `Gap ${n}`,
     },
     review: {
-      score: (pct: number, pts: number, max: number) => `${pct}% · ${pts} of ${max} points`,
       submitted: 'Submitted',
       yourGrade: 'Your grade',
       waiting: 'Some answers are waiting for the teacher. You’ll be told when it’s graded.',

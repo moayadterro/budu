@@ -753,6 +753,15 @@ export const ar: typeof en = {
   },
 
   quiz: {
+    outcome: {
+      excellent: 'ممتاز!',
+      passed: 'ناجح',
+      failed: 'لم ينجح',
+      excellentMsg: 'عمل رائع — استمر.',
+      passedMsg: (p: number) => `وصلت إلى درجة النجاح (${p}%).`,
+      failedMsg: (p: number) => `درجة النجاح ${p}%.`,
+      tryAgain: 'حاول مرة أخرى',
+    },
     homeTitle: 'الاختبارات والامتحانات',
     noneOpen: 'لا شيء لحلّه الآن.',
     examsTitle: 'الامتحانات',
@@ -950,7 +959,6 @@ export const ar: typeof en = {
       gap: (n: number) => `الفراغ ${n}`,
     },
     review: {
-      score: (pct: number, pts: number, max: number) => `${pct}% · ${pts} من ${max} درجة`,
       submitted: 'سُلِّم',
       yourGrade: 'درجتك',
       waiting: 'بعض الإجابات بانتظار المعلم. سيصلك إشعار عند التقييم.',

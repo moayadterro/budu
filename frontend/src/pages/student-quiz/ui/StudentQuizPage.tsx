@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { QuizKindBadge, QuizStateBadge } from '@/entities/quiz'
+import { QuizKindBadge, QuizStateBadge, ResultSummary } from '@/entities/quiz'
 import { quizForStudent } from '@/entities/quiz/server'
 import { requireRole } from '@/entities/session/server'
 import { getGradeScale } from '@/entities/tenant/server'
@@ -58,18 +58,13 @@ export async function StudentQuizPage({ params }: { params: Promise<{ courseId: 
           </dl>
           <p className="text-xs text-muted-foreground">{quiz.kind === 'exam' ? s.examRules : s.quizRules}</p>
           {quiz.grade !== null && (
-            <div className="flex items-center justify-between gap-3 rounded-lg border p-3">
-              <div>
-                <div className="text-sm">{s.yourGrade}</div>
-                {scale !== 'percent' && <div className="text-xs text-muted-foreground">{t.scales[scale]}</div>}
-              </div>
-              <div className="text-end">
-                <div className="text-2xl font-semibold tabular-nums">
-                  {formatGrade(quiz.grade, scale)}
-                  {scaleMax(scale) && <span className="ms-1 text-sm font-normal text-muted-foreground">{scaleMax(scale)}</span>}
-                </div>
-                <div className="text-xs text-muted-foreground tabular-nums">{Math.round(quiz.grade)}%</div>
-              </div>
+            <div className="rounded-lg border p-4">
+              <ResultSummary
+                grade={quiz.grade}
+                label={formatGrade(quiz.grade, scale)}
+                outOf={scaleMax(scale)}
+                passMark={quiz.passMark}
+              />
             </div>
           )}
           {quiz.needsGrading && <p className="text-sm text-muted-foreground">{t.quiz.review.waiting}</p>}

@@ -30,10 +30,11 @@ export async function QuizAttemptPage({ params }: { params: Promise<{ courseId: 
       </h2>
       <QuizReview
         review={review}
+        passMark={quiz.passMark}
         grade={
           review.grade === null
             ? undefined
-            : { label: formatGrade(review.grade, scale), outOf: scaleMax(scale), scaleName: scale === 'percent' ? null : t.scales[scale] }
+            : { label: formatGrade(review.grade, scale), outOf: scaleMax(scale) }
         }
         gradeForms={forms}
       />

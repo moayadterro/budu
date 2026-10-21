@@ -1,12 +1,15 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { outcomeOf } from '@/entities/quiz'
 import { quizResults } from '@/entities/quiz/server'
 import { getGradeScale } from '@/entities/tenant/server'
 import { formatGrade } from '@/shared/lib/grade-scale'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card'
+import { Icon } from '@/shared/ui/icon'
 import { LocalTime } from '@/shared/ui/local-time'
+import { cn } from '@/shared/lib/cn'
 import { PersonAvatar } from '@/shared/ui/person-avatar'
 import { getT } from '@/shared/i18n/server'
 import { CourseQuizHeader, courseForQuizzes } from './shared'
@@ -49,7 +52,21 @@ export async function QuizResultsPage({ params }: { params: Promise<{ courseId: 
                 <div className="text-xs text-muted-foreground">{x.submittedAt ? <LocalTime seconds={x.submittedAt} /> : '—'}</div>
               </div>
               <Badge variant={stateVariant[x.state]}>{s.state[x.state]}</Badge>
-              <span className="w-14 text-end font-semibold tabular-nums">{x.grade === null ? '—' : formatGrade(x.grade, scale)}</span>
+              {x.grade === null ? (
+                <span className="w-16 text-end text-muted-foreground">—</span>
+              ) : (
+                // colour + icon + the grade: below the pass mark red ✗, otherwise green ✓ (★ for 85%+)
+                <span
+                  className={cn(
+                    'flex w-16 items-center justify-end gap-1 font-semibold tabular-nums',
+                    outcomeOf(x.grade, r.passMark) === 'failed' ? 'text-destructive' : 'text-success',
+                  )}
+                  title={`${Math.round(x.grade)}%`}
+                >
+                  <Icon name={{ failed: 'close', passed: 'tick', excellent: 'star' }[outcomeOf(x.grade, r.passMark)] as 'close' | 'tick' | 'star'} className="size-3.5" />
+                  {formatGrade(x.grade, scale)}
+                </span>
+              )}
               {x.attemptId > 0 && (
                 <Button variant={x.state === 'needsgrading' ? 'default' : 'outline'} size="sm" asChild>
                   <Link href={`/courses/${course.id}/quizzes/${r.id}/attempts/${x.attemptId}`}>{x.state === 'needsgrading' ? s.grade : s.open}</Link>

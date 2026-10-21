@@ -108,6 +108,7 @@ const icons = {
   eyeOff: ViewOffIcon,
   chevRight: ArrowRight01Icon,
   plus: Add01Icon,
+  star: HugeStarIcon,
   clock: Clock01Icon,
   close: Cancel01Icon,
   text: Note01Icon,

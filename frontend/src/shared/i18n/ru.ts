@@ -755,6 +755,15 @@ export const ru: typeof en = {
   },
 
   quiz: {
+    outcome: {
+      excellent: 'Отлично!',
+      passed: 'Зачёт',
+      failed: 'Незачёт',
+      excellentMsg: 'Великолепная работа — так держать.',
+      passedMsg: (p: number) => `Проходной балл (${p}%) достигнут.`,
+      failedMsg: (p: number) => `Проходной балл — ${p}%.`,
+      tryAgain: 'Попробовать ещё раз',
+    },
     homeTitle: 'Тесты и экзамены',
     noneOpen: 'Сейчас нечего проходить.',
     examsTitle: 'Экзамены',
@@ -952,7 +961,6 @@ export const ru: typeof en = {
       gap: (n: number) => `Пропуск ${n}`,
     },
     review: {
-      score: (pct: number, pts: number, max: number) => `${pct}% · ${pts} из ${max} баллов`,
       submitted: 'Сдано',
       yourGrade: 'Ваша оценка',
       waiting: 'Некоторые ответы ждут проверки учителем. Вы получите уведомление.',
