@@ -14,6 +14,13 @@ export type CourseSummary = {
 
 export type CourseFile = { id: number; name: string; size: number; mime: string }
 
+/**
+ * A lesson / item of a PUBLISHED course the teacher changed but hasn't published yet (students still
+ * see the published version): new (hidden from students), changed (edit waiting), removed (still
+ * visible to students until published). '' = as published. Only editors get these.
+ */
+export type DraftState = '' | 'new' | 'changed' | 'removed'
+
 /** video / file = a lesson material (mod_resource); text = a rich-text page (mod_page); task = an assignment (mod_assign). */
 export type LessonItemKind = 'video' | 'file' | 'text' | 'task'
 
@@ -29,6 +36,7 @@ export type LessonItem = {
   files: CourseFile[]
   /** text pages only: HTML, already cleaned by IOMAD (HTMLPurifier) — safe to render */
   content: string
+  draft: DraftState
 }
 
 export type CourseLesson = {
@@ -37,9 +45,11 @@ export type CourseLesson = {
   title: string
   description: string
   items: LessonItem[]
+  draft: DraftState
 }
 
-export type Course = CourseSummary & { canEdit: boolean; lessons: CourseLesson[] }
+/** `changes`: unpublished changes of a published course (editors; 0 for others). */
+export type Course = CourseSummary & { canEdit: boolean; lessons: CourseLesson[]; changes: number }
 
 /** Browser URL of a lesson file (streamed by the /files route after an access check). */
 export const fileUrl = (file: CourseFile) => `/files/${file.id}`

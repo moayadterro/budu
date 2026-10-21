@@ -210,9 +210,22 @@ export const en = {
     underName: 'under your own name',
     status: 'Status',
     draftHint: 'Only you can see this course. Publish it when it’s ready.',
-    publishedHint: 'Students enrolled in this course can see it.',
+    publishedHint: 'Students see the published version. Your edits stay as unpublished changes until you publish them.',
     publish: 'Publish course',
-    unpublish: 'Move back to draft',
+    unpublish: 'Unpublish',
+    unpublishTitle: (title: string) => `Unpublish “${title}”?`,
+    unpublishDesc: 'Enrolled students lose access to it until you publish it again.',
+    unpublishApplies: 'Your unpublished changes are applied.',
+    changes: (n: number) => `Unpublished changes: ${n}`,
+    changesHint: 'Students still see the published version.',
+    publishChanges: 'Publish changes',
+    discardChanges: 'Discard changes',
+    discardTitle: 'Discard all unpublished changes?',
+    discardDesc: 'New lessons and items are deleted; edits and removals are undone. Students see no difference.',
+    keepEditing: 'Keep editing',
+    undoChanges: 'Undo changes',
+    keepIt: 'Don’t remove',
+    draftState: { new: 'New', changed: 'Edited', removed: 'Will be removed' },
 
     // lessons
     lessons: 'Lessons',
@@ -1056,6 +1069,7 @@ export const en = {
   },
 
   confirm: {
+    untilPublish: 'Students keep seeing it until you publish your changes.',
     inviteTitle: (name: string) => `Cancel the invitation for ${name}?`,
     inviteDesc: 'They won’t be able to accept it. You can invite them again later.',
     dismiss: 'Cancel',

@@ -3,7 +3,8 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { COURSE_LIMITS } from '@/entities/course'
-import { createCourse, getCourse, saveListing, setCourseImage, updateCourse } from '@/entities/course/server'
+import { createCourse, discardChanges, getCourse, listStudents, publishChanges, saveListing, setCourseImage, updateCourse } from '@/entities/course/server'
+import { notify } from '@/entities/notification/server'
 import { isCurrency } from '@/shared/config/currency'
 import { requireRole } from '@/entities/session/server'
 import { formId, formText } from '@/shared/lib/form'
@@ -61,6 +62,35 @@ export async function setCoursePublished(form: FormData) {
   await updateCourse(user.userId, courseId, { ...details, published: formText(form, 'published') === '1' })
   revalidatePath(`/courses/${courseId}`)
   revalidatePath('/courses')
+}
+
+/** "Publish changes": the published course's pending edits go live; students hear about new homework. */
+export async function publishChangesAction(form: FormData) {
+  const user = await requireRole('teacher')
+  const courseId = formId(form, 'courseId')
+  if (!courseId) return
+  const tasks = await publishChanges(user.userId, courseId)
+  if (tasks.length) {
+    const [course, students] = await Promise.all([getCourse(user.userId, courseId), listStudents(user.userId, courseId)])
+    for (const task of tasks) {
+      await notify(
+        students.map((s) => ({ id: s.id, email: s.email, name: s.name })),
+        'homeworkNew',
+        { course: course?.title ?? '', homework: task.name },
+        `/classes/${courseId}/homework/${task.id}`,
+      )
+    }
+  }
+  revalidatePath(`/courses/${courseId}`)
+}
+
+/** "Discard changes": back to the published version. */
+export async function discardChangesAction(form: FormData) {
+  const user = await requireRole('teacher')
+  const courseId = formId(form, 'courseId')
+  if (!courseId) return
+  await discardChanges(user.userId, courseId)
+  revalidatePath(`/courses/${courseId}`)
 }
 
 export type ListingState = { status: 'idle' } | { status: 'saved'; at: number } | { status: 'error'; at: number }

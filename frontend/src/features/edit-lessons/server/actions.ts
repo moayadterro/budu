@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { COURSE_LIMITS } from '@/entities/course'
-import { deleteLesson, moveLesson, saveLesson } from '@/entities/course/server'
+import { deleteLesson, discardChanges, moveLesson, saveLesson } from '@/entities/course/server'
 import { requireRole } from '@/entities/session/server'
 import { formId, formText } from '@/shared/lib/form'
 import type { LessonFormState } from '../model/types'
@@ -42,5 +42,15 @@ export async function moveLessonAction(form: FormData) {
   const direction = formText(form, 'direction') === 'up' ? -1 : 1
   if (!courseId || !lessonId) return
   await moveLesson(user.userId, courseId, lessonId, direction)
+  revalidatePath(`/courses/${courseId}`)
+}
+
+/** Undo one lesson's unpublished change (a new lesson is deleted; a rename / removal is forgotten). */
+export async function undoLessonChangeAction(form: FormData) {
+  const user = await requireRole('teacher')
+  const courseId = formId(form, 'courseId')
+  const lessonId = formId(form, 'lessonId')
+  if (!courseId || !lessonId) return
+  await discardChanges(user.userId, courseId, { kind: 'section', id: lessonId })
   revalidatePath(`/courses/${courseId}`)
 }

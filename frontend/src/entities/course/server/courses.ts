@@ -1,7 +1,7 @@
 import 'server-only'
 import { defaultInstance, iomadCall, iomadUpload, IomadError } from '@/shared/server/iomad'
 import { toPerson, type Person, type RawPerson } from '@/shared/lib/person'
-import type { Course, CourseLesson, CourseSummary, EnrolResult, LessonItem, StudentCourse } from '../model/types'
+import type { Course, CourseLesson, CourseSummary, DraftState, EnrolResult, LessonItem, StudentCourse } from '../model/types'
 
 /**
  * Courses, lessons, materials and tasks in IOMAD, via the local_budu plugin.
@@ -10,13 +10,16 @@ import type { Course, CourseLesson, CourseSummary, EnrolResult, LessonItem, Stud
  */
 
 type RawFile = { id: number; filename: string; filesize: number; mimetype: string }
-type RawItem = { cmid: number; kind: LessonItem['kind']; name: string; instructions: string; duedate: number; files: RawFile[]; content?: string }
+type RawItem = { cmid: number; kind: LessonItem['kind']; name: string; instructions: string; duedate: number; files: RawFile[]; content?: string; draft?: string }
 type RawCourse = { id: number; fullname: string; summary: string; visible: boolean; lessons: number; timemodified: number; image?: number }
-type RawLesson = { id: number; name: string; summary: string; items: RawItem[] }
+type RawLesson = { id: number; name: string; summary: string; items: RawItem[]; draft?: string }
 type RawFullCourse = RawCourse & {
   canedit: boolean
   lessonlist: RawLesson[]
+  changes?: number
 }
+
+const toDraft = (d?: string): DraftState => (d === 'new' || d === 'changed' || d === 'removed' ? d : '')
 
 const toLesson = (l: RawLesson): CourseLesson => ({
   id: l.id,
@@ -30,7 +33,9 @@ const toLesson = (l: RawLesson): CourseLesson => ({
     dueAt: i.duedate || null,
     files: i.files.map((f) => ({ id: f.id, name: f.filename, size: f.filesize, mime: f.mimetype })),
     content: i.content ?? '',
+    draft: toDraft(i.draft),
   })),
+  draft: toDraft(l.draft),
 })
 
 const summary = (c: RawCourse): CourseSummary => ({
@@ -60,6 +65,7 @@ export async function getCourse(userId: number, courseId: number): Promise<Cours
       ...summary(c),
       canEdit: c.canedit,
       lessons: c.lessonlist.map(toLesson),
+      changes: c.changes ?? 0,
     }
   } catch (e) {
     // no permission / no such course: treat both as "not found"
@@ -114,6 +120,19 @@ export async function saveTask(
 /** Adds a text page to a lesson (pageId 0) or changes one. IOMAD cleans the HTML. */
 export const savePage = (userId: number, courseId: number, lessonId: number, pageId: number, page: { name: string; html: string }) =>
   call<Id>('save_page', { courseid: courseId, userid: userId, sectionid: lessonId, cmid: pageId, name: page.name, content: page.html })
+
+/**
+ * "Publish changes": a published course's pending edits go live. Returns the homework students can
+ * see for the first time (to notify them).
+ */
+export async function publishChanges(userId: number, courseId: number): Promise<Array<{ id: number; name: string }>> {
+  const r = await call<{ newtasks: Array<{ cmid: number; name: string }> }>('publish_changes', { courseid: courseId, userid: userId })
+  return r.newtasks.map((x) => ({ id: x.cmid, name: x.name }))
+}
+
+/** "Discard changes": back to the published version — all, or only one lesson / item. */
+export const discardChanges = (userId: number, courseId: number, only?: { kind: 'section' | 'cm'; id: number }) =>
+  call<Id>('discard_changes', { courseid: courseId, userid: userId, kind: only?.kind ?? '', objectid: only?.id ?? 0 })
 
 export const deleteLessonItem = (userId: number, courseId: number, itemId: number) =>
   call<Id>('delete_item', { courseid: courseId, userid: userId, cmid: itemId })

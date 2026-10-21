@@ -12,6 +12,8 @@ export {
   saveTask,
   savePage,
   deleteLessonItem,
+  publishChanges,
+  discardChanges,
   lessonFileAccess,
   previewLesson,
   listStudents,

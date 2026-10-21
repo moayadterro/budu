@@ -11,6 +11,7 @@ export type {
   CourseLesson,
   LessonItem,
   LessonItemKind,
+  DraftState,
   CourseFile,
   StudentCourse,
   EnrolResult,

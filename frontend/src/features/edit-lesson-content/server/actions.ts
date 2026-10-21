@@ -2,8 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { COURSE_LIMITS } from '@/entities/course'
-import { deleteLessonItem, getCourse, listStudents, savePage, saveTask } from '@/entities/course/server'
-import { notify } from '@/entities/notification/server'
+import { deleteLessonItem, discardChanges, savePage, saveTask } from '@/entities/course/server'
 import { requireRole } from '@/entities/session/server'
 import { MAX_UPLOAD_BYTES } from '@/shared/config/upload'
 import { formFile, formId, formText } from '@/shared/lib/form'
@@ -26,20 +25,8 @@ export async function saveTaskAction(_prev: ContentFormState, form: FormData): P
   if (name.length > COURSE_LIMITS.title || instructions.length > COURSE_LIMITS.text) return fail('tooLong')
   if (file && file.size > MAX_UPLOAD_BYTES) return fail('tooBig')
   try {
-    const saved = await saveTask(user.userId, courseId, lessonId, taskId, { name, instructions, dueAt, file })
-    if (!taskId) {
-      // new homework → tell the course's students (only once the course is published)
-      const course = await getCourse(user.userId, courseId)
-      if (course?.published) {
-        const students = await listStudents(user.userId, courseId)
-        await notify(
-          students.map((s) => ({ id: s.id, email: s.email, name: s.name })),
-          'homeworkNew',
-          { course: course.title, homework: name },
-          `/classes/${courseId}/homework/${saved.id}`,
-        )
-      }
-    }
+    // a new task in a published course waits as a draft — students are told on "Publish changes"
+    await saveTask(user.userId, courseId, lessonId, taskId, { name, instructions, dueAt, file })
   } catch (e) {
     console.error('save task failed', e)
     return fail('server')
@@ -74,5 +61,15 @@ export async function deleteItemAction(form: FormData) {
   const itemId = formId(form, 'itemId')
   if (!courseId || !itemId) return
   await deleteLessonItem(user.userId, courseId, itemId)
+  revalidatePath(`/courses/${courseId}`)
+}
+
+/** Undo one item's unpublished change (a new item is deleted; an edit / removal is forgotten). */
+export async function undoItemChangeAction(form: FormData) {
+  const user = await requireRole('teacher')
+  const courseId = formId(form, 'courseId')
+  const itemId = formId(form, 'itemId')
+  if (!courseId || !itemId) return
+  await discardChanges(user.userId, courseId, { kind: 'cm', id: itemId })
   revalidatePath(`/courses/${courseId}`)
 }

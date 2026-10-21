@@ -42,12 +42,13 @@ export function CourseBuilder({
                 number={i + 1}
                 isFirst={i === 0}
                 isLast={i === course.lessons.length - 1}
+                published={course.published}
               />
             </CardHeader>
             <CardContent className="flex flex-col gap-2">
               {lesson.items.length === 0 && <p className="text-sm text-muted-foreground">{s.emptyLesson}</p>}
               {lesson.items.map((item) => (
-                <ItemActions key={item.id} courseId={course.id} lessonId={lesson.id} item={item}>
+                <ItemActions key={item.id} courseId={course.id} lessonId={lesson.id} item={item} published={course.published}>
                   <LessonItemView item={item} />
                 </ItemActions>
               ))}

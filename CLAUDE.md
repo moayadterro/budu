@@ -341,6 +341,14 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-21 Draft changes (owner): editing a PUBLISHED course never changes what students see until
+  "Publish changes". New lessons / items are created hidden; edits of live lesson titles, text pages
+  and homework are kept in the plugin table `local_budu_draft` (a new task attachment in file area
+  `local_budu/taskdraft`); deletions are only marked. Teachers see badges (New / Edited / Will be
+  removed), "Undo" per lesson / item, and Publish / Discard changes on the status card. Publishing
+  notifies students of newly visible homework (no longer on save). Lesson order changes apply at
+  once. "Unpublish" hides the whole course (students lose access) and applies pending changes.
+  A draft (unpublished) course is edited directly, as before.
 - 2026-10-21 Free preview (owner): a marketplace course's FIRST lesson (usually the intro) opens for
   anyone at `/catalog/:id/preview` — its videos, files and text pages, never homework. Every other
   lesson shows a lock; visitors must create an account even for free courses. IOMAD decides what
