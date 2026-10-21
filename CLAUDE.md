@@ -337,6 +337,12 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-21 Free preview (owner): a marketplace course's FIRST lesson (usually the intro) opens for
+  anyone at `/catalog/:id/preview` — its videos, files and text pages, never homework. Every other
+  lesson shows a lock; visitors must create an account even for free courses. IOMAD decides what
+  is preview (`local_budu_preview_lesson`; `file_access` lets user 0 / non-members open lesson 1's
+  `mod_resource` files of a PUBLISHED course and flags them `preview`), and the `/files` route
+  additionally requires the course to be listed in the marketplace (school-only courses stay private).
 - 2026-10-21 Lesson materials upload resumably (owner: "it just need to be resumable", storage stays
   in IOMAD). tus protocol: tus-js-client in the browser, @tus/server + @tus/file-store behind the
   SECOND route-handler exception `/uploads` (`app/uploads/[[...tus]]/route.ts` →

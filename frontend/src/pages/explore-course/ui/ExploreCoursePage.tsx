@@ -22,6 +22,8 @@ export async function ExploreCoursePage({ params }: { params: Promise<{ courseId
       course={course}
       price={price}
       back={{ href: '/explore', label: t.shop.back }}
+      // not in the course yet: lesson 1 is a free preview, the rest are locked
+      previewHref={course.enrolled ? null : `/catalog/${course.id}/preview`}
       action={
         <BuyCourse
           courseId={course.id}

@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { fileUrl, LessonItemIcon } from '@/entities/course'
+import { LessonItemIcon, LessonMaterials } from '@/entities/course'
 import { getCourse } from '@/entities/course/server'
 import { HomeworkStatusBadge } from '@/entities/homework'
 import { myHomework } from '@/entities/homework/server'
@@ -8,9 +8,7 @@ import { requireRole } from '@/entities/session/server'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { Icon } from '@/shared/ui/icon'
-import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/shared/ui/item'
-import { formatBytes } from '@/shared/lib/format'
-import { RichText } from '@/shared/ui/rich-text-editor'
+import { Item, ItemActions, ItemContent, ItemMedia, ItemTitle } from '@/shared/ui/item'
 import { cn } from '@/shared/lib/cn'
 import { getGradeScale } from '@/entities/tenant/server'
 import { getT } from '@/shared/i18n/server'
@@ -32,9 +30,6 @@ export async function LessonPage({ params }: { params: Promise<{ courseId: strin
   const scale = await getGradeScale(user.companyId)
   const s = t.learn
 
-  const videos = lesson.items.filter((x) => x.kind === 'video')
-  const docs = lesson.items.filter((x) => x.kind === 'file')
-  const texts = lesson.items.filter((x) => x.kind === 'text')
   const tasks = homework.filter((h) => h.lessonId === lesson.id)
 
   return (
@@ -55,59 +50,7 @@ export async function LessonPage({ params }: { params: Promise<{ courseId: strin
             {lesson.description && <p className="mt-2 whitespace-pre-line text-sm text-muted-foreground">{lesson.description}</p>}
           </div>
 
-          {videos.map((v) =>
-            v.files[0] ? (
-              <figure key={v.id} className="flex flex-col gap-2">
-                <video
-                  controls
-                  preload="metadata"
-                  playsInline
-                  controlsList="nodownload"
-                  src={fileUrl(v.files[0])}
-                  className="aspect-video w-full rounded-xl border bg-live"
-                />
-                <figcaption className="text-sm font-medium">{v.name}</figcaption>
-              </figure>
-            ) : null,
-          )}
-
-          {texts.map((p) => (
-            <Card key={p.id}>
-              <CardHeader>
-                <CardTitle>{p.name}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {/* cleaned by IOMAD (HTMLPurifier) when saved and when read */}
-                <RichText html={p.content} />
-              </CardContent>
-            </Card>
-          ))}
-
-          {docs.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>{s.materials}</CardTitle>
-              </CardHeader>
-              <CardContent className="gap-2">
-                {docs.map((d) =>
-                  d.files[0] ? (
-                    <Item key={d.id} variant="outline" size="sm" asChild>
-                      <a href={fileUrl(d.files[0])} target="_blank" rel="noopener">
-                        <ItemMedia>
-                          <LessonItemIcon kind="file" mime={d.files[0].mime} />
-                        </ItemMedia>
-                        <ItemContent>
-                          <ItemTitle>{d.name}</ItemTitle>
-                          <ItemDescription>{formatBytes(d.files[0].size)}</ItemDescription>
-                        </ItemContent>
-                        <Icon name="external" className="size-4 text-muted-foreground" />
-                      </a>
-                    </Item>
-                  ) : null,
-                )}
-              </CardContent>
-            </Card>
-          )}
+          <LessonMaterials lesson={lesson} materialsLabel={s.materials} />
 
           {tasks.length > 0 && (
             <Card>
@@ -134,7 +77,7 @@ export async function LessonPage({ params }: { params: Promise<{ courseId: strin
             </Card>
           )}
 
-          {videos.length + docs.length + tasks.length === 0 && <p className="text-sm text-muted-foreground">{s.nothingYet}</p>}
+          {lesson.items.filter((x) => x.kind !== 'task').length + tasks.length === 0 && <p className="text-sm text-muted-foreground">{s.nothingYet}</p>}
 
           <div className="flex flex-wrap items-center gap-2">
             {prev && (

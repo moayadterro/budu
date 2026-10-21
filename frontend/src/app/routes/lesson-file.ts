@@ -1,5 +1,5 @@
 import 'server-only'
-import { lessonFileAccess } from '@/entities/course/server'
+import { getListing, lessonFileAccess } from '@/entities/course/server'
 import { getSession } from '@/entities/session/server'
 import { defaultInstance, iomadFile } from '@/shared/server/iomad'
 
@@ -7,8 +7,8 @@ import { defaultInstance, iomadFile } from '@/shared/server/iomad'
  * GET /files/:fileId — streams a lesson file (video, PDF, task attachment, course cover) from IOMAD.
  * The ONE route handler in the app (CLAUDE.md → Decision log): server actions
  * can't stream video with seeking. Access is decided by IOMAD for the signed-in
- * user (local_budu_file_access) — visitors only get covers of published courses (the public
- * catalog); the token never reaches the browser.
+ * user (local_budu_file_access) — visitors only get covers of published courses and the
+ * materials of a marketplace course's free preview (lesson 1); the token never reaches the browser.
  *
  * Uploaded files are untrusted: only media/PDF are shown inline; everything else
  * downloads, and the sandbox CSP stops any HTML/SVG from running on our origin.
@@ -25,6 +25,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ fileId: 
   // visitors (no session) ask as user 0: IOMAD allows them only the covers of published courses
   const access = await lessonFileAccess(user?.userId ?? 0, fileId)
   if (!access.allowed) return new Response('Not found', { status: 404 })
+  // a free-preview file: only for courses in the marketplace (a school's own courses stay private)
+  if (access.preview && !(await getListing(access.preview.courseId))?.listed) return new Response('Not found', { status: 404 })
 
   const upstream = await iomadFile(defaultInstance(), access.path, req.headers.get('range'))
   if (!upstream.ok || !upstream.body) {

@@ -13,6 +13,7 @@ export {
   savePage,
   deleteLessonItem,
   lessonFileAccess,
+  previewLesson,
   listStudents,
   enrolStudent,
   unenrolStudent,

@@ -7,7 +7,7 @@ import { catalogFor } from '@/widgets/course-catalog/server'
 import { Button } from '@/shared/ui/button'
 import { getT } from '@/shared/i18n/server'
 
-/** Public: one course. Visitors are asked to sign up (or sign in) to enrol; students go to Explore. */
+/** Public: one course — lesson 1 opens as a free preview, the rest are locked. Visitors are asked to sign up (or sign in) to enrol, free courses too; students go to Explore. */
 export async function CatalogCoursePage({ params }: { params: Promise<{ courseId: string }> }) {
   const id = Number((await params).courseId)
   if (!Number.isSafeInteger(id) || id <= 0) notFound()
@@ -23,6 +23,7 @@ export async function CatalogCoursePage({ params }: { params: Promise<{ courseId
       course={item.course}
       price={item.price}
       back={{ href: '/catalog', label: s.all }}
+      previewHref={`/catalog/${id}/preview`}
       action={
         user ? (
           <p className="text-sm text-muted-foreground">{s.studentsOnly}</p>

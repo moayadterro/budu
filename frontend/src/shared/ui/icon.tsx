@@ -70,6 +70,7 @@ import {
   Cancel01Icon,
   Clock01Icon,
   Wifi01Icon,
+  SquareLock02Icon,
   WifiDisconnected02Icon,
 } from '@hugeicons/core-free-icons'
 
@@ -90,6 +91,8 @@ const icons = {
   sun: Sun03Icon,
   alert: Alert02Icon,
   wifi: Wifi01Icon,
+  lock: SquareLock02Icon,
+  play: HugePlayIcon,
   wifiOff: WifiDisconnected02Icon,
   back: ArrowLeft01Icon,
   tick: Tick02Icon,

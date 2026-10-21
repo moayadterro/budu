@@ -1101,6 +1101,21 @@ export const en = {
     ctaSub: 'It takes a minute. Schools and teachers can bring their students right after.',
   },
 
+  preview: {
+    tag: 'Free preview',
+    locked: 'Opens after you join',
+    watch: 'Free preview',
+    lessonOf: (n: number) => `Lesson 1 of ${n}`,
+    back: 'About the course',
+    nothing: 'This lesson has no videos or materials yet.',
+    nextTitle: 'Continue the course',
+    nextFree: (n: number) => `Create a free account to open all ${n} lessons, hand in homework and get feedback.`,
+    nextPaid: (n: number) => `Create an account to buy the course and open all ${n} lessons.`,
+    nextStudent: (n: number) => `Join the course to open all ${n} lessons.`,
+    join: 'Join the course',
+    open: 'Go to the course',
+  },
+
   catalog: {
     heroTitle: 'Learn with teachers and schools you trust',
     heroSub: 'Browse every course on Budu — no account needed. Free courses start right away; paid ones in a few steps.',

@@ -2,23 +2,31 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { CourseCover, type ShownPrice } from '@/entities/course'
 import type { CatalogCourse } from '@/entities/course/server'
+import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { Icon } from '@/shared/ui/icon'
 import { PersonAvatar } from '@/shared/ui/person-avatar'
+import { cn } from '@/shared/lib/cn'
 import { getT } from '@/shared/i18n/server'
 
-/** One marketplace course: cover, what's inside, who teaches it, the price — and `action` (Enrol / Buy / Sign up). */
+/**
+ * One marketplace course: cover, what's inside, who teaches it, the price — and `action` (Enrol /
+ * Buy / Sign up). `previewHref`: lesson 1 opens as a free preview there and the rest show a lock
+ * (people not in the course yet).
+ */
 export async function CourseDetail({
   course,
   price,
   action,
   back,
+  previewHref,
 }: {
   course: CatalogCourse
   price: ShownPrice
   action: ReactNode
   back: { href: string; label: string }
+  previewHref?: string | null
 }) {
   const t = await getT()
   const s = t.shop
@@ -55,13 +63,29 @@ export async function CourseDetail({
               {course.lessons.length === 0 ? (
                 <p className="text-sm text-muted-foreground">{t.courses.noLessons}</p>
               ) : (
-                <ol className="flex flex-col gap-2">
-                  {course.lessons.map((l, i) => (
-                    <li key={i} className="flex items-center gap-3 text-sm">
-                      <span className="grid size-7 flex-none place-items-center rounded-md bg-muted text-xs font-semibold tabular-nums">{i + 1}</span>
-                      {l}
-                    </li>
-                  ))}
+                <ol className="flex flex-col gap-1">
+                  {course.lessons.map((l, i) =>
+                    previewHref && i === 0 ? (
+                      <li key={i}>
+                        <Link
+                          href={previewHref}
+                          className="-mx-2 flex items-center gap-3 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-primary/5"
+                        >
+                          <span className="grid size-7 flex-none place-items-center rounded-md bg-primary text-primary-foreground">
+                            <Icon name="play" className="size-3.5 rtl:-scale-x-100" />
+                          </span>
+                          <span className="min-w-0 flex-1 font-medium">{l}</span>
+                          <Badge variant="success">{t.preview.tag}</Badge>
+                        </Link>
+                      </li>
+                    ) : (
+                      <li key={i} className="flex items-center gap-3 py-1.5 text-sm">
+                        <span className="grid size-7 flex-none place-items-center rounded-md bg-muted text-xs font-semibold tabular-nums">{i + 1}</span>
+                        <span className={cn('min-w-0 flex-1', previewHref && 'text-muted-foreground')}>{l}</span>
+                        {previewHref && <Icon name="lock" className="size-4 flex-none text-muted-foreground" aria-label={t.preview.locked} />}
+                      </li>
+                    ),
+                  )}
                 </ol>
               )}
             </CardContent>

@@ -1,7 +1,7 @@
 import 'server-only'
 import { defaultInstance, iomadCall, iomadUpload, IomadError } from '@/shared/server/iomad'
 import { toPerson, type Person, type RawPerson } from '@/shared/lib/person'
-import type { Course, CourseSummary, EnrolResult, LessonItem, StudentCourse } from '../model/types'
+import type { Course, CourseLesson, CourseSummary, EnrolResult, LessonItem, StudentCourse } from '../model/types'
 
 /**
  * Courses, lessons, materials and tasks in IOMAD, via the local_budu plugin.
@@ -12,10 +12,26 @@ import type { Course, CourseSummary, EnrolResult, LessonItem, StudentCourse } fr
 type RawFile = { id: number; filename: string; filesize: number; mimetype: string }
 type RawItem = { cmid: number; kind: LessonItem['kind']; name: string; instructions: string; duedate: number; files: RawFile[]; content?: string }
 type RawCourse = { id: number; fullname: string; summary: string; visible: boolean; lessons: number; timemodified: number; image?: number }
+type RawLesson = { id: number; name: string; summary: string; items: RawItem[] }
 type RawFullCourse = RawCourse & {
   canedit: boolean
-  lessonlist: Array<{ id: number; name: string; summary: string; items: RawItem[] }>
+  lessonlist: RawLesson[]
 }
+
+const toLesson = (l: RawLesson): CourseLesson => ({
+  id: l.id,
+  title: l.name,
+  description: l.summary,
+  items: l.items.map((i) => ({
+    id: i.cmid,
+    kind: i.kind,
+    name: i.name,
+    instructions: i.instructions,
+    dueAt: i.duedate || null,
+    files: i.files.map((f) => ({ id: f.id, name: f.filename, size: f.filesize, mime: f.mimetype })),
+    content: i.content ?? '',
+  })),
+})
 
 const summary = (c: RawCourse): CourseSummary => ({
   id: c.id,
@@ -43,20 +59,7 @@ export async function getCourse(userId: number, courseId: number): Promise<Cours
     return {
       ...summary(c),
       canEdit: c.canedit,
-      lessons: c.lessonlist.map((l) => ({
-        id: l.id,
-        title: l.name,
-        description: l.summary,
-        items: l.items.map((i) => ({
-          id: i.cmid,
-          kind: i.kind,
-          name: i.name,
-          instructions: i.instructions,
-          dueAt: i.duedate || null,
-          files: i.files.map((f) => ({ id: f.id, name: f.filename, size: f.filesize, mime: f.mimetype })),
-          content: i.content ?? '',
-        })),
-      })),
+      lessons: c.lessonlist.map(toLesson),
     }
   } catch (e) {
     // no permission / no such course: treat both as "not found"
@@ -115,15 +118,36 @@ export const savePage = (userId: number, courseId: number, lessonId: number, pag
 export const deleteLessonItem = (userId: number, courseId: number, itemId: number) =>
   call<Id>('delete_item', { courseid: courseId, userid: userId, cmid: itemId })
 
-export type FileAccess = { allowed: false } | { allowed: true; path: string; name: string; size: number; mime: string }
+export type FileAccess =
+  | { allowed: false }
+  | {
+      allowed: true
+      path: string
+      name: string
+      size: number
+      mime: string
+      /** allowed only as the course's free preview (lesson 1) — check the course is in the marketplace */
+      preview: { courseId: number } | null
+    }
 
 /** May this user open this lesson file? If so, its IOMAD location. */
 export async function lessonFileAccess(userId: number, fileId: number): Promise<FileAccess> {
-  const r = await call<{ allowed: boolean; path: string; filename: string; filesize: number; mimetype: string }>('file_access', {
-    userid: userId,
-    fileid: fileId,
-  })
-  return r.allowed ? { allowed: true, path: r.path, name: r.filename, size: r.filesize, mime: r.mimetype } : { allowed: false }
+  const r = await call<{ allowed: boolean; path: string; filename: string; filesize: number; mimetype: string; courseid?: number; preview?: boolean }>(
+    'file_access',
+    { userid: userId, fileid: fileId },
+  )
+  if (!r.allowed) return { allowed: false }
+  const preview = r.preview && r.courseid ? { courseId: r.courseid } : null
+  return { allowed: true, path: r.path, name: r.filename, size: r.filesize, mime: r.mimetype, preview }
+}
+
+/**
+ * The free preview of a published course — its first lesson's videos, files and text pages, for
+ * anyone (visitors too). null = nothing to preview. Callers check the course is in the marketplace.
+ */
+export async function previewLesson(courseId: number): Promise<CourseLesson | null> {
+  const l = await call<RawLesson>('preview_lesson', { courseid: courseId })
+  return l.id ? toLesson(l) : null
 }
 
 // ----- students (local_budu learning functions) -----
