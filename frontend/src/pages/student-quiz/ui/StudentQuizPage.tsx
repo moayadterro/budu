@@ -69,11 +69,15 @@ export async function StudentQuizPage({ params }: { params: Promise<{ courseId: 
             </div>
           )}
           {quiz.needsGrading && <p className="text-sm text-muted-foreground">{t.quiz.review.waiting}</p>}
-          {(quiz.canStart || quiz.state === 'inprogress') && <StartQuiz quizId={quiz.id} inProgress={quiz.state === 'inprogress'} />}
+          {/* after an attempt the result comes first; trying again (practice quizzes) is the quieter option */}
           {quiz.state === 'finished' && quiz.attemptId > 0 && (
-            <Button variant="outline" asChild>
+            <Button asChild>
               <Link href={`/quiz/${quiz.attemptId}/review`}>{s.seeResult}</Link>
             </Button>
+          )}
+          {quiz.state === 'inprogress' && <StartQuiz quizId={quiz.id} inProgress />}
+          {quiz.canStart && quiz.state !== 'inprogress' && (
+            <StartQuiz quizId={quiz.id} inProgress={false} secondary={quiz.attemptsUsed > 0} label={quiz.attemptsUsed > 0 ? t.quiz.outcome.tryAgain : undefined} />
           )}
           {!quiz.canStart && quiz.state === 'new' && <p className="text-sm text-muted-foreground">{s.notOpen}</p>}
         </CardContent>
