@@ -3,6 +3,7 @@ import { AnnouncementsCard } from '@/entities/announcement'
 import { listAnnouncements } from '@/entities/announcement/server'
 import { progress } from '@/entities/family'
 import { getFamily, requestsForParent } from '@/entities/family/server'
+import { myCourses } from '@/entities/course/server'
 import { myHomework } from '@/entities/homework/server'
 import { myWeek } from '@/entities/schedule/server'
 import { myClasses } from '@/entities/school-class/server'
@@ -30,21 +31,26 @@ export async function FamilyPage() {
   const [{ children }, requests] = await Promise.all([getFamily(user.userId), requestsForParent(user.userId)])
   const schoolIds = [...new Set(children.flatMap((c) => c.schools.map((x) => x.companyId)))]
 
-  const [summaries, news, weeks] = await Promise.all([
+  const [summaries, weeks] = await Promise.all([
     Promise.all(
       children.map(async (child) => {
-        const [homework, classes, scale] = await Promise.all([
+        const [homework, classes, scale, courses] = await Promise.all([
           myHomework(child.id),
           myClasses(child.id),
           getGradeScale(child.schools[0]?.companyId ?? null),
+          myCourses(child.id),
         ])
         const line = [child.schools[0]?.name, classes.member[0]?.name].filter(Boolean).join(' · ')
-        return { child, line, scale, p: progress(homework, 'week', now) }
+        return { child, line, scale, p: progress(homework, 'week', now), classIds: classes.member.map((k) => k.id), courseIds: courses.map((c) => c.id) }
       }),
     ),
-    listAnnouncements(schoolIds, 6),
     Promise.all(children.map((c) => myWeek(c.id, now - 86400, now + 14 * 86400))),
   ])
+  // what each child would see: their schools', classes' and courses' announcements
+  const news = await listAnnouncements(
+    { schools: schoolIds, classes: summaries.flatMap((x) => x.classIds), courses: summaries.flatMap((x) => x.courseIds) },
+    6,
+  )
   // school events of all children's schools, once each
   const events = [...new Map(weeks.flat().filter((i) => i.kind === 'event').map((i) => [i.id, i])).values()].sort((a, b) => a.start - b.start)
 

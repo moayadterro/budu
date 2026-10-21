@@ -15,4 +15,5 @@ export {
   skipParentPrompt,
   needsParentStep,
   schoolParents,
+  parentsOf,
 } from './family'

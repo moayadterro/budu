@@ -70,6 +70,8 @@ const FUNCTIONS = [
     'local_budu_family',
     'local_budu_child_teachers',
     'local_budu_company_parents',
+    'local_budu_parents_of',
+    'local_budu_course_company',
 ];
 const CAPABILITIES = [
     'webservice/rest:use',

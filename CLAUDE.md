@@ -229,8 +229,10 @@ Built and verified:
   events), `/family/:id` (24 h / 7 d / 30 d: handed in, late, overdue, feedback, course averages,
   teachers + Message). Parent ↔ teacher chat `/messages` (polls every 5 s; teachers start from a
   course's Students tab → `/messages/new?student=`); the first unread message is emailed, not every
-  line. School announcements: managers post on `/school`; students, teachers and parents see them
-  on their home and get bell + email. Teachers see every school they teach in, grouped by school
+  line. Announcements have an audience: whole school or one class (managers, on `/school`), or one
+  course (its teachers, course tab Announcements). Each reaches its people + their parents (bell +
+  email; class teachers for a class) and shows on their home, class ones / course ones with a badge;
+  course ones also on the student's course page. Teachers see all their schools, grouped by school
   (newest 5 per school).
 - Timetable (tested 2026-10-21, all roles): `/timetable` = week calendar on real IOMAD calendar
   events (`widgets/week-calendar`): lessons of the user's courses positioned by time, one colour per
@@ -300,8 +302,9 @@ Not built yet (rough priority):
   a parent of a student they teach). Owner chose app-db over Moodle messaging so it can move into a
   separate backend later: the logic sits in plain `entities/*/server` modules, not in actions.
 - 2026-10-21 Notifications go through delivery channels (`CHANNELS`: email today; mobile push will be
-  one more channel). School announcements in app-db (`announcements`), for everyone in the school
-  incl. students' parents (owner's choice).
+  one more channel). Announcements in app-db (`announcements`) with an audience (owner):
+  `school` (everyone + students' parents), `class` (target_id = cohort) or `course` (target_id =
+  course; company_id = the course's company). Readers get a scope (their schools, classes, courses).
 - 2026-10-21 Timetable data = Moodle calendar events (no app-db table): a lesson = course event, or
   a group event for one class (group created on demand from the class cohort), component local_budu,
   `repeatid` = the series; a school event = category event of the company's category. All via

@@ -166,7 +166,7 @@ export const ru: typeof en = {
   },
 
   courses: {
-    tabs: { content: 'Содержание', students: 'Ученики', schedule: 'Расписание' },
+    tabs: { content: 'Содержание', students: 'Ученики', schedule: 'Расписание', announcements: 'Объявления' },
     title: 'Мои курсы',
     sub: 'Курсы, которые вы публикуете — для каталога или для школ.',
     newCourse: 'Новый курс',
@@ -683,7 +683,10 @@ export const ru: typeof en = {
 
   announcements: {
     title: 'Объявления',
-    sub: 'Новости для всей школы — учеников, учителей и родителей.',
+    sub: 'Новости для всей школы или одного класса. Ученики, учителя и родители получат уведомление.',
+    sendTo: 'Кому',
+    wholeSchool: 'Вся школа',
+    courseSub: 'Новости для учеников курса и их родителей.',
     new: 'Новое объявление',
     titleLabel: 'Заголовок',
     bodyLabel: 'Текст',

@@ -36,8 +36,11 @@ export async function HomePage() {
     myWeek(user.userId, nowSec - 86400, nowSec + 8 * 86400),
     getFamily(user.userId),
     requestsOfChild(user.userId),
-    listAnnouncements(user.companyId ? [user.companyId] : [], 5),
+    listAnnouncements({ schools: user.companyId ? [user.companyId] : [] }, 5),
   ])
+  // school-wide news + their class's + their courses' (fetched after: needs the class and course ids)
+  const classNews = await listAnnouncements({ classes: classes.member.map((k) => k.id), courses: courses.map((c) => c.id) }, 5)
+  const allNews = [...news, ...classNews].sort((a, b) => b.createdAt - a.createdAt).slice(0, 6)
   const today = new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date())
   // "School · Class 10": their school and their class (at most one); solo students get no line
   const school = (await isSchool(user.companyId)) ? await getTenantName(user.companyId) : null
@@ -133,7 +136,7 @@ export async function HomePage() {
             </CardContent>
           </Card>
           <SchoolEventsCard items={agenda} />
-          <AnnouncementsCard items={news} />
+          <AnnouncementsCard items={allNews} />
         </div>
       </div>
     </>

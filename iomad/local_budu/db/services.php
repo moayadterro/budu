@@ -278,4 +278,16 @@ $functions = [
         'description' => 'Parents of a school’s members.',
         'type' => 'read',
     ],
+    'local_budu_parents_of' => [
+        'classname' => \local_budu\external\audience::class,
+        'methodname' => 'parents_of',
+        'description' => 'The parents of a set of students (class or course announcements).',
+        'type' => 'read',
+    ],
+    'local_budu_course_company' => [
+        'classname' => \local_budu\external\audience::class,
+        'methodname' => 'course_company',
+        'description' => 'The IOMAD company that owns a course.',
+        'type' => 'read',
+    ],
 ];

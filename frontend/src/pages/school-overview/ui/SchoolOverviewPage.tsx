@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { requireRole } from '@/entities/session/server'
 import { AnnouncementsCard } from '@/entities/announcement'
 import { listAnnouncements } from '@/entities/announcement/server'
+import { listClasses } from '@/entities/school-class/server'
 import { getTenantName, isSchool, schoolCourses, schoolPeople } from '@/entities/tenant/server'
 import { DeleteAnnouncementButton, NewAnnouncementDialog } from '@/features/announcements'
 import { StatTile } from '@/widgets/teacher-overview'
@@ -19,12 +20,13 @@ export async function SchoolOverviewPage() {
   const t = await getT()
   const s = t.school
   if (!user.companyId) return <ScreenHead title={t.nav.school} sub={s.overviewSub} />
-  const [name, people, courses, inSchool, news] = await Promise.all([
+  const [name, people, courses, inSchool, news, classes] = await Promise.all([
     getTenantName(user.companyId),
     schoolPeople(user.userId, user.companyId),
     schoolCourses(user.userId, user.companyId),
     isSchool(user.companyId),
-    listAnnouncements([user.companyId], 10),
+    listAnnouncements({ allOf: [user.companyId] }, 10), // everything in the school: whole school, classes, courses
+    listClasses(user.userId, user.companyId),
   ])
   const count = (role: string) => people.filter((p) => p.role === role).length
 
@@ -96,7 +98,7 @@ export async function SchoolOverviewPage() {
           <AnnouncementsCard
             items={news}
             sub={t.announcements.sub}
-            action={<NewAnnouncementDialog />}
+            action={<NewAnnouncementDialog classes={classes.map((k) => ({ id: k.id, name: k.name }))} />}
             itemActions={Object.fromEntries(news.map((a) => [a.id, <DeleteAnnouncementButton key={a.id} announcementId={a.id} />]))}
           />
         </div>

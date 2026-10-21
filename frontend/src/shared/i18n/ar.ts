@@ -166,7 +166,7 @@ export const ar: typeof en = {
   },
 
   courses: {
-    tabs: { content: 'المحتوى', students: 'الطلاب', schedule: 'الجدول' },
+    tabs: { content: 'المحتوى', students: 'الطلاب', schedule: 'الجدول', announcements: 'الإعلانات' },
     title: 'دوراتي',
     sub: 'الدورات التي تنشرها — للسوق أو للمدارس.',
     newCourse: 'دورة جديدة',
@@ -681,7 +681,10 @@ export const ar: typeof en = {
 
   announcements: {
     title: 'الإعلانات',
-    sub: 'أخبار لكل من في المدرسة — الطلاب والمعلمين وأولياء الأمور.',
+    sub: 'أخبار للمدرسة كلها أو لصف واحد. سيصل إشعار للطلاب والمعلمين وأولياء الأمور.',
+    sendTo: 'إلى',
+    wholeSchool: 'المدرسة كلها',
+    courseSub: 'أخبار لطلاب هذا المقرر وأولياء أمورهم.',
     new: 'إعلان جديد',
     titleLabel: 'العنوان',
     bodyLabel: 'النص',

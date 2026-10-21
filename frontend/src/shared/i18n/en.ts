@@ -155,7 +155,7 @@ export const en = {
   },
 
   courses: {
-    tabs: { content: 'Content', students: 'Students', schedule: 'Schedule' },
+    tabs: { content: 'Content', students: 'Students', schedule: 'Schedule', announcements: 'Announcements' },
     title: 'My courses',
     sub: 'Courses you publish — for the marketplace or for schools.',
     newCourse: 'New course',
@@ -674,7 +674,10 @@ export const en = {
 
   announcements: {
     title: 'Announcements',
-    sub: 'News for everyone in your school — students, teachers and parents.',
+    sub: 'News for the whole school or one class. Students, teachers and parents are notified.',
+    sendTo: 'Send to',
+    wholeSchool: 'Whole school',
+    courseSub: 'News for this course’s students and their parents.',
     new: 'New announcement',
     titleLabel: 'Title',
     bodyLabel: 'Message',

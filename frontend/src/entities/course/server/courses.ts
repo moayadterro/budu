@@ -152,3 +152,9 @@ export async function myCourses(userId: number): Promise<StudentCourse[]> {
     todo: c.todo,
   }))
 }
+
+/** The IOMAD company (school / teacher tenant) that owns the course; null if none. */
+export async function courseCompany(courseId: number): Promise<number | null> {
+  const r = await call<{ companyid: number }>('course_company', { courseid: courseId })
+  return r.companyid || null
+}

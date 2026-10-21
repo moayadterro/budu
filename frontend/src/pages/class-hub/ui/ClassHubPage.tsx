@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { AnnouncementsCard } from '@/entities/announcement'
+import { listAnnouncements } from '@/entities/announcement/server'
 import { getCourse, myCourses } from '@/entities/course/server'
 import { HomeworkStatusBadge } from '@/entities/homework'
 import { myHomework } from '@/entities/homework/server'
@@ -13,12 +15,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 import { getGradeScale } from '@/entities/tenant/server'
 import { getT } from '@/shared/i18n/server'
 
-/** Student: one course — its lessons and homework. Live IOMAD data. */
+/** Student: one course — its announcements, lessons and homework. Live IOMAD data. */
 export async function ClassHubPage({ params }: { params: Promise<{ courseId: string }> }) {
   const user = await requireRole('student')
   const id = Number((await params).courseId)
   if (!Number.isSafeInteger(id) || id <= 0) notFound()
-  const [course, homework, mine] = await Promise.all([getCourse(user.userId, id), myHomework(user.userId, id), myCourses(user.userId)])
+  const [course, homework, mine, news] = await Promise.all([
+    getCourse(user.userId, id),
+    myHomework(user.userId, id),
+    myCourses(user.userId),
+    listAnnouncements({ courses: [id] }, 3),
+  ])
   if (!course) notFound()
   const t = await getT()
   const scale = await getGradeScale(user.companyId)
@@ -47,6 +54,12 @@ export async function ClassHubPage({ params }: { params: Promise<{ courseId: str
         </div>
       </div>
       {course.description && <p className="mb-6 max-w-3xl whitespace-pre-line text-sm text-muted-foreground">{course.description}</p>}
+
+      {news.length > 0 && (
+        <div className="mb-6 max-w-3xl">
+          <AnnouncementsCard items={news} />
+        </div>
+      )}
 
       <Tabs defaultValue="lessons" className="gap-4">
         <TabsList>

@@ -130,6 +130,11 @@ CREATE TABLE IF NOT EXISTS announcements (
   created_at  timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS announcements_company ON announcements (company_id, created_at DESC);
+-- who it is for: the whole school, one class (cohort id) or one course (course id)
+ALTER TABLE announcements ADD COLUMN IF NOT EXISTS audience text NOT NULL DEFAULT 'school';  -- school | class | course
+ALTER TABLE announcements ADD COLUMN IF NOT EXISTS target_id integer;
+ALTER TABLE announcements ADD COLUMN IF NOT EXISTS target_name text NOT NULL DEFAULT '';
+CREATE INDEX IF NOT EXISTS announcements_target ON announcements (audience, target_id, created_at DESC);
 `
 
 // One pool per server process (survives dev hot reloads). The schema check re-runs whenever SCHEMA

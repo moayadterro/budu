@@ -16,5 +16,6 @@ export {
   enrolStudent,
   unenrolStudent,
   myCourses,
+  courseCompany,
 } from './courses'
 export type { EnrolResult } from '../model/types'

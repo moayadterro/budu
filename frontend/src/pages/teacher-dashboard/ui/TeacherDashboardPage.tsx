@@ -14,6 +14,7 @@ import { PersonAvatar } from '@/shared/ui/person-avatar'
 import { ScreenHead } from '@/shared/ui/screen-head'
 import { getGradeScale, schoolsAmong } from '@/entities/tenant/server'
 import { getAccount } from '@/entities/user/server'
+import { myClasses } from '@/entities/school-class/server'
 import { AnnouncementsCard } from '@/entities/announcement'
 import { listAnnouncements } from '@/entities/announcement/server'
 import { getT } from '@/shared/i18n/server'
@@ -24,14 +25,17 @@ export async function TeacherDashboardPage() {
   const t = await getT()
   const scale = await getGradeScale(user.companyId)
   const s = t.teach
-  const [courses, submissions, news] = await Promise.all([
+  const [courses, submissions, [schoolIds, myKlasses]] = await Promise.all([
     teacherOverview(user.userId, user.companyId),
     user.companyId ? listSubmissions(user.userId, user.companyId) : Promise.resolve([]),
-    // a teacher may teach in several schools: announcements of all of them, grouped by school
-    getAccount(user.email)
-      .then((a) => schoolsAmong(a.memberships.map((m) => m.companyid)))
-      .then((ids) => listAnnouncements(ids, 5)),
+    // a teacher may teach in several schools: their school-wide news, their courses' and the classes
+    // they're class teacher of — grouped by school
+    Promise.all([getAccount(user.email).then((a) => schoolsAmong(a.memberships.map((m) => m.companyid))), myClasses(user.userId)]),
   ])
+  const announcements = await listAnnouncements(
+    { schools: schoolIds, courses: courses.map((c) => c.id), classes: myKlasses.teaching.map((k) => k.id) },
+    5,
+  )
   const toGrade = submissions.filter((x) => x.status === 'submitted')
   const students = courses.reduce((n, c) => n + c.students, 0)
   const firstName = user.name.split(' ')[0] ?? user.name
@@ -119,9 +123,9 @@ export async function TeacherDashboardPage() {
           </CardContent>
         </Card>
       </div>
-      {news.length > 0 && (
+      {announcements.length > 0 && (
         <div className="mt-6">
-          <AnnouncementsCard items={news} groupBySchool />
+          <AnnouncementsCard items={announcements} groupBySchool />
         </div>
       )}
     </>

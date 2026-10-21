@@ -142,3 +142,9 @@ export async function needsParentStep(userId: number): Promise<boolean> {
 export async function schoolParents(companyId: number) {
   return (await call<RawPerson[]>('company_parents', { companyid: companyId })).map(toPerson)
 }
+
+/** The parents of these students, each once (class / course announcements reach them too). */
+export async function parentsOf(studentIds: number[]) {
+  if (!studentIds.length) return []
+  return (await call<RawPerson[]>('parents_of', { userids: studentIds })).map(toPerson)
+}
