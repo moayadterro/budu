@@ -26,7 +26,8 @@ export async function AppShell({ children }: { children: ReactNode }) {
         <SidebarInset>
           <SiteHeader inbox={{ items, unread }} />
           <main className="flex-1 p-4 md:p-6">
-            <div className="mx-auto w-full max-w-6xl">
+            {/* pages that need the room (the timetable) opt out of the max width with data-wide */}
+            <div className="mx-auto w-full max-w-6xl has-[[data-wide]]:max-w-none">
               <PageTransition>{children}</PageTransition>
             </div>
           </main>

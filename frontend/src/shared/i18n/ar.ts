@@ -83,7 +83,6 @@ export const ar: typeof en = {
 
   timetable: {
     title: 'الجدول',
-    sub: 'دروسك وفعاليات مدرستك.',
     today: 'اليوم',
     prev: 'الأسبوع السابق',
     next: 'الأسبوع التالي',

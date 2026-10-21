@@ -4,7 +4,6 @@ import { getSession } from '@/entities/session/server'
 import { isSchool } from '@/entities/tenant/server'
 import { AddSchoolEventDialog } from '@/features/school-events'
 import { WeekCalendar } from '@/widgets/week-calendar'
-import { ScreenHead } from '@/shared/ui/screen-head'
 import { getT } from '@/shared/i18n/server'
 
 const DAY = 86400
@@ -28,8 +27,9 @@ export async function TimetablePage({ searchParams }: { searchParams: Promise<{ 
   const today = new Date().toISOString().slice(0, 10)
 
   return (
-    <>
-      <ScreenHead title={t.timetable.title} sub={t.timetable.sub} />
+    // full width (data-wide, see AppShell); the calendar toolbar is the visible heading
+    <div data-wide>
+      <h1 className="sr-only">{t.timetable.title}</h1>
       <WeekCalendar
         items={items}
         week={m ? week : null}
@@ -37,6 +37,6 @@ export async function TimetablePage({ searchParams }: { searchParams: Promise<{ 
         canManageEvents={canManageEvents}
         actions={canManageEvents ? <AddSchoolEventDialog defaultDate={week ?? today} /> : undefined}
       />
-    </>
+    </div>
   )
 }

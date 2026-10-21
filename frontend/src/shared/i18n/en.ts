@@ -72,7 +72,6 @@ export const en = {
 
   timetable: {
     title: 'Timetable',
-    sub: 'Your lessons and school events.',
     today: 'Today',
     prev: 'Previous week',
     next: 'Next week',

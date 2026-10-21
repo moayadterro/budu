@@ -83,7 +83,6 @@ export const ru: typeof en = {
 
   timetable: {
     title: 'Расписание',
-    sub: 'Ваши уроки и события школы.',
     today: 'Сегодня',
     prev: 'Предыдущая неделя',
     next: 'Следующая неделя',
