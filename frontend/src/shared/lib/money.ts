@@ -21,12 +21,16 @@ export function roundUpPrice(amount: number) {
   return Math.round(Math.ceil(amount / step - 1e-9) * step * 100) / 100
 }
 
+const SHARED_SIGN = new Set(['SYP', 'EGP', 'LBP', 'JOD', 'IQD'])
+
 /** "1 200 ₽", "$15", "١٥٠٬٠٠٠ ل.س." — in the UI language; whole units once the number is large. */
 export function formatMoney(amount: number, currency: string, locale: string) {
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
-    currencyDisplay: 'narrowSymbol', // "$15", "1 240 ₽" — not "US$" (codes stay for currencies without a symbol)
+    // "$15", "1 240 ₽" (not "US$") — but never a sign another currency uses: the Syrian, Egyptian
+    // and Lebanese pounds would all become "£"; they keep their own sign or code ("SYP", "ل.س.")
+    currencyDisplay: SHARED_SIGN.has(currency) ? 'symbol' : 'narrowSymbol',
     maximumFractionDigits: Math.abs(amount) >= 100 ? 0 : 2,
   }).format(amount)
 }
