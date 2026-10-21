@@ -65,6 +65,11 @@ const FUNCTIONS = [
     'local_budu_add_school_event',
     'local_budu_delete_school_event',
     'local_budu_my_week',
+    'local_budu_link_parent',
+    'local_budu_unlink_parent',
+    'local_budu_family',
+    'local_budu_child_teachers',
+    'local_budu_company_parents',
 ];
 const CAPABILITIES = [
     'webservice/rest:use',

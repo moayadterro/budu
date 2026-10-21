@@ -62,6 +62,7 @@ class get_account extends external_api {
             'email' => $user->email,
             'suspended' => (bool)$user->suspended,
             'siteadmin' => is_siteadmin($user->id),
+            'children' => count(family::children_of((int)$user->id)),
             'memberships' => array_values(array_map(fn($r) => [
                 'companyid' => (int)$r->companyid,
                 'companyname' => $r->name,
@@ -82,6 +83,7 @@ class get_account extends external_api {
             'suspended' => new external_value(PARAM_BOOL, 'Account suspended (e.g. email not confirmed)', VALUE_OPTIONAL),
             'siteadmin' => new external_value(PARAM_BOOL, 'IOMAD site administrator (Budu platform admin)', VALUE_OPTIONAL),
             'picture' => new external_value(PARAM_INT, 'Profile picture file id (f1), 0 = none', VALUE_OPTIONAL),
+            'children' => new external_value(PARAM_INT, 'How many children this user is the parent of', VALUE_OPTIONAL),
             'memberships' => new external_multiple_structure(new external_single_structure([
                 'companyid' => new external_value(PARAM_INT, 'IOMAD company (tenant) id'),
                 'companyname' => new external_value(PARAM_TEXT, 'Company name'),

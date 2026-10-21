@@ -248,4 +248,34 @@ $functions = [
         'description' => 'Lessons and school events a user should see in a date range.',
         'type' => 'read',
     ],
+    'local_budu_link_parent' => [
+        'classname' => \local_budu\external\family::class,
+        'methodname' => 'link_parent',
+        'description' => 'Link a parent to a child (after the parent accepted).',
+        'type' => 'write',
+    ],
+    'local_budu_unlink_parent' => [
+        'classname' => \local_budu\external\family::class,
+        'methodname' => 'unlink_parent',
+        'description' => 'Remove a parent–child link.',
+        'type' => 'write',
+    ],
+    'local_budu_family' => [
+        'classname' => \local_budu\external\family::class,
+        'methodname' => 'family',
+        'description' => 'A user’s parents and children, with their schools.',
+        'type' => 'read',
+    ],
+    'local_budu_child_teachers' => [
+        'classname' => \local_budu\external\family::class,
+        'methodname' => 'child_teachers',
+        'description' => 'A student’s courses with their teachers.',
+        'type' => 'read',
+    ],
+    'local_budu_company_parents' => [
+        'classname' => \local_budu\external\family::class,
+        'methodname' => 'company_parents',
+        'description' => 'Parents of a school’s members.',
+        'type' => 'read',
+    ],
 ];

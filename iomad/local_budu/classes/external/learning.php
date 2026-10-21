@@ -57,7 +57,7 @@ class learning extends external_api {
     }
 
     /** Teachers of a course (editing teacher role) — who gets told about new answers. */
-    private static function teachers_of(int $courseid): array {
+    public static function teachers_of(int $courseid): array {
         global $DB;
         $roleid = $DB->get_field('role', 'id', ['shortname' => 'editingteacher'], MUST_EXIST);
         return array_values(get_role_users($roleid, \context_course::instance($courseid), false,
@@ -85,7 +85,7 @@ class learning extends external_api {
         return new \assign($ctx, $cm, $course);
     }
 
-    private static function person(\stdClass $u): array {
+    public static function person(\stdClass $u): array {
         global $DB;
         $ctx = \context_user::instance($u->id, IGNORE_MISSING);
         $picture = $ctx ? (int)$DB->get_field_select('files', 'id',
@@ -151,6 +151,7 @@ class learning extends external_api {
             'grade' => $graded ? (float)$grade->grade : -1.0,
             'feedback' => $feedback,
             'submittedat' => $submitted ? (int)$sub->timemodified : 0,
+            'gradedat' => $graded ? (int)$grade->timemodified : 0,
             'submissionid' => $sub ? (int)$sub->id : 0,
         ];
     }
@@ -161,6 +162,7 @@ class learning extends external_api {
             'grade' => new external_value(PARAM_FLOAT, 'Grade 0–100, −1 = not graded'),
             'feedback' => new external_value(PARAM_RAW, 'Teacher feedback (plain text)'),
             'submittedat' => new external_value(PARAM_INT, 'Submission time, 0 = not submitted'),
+            'gradedat' => new external_value(PARAM_INT, 'When it was graded, 0 = not graded', VALUE_OPTIONAL),
         ];
     }
 
