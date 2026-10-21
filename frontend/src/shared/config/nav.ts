@@ -49,6 +49,7 @@ export const NAV: Record<Role, NavItem[]> = {
     { label: 'dashboard', icon: 'grid', href: '/teach', bottom: true },
     { label: 'myCourses', icon: 'book', href: '/courses', bottom: true },
     { label: 'myClasses', icon: 'layers', href: '/teach/classes', schoolOnly: true },
+    { label: 'timetable', icon: 'cal', href: '/timetable' },
     { label: 'grading', icon: 'check', href: '/grading', bottom: true },
     { label: 'gradebook', icon: 'report', href: '/gradebook', bottom: true },
     { label: 'live', icon: 'video', href: '/live' },

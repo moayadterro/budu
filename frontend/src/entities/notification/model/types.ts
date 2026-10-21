@@ -1,5 +1,5 @@
 /** What happened. The text is rendered from kind + params in the reader's language (t.notify.kinds). */
-export type NotificationKind = 'enrolled' | 'homeworkNew' | 'homeworkSubmitted' | 'homeworkGraded' | 'addedToSchool' | 'addedToClass' | 'schoolInvite' | 'inviteAnswered'
+export type NotificationKind = 'enrolled' | 'homeworkNew' | 'homeworkSubmitted' | 'homeworkGraded' | 'addedToSchool' | 'addedToClass' | 'schoolInvite' | 'inviteAnswered' | 'schoolEvent'
 
 export type NotificationParams = Record<string, string>
 
