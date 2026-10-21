@@ -219,6 +219,13 @@ Built and verified:
 - Roles: admin / manager / teacher / student from IOMAD; admin "Tenants" page (live IOMAD data);
   server-side `requireRole`; sessions refresh role every 5 min.
 - Stack upgraded 2026-10-19 (see Running → Versions).
+- School manager (live IOMAD data, tested end to end 2026-10-21 with a fresh school): overview
+  (`/school`), people with invites + role changes (`/school/people`), courses (`/school/courses`),
+  gradebook, grade-scale setting (`/school/settings`). Invites: new people get a 7-day link
+  (`/accept-invite`), existing accounts are added and notified.
+- Notifications: bell in the header (unread count, list, mark read, polls every 60 s) + email for
+  enrolled / new homework / homework handed in / graded / added to school, in the recipient's language.
+- Grades shown in the school's scale everywhere (stored 0–100; `shared/lib/grade-scale.ts`).
 - Homework loop on live IOMAD data (tested in the browser 2026-10-21): teacher adds students by
   email (`/teach/classes/:id`), adds homework to lessons (course builder), grades answers 0–100 with
   feedback (`/grading`, "Save & next"), sees the students × homework grid (`/gradebook`) and a
@@ -240,9 +247,9 @@ Not built yet (rough priority):
 2. Teacher follow-ups: invite link for students without an account, lesson completion / progress,
    pricing / audience / subject fields (prototype), upload progress bar, AI feedback draft.
    Admin screens: people, course deals, platform settings (only "Tenants" exists).
-3. Manager screens: school overview, classes, courses (catalog + approvals), people, schedule,
-   school settings + grade-scale page.
-4. Invites: manager invites teachers/students into a school (IOMAD company).
+3. Manager follow-ups: course catalog + approvals (paid courses), schedule on real data, remove
+   someone from the school, resend an invite.
+4. Class groups (e.g. "Grade 10-A") and bulk enrolment of a class into a course; timetable on real data.
 5. BigBlueButton: real live classes (join URLs), recordings → AI summaries.
 6. Account: change email (needs a confirmation flow); remember the language per user in IOMAD
    (today it's per browser, a cookie).
@@ -251,6 +258,18 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-21 Notifications live in app-db (`notifications`: kind + params, text rendered in the
+  reader's language) and are emailed via `entities/notification/server` `notify()`; emails are
+  best-effort (logged on failure). A user's language is kept in `user_prefs` (saved on sign-in and on
+  switching language) so emails/notifications use it.
+- 2026-10-21 Role rule: IOMAD flags every company manager as an educator, so `roleFor` checks
+  "manager of a company registered as a school (tenants.kind='school')" BEFORE "educator → teacher".
+  Companies not in `tenants` (made outside our sign-up) fall back to educator → teacher.
+- 2026-10-21 School managers invite people (new → suspended IOMAD account + `invite` token email;
+  existing → added at once) and change roles via `local_budu_set_role` (IOMAD's assign_users never
+  updates the educator flag of an existing member). Managers may also teach/grade their school's courses.
+- 2026-10-21 Grade scale = per-tenant setting in app-db (`tenants.grade_scale`); 10 scales from the
+  product spec; teachers still enter 0–100; colours by the 0–100 value.
 - 2026-10-21 Homework = IOMAD assignments; students are manual enrolments (student role) added by
   the teacher by email; answers handed in and graded through `local_budu` learning functions (the
   integration user acts with editothersubmission / grade after checking the real user). No drafts:
@@ -338,6 +357,13 @@ Not built yet (rough priority):
   frontend (React escapes) or you get `&amp;` on screen.
 - Moodle REST `webservice/upload.php` / `pluginfile.php` need the service's `uploadfiles` /
   `downloadfiles` flags (set by ws-setup.php); the token goes in the POST body, not the URL.
+- IOMAD: every company manager is also flagged `educator=1` (iomad_autoenrol_managers), and
+  `block_iomad_company_admin_assign_users` only sets `educator` when first adding a member — use
+  `local_budu_set_role` to change roles.
+- React 19 resets a `<form action>` after the action runs; a controlled radio/select inside it can
+  show the reset value. Call the server action directly (useTransition) for such pickers.
+- Browser automation: `form.role` is the form's ARIA role, not a field named "role" — use
+  `form.elements.namedItem('role')`. Radix dropdowns open on pointerdown/keyboard, not synthetic click.
 - Claude-in-Chrome screenshots of this app sometimes come out tiled/washed out and ref clicks can
   miss; drive forms with `form_input` + `requestSubmit()` and read results as page text.
 
