@@ -5,20 +5,17 @@ import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { CURRENCIES, isCurrency, type Currency } from '@/shared/config/currency'
 import { cn } from '@/shared/lib/cn'
 import { currencyName } from '@/shared/lib/money'
+import { Button } from '@/shared/ui/button'
 import { Icon } from '@/shared/ui/icon'
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover'
 import { useLocale, useT } from '@/shared/i18n'
 import { setCurrencyAction } from '../server/actions'
 
-/** shown first — the rest under "All currencies" */
-const POPULAR: Currency[] = ['RUB', 'USD', 'EUR']
-
 /**
- * The currency prices are shown in (saved at once), as a soft pill that opens a searchable panel:
- * Popular (RUB, USD, EUR) then all currencies — code and name (owner: just "USD", no symbols here;
- * prices themselves carry the symbol). `inline`: the
- * small "Prices in ₽ RUB" pill next to prices (catalog, course page); otherwise a full-width field
- * (Settings).
+ * The currency prices are shown in (saved at once): a button like the app's other controls that
+ * opens a searchable list — code and name (owner: just "USD", no symbols here; prices themselves
+ * carry the symbol). `inline`: the small "Prices in RUB" control next to prices (catalog, course
+ * page); otherwise a full-width field (Settings).
  */
 export function CurrencyPicker({ value, inline = false }: { value: Currency; inline?: boolean }) {
   const t = useT()
@@ -79,7 +76,7 @@ export function CurrencyPicker({ value, inline = false }: { value: Currency; inl
       aria-selected={r.code === current}
       onClick={() => choose(r.code)}
       className={cn(
-        'flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-start text-sm outline-none transition-colors hover:bg-muted focus-visible:bg-muted',
+        'flex w-full items-center gap-3 rounded-sm px-2 py-1.5 text-start text-sm outline-none transition-colors hover:bg-muted focus-visible:bg-muted',
         r.code === current && 'bg-primary/5',
       )}
     >
@@ -94,25 +91,22 @@ export function CurrencyPicker({ value, inline = false }: { value: Currency; inl
       <div className={cn('flex items-center gap-2', !inline && 'w-full max-w-xs')}>
         {inline && <span className="text-sm text-muted-foreground">{t.pricesIn}</span>}
         <PopoverTrigger asChild>
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size={inline ? 'sm' : 'default'}
             disabled={pending}
             aria-label={`${t.account.currency}: ${currencyName(current, locale)}`}
-            className={cn(
-              'group inline-flex items-center gap-2 border bg-background text-sm font-medium shadow-xs transition-all outline-none',
-              'hover:border-foreground/20 hover:shadow-sm focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-60',
-              'data-[state=open]:border-foreground/20 data-[state=open]:shadow-sm',
-              inline ? 'h-9 rounded-full px-3.5' : 'h-10 w-full rounded-lg px-3',
-            )}
+            className={cn('group', !inline && 'w-full justify-between font-normal')}
           >
             <span className={cn('tabular-nums', !inline && 'flex-1 truncate text-start')}>
               {inline ? current : `${currencyName(current, locale)} · ${current}`}
             </span>
             <Icon name="down" className="size-3.5 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
-          </button>
+          </Button>
         </PopoverTrigger>
       </div>
-      <PopoverContent align="end" className="w-72 rounded-2xl p-1.5 shadow-lg">
+      <PopoverContent align="end" className="w-64 p-1">
         <div className="flex items-center gap-2 border-b px-2 pb-1.5">
           <Icon name="search" className="size-4 text-muted-foreground" />
           <input
@@ -135,12 +129,7 @@ export function CurrencyPicker({ value, inline = false }: { value: Currency; inl
               <p className="px-2 py-6 text-center text-sm text-muted-foreground">{t.currencyNone}</p>
             )
           ) : (
-            <>
-              <p className="px-2 pt-1.5 pb-1 text-xs font-medium text-muted-foreground">{t.currencyPopular}</p>
-              {rows.filter((r) => POPULAR.includes(r.code)).map(row)}
-              <p className="px-2 pt-3 pb-1 text-xs font-medium text-muted-foreground">{t.currencyAll}</p>
-              {rows.filter((r) => !POPULAR.includes(r.code)).map(row)}
-            </>
+            rows.map(row)
           )}
         </div>
       </PopoverContent>

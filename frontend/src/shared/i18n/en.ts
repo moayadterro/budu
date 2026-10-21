@@ -4,8 +4,6 @@ export const en = {
   pricesIn: 'Prices in',
   currencySearch: 'Search currency',
   currencyNone: 'Nothing found',
-  currencyPopular: 'Popular',
-  currencyAll: 'All currencies',
   moreActions: 'More actions',
   actionsFor: (name: string) => `Actions for “${name}”`,
   connection: { offline: 'You’re offline. Check your connection.', back: 'Back online' },

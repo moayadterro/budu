@@ -15,8 +15,6 @@ export const ar: typeof en = {
   pricesIn: 'الأسعار بـ',
   currencySearch: 'ابحث عن عملة',
   currencyNone: 'لا توجد نتائج',
-  currencyPopular: 'الأكثر استخدامًا',
-  currencyAll: 'كل العملات',
   moreActions: 'إجراءات أخرى',
   actionsFor: (name: string) => `إجراءات «${name}»`,
   connection: { offline: 'أنت غير متصل. تحقق من اتصالك بالإنترنت.', back: 'عاد الاتصال' },

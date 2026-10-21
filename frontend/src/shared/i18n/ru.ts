@@ -15,8 +15,6 @@ export const ru: typeof en = {
   pricesIn: 'Цены в',
   currencySearch: 'Найти валюту',
   currencyNone: 'Ничего не найдено',
-  currencyPopular: 'Популярные',
-  currencyAll: 'Все валюты',
   moreActions: 'Ещё действия',
   actionsFor: (name: string) => `Действия: «${name}»`,
   connection: { offline: 'Нет подключения к интернету. Проверьте соединение.', back: 'Снова в сети' },
