@@ -78,8 +78,11 @@ export function ConfirmButton({
           <AlertDialogDescription>{description ?? t.confirm.cannotUndo}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel autoFocus>{t.confirm.back}</AlertDialogCancel>
-          <AlertDialogAction variant="danger" onClick={confirm}>
+          {/* large: a decision this important deserves comfortable targets */}
+          <AlertDialogCancel size="lg" autoFocus>
+            {t.confirm.back}
+          </AlertDialogCancel>
+          <AlertDialogAction size="lg" variant="danger" onClick={confirm}>
             {label}
           </AlertDialogAction>
         </AlertDialogFooter>

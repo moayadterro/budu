@@ -249,7 +249,7 @@ export function QuestionEditor({ quizId, question, onDone }: { quizId: number; q
                 type="button"
                 aria-pressed={st.tf === v}
                 onClick={() => set({ tf: v })}
-                className={cn('h-9 rounded-md border px-4 text-sm font-medium', st.tf === v ? 'border-primary bg-primary text-primary-foreground' : 'hover:bg-muted')}
+                className={cn('h-10 rounded-md border px-4 text-sm font-medium', st.tf === v ? 'border-primary bg-primary text-primary-foreground' : 'hover:bg-muted')}
               >
                 {v ? s.true : s.false}
               </button>

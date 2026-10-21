@@ -78,7 +78,7 @@ export function AddLessonsForm({ courseId, classes }: { courseId: number; classe
                 aria-pressed={on}
                 onClick={() => setDays((cur) => (on ? cur.filter((x) => x !== d) : [...cur, d]))}
                 className={cn(
-                  'h-9 min-w-12 rounded-md border px-3 text-sm font-medium transition-colors',
+                  'h-10 min-w-12 rounded-md border px-3 text-sm font-medium transition-colors',
                   on ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted',
                 )}
               >

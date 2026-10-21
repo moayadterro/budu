@@ -33,7 +33,7 @@ export function NewAnnouncementDialog({ classes = [], courseId }: { classes?: Ar
   const noneChosen = audience === 'class' && picked.length === 0
   const choice = (on: boolean) =>
     cn(
-      'h-9 rounded-md border px-3 text-sm font-medium transition-colors',
+      'h-10 rounded-md border px-3 text-sm font-medium transition-colors',
       on ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted',
     )
   return (

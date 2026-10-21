@@ -70,7 +70,7 @@ export function AudienceEditor({
       reset?.()
     })
   const chip = (on: boolean) =>
-    cn('h-9 rounded-md border px-3 text-sm font-medium transition-colors', on ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted')
+    cn('h-10 rounded-md border px-3 text-sm font-medium transition-colors', on ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted')
 
   return (
     <div className="flex flex-col gap-5">
