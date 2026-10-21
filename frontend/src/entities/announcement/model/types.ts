@@ -1,4 +1,4 @@
-/** Who an announcement is for: everyone in the school, one class, or one course. */
+/** Who an announcement is for: everyone in the school, some of its classes, or one course. */
 export type Audience = 'school' | 'class' | 'course'
 
 /** An announcement: from a school manager (school / class) or a course teacher (course). */
@@ -8,9 +8,11 @@ export type Announcement = {
   companyId: number
   school: string
   audience: Audience
-  /** class or course id; null for the whole school */
+  /** the course id (course announcements); null otherwise */
   targetId: number | null
-  /** class or course name, '' for the whole school */
+  /** the classes (class announcements; one or several); [] otherwise */
+  classIds: number[]
+  /** course name, or the class names ("Class 10, Class 11"); '' for the whole school */
   targetName: string
   authorId: number
   authorName: string

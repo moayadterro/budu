@@ -11,6 +11,7 @@ type Row = {
   school: string | null
   audience: Audience
   target_id: number | null
+  class_ids: number[] | null
   target_name: string
   author_id: number
   author_name: string
@@ -24,7 +25,8 @@ const toAnnouncement = (r: Row): Announcement => ({
   companyId: r.company_id,
   school: r.school ?? '',
   audience: r.audience,
-  targetId: r.target_id,
+  targetId: r.audience === 'course' ? r.target_id : null,
+  classIds: r.class_ids ?? [],
   targetName: r.target_name,
   authorId: r.author_id,
   authorName: r.author_name,
@@ -33,7 +35,7 @@ const toAnnouncement = (r: Row): Announcement => ({
   createdAt: r.created,
 })
 
-const COLUMNS = `a.id, a.company_id, t.name AS school, a.audience, a.target_id, a.target_name, a.author_id, a.author_name,
+const COLUMNS = `a.id, a.company_id, t.name AS school, a.audience, a.target_id, a.class_ids, a.target_name, a.author_id, a.author_name,
   a.title, a.body, extract(epoch FROM a.created_at)::int AS created`
 
 /**
@@ -51,7 +53,7 @@ export async function listAnnouncements(scope: AnnouncementScope, limit = 10): P
          LEFT JOIN tenants t ON t.iomad_url = a.iomad_url AND t.company_id = a.company_id
         WHERE a.iomad_url = $1 AND (
               (a.audience = 'school' AND a.company_id = ANY($2::int[]))
-           OR (a.audience = 'class'  AND a.target_id  = ANY($3::int[]))
+           OR (a.audience = 'class'  AND a.class_ids && $3::int[])
            OR (a.audience = 'course' AND a.target_id  = ANY($4::int[]))
            OR a.company_id = ANY($5::int[]))
      ) x WHERE n <= $6 ORDER BY created_at DESC`,
@@ -74,14 +76,17 @@ export async function createAnnouncement(p: {
   companyId: number
   author: { id: number; name: string }
   audience: Audience
-  target: { id: number; name: string } | null
+  /** course: its id; class: the class ids; school: null */
+  target: { ids: number[]; name: string } | null
   title: string
   body: string
 }) {
+  const course = p.audience === 'course' ? (p.target?.ids[0] ?? null) : null
+  const classes = p.audience === 'class' ? (p.target?.ids ?? []) : null
   await query(
-    `INSERT INTO announcements (iomad_url, company_id, author_id, author_name, audience, target_id, target_name, title, body)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-    [defaultInstance().url, p.companyId, p.author.id, p.author.name, p.audience, p.target?.id ?? null, p.target?.name ?? '', p.title, p.body],
+    `INSERT INTO announcements (iomad_url, company_id, author_id, author_name, audience, target_id, class_ids, target_name, title, body)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+    [defaultInstance().url, p.companyId, p.author.id, p.author.name, p.audience, course, classes, p.target?.name ?? '', p.title, p.body],
   )
 }
 

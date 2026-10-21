@@ -674,9 +674,12 @@ export const en = {
 
   announcements: {
     title: 'Announcements',
-    sub: 'News for the whole school or one class. Students, teachers and parents are notified.',
+    sub: 'News for the whole school or for chosen classes. Students, teachers and parents are notified.',
     sendTo: 'Send to',
     wholeSchool: 'Whole school',
+    someClasses: 'Selected classes',
+    pickClasses: 'Pick one or more classes.',
+    noClasses: 'Pick at least one class.',
     courseSub: 'News for this course’s students and their parents.',
     new: 'New announcement',
     titleLabel: 'Title',

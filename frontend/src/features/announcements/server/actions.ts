@@ -15,16 +15,19 @@ import type { SessionUser } from '@/entities/session'
 
 export type AnnouncementState = { status: 'idle' } | { status: 'saved'; at: number } | { status: 'error'; error: 'invalid' | 'server'; at: number }
 
-type Target = { companyId: number; audience: Audience; target: { id: number; name: string } | null; label: string; recipients: Recipient[] }
+type Target = { companyId: number; audience: Audience; target: { ids: number[]; name: string } | null; label: string; recipients: Recipient[] }
+
+const MAX_CLASSES = 50
 
 /**
  * Who may post where, and who it reaches:
  *  - whole school → a manager of a school; everyone in it + the students' parents;
- *  - one class    → a manager of the class's school; its students, class teachers and their parents;
+ *  - classes      → a manager of their school (one or several classes at once); their students,
+ *                    class teachers and the students' parents — each person once;
  *  - one course   → a teacher of the course (or a manager of its school); its students and their parents.
  * null = not allowed / not found.
  */
-async function resolveTarget(user: SessionUser, audience: string, targetId: number): Promise<Target | null> {
+async function resolveTarget(user: SessionUser, audience: string, targetId: number, classIds: number[]): Promise<Target | null> {
   if (audience === 'school') {
     if (user.role !== 'manager' || !user.companyId || !(await isSchool(user.companyId))) return null
     const [school, people, parents] = await Promise.all([
@@ -35,16 +38,19 @@ async function resolveTarget(user: SessionUser, audience: string, targetId: numb
     return { companyId: user.companyId, audience, target: null, label: school ?? '', recipients: [...people.filter((p) => !p.pending), ...parents] }
   }
   if (audience === 'class') {
-    if (user.role !== 'manager' || !targetId) return null
-    const k = await getClass(user.userId, targetId)
-    if (!k?.canManage || k.companyId !== user.companyId) return null
-    const [school, parents] = await Promise.all([getTenantName(k.companyId), parentsOf(k.students.map((s) => s.id))])
+    if (user.role !== 'manager' || !user.companyId || !classIds.length || classIds.length > MAX_CLASSES) return null
+    const classes = await Promise.all(classIds.map((id) => getClass(user.userId, id)))
+    if (classes.some((k) => !k?.canManage || k.companyId !== user.companyId)) return null
+    const ks = classes.filter((k) => k !== null)
+    const students = ks.flatMap((k) => k.students)
+    const [school, parents] = await Promise.all([getTenantName(user.companyId), parentsOf([...new Set(students.map((s) => s.id))])])
+    const names = ks.map((k) => k.name).join(', ')
     return {
-      companyId: k.companyId,
+      companyId: user.companyId,
       audience,
-      target: { id: k.id, name: k.name },
-      label: [school, k.name].filter(Boolean).join(' · '),
-      recipients: [...k.students, ...k.teachers, ...parents],
+      target: { ids: ks.map((k) => k.id), name: names },
+      label: [school, names].filter(Boolean).join(' · '),
+      recipients: [...students, ...ks.flatMap((k) => k.teachers), ...parents], // notify() sends each person once
     }
   }
   if (audience === 'course') {
@@ -56,7 +62,7 @@ async function resolveTarget(user: SessionUser, audience: string, targetId: numb
     return {
       companyId: companyId ?? user.companyId ?? 0,
       audience,
-      target: { id: course.id, name: course.title },
+      target: { ids: [course.id], name: course.title },
       label: course.title,
       recipients: [...students, ...parents],
     }
@@ -64,7 +70,7 @@ async function resolveTarget(user: SessionUser, audience: string, targetId: numb
   return null
 }
 
-/** Post an announcement to a school, a class or a course; its people are told (bell + email). */
+/** Post an announcement to a school, some of its classes or a course; its people are told (bell + email). */
 export async function postAnnouncementAction(_prev: AnnouncementState, form: FormData): Promise<AnnouncementState> {
   const user = await requireRole('manager', 'teacher')
   const at = Date.now()
@@ -72,7 +78,8 @@ export async function postAnnouncementAction(_prev: AnnouncementState, form: For
   const body = formText(form, 'body').slice(0, 4000)
   if (!title) return { status: 'error', error: 'invalid', at }
   try {
-    const t = await resolveTarget(user, formText(form, 'audience'), formId(form, 'targetId'))
+    const classIds = [...new Set(form.getAll('classIds').map(Number))].filter((n) => Number.isSafeInteger(n) && n > 0)
+    const t = await resolveTarget(user, formText(form, 'audience'), formId(form, 'targetId'), classIds)
     if (!t || !t.companyId) return { status: 'error', error: 'invalid', at }
     await createAnnouncement({ companyId: t.companyId, author: { id: user.userId, name: user.name }, audience: t.audience, target: t.target, title, body })
     const preview = body.length > 300 ? `${body.slice(0, 300)}…` : body

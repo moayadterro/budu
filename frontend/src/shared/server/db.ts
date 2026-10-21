@@ -135,6 +135,10 @@ ALTER TABLE announcements ADD COLUMN IF NOT EXISTS audience text NOT NULL DEFAUL
 ALTER TABLE announcements ADD COLUMN IF NOT EXISTS target_id integer;
 ALTER TABLE announcements ADD COLUMN IF NOT EXISTS target_name text NOT NULL DEFAULT '';
 CREATE INDEX IF NOT EXISTS announcements_target ON announcements (audience, target_id, created_at DESC);
+-- class announcements can go to several classes at once (one row, so nobody gets it twice)
+ALTER TABLE announcements ADD COLUMN IF NOT EXISTS class_ids integer[];
+UPDATE announcements SET class_ids = ARRAY[target_id] WHERE audience = 'class' AND class_ids IS NULL AND target_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS announcements_classes ON announcements USING gin (class_ids);
 `
 
 // One pool per server process (survives dev hot reloads). The schema check re-runs whenever SCHEMA
