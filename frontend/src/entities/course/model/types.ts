@@ -8,6 +8,8 @@ export type CourseSummary = {
   lessonCount: number
   /** unix seconds */
   updatedAt: number
+  /** cover image file id (served by /files), null = generated cover */
+  imageId: number | null
 }
 
 export type CourseFile = { id: number; name: string; size: number; mime: string }

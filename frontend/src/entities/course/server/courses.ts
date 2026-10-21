@@ -11,7 +11,7 @@ import type { Course, CourseSummary, EnrolResult, LessonItem, StudentCourse } fr
 
 type RawFile = { id: number; filename: string; filesize: number; mimetype: string }
 type RawItem = { cmid: number; kind: LessonItem['kind']; name: string; instructions: string; duedate: number; files: RawFile[]; content?: string }
-type RawCourse = { id: number; fullname: string; summary: string; visible: boolean; lessons: number; timemodified: number }
+type RawCourse = { id: number; fullname: string; summary: string; visible: boolean; lessons: number; timemodified: number; image?: number }
 type RawFullCourse = RawCourse & {
   canedit: boolean
   lessonlist: Array<{ id: number; name: string; summary: string; items: RawItem[] }>
@@ -24,6 +24,7 @@ const summary = (c: RawCourse): CourseSummary => ({
   published: c.visible,
   lessonCount: c.lessons,
   updatedAt: c.timemodified,
+  imageId: c.image || null,
 })
 
 const call = <T>(fn: string, params: Record<string, unknown>) => iomadCall<T>(defaultInstance(), `local_budu_${fn}`, params)
@@ -175,13 +176,15 @@ export type CatalogCourse = {
   lessons: string[]
   /** the viewer is enrolled already */
   enrolled: boolean
+  /** cover image file id, null = generated cover */
+  imageId: number | null
 }
 
 /** Public facts of these (listed) courses; unpublished ones are left out. */
 export async function catalog(courseIds: number[], viewerId = 0): Promise<CatalogCourse[]> {
   if (!courseIds.length) return []
   const rows = await call<
-    Array<{ id: number; fullname: string; summary: string; school: string; teachers: RawPerson[]; lessons: string[]; enrolled: boolean }>
+    Array<{ id: number; fullname: string; summary: string; school: string; teachers: RawPerson[]; lessons: string[]; enrolled: boolean; image: number }>
   >('catalog', { courseids: courseIds, userid: viewerId })
   return rows.map((r) => ({
     id: r.id,
@@ -191,7 +194,15 @@ export async function catalog(courseIds: number[], viewerId = 0): Promise<Catalo
     teachers: r.teachers.map(toPerson),
     lessons: r.lessons,
     enrolled: r.enrolled,
+    imageId: r.image || null,
   }))
+}
+
+/** Set (an image file) or remove (null) the course's cover image. Returns the new image id, or null. */
+export async function setCourseImage(userId: number, courseId: number, file: File | null): Promise<number | null> {
+  const draft = file ? await iomadUpload(defaultInstance(), file) : 0
+  const r = await call<{ id: number }>('set_course_image', { courseid: courseId, userid: userId, draftitemid: draft })
+  return r.id || null
 }
 
 /** Enrol a learner (the caller decided they may: free course, or a confirmed payment). */

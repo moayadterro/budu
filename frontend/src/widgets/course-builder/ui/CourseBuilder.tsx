@@ -2,7 +2,7 @@
 
 import type { Course } from '@/entities/course'
 import { initialsOf } from '@/entities/session'
-import { CourseDetailsForm, ListingForm, PublishToggle } from '@/features/edit-course'
+import { CourseCoverForm, CourseDetailsForm, ListingForm, PublishToggle } from '@/features/edit-course'
 import type { Currency } from '@/shared/config/currency'
 import { AddLessonContent, ItemActions } from '@/features/edit-lesson-content'
 import { AddLesson, LessonHeader } from '@/features/edit-lessons'
@@ -66,6 +66,14 @@ export function CourseBuilder({
           </CardHeader>
           <CardContent>
             <PublishToggle course={course} />
+          </CardContent>
+        </Card>
+        <Card size="sm">
+          <CardHeader>
+            <CardTitle>{s.cover.title}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CourseCoverForm courseId={course.id} title={course.title} imageId={course.imageId} />
           </CardContent>
         </Card>
         <Card size="sm">

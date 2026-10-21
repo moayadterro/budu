@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { COURSE_LIMITS } from '@/entities/course'
-import { createCourse, getCourse, saveListing, updateCourse } from '@/entities/course/server'
+import { createCourse, getCourse, saveListing, setCourseImage, updateCourse } from '@/entities/course/server'
 import { isCurrency } from '@/shared/config/currency'
 import { requireRole } from '@/entities/session/server'
 import { formId, formText } from '@/shared/lib/form'
@@ -81,5 +81,31 @@ export async function saveListingAction(_prev: ListingState, form: FormData): Pr
   await saveListing(user.userId, { courseId, listed: form.get('listed') === 'on', price, currency })
   revalidatePath(`/courses/${courseId}`)
   revalidatePath('/explore')
+  return { status: 'saved', at }
+}
+
+export type CoverState = { status: 'idle' } | { status: 'saved'; at: number } | { status: 'error'; error: 'notImage' | 'tooBig' | 'server'; at: number }
+
+const COVER_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp']
+const COVER_MAX_BYTES = 5 * 1024 * 1024
+
+/** Teacher sets (file "cover") or removes (remove=1) the course's cover image. */
+export async function setCourseCoverAction(_prev: CoverState, form: FormData): Promise<CoverState> {
+  const user = await requireRole('teacher')
+  const at = Date.now()
+  const courseId = formId(form, 'courseId')
+  const remove = form.get('remove') === '1'
+  const file = form.get('cover')
+  const image = file instanceof File && file.size > 0 ? file : null
+  if (!courseId || (!remove && !image)) return { status: 'error', error: 'notImage', at }
+  if (image && !COVER_TYPES.includes(image.type)) return { status: 'error', error: 'notImage', at }
+  if (image && image.size > COVER_MAX_BYTES) return { status: 'error', error: 'tooBig', at }
+  try {
+    await setCourseImage(user.userId, courseId, remove ? null : image)
+  } catch (e) {
+    console.error('course cover failed', e)
+    return { status: 'error', error: 'server', at }
+  }
+  revalidatePath('/', 'layout')
   return { status: 'saved', at }
 }

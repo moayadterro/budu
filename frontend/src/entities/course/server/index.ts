@@ -20,6 +20,7 @@ export {
   courseCompany,
   catalog,
   enrolLearner,
+  setCourseImage,
   type CatalogCourse,
 } from './courses'
 export { getListing, listedCourses, saveListing, type Listing } from './listing'
