@@ -47,7 +47,7 @@ class schedule extends external_api {
     }
 
     /** The class's group in the course (created on first need — cohort sync keeps it filled). */
-    private static function class_group(int $courseid, int $classid): int {
+    public static function class_group(int $courseid, int $classid): int {
         global $DB;
         $instance = $DB->get_record('enrol', ['enrol' => 'cohort', 'courseid' => $courseid, 'customint1' => $classid]);
         if (!$instance) {

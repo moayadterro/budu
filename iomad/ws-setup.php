@@ -75,6 +75,24 @@ const FUNCTIONS = [
     'local_budu_save_page',
     'local_budu_catalog',
     'local_budu_enrol_learner',
+    'local_budu_course_quizzes',
+    'local_budu_save_quiz',
+    'local_budu_get_quiz',
+    'local_budu_publish_quiz',
+    'local_budu_delete_quiz',
+    'local_budu_save_question',
+    'local_budu_remove_question',
+    'local_budu_my_quizzes',
+    'local_budu_quiz_for_student',
+    'local_budu_start_attempt',
+    'local_budu_get_attempt',
+    'local_budu_save_attempt',
+    'local_budu_review_attempt',
+    'local_budu_quiz_results',
+    'local_budu_teacher_review',
+    'local_budu_grade_answer',
+    'local_budu_closing_soon',
+    'local_budu_opening_now',
 ];
 const CAPABILITIES = [
     'webservice/rest:use',
@@ -103,6 +121,7 @@ const CAPABILITIES = [
     'mod/resource:view',
     'mod/assign:addinstance',
     'mod/page:addinstance',           // lesson text pages
+    'mod/quiz:addinstance',           // quizzes and exams
     'mod/assign:view',
     // Homework: hand in for a student, grade, read grades (after local_budu checked the real user).
     'mod/assign:editothersubmission',

@@ -34,7 +34,7 @@ class learning extends external_api {
     }
 
     /** May $userid teach this course: its teacher, or a manager of the school that owns it. */
-    private static function can_teach(\stdClass $course, int $userid): bool {
+    public static function can_teach(\stdClass $course, int $userid): bool {
         global $DB;
         if (has_capability('mod/assign:grade', \context_course::instance($course->id), $userid)) {
             return true;
@@ -48,7 +48,7 @@ class learning extends external_api {
     }
 
     /** The course, if $userid may teach it (teacher, or school manager). */
-    private static function taught(int $courseid, int $userid): \stdClass {
+    public static function taught(int $courseid, int $userid): \stdClass {
         $course = get_course($courseid);
         if ($course->id == SITEID || !self::can_teach($course, $userid)) {
             throw self::deny('teach this course');
@@ -121,7 +121,7 @@ class learning extends external_api {
     }
 
     /** Students = active enrolments with the student role. */
-    private static function students_of(int $courseid): array {
+    public static function students_of(int $courseid): array {
         global $DB;
         $roleid = $DB->get_field('role', 'id', ['shortname' => 'student'], MUST_EXIST);
         $ctx = \context_course::instance($courseid);
@@ -442,7 +442,20 @@ class learning extends external_api {
         $instances = [];
         foreach (self::homework_of($course, $p['userid']) as $cm) {
             $instances[$cm->id] = $DB->get_record('assign', ['id' => $cm->instance], 'id, name, duedate', MUST_EXIST);
-            $homework[] = ['cmid' => (int)$cm->id, 'name' => $instances[$cm->id]->name, 'duedate' => (int)$instances[$cm->id]->duedate];
+            $homework[] = ['cmid' => (int)$cm->id, 'name' => $instances[$cm->id]->name, 'duedate' => (int)$instances[$cm->id]->duedate,
+                'kind' => 'homework'];
+        }
+        // published quizzes and exams are columns too (grade = the student's best, out of 100)
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/quiz/locallib.php');
+        $quizzes = [];
+        foreach (get_fast_modinfo($course)->get_instances_of('quiz') as $cm) {
+            if ($cm->deletioninprogress || !$cm->visible) {
+                continue;
+            }
+            $quizzes[$cm->id] = $DB->get_record('quiz', ['id' => $cm->instance], '*', MUST_EXIST);
+            $homework[] = ['cmid' => (int)$cm->id, 'name' => $quizzes[$cm->id]->name, 'duedate' => (int)$quizzes[$cm->id]->timeclose,
+                'kind' => $cm->idnumber === 'exam' ? 'exam' : 'quiz'];
         }
         $rows = [];
         foreach (self::students_of($course->id) as $s) {
@@ -453,6 +466,16 @@ class learning extends external_api {
             foreach ($instances as $cmid => $instance) {
                 $st = self::state($instance, $s->id);
                 $cells[] = ['cmid' => $cmid, 'status' => $st['status'], 'grade' => $st['grade']];
+            }
+            foreach ($quizzes as $cmid => $quiz) {
+                $finished = quiz_get_user_attempts($quiz->id, $s->id, 'finished', true);
+                $needs = false;
+                foreach ($finished as $a) {
+                    $needs = $needs || \mod_quiz\quiz_attempt::create($a->id)->requires_manual_grading();
+                }
+                $best = $finished && !$needs ? quiz_get_best_grade($quiz, $s->id) : null;
+                $cells[] = ['cmid' => $cmid, 'status' => $best !== null ? 'graded' : ($finished ? 'submitted' : 'new'),
+                    'grade' => $best !== null ? (float)$best : -1.0];
             }
             $rows[] = ['student' => self::person($s), 'cells' => $cells];
         }
@@ -467,6 +490,7 @@ class learning extends external_api {
                 'cmid' => new external_value(PARAM_INT, 'Homework'),
                 'name' => new external_value(PARAM_TEXT, 'Title'),
                 'duedate' => new external_value(PARAM_INT, 'Due date, 0 = none'),
+                'kind' => new external_value(PARAM_ALPHA, 'homework | quiz | exam'),
             ])),
             'rows' => new external_multiple_structure(new external_single_structure([
                 'student' => self::person_structure(),
