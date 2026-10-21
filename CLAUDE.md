@@ -221,6 +221,17 @@ Built and verified:
 - Roles: admin / manager / teacher / student from IOMAD; admin "Tenants" page (live IOMAD data);
   server-side `requireRole`; sessions refresh role every 5 min.
 - Stack upgraded 2026-10-19 (see Running → Versions).
+- Quizzes & exams (tested 2026-10-21, API + browser, RU UI): Moodle's quiz engine via `local_budu`
+  `quizzes.php`. A quiz belongs to a course (optionally only some classes = their groups). Kinds: quiz
+  (practice: unlimited tries, answers right after) / exam (1 try, score after submit, answers after
+  close; per-question marks hidden until then). 8 question types (multiple choice one/many, true/false,
+  short answer, number ± tolerance, written answer graded by hand, matching, ordering, missing words).
+  Teacher: course tab Quizzes (`/courses/:id/quizzes`, editor, results, grading). Publish now or
+  scheduled (hidden by an availability date until then; announced by the after-page-load job).
+  Time limit per student: autosave ~1.5 s after each change; at zero what was answered is submitted.
+  Student: course tab Quizzes, home card, `/quiz/:attemptId` (+ `/review`). Quiz/exam grades are
+  gradebook columns; parents see exam results. Notifications: published (students; parents for
+  exams), to grade (teachers), graded (student), exam result (parents), closes-in-24-h reminder.
 - Courses & marketplace (tested 2026-10-21 in the browser): lessons hold videos, files, homework and
   rich-text pages (Tiptap editor `shared/ui/rich-text-editor`; stored as Moodle mod_page, HTML cleaned
   by Moodle's HTMLPurifier on save AND read, shown with `RichText`). Teachers list a course in
@@ -305,6 +316,12 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-21 Quizzes/exams use Moodle's quiz engine (owner) — grades land in IOMAD's gradebook. They
+  belong to a course (optionally limited to classes). Budu stores nothing quiz-specific except the
+  notification bookkeeping (`quiz_reminders`, `quiz_announcements`). Kind = cm idnumber ('exam').
+  Scheduled publishing = cm visible + availability date (hidden until then) + timeopen. Background
+  chores (scheduled announcements, reminders) run via `after()` from the app shell, throttled — fine
+  while there's traffic; move to a real scheduler (cron / worker) later.
 - 2026-10-21 Marketplace & money (owner): prices in the teacher's currency, shown converted to each
   user's currency (Settings; platform default RUB). Rates: free daily service (open.er-api.com, USD
   base) + admin overrides (e.g. a market rate for SYP). No payment provider yet: manual transfer to
@@ -419,6 +436,12 @@ Not built yet (rough priority):
   ("use zustand", "use motion") count as approval for that dependency.
 
 ## Gotchas we hit
+- Moodle 4.5: `question_get_default_category($contextid)` has no "create" flag — use
+  `question_make_default_categories([$ctx])` when it returns false. A quiz's pass mark lives on its
+  grade item, not the quiz row. `quiz_update_events($quiz)` — the 2nd arg is an override, not the cm.
+- Response summaries (`get_response_summary`) come in Moodle's language ("True"), and gapselect ones
+  look like "{mass} {acceleration}" — the review strips the braces.
+- `<p>` can't contain shadcn NativeSelect (it renders a `<div>` wrapper) → hydration error.
 - Moodle `page_add_instance()` copies `$data->page['text']` into `content` only when given a form —
   from the API set `content`/`contentformat` yourself or pages are saved empty.
 - Exchange rates: the feed gave ≈ 122 SYP per USD on 2026-10-21 (looks like the redenominated pound,
