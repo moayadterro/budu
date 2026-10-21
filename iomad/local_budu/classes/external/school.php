@@ -107,7 +107,8 @@ class school extends external_api {
         $teacherrole = $DB->get_field('role', 'id', ['shortname' => 'editingteacher'], MUST_EXIST);
         $studentrole = $DB->get_field('role', 'id', ['shortname' => 'student'], MUST_EXIST);
         $courses = $DB->get_records_sql('SELECT c.id, c.fullname, c.visible, c.timemodified FROM {course} c
-            JOIN {company_course} cc ON cc.courseid = c.id WHERE cc.companyid = ? ORDER BY c.fullname', [$p['companyid']]);
+            JOIN {company_course} cc ON cc.courseid = c.id WHERE cc.companyid = ? AND ' .
+            $DB->sql_like('c.idnumber', '?', true, true, true) . ' ORDER BY c.fullname', [$p['companyid'], school_exams::PREFIX . '%']);
         $out = [];
         foreach ($courses as $c) {
             $ctx = \context_course::instance($c->id);

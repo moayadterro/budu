@@ -416,4 +416,22 @@ $functions = [
         'description' => 'Quizzes whose scheduled publish time just passed (to announce them).',
         'type' => 'read',
     ],
+    'local_budu_exam_space' => [
+        'classname' => \local_budu\external\school_exams::class,
+        'methodname' => 'exam_space',
+        'description' => 'A school’s exam space (manager).',
+        'type' => 'write',
+    ],
+    'local_budu_exam_audience' => [
+        'classname' => \local_budu\external\school_exams::class,
+        'methodname' => 'exam_audience',
+        'description' => 'Who takes a school exam (manager).',
+        'type' => 'read',
+    ],
+    'local_budu_set_exam_audience' => [
+        'classname' => \local_budu\external\school_exams::class,
+        'methodname' => 'set_exam_audience',
+        'description' => 'Add / remove people for a school exam (manager).',
+        'type' => 'write',
+    ],
 ];

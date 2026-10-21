@@ -517,9 +517,9 @@ class learning extends external_api {
         $studentrole = $DB->get_field('role', 'id', ['shortname' => 'student'], MUST_EXIST);
         $teacherrole = $DB->get_field('role', 'id', ['shortname' => 'editingteacher'], MUST_EXIST);
         $out = [];
-        foreach (enrol_get_all_users_courses($p['userid'], true, 'id, fullname, summary, visible') as $course) {
+        foreach (enrol_get_all_users_courses($p['userid'], true, 'id, fullname, summary, visible, idnumber') as $course) {
             $ctx = \context_course::instance($course->id);
-            if (!$course->visible || !user_has_role_assignment($p['userid'], $studentrole, $ctx->id)) {
+            if (!$course->visible || school_exams::is_exam_space($course) || !user_has_role_assignment($p['userid'], $studentrole, $ctx->id)) {
                 continue;
             }
             $teachers = get_role_users($teacherrole, $ctx, false, 'u.id, u.firstname, u.lastname, u.firstnamephonetic,

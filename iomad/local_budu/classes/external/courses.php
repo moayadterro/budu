@@ -170,6 +170,9 @@ class courses extends external_api {
             [$p['companyid']]);
         $out = [];
         foreach ($courses as $c) {
+            if (school_exams::is_exam_space($c)) {
+                continue; // a school's exam space is not a course
+            }
             if (has_capability('moodle/course:manageactivities', \context_course::instance($c->id), $p['userid'])) {
                 $out[] = ['id' => $c->id, 'fullname' => $c->fullname, 'summary' => $c->summary, 'visible' => (bool)$c->visible,
                     'lessons' => self::lesson_count($c->id), 'timemodified' => $c->timemodified];

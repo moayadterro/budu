@@ -94,11 +94,15 @@ class quizzes extends external_api {
     }
 
     /**
-     * Who sees the quiz and from when: only these classes' groups (created on first need), and — when
-     * publishing is scheduled — nobody before `publishat` (hidden entirely until then).
+     * Who sees the quiz and from when: only these classes' groups (created on first need), or a school
+     * exam's audience group, and — when publishing is scheduled — nobody before `publishat`.
      */
-    private static function availability_for(int $courseid, array $classids, int $publishat = 0): ?string {
+    private static function availability_for(int $courseid, array $classids, int $publishat = 0, int $audiencegroup = 0): ?string {
         $conditions = [];
+        if ($audiencegroup) {
+            // a school exam: only its audience (an empty audience = nobody)
+            $conditions[] = \availability_group\condition::get_json($audiencegroup);
+        }
         if ($classids) {
             $groups = [];
             foreach (array_unique($classids) as $classid) {
@@ -366,6 +370,7 @@ class quizzes extends external_api {
             'kind' => self::kind($cm), 'published' => (bool)$cm->visible,
             'timeopen' => (int)$quiz->timeopen, 'timeclose' => (int)$quiz->timeclose, 'timelimit' => (int)$quiz->timelimit,
             'attempts' => (int)$quiz->attempts, 'gradepass' => self::gradepass($quiz), 'classids' => self::class_ids_of($cm),
+            'schoolexam' => school_exams::is_exam_space(get_course($cm->course)),
         ];
     }
 
@@ -383,6 +388,7 @@ class quizzes extends external_api {
             'attempts' => new external_value(PARAM_INT, 'Attempts allowed (0 = unlimited)'),
             'gradepass' => new external_value(PARAM_FLOAT, 'Pass mark 0–100 (0 = none)'),
             'classids' => new external_multiple_structure(new external_value(PARAM_INT, 'Class'), 'Only these classes ([] = everyone)'),
+            'schoolexam' => new external_value(PARAM_BOOL, 'A school exam (no course; its own audience)'),
         ];
     }
 
@@ -458,7 +464,11 @@ class quizzes extends external_api {
         self::setup();
         $course = learning::taught($p['courseid'], $p['userid']);
         $kind = $p['kind'] === 'exam' ? 'exam' : 'quiz';
-        $settings = function (\stdClass $data) use ($p, $kind, $course) {
+        $exam = school_exams::is_exam_space($course);
+        if ($exam) {
+            $kind = 'exam'; // school exams are always exams
+        }
+        $settings = function (\stdClass $data) use ($p, &$kind, $course, $exam) {
             // the publish time (timeopen) is set by publish_quiz, never here
             $data->timeopen = (int)($data->timeopen ?? 0);
             if ($p['timeclose'] && $p['timeclose'] <= max($data->timeopen, 0)) {
@@ -494,12 +504,21 @@ class quizzes extends external_api {
             foreach (self::review_flags($kind) as $k => $v) {
                 $data->$k = $v;
             }
-            $data->availability = self::availability_for($course->id, $p['classids'], $data->timeopen);
+            $data->availability = self::availability_for($course->id, $exam ? [] : $p['classids'], $data->timeopen,
+                $exam && !empty($data->coursemodule) ? school_exams::group_id($course->id, (int)$data->coursemodule, true) : 0);
             return $data;
         };
         if (!$p['cmid']) {
             $data = (object)['modulename' => 'quiz', 'course' => $course->id, 'section' => 0, 'visible' => 0, 'visibleoncoursepage' => 1];
-            return ['id' => (int)create_module($settings($data))->coursemodule];
+            $cmid = (int)create_module($settings($data))->coursemodule;
+            if ($exam) {
+                // limit it to its (still empty) audience from the start
+                global $DB;
+                $DB->set_field('course_modules', 'availability',
+                    self::availability_for($course->id, [], 0, school_exams::group_id($course->id, $cmid, true)), ['id' => $cmid]);
+                rebuild_course_cache($course->id, true);
+            }
+            return ['id' => $cmid];
         }
         [$cm] = self::taught_quiz($p['cmid'], $p['userid']);
         if ($cm->course != $course->id) {
@@ -566,7 +585,8 @@ class quizzes extends external_api {
             throw new \invalid_parameter_exception('closes before it is published');
         }
         $DB->set_field('quiz', 'timeopen', $at, ['id' => $quiz->id]);
-        $DB->set_field('course_modules', 'availability', self::availability_for($course->id, self::class_ids_of($cm), $at), ['id' => $cm->id]);
+        $DB->set_field('course_modules', 'availability', self::availability_for($course->id, self::class_ids_of($cm), $at,
+            school_exams::is_exam_space($course) ? school_exams::group_id($course->id, $cm->id, true) : 0), ['id' => $cm->id]);
         $quiz->timeopen = $at;
         quiz_update_events($quiz); // the quiz's calendar events follow the new open time
         set_coursemodule_visible($cm->id, $p['published'] ? 1 : 0);
@@ -717,11 +737,11 @@ class quizzes extends external_api {
         $p = self::validate_parameters(self::my_quizzes_parameters(), compact('userid', 'courseid'));
         self::setup();
         $out = [];
-        foreach (learning::my_courses($p['userid']) as $c) {
-            if ($p['courseid'] && $c['id'] != $p['courseid']) {
+        foreach (self::student_course_ids($p['userid']) as $courseid) {
+            if ($p['courseid'] && $courseid != $p['courseid']) {
                 continue;
             }
-            $course = get_course($c['id']);
+            $course = get_course($courseid);
             foreach (get_fast_modinfo($course, $p['userid'])->get_instances_of('quiz') as $cminfo) {
                 if (!$cminfo->uservisible || $cminfo->deletioninprogress) {
                     continue;
@@ -729,9 +749,23 @@ class quizzes extends external_api {
                 $cm = get_coursemodule_from_id('quiz', $cminfo->id, 0, false, MUST_EXIST);
                 $quiz = $DB->get_record('quiz', ['id' => $cm->instance], '*', MUST_EXIST);
                 $out[] = self::student_state($cm, $quiz, $p['userid']) + ['coursename' => $course->fullname];
+                // (a school exam's "course" name is the school's name)
             }
         }
         return $out;
+    }
+
+    /** Visible courses the user is enrolled in as a student — including school exam spaces. */
+    private static function student_course_ids(int $userid): array {
+        global $DB;
+        $studentrole = $DB->get_field('role', 'id', ['shortname' => 'student'], MUST_EXIST);
+        $ids = [];
+        foreach (enrol_get_all_users_courses($userid, true, 'id, visible') as $c) {
+            if ($c->visible && user_has_role_assignment($userid, $studentrole, \context_course::instance($c->id)->id)) {
+                $ids[] = (int)$c->id;
+            }
+        }
+        return $ids;
     }
 
     /** What a student sees of a quiz: info + state (new | inprogress | finished | closed) + grade if shown. */

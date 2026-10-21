@@ -93,6 +93,9 @@ const FUNCTIONS = [
     'local_budu_grade_answer',
     'local_budu_closing_soon',
     'local_budu_opening_now',
+    'local_budu_exam_space',
+    'local_budu_exam_audience',
+    'local_budu_set_exam_audience',
 ];
 const CAPABILITIES = [
     'webservice/rest:use',
