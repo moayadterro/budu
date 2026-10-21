@@ -221,6 +221,12 @@ Built and verified:
 - Roles: admin / manager / teacher / student from IOMAD; admin "Tenants" page (live IOMAD data);
   server-side `requireRole`; sessions refresh role every 5 min.
 - Stack upgraded 2026-10-19 (see Running → Versions).
+- Public catalog (tested 2026-10-21 as a visitor over HTTP): `/catalog` and `/catalog/:id` need no
+  account (route group `(public)`, `PublicLayout`: language, currency, Sign in / Sign up); visitors at
+  `/` land there. Course covers: teachers upload one in the course builder (Moodle course image,
+  `course/overviewfiles`); without one a generated gradient + initials (`entities/course` CourseCover).
+  Students keep `/explore` (same `widgets/course-catalog`). "I have an account" signs in straight to
+  that course's enrol page. Visitors' currency = cookie `budu_currency`.
 - School exams without a course (tested 2026-10-21, API + browser): managers' nav Exams
   (`/school/exams`). An exam lives in the school's hidden exam space (`local_budu` `school_exams.php`)
   and is given to an audience: whole classes (current students), chosen students, or candidates
@@ -322,6 +328,9 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-21 The course catalog is public (owner: visitors browse, then sign up to enrol). `/files` is
+  reachable without a session but then asks IOMAD as user 0, which allows ONLY covers of published
+  courses (everything else 404). `/catalog` and `/files` are in PUBLIC_PATHS; nothing else is.
 - 2026-10-21 School exams (entrance / placement) = exam-kind quizzes in one hidden "exam space" course
   per school (idnumber `budu-exams-<companyid>`, skipped by every course list); each exam's audience
   is its own group (idnumber `budu-exam-<cmid>`) — empty = nobody sees it. Only school managers manage
