@@ -55,7 +55,7 @@ below it**, and never from a sibling slice on the same layer (no feature → fea
 |---|---|---|
 | `src/app` | app-wide setup: root layout, global styles, providers | `layouts/RootLayout`, `styles/globals.css` |
 | `src/pages` | one slice per screen; composes widgets/features/entities | `home`, `timetable`, `classes`, `class-hub`, `lesson`, `homework`, `explore`, `live`, `account`, `admin-tenants`, `login`, `register`, `forgot-password`, `reset-password`, `verify-email` |
-| `src/widgets` | big self-contained UI blocks used by pages | `app-shell`, `timetable`, `class-hub`, `course-catalog`, `live-classroom` |
+| `src/widgets` | big self-contained UI blocks used by pages | `app-shell`, `week-calendar`, `class-hub`, `course-catalog`, `live-classroom` |
 | `src/features` | one user action each (interactive, may call the server) | `sign-in`, `sign-up`, `sign-out`, `reset-password`, `verify-email`, `switch-theme`, `mark-lesson-complete`, `submit-homework`, `request-course`, `upload-avatar` |
 | `src/entities` | business objects: their model + display UI | `session` (signed-in user), `user` (IOMAD accounts), `tenant`, `subject`, `lesson`, `homework`, `course` |
 | `src/shared` | no business logic; reused everywhere | `ui` (kit), `lib` (cn, color, password), `server` (IOMAD client, db, tokens, mailer), `mock` (prototype data), `config` (nav, roles, auth), `i18n`, `theme` |
@@ -219,6 +219,13 @@ Built and verified:
 - Roles: admin / manager / teacher / student from IOMAD; admin "Tenants" page (live IOMAD data);
   server-side `requireRole`; sessions refresh role every 5 min.
 - Stack upgraded 2026-10-19 (see Running → Versions).
+- Timetable (tested 2026-10-21, all roles): `/timetable` = week calendar on real IOMAD calendar
+  events (`widgets/week-calendar`): lessons of the user's courses positioned by time, one colour per
+  course, school events in an all-day/amber lane, now-line, popover details, mobile day strip +
+  agenda, `?week=` navigation. Teachers/managers schedule repeating lessons per course
+  (`/courses/:id/schedule`: weekdays, time, duration, date range, optional class); school managers
+  add/delete school events (members notified). Student/teacher home shows next lesson, today and
+  school events from the same data.
 - Classes (tested 2026-10-21): a class ("Class 10", "11-A") = Moodle cohort in the school's category
   (component local_budu). Managers create classes, add students, pick optional class teachers and
   enrol the class into courses (cohort sync: joining/leaving the class enrols/unenrols); the class
@@ -229,7 +236,8 @@ Built and verified:
 - School manager (live IOMAD data, tested end to end 2026-10-21 with a fresh school): overview
   (`/school`), people with invites + role changes (`/school/people`), courses (`/school/courses`),
   gradebook, grade-scale setting (`/school/settings`). Invites: new people get a 7-day link
-  (`/accept-invite`), existing accounts are added and notified.
+  (`/accept-invite`); existing accounts get a pending invite they accept or decline (home banner +
+  notification) — a school can never add someone without their approval.
 - Notifications: bell in the header (unread count, list, mark read, polls every 60 s) + email for
   enrolled / new homework / homework handed in / graded / added to school, in the recipient's language.
 - Grades shown in the school's scale everywhere (stored 0–100; `shared/lib/grade-scale.ts`).
@@ -248,15 +256,16 @@ Built and verified:
   + attachment). Files via `/files/:id`. Tested in the browser 2026-10-20.
 
 Not built yet (rough priority):
-1. Still mock: timetable, next-class hero on student home, live classroom, explore (marketplace).
+1. Still mock: live classroom, explore (marketplace).
    Video: transcoding / CDN (Kinescope, Bunny Stream or self-hosted HLS) behind `/files` later —
    NOT YouTube/RuTube (their terms require their branded player; see Decision log).
 2. Teacher follow-ups: invite link for students without an account, lesson completion / progress,
    pricing / audience / subject fields (prototype), upload progress bar, AI feedback draft.
    Admin screens: people, course deals, platform settings (only "Tenants" exists).
-3. Manager follow-ups: course catalog + approvals (paid courses), schedule on real data, remove
+3. Manager follow-ups: course catalog + approvals (paid courses), remove
    someone from the school, resend an invite.
-4. Timetable per class on real data; lesson completion / progress; removing a single student who
+4. Timetable: edit/cancel a single lesson (today: delete the whole series), rooms/online links,
+   month view. Lesson completion / progress; removing a single student who
    came in through a class (today: remove them from the class).
 5. BigBlueButton: real live classes (join URLs), recordings → AI summaries.
 6. Account: change email (needs a confirmation flow); remember the language per user in IOMAD
@@ -266,6 +275,13 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-21 Timetable data = Moodle calendar events (no app-db table): a lesson = course event, or
+  a group event for one class (group created on demand from the class cohort), component local_budu,
+  `repeatid` = the series; a school event = category event of the company's category. All via
+  `local_budu` schedule functions (`my_week`, `add_lessons`, `add_school_event`…). Times are rendered
+  in the viewer's browser time zone.
+- 2026-10-21 Joining a school always needs the person's approval: managers send invites
+  (`school_invites`, status pending/accepted/declined); existing accounts accept in the app.
 - 2026-10-21 A student is in at most ONE class per school (a class = a year group). Adding a student
   who is in another class moves them (enforced in `local_budu_set_students`); solo students have none.
 - 2026-10-21 Classes = IOMAD-side Moodle cohorts + cohort enrolment (not app-db), so enrolment stays in
