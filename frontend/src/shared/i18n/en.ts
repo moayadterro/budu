@@ -1149,7 +1149,7 @@ export const en = {
 
   catalog: {
     heroTitle: 'Learn with teachers and schools you trust',
-    heroSub: 'Browse every course on Budu — no account needed. Free courses start right away; paid ones in a few steps.',
+    heroSub: 'Browse every course on Budu and watch the first lesson for free. To join a course — free ones too — create an account.',
     all: 'All courses',
     browse: 'Browse courses without an account',
     signIn: 'Sign in',
