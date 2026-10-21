@@ -5,7 +5,7 @@ import { rememberLocale } from '@/entities/notification/server'
 import { needsParentStep } from '@/entities/family/server'
 import { createSession } from '@/entities/session/server'
 import { getLocale } from '@/shared/i18n/server'
-import { getAccount, resolveRole, sendVerificationEmail } from '@/entities/user/server'
+import { getAccount, resolveRole, sendVerificationEmail, syncCurrency } from '@/entities/user/server'
 import { defaultInstance, iomadCheckPassword } from '@/shared/server/iomad'
 import { hasPendingToken, issuedRecently } from '@/shared/server/tokens'
 import { homeFor } from '@/shared/config/nav'
@@ -50,6 +50,7 @@ export async function signIn(_prev: SignInState, form: FormData): Promise<SignIn
       pictureId: account.picture || null,
     })
     await rememberLocale(account.id, await getLocale()) // their emails follow the language they use
+    await syncCurrency(account.id) // the public catalog (signed out) then shows their Settings currency
     // a student without a parent gets the "add your parent" step once (they can skip it)
     const step = role === 'student' && (await needsParentStep(account.id)) ? '/welcome/parent' : null
     destination = safeNext(form.get('next')) ?? step ?? homeFor(role)
