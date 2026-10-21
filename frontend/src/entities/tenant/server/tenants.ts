@@ -133,6 +133,16 @@ export async function isSchool(companyId: number | null): Promise<boolean> {
   return row?.kind === 'school'
 }
 
+/** Which of these companies are registered as schools. */
+export async function schoolsAmong(companyIds: number[]): Promise<number[]> {
+  if (!companyIds.length) return []
+  const rows = await query<{ company_id: number }>(
+    `SELECT company_id FROM tenants WHERE iomad_url = $1 AND kind = 'school' AND company_id = ANY($2::int[])`,
+    [defaultInstance().url, companyIds],
+  )
+  return rows.map((r) => r.company_id)
+}
+
 // ----- invitations (existing accounts must accept before joining a school) -----
 
 export type SchoolInvite = {

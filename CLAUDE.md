@@ -230,7 +230,8 @@ Built and verified:
   teachers + Message). Parent ↔ teacher chat `/messages` (polls every 5 s; teachers start from a
   course's Students tab → `/messages/new?student=`); the first unread message is emailed, not every
   line. School announcements: managers post on `/school`; students, teachers and parents see them
-  on their home and get bell + email.
+  on their home and get bell + email. Teachers see every school they teach in, grouped by school
+  (newest 5 per school).
 - Timetable (tested 2026-10-21, all roles): `/timetable` = week calendar on real IOMAD calendar
   events (`widgets/week-calendar`): lessons of the user's courses positioned by time, one colour per
   course, school events in an all-day/amber lane, now-line, popover details, mobile day strip +

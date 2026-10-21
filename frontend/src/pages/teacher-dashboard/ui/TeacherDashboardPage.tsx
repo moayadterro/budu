@@ -12,7 +12,8 @@ import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle }
 import { LocalTime } from '@/shared/ui/local-time'
 import { PersonAvatar } from '@/shared/ui/person-avatar'
 import { ScreenHead } from '@/shared/ui/screen-head'
-import { getGradeScale } from '@/entities/tenant/server'
+import { getGradeScale, schoolsAmong } from '@/entities/tenant/server'
+import { getAccount } from '@/entities/user/server'
 import { AnnouncementsCard } from '@/entities/announcement'
 import { listAnnouncements } from '@/entities/announcement/server'
 import { getT } from '@/shared/i18n/server'
@@ -26,7 +27,10 @@ export async function TeacherDashboardPage() {
   const [courses, submissions, news] = await Promise.all([
     teacherOverview(user.userId, user.companyId),
     user.companyId ? listSubmissions(user.userId, user.companyId) : Promise.resolve([]),
-    listAnnouncements(user.companyId ? [user.companyId] : [], 5),
+    // a teacher may teach in several schools: announcements of all of them, grouped by school
+    getAccount(user.email)
+      .then((a) => schoolsAmong(a.memberships.map((m) => m.companyid)))
+      .then((ids) => listAnnouncements(ids, 5)),
   ])
   const toGrade = submissions.filter((x) => x.status === 'submitted')
   const students = courses.reduce((n, c) => n + c.students, 0)
@@ -117,7 +121,7 @@ export async function TeacherDashboardPage() {
       </div>
       {news.length > 0 && (
         <div className="mt-6">
-          <AnnouncementsCard items={news} />
+          <AnnouncementsCard items={news} groupBySchool />
         </div>
       )}
     </>
