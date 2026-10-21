@@ -12,6 +12,7 @@ const plural = (n: number, one: string, few: string, many: string) => {
 /** Russian UI strings. Same keys as en.ts. */
 export const ru: typeof en = {
   appName: 'Budu',
+  connection: { offline: 'Нет подключения к интернету. Проверьте соединение.', back: 'Снова в сети' },
   searchPh: 'Поиск…',
   settings: 'Настройки',
   notifications: 'Уведомления',

@@ -1,6 +1,7 @@
 /** English UI strings — the reference dictionary. Every user-facing string lives here; ru.ts / ar.ts mirror it. */
 export const en = {
   appName: 'Budu',
+  connection: { offline: 'You’re offline. Check your connection.', back: 'Back online' },
   searchPh: 'Search…',
   settings: 'Settings',
   notifications: 'Notifications',

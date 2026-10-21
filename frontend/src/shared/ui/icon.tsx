@@ -69,6 +69,8 @@ import {
   Wallet01Icon,
   Cancel01Icon,
   Clock01Icon,
+  Wifi01Icon,
+  WifiDisconnected02Icon,
 } from '@hugeicons/core-free-icons'
 
 /** App icon names → Hugeicons (free set). One place to swap an icon everywhere. */
@@ -87,6 +89,8 @@ const icons = {
   bell: Notification01Icon,
   sun: Sun03Icon,
   alert: Alert02Icon,
+  wifi: Wifi01Icon,
+  wifiOff: WifiDisconnected02Icon,
   back: ArrowLeft01Icon,
   tick: Tick02Icon,
   file: File01Icon,

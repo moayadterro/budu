@@ -303,6 +303,8 @@ Built and verified:
   first/last name, password change (current password checked by IOMAD, other devices signed out),
   language, theme. Tested 2026-10-21.
 - UI fully in English / Russian / Arabic (RTL), switchable in Settings or the header globe menu.
+- Connection strip (`shared/ui/connection-status`, in RootLayout, every page): offline → dark strip at
+  the bottom; back online → green "Back online" for 3 s (like YouTube).
 - Teacher course builder (live IOMAD data): `/courses` (my courses), `/courses/new`, `/courses/:id`
   (details, publish/draft, lessons add/rename/move/delete, upload video/PDF/files, tasks with due date
   + attachment). Files via `/files/:id`. Tested in the browser 2026-10-20.

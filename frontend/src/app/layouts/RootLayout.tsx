@@ -5,6 +5,7 @@ import { dirOf, I18nProvider } from '@/shared/i18n'
 import { getLocale } from '@/shared/i18n/server'
 import { THEME_KEY } from '@/shared/theme/key'
 import { ThemeSync } from '@/shared/theme/ThemeSync'
+import { ConnectionStatus } from '@/shared/ui/connection-status'
 import { Toaster } from '@/shared/ui/sonner'
 import { TooltipProvider } from '@/shared/ui/tooltip'
 
@@ -33,6 +34,7 @@ export async function RootLayout({ children }: { children: React.ReactNode }) {
         <I18nProvider locale={locale}>
           <ThemeSync />
           <TooltipProvider>{children}</TooltipProvider>
+          <ConnectionStatus />
           <Toaster position={dirOf(locale) === 'rtl' ? 'bottom-left' : 'bottom-right'} />
         </I18nProvider>
       </body>
