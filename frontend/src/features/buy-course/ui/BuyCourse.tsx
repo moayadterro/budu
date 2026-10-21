@@ -22,7 +22,6 @@ export function BuyCourse({
   free,
   enrolled,
   order: initialOrder,
-  originalPrice,
 }: {
   courseId: number
   courseTitle: string
@@ -30,8 +29,6 @@ export function BuyCourse({
   enrolled: boolean
   /** the student's open order, if any */
   order: OrderView
-  /** the teacher's price, shown under the ruble amount when it isn't in rubles */
-  originalPrice: string | null
 }) {
   const t = useT()
   const s = t.shop
@@ -84,14 +81,14 @@ export function BuyCourse({
           </DialogHeader>
           {failed && <Alert variant="destructive">{s.pay.failed}</Alert>}
           {!order && !failed && <p className="py-6 text-center text-sm text-muted-foreground">{pending ? s.pay.preparing : ''}</p>}
-          {order && <PaymentSteps order={order} originalPrice={originalPrice} onReported={setOrder} />}
+          {order && <PaymentSteps order={order} onReported={setOrder} />}
         </DialogContent>
       </Dialog>
     </>
   )
 }
 
-function PaymentSteps({ order, originalPrice, onReported }: { order: NonNullable<OrderView>; originalPrice: string | null; onReported: (o: OrderView) => void }) {
+function PaymentSteps({ order, onReported }: { order: NonNullable<OrderView>; onReported: (o: OrderView) => void }) {
   const t = useT()
   const locale = useLocale()
   const s = t.shop.pay
@@ -102,7 +99,6 @@ function PaymentSteps({ order, originalPrice, onReported }: { order: NonNullable
       <div className="rounded-lg border bg-muted/40 p-4 text-center">
         <div className="text-xs text-muted-foreground">{s.amount}</div>
         <div className="text-3xl font-semibold tabular-nums">{amount}</div>
-        {originalPrice && <div className="mt-1 text-xs text-muted-foreground">{s.coursePrice(originalPrice)}</div>}
       </div>
       <ol className="flex list-decimal flex-col gap-3 ps-5 text-sm">
         <li>

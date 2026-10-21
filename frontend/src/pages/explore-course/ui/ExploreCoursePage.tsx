@@ -16,7 +16,7 @@ export async function ExploreCoursePage({ params }: { params: Promise<{ courseId
   const item = items.find((i) => i.course.id === id)
   if (!item) notFound()
   const t = await getT()
-  const { course, listing, price } = item
+  const { course, price } = item
   return (
     <CourseDetail
       course={course}
@@ -31,7 +31,6 @@ export async function ExploreCoursePage({ params }: { params: Promise<{ courseId
           free={price.free}
           enrolled={course.enrolled}
           order={order && { id: order.id, number: order.number, amountRub: order.amountRub, status: order.status as 'pending' | 'reported' }}
-          originalPrice={listing.currency === 'RUB' ? null : price.original}
         />
       }
     />

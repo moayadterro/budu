@@ -112,7 +112,6 @@ export async function CourseDetail({
               <div>
                 <div className="text-xs text-muted-foreground">{s.price}</div>
                 <div className="text-2xl font-semibold tabular-nums">{price.free ? s.free : price.shown}</div>
-                {price.original && <div className="text-xs text-muted-foreground">{s.teacherPrice(price.original)}</div>}
               </div>
               {action}
             </CardContent>

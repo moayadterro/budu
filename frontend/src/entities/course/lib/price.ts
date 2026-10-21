@@ -2,20 +2,21 @@ import { convert, formatMoney, roundUpPrice, type Rates } from '@/shared/lib/mon
 
 export type ShownPrice = {
   free: boolean
-  /** in the viewer's currency (converted ones rounded up: "1 240 ₽") */
+  /** in the viewer's currency (converted ones rounded up: "1 240 ₽") — the only price people see */
   shown: string
-  /** the teacher's price when it was converted ("15 $"), else null */
-  original: string | null
 }
 
-/** A course price as this viewer sees it: converted to their currency and rounded up (owner: no "≈"). */
+/**
+ * A course price as this viewer sees it: converted to their currency and rounded up (owner: no "≈",
+ * and never the teacher's own price / currency — the platform decides what people see).
+ */
 export function showPrice(price: number, currency: string, viewer: string, rates: Rates, locale: string): ShownPrice {
-  if (price <= 0) return { free: true, shown: '', original: null }
-  const original = formatMoney(price, currency, locale)
-  if (viewer === currency) return { free: false, shown: original, original: null }
+  if (price <= 0) return { free: true, shown: '' }
+  if (viewer === currency) return { free: false, shown: formatMoney(price, currency, locale) }
   const converted = convert(price, currency, viewer, rates)
-  if (converted === null) return { free: false, shown: original, original: null }
-  return { free: false, shown: formatMoney(roundUpPrice(converted), viewer, locale), original }
+  // no rate for this pair: fall back to the listed price rather than show nothing
+  if (converted === null) return { free: false, shown: formatMoney(price, currency, locale) }
+  return { free: false, shown: formatMoney(roundUpPrice(converted), viewer, locale) }
 }
 
 /** Rubles to transfer for a price — the same rounded-up figure a RUB viewer sees; null if no rate. */

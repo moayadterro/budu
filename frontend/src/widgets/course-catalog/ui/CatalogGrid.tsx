@@ -44,7 +44,7 @@ export async function CatalogGrid({ items, hrefBase }: { items: Array<{ course: 
               ) : p.free ? (
                 <Badge variant="info">{s.free}</Badge>
               ) : (
-                <span className="font-semibold tabular-nums" title={p.original ?? undefined}>
+                <span className="font-semibold tabular-nums">
                   {p.shown}
                 </span>
               )}
