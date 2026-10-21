@@ -31,7 +31,7 @@ export const ru: typeof en = {
     platformSettings: 'Настройки платформы',
     home: 'Главная',
     timetable: 'Расписание',
-    myClasses: 'Мои предметы',
+    myClasses: 'Мои классы',
     explore: 'Каталог',
     live: 'Онлайн-урок',
     dashboard: 'Обзор',
@@ -241,8 +241,6 @@ export const ru: typeof en = {
     toGradeEmpty: 'Проверять нечего — всё проверено.',
     openGrading: 'К проверке',
     coursesTitle: 'Ваши курсы',
-    classesTitle: 'Мои классы',
-    classesSub: 'Ваши курсы и их ученики. Откройте курс, чтобы добавить или убрать учеников.',
     cols: { course: 'Курс', students: 'Ученики', homework: 'Задания', toGrade: 'Проверить', status: 'Статус' },
     open: 'Открыть',
     noClasses: 'Курсов пока нет — создайте курс в разделе «Курсы».',
@@ -305,7 +303,7 @@ export const ru: typeof en = {
   },
 
   learn: {
-    coursesTitle: 'Мои предметы',
+    coursesTitle: 'Мои курсы',
     coursesSub: 'Ваши курсы. Откройте курс, чтобы увидеть уроки и задания.',
     empty: 'Вы пока не записаны ни на один курс. Вас добавит учитель или школа.',
     lessonsTab: 'Уроки',

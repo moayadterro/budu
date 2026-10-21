@@ -41,7 +41,7 @@ export const NAV: Record<Role, NavItem[]> = {
   student: [
     { label: 'home', icon: 'grid', href: '/home', bottom: true },
     { label: 'timetable', icon: 'cal', href: '/timetable', bottom: true },
-    { label: 'myClasses', icon: 'book', href: '/classes', bottom: true },
+    { label: 'myCourses', icon: 'book', href: '/classes', bottom: true },
     { label: 'explore', icon: 'search', href: '/explore' },
     { label: 'live', icon: 'video', href: '/live', bottom: true },
   ],

@@ -31,7 +31,7 @@ export const ar: typeof en = {
     platformSettings: 'إعدادات المنصة',
     home: 'الرئيسية',
     timetable: 'الجدول',
-    myClasses: 'موادي',
+    myClasses: 'فصولي',
     explore: 'استكشاف',
     live: 'حصة مباشرة',
     dashboard: 'لوحة التحكم',
@@ -241,8 +241,6 @@ export const ar: typeof en = {
     toGradeEmpty: 'لا شيء للتصحيح — أنجزت كل شيء.',
     openGrading: 'فتح التصحيح',
     coursesTitle: 'دوراتك',
-    classesTitle: 'فصولي',
-    classesSub: 'دوراتك وطلابها. افتح دورة لإضافة طلاب أو إزالتهم.',
     cols: { course: 'الدورة', students: 'الطلاب', homework: 'الواجبات', toGrade: 'للتصحيح', status: 'الحالة' },
     open: 'فتح',
     noClasses: 'لا توجد دورات بعد — أنشئ دورة من قسم الدورات.',
@@ -305,7 +303,7 @@ export const ar: typeof en = {
   },
 
   learn: {
-    coursesTitle: 'موادي',
+    coursesTitle: 'دوراتي',
     coursesSub: 'دوراتك. افتح دورة لترى دروسها وواجباتها.',
     empty: 'لست مسجّلًا في أي دورة بعد. سيضيفك معلمك أو مدرستك.',
     lessonsTab: 'الدروس',

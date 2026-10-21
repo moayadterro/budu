@@ -234,8 +234,6 @@ export const en = {
     toGradeEmpty: 'Nothing to grade — you’re all caught up.',
     openGrading: 'Open grading',
     coursesTitle: 'Your courses',
-    classesTitle: 'My classes',
-    classesSub: 'Your courses and their students. Open one to add or remove students.',
     cols: { course: 'Course', students: 'Students', homework: 'Homework', toGrade: 'To grade', status: 'Status' },
     open: 'Open',
     noClasses: 'No courses yet — create one in Courses.',
@@ -298,7 +296,7 @@ export const en = {
   },
 
   learn: {
-    coursesTitle: 'My classes',
+    coursesTitle: 'My courses',
     coursesSub: 'Your courses. Open one for its lessons and homework.',
     empty: 'You’re not in a course yet. Your teacher or school will add you.',
     lessonsTab: 'Lessons',
