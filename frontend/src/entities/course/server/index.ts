@@ -10,6 +10,7 @@ export {
   moveLesson,
   addMaterial,
   saveTask,
+  savePage,
   deleteLessonItem,
   lessonFileAccess,
   listStudents,
@@ -17,5 +18,9 @@ export {
   unenrolStudent,
   myCourses,
   courseCompany,
+  catalog,
+  enrolLearner,
+  type CatalogCourse,
 } from './courses'
+export { getListing, listedCourses, saveListing, type Listing } from './listing'
 export type { EnrolResult } from '../model/types'

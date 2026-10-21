@@ -1,6 +1,7 @@
 import { requireRole } from '@/entities/session/server'
 import { getFamily, requestsOfChild } from '@/entities/family/server'
-import { getAccount } from '@/entities/user/server'
+import { CurrencyPicker } from '@/features/switch-currency'
+import { getAccount, getCurrency } from '@/entities/user/server'
 import { AddParentForm, CancelParentRequestButton, RemoveParentButton } from '@/features/add-parent'
 import { NameForm, PasswordForm, ProfilePhoto } from '@/features/edit-profile'
 import { SignOutButton } from '@/features/sign-out'
@@ -14,15 +15,16 @@ import { Separator } from '@/shared/ui/separator'
 import { ScreenHead } from '@/shared/ui/screen-head'
 import { getT } from '@/shared/i18n/server'
 
-/** Personal settings: profile (photo, name), parents (students), password, language, theme. */
+/** Personal settings: profile (photo, name), parents (students), password, language, currency, theme. */
 export async function AccountPage() {
   const t = await getT()
   const user = await requireRole(...ROLES)
   const isStudent = user.role === 'student'
-  const [account, family, sent] = await Promise.all([
+  const [account, family, sent, currency] = await Promise.all([
     getAccount(user.email),
     isStudent ? getFamily(user.userId) : null,
     isStudent ? requestsOfChild(user.userId) : [],
+    getCurrency(user.userId),
   ])
   const [first = '', ...rest] = user.name.split(' ')
   const firstName = account.found ? account.firstname : first
@@ -110,6 +112,16 @@ export async function AccountPage() {
         </CardHeader>
         <CardContent>
           <LanguagePicker />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{s.currency}</CardTitle>
+          <CardDescription>{s.currencyHint}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <CurrencyPicker value={currency} />
         </CardContent>
       </Card>
 

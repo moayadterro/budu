@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getCourse } from '@/entities/course/server'
+import { getCourse, getListing } from '@/entities/course/server'
+import { getCurrency } from '@/entities/user/server'
 import { requireRole } from '@/entities/session/server'
 import { CourseBuilder, CourseTabs } from '@/widgets/course-builder'
 import { Button } from '@/shared/ui/button'
@@ -16,6 +17,7 @@ export async function CourseBuilderPage({ params }: { params: Promise<{ courseId
   if (!Number.isSafeInteger(id) || id <= 0) notFound()
   const course = await getCourse(user.userId, id)
   if (!course?.canEdit) notFound()
+  const [listing, currency] = await Promise.all([getListing(id), getCurrency(user.userId)])
 
   const s = t.courses
   return (
@@ -28,7 +30,11 @@ export async function CourseBuilderPage({ params }: { params: Promise<{ courseId
       </Button>
       <ScreenHead title={course.title} sub={s.lessonCount(course.lessonCount)} />
       <CourseTabs courseId={course.id} />
-      <CourseBuilder course={course} authorName={user.name} />
+      <CourseBuilder
+        course={course}
+        authorName={user.name}
+        listing={listing ?? { listed: false, price: 0, currency }} // new listing: the teacher's own currency
+      />
     </>
   )
 }

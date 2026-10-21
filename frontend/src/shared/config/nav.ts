@@ -35,8 +35,9 @@ export const NAV: Record<Role, NavItem[]> = {
   admin: [
     { label: 'tenants', icon: 'layers', href: '/admin', bottom: true },
     { label: 'people', icon: 'users', href: null, bottom: true },
-    { label: 'deals', icon: 'store', href: null, bottom: true },
-    { label: 'platformSettings', icon: 'gear', href: null },
+    { label: 'payments', icon: 'wallet', href: '/admin/payments', bottom: true },
+    { label: 'deals', icon: 'store', href: null },
+    { label: 'platformSettings', icon: 'gear', href: '/admin/settings' },
   ],
   student: [
     { label: 'home', icon: 'grid', href: '/home', bottom: true },

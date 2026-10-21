@@ -3,7 +3,8 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { COURSE_LIMITS } from '@/entities/course'
-import { createCourse, updateCourse } from '@/entities/course/server'
+import { createCourse, getCourse, saveListing, updateCourse } from '@/entities/course/server'
+import { isCurrency } from '@/shared/config/currency'
 import { requireRole } from '@/entities/session/server'
 import { formId, formText } from '@/shared/lib/form'
 import type { CourseFormError, CourseFormState } from '../model/types'
@@ -60,4 +61,25 @@ export async function setCoursePublished(form: FormData) {
   await updateCourse(user.userId, courseId, { ...details, published: formText(form, 'published') === '1' })
   revalidatePath(`/courses/${courseId}`)
   revalidatePath('/courses')
+}
+
+export type ListingState = { status: 'idle' } | { status: 'saved'; at: number } | { status: 'error'; at: number }
+
+const MAX_PRICE = 100_000_000
+
+/** Teacher lists the course in Explore (or not) with a price in a currency; empty / 0 = free. */
+export async function saveListingAction(_prev: ListingState, form: FormData): Promise<ListingState> {
+  const user = await requireRole('teacher')
+  const at = Date.now()
+  const courseId = formId(form, 'courseId')
+  const raw = formText(form, 'price').replace(',', '.')
+  const price = raw === '' ? 0 : Math.round(Number(raw) * 100) / 100
+  const currency = formText(form, 'currency')
+  if (!courseId || !Number.isFinite(price) || price < 0 || price > MAX_PRICE || !isCurrency(currency)) return { status: 'error', at }
+  const course = await getCourse(user.userId, courseId)
+  if (!course?.canEdit) return { status: 'error', at }
+  await saveListing(user.userId, { courseId, listed: form.get('listed') === 'on', price, currency })
+  revalidatePath(`/courses/${courseId}`)
+  revalidatePath('/explore')
+  return { status: 'saved', at }
 }

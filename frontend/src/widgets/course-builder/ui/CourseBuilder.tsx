@@ -2,7 +2,8 @@
 
 import type { Course } from '@/entities/course'
 import { initialsOf } from '@/entities/session'
-import { CourseDetailsForm, PublishToggle } from '@/features/edit-course'
+import { CourseDetailsForm, ListingForm, PublishToggle } from '@/features/edit-course'
+import type { Currency } from '@/shared/config/currency'
 import { AddLessonContent, ItemActions } from '@/features/edit-lesson-content'
 import { AddLesson, LessonHeader } from '@/features/edit-lessons'
 import Link from 'next/link'
@@ -14,8 +15,17 @@ import { Separator } from '@/shared/ui/separator'
 import { useT } from '@/shared/i18n'
 import { LessonItemView } from './LessonItemView'
 
-/** Teacher's course editor: publish status, details, then lessons with their videos, PDFs and tasks. */
-export function CourseBuilder({ course, authorName }: { course: Course; authorName: string }) {
+/** Teacher's course editor: publish status, marketplace price, details, then lessons with their content and tasks. */
+export function CourseBuilder({
+  course,
+  authorName,
+  listing,
+}: {
+  course: Course
+  authorName: string
+  /** marketplace listing (Explore): shown or not, price */
+  listing: { listed: boolean; price: number; currency: Currency }
+}) {
   const t = useT()
   const s = t.courses
   return (
@@ -56,6 +66,15 @@ export function CourseBuilder({ course, authorName }: { course: Course; authorNa
           </CardHeader>
           <CardContent>
             <PublishToggle course={course} />
+          </CardContent>
+        </Card>
+        <Card size="sm">
+          <CardHeader>
+            <CardTitle>{t.market.title}</CardTitle>
+            <CardDescription>{t.market.sub}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ListingForm courseId={course.id} published={course.published} listing={listing} />
           </CardContent>
         </Card>
         <Card size="sm">

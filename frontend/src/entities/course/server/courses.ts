@@ -10,7 +10,7 @@ import type { Course, CourseSummary, EnrolResult, LessonItem, StudentCourse } fr
  */
 
 type RawFile = { id: number; filename: string; filesize: number; mimetype: string }
-type RawItem = { cmid: number; kind: LessonItem['kind']; name: string; instructions: string; duedate: number; files: RawFile[] }
+type RawItem = { cmid: number; kind: LessonItem['kind']; name: string; instructions: string; duedate: number; files: RawFile[]; content?: string }
 type RawCourse = { id: number; fullname: string; summary: string; visible: boolean; lessons: number; timemodified: number }
 type RawFullCourse = RawCourse & {
   canedit: boolean
@@ -53,6 +53,7 @@ export async function getCourse(userId: number, courseId: number): Promise<Cours
           instructions: i.instructions,
           dueAt: i.duedate || null,
           files: i.files.map((f) => ({ id: f.id, name: f.filename, size: f.filesize, mime: f.mimetype })),
+          content: i.content ?? '',
         })),
       })),
     }
@@ -106,6 +107,10 @@ export async function saveTask(
   })
 }
 
+/** Adds a text page to a lesson (pageId 0) or changes one. IOMAD cleans the HTML. */
+export const savePage = (userId: number, courseId: number, lessonId: number, pageId: number, page: { name: string; html: string }) =>
+  call<Id>('save_page', { courseid: courseId, userid: userId, sectionid: lessonId, cmid: pageId, name: page.name, content: page.html })
+
 export const deleteLessonItem = (userId: number, courseId: number, itemId: number) =>
   call<Id>('delete_item', { courseid: courseId, userid: userId, cmid: itemId })
 
@@ -158,3 +163,37 @@ export async function courseCompany(courseId: number): Promise<number | null> {
   const r = await call<{ companyid: number }>('course_company', { courseid: courseId })
   return r.companyid || null
 }
+
+// ----- marketplace (Explore) -----
+
+export type CatalogCourse = {
+  id: number
+  title: string
+  description: string
+  school: string
+  teachers: Person[]
+  lessons: string[]
+  /** the viewer is enrolled already */
+  enrolled: boolean
+}
+
+/** Public facts of these (listed) courses; unpublished ones are left out. */
+export async function catalog(courseIds: number[], viewerId = 0): Promise<CatalogCourse[]> {
+  if (!courseIds.length) return []
+  const rows = await call<
+    Array<{ id: number; fullname: string; summary: string; school: string; teachers: RawPerson[]; lessons: string[]; enrolled: boolean }>
+  >('catalog', { courseids: courseIds, userid: viewerId })
+  return rows.map((r) => ({
+    id: r.id,
+    title: r.fullname,
+    description: r.summary,
+    school: r.school,
+    teachers: r.teachers.map(toPerson),
+    lessons: r.lessons,
+    enrolled: r.enrolled,
+  }))
+}
+
+/** Enrol a learner (the caller decided they may: free course, or a confirmed payment). */
+export const enrolLearner = (courseId: number, userId: number) =>
+  call<{ result: 'enrolled' | 'already' }>('enrol_learner', { courseid: courseId, userid: userId })

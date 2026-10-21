@@ -139,6 +139,55 @@ CREATE INDEX IF NOT EXISTS announcements_target ON announcements (audience, targ
 ALTER TABLE announcements ADD COLUMN IF NOT EXISTS class_ids integer[];
 UPDATE announcements SET class_ids = ARRAY[target_id] WHERE audience = 'class' AND class_ids IS NULL AND target_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS announcements_classes ON announcements USING gin (class_ids);
+
+-- the currency a user sees prices in (converted); NULL = the platform default (RUB)
+ALTER TABLE user_prefs ADD COLUMN IF NOT EXISTS currency text;
+
+-- a course in the marketplace (Explore): listed or not, and its price in the teacher's currency (0 = free)
+CREATE TABLE IF NOT EXISTS course_listings (
+  iomad_url  text NOT NULL,
+  course_id  integer NOT NULL,
+  listed     boolean NOT NULL DEFAULT false,
+  price      numeric(14,2) NOT NULL DEFAULT 0,
+  currency   text NOT NULL DEFAULT 'RUB',
+  updated_by integer,
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (iomad_url, course_id)
+);
+
+-- exchange rates: units per 1 USD (automatic, refreshed daily) and the platform admin's overrides
+CREATE TABLE IF NOT EXISTS fx_rates (
+  currency   text PRIMARY KEY,
+  per_usd    numeric NOT NULL,
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS fx_overrides (
+  currency   text PRIMARY KEY,
+  per_usd    numeric NOT NULL,
+  updated_by integer,
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- course purchases: paid by hand (bank transfer), confirmed by the platform admin
+CREATE TABLE IF NOT EXISTS orders (
+  id           bigserial PRIMARY KEY,
+  iomad_url    text NOT NULL,
+  student_id   integer NOT NULL,
+  course_id    integer NOT NULL,
+  course_title text NOT NULL,
+  price        numeric(14,2) NOT NULL,     -- in the course's currency, when ordered
+  currency     text NOT NULL,
+  amount_rub   numeric(14,2) NOT NULL,     -- what to transfer
+  status       text NOT NULL DEFAULT 'pending', -- pending | reported | confirmed | rejected
+  created_at   timestamptz NOT NULL DEFAULT now(),
+  reported_at  timestamptz,                -- the student pressed "I've paid"
+  decided_at   timestamptz,
+  decided_by   integer
+);
+CREATE INDEX IF NOT EXISTS orders_status ON orders (status, created_at);
+CREATE INDEX IF NOT EXISTS orders_student ON orders (student_id, course_id);
+-- at most one open order per student + course (a double click can't create two)
+CREATE UNIQUE INDEX IF NOT EXISTS orders_one_open ON orders (iomad_url, student_id, course_id) WHERE status IN ('pending', 'reported');
 `
 
 // One pool per server process (survives dev hot reloads). The schema check re-runs whenever SCHEMA
