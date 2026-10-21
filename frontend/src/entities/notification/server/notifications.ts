@@ -1,15 +1,15 @@
 import 'server-only'
-import { DEFAULT_LOCALE, dirOf, isLocale, type Locale } from '@/shared/i18n'
+import { DEFAULT_LOCALE, isLocale, type Locale } from '@/shared/i18n'
 import { MESSAGES } from '@/shared/i18n/messages'
 import { query } from '@/shared/server/db'
-import { composeMail } from '@/shared/server/mail-layout'
-import { appUrl, sendMail } from '@/shared/server/mailer'
 import { renderNotification } from '../lib/render'
+import { CHANNELS } from './channels'
 import type { AppNotification, NotificationKind, NotificationParams, Recipient } from '../model/types'
 
 /**
- * Notifications: a row per recipient in app-db (the bell) + an email in the recipient's language.
- * Emails are best-effort — a mail failure is logged, never breaks the action that caused it.
+ * Notifications: a row per recipient in app-db (the bell) + every delivery channel (email today, push
+ * later — see channels.ts), in the recipient's language. Deliveries are best-effort: a failure is
+ * logged, never breaks the action that caused it.
  * SERVER-SIDE ONLY.
  */
 
@@ -42,25 +42,16 @@ export async function notify(recipients: Recipient[], kind: NotificationKind, pa
   )
   const locales = await localesOf(unique.map((r) => r.id))
   await Promise.all(
-    unique.map(async (r) => {
-      if (!r.email) return
-      const locale = locales.get(r.id) ?? DEFAULT_LOCALE
-      const t = MESSAGES[locale]
-      const { title, body } = renderNotification(t, kind, params)
-      try {
-        await sendMail({
-          to: r.email,
-          subject: title,
-          ...composeMail(t, dirOf(locale), {
-            name: r.name.split(' ')[0] || r.name,
-            body,
-            action: t.notify.open,
-            link: appUrl(link ?? '/'),
-            footer: t.notify.emailFooter,
-          }),
-        })
-      } catch (e) {
-        console.error(`notification email to user ${r.id} failed`, e)
+    unique.map(async (recipient) => {
+      const locale = locales.get(recipient.id) ?? DEFAULT_LOCALE
+      const { title, body } = renderNotification(MESSAGES[locale], kind, params)
+      const delivery = { recipient, locale, title, body, link: link ?? '/' }
+      for (const channel of CHANNELS) {
+        try {
+          await channel.send(delivery)
+        } catch (e) {
+          console.error(`notification ${channel.name} to user ${recipient.id} failed`, e)
+        }
       }
     }),
   )
