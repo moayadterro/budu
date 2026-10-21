@@ -740,6 +740,7 @@ export const ar: typeof en = {
   },
 
   messages: {
+    status: { sent: 'أُرسلت', delivered: 'وصلت', seen: 'قُرئت' },
     title: 'الرسائل',
     sub: 'محادثات بين أولياء الأمور والمعلمين.',
     empty: 'لا توجد محادثات بعد.',

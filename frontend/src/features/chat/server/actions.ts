@@ -1,8 +1,8 @@
 'use server'
 
 import { redirect } from 'next/navigation'
-import { MAX_MESSAGE, type Message } from '@/entities/conversation'
-import { getConversation, listMessages, markConversationRead, openConversation, sendMessage } from '@/entities/conversation/server'
+import { MAX_MESSAGE, type Message, type Receipts } from '@/entities/conversation'
+import { getConversation, listMessages, markConversationRead, markDelivered, openConversation, receiptsFor, sendMessage } from '@/entities/conversation/server'
 import { childOf, getFamily, teachesChild } from '@/entities/family/server'
 import { notify } from '@/entities/notification/server'
 import { getSession, requireRole } from '@/entities/session/server'
@@ -51,13 +51,31 @@ export async function sendMessageAction(conversationId: number, text: string): P
   return { ok: true, message }
 }
 
-/** New messages since `afterId` (the open thread asks when /events says one arrived); marks the conversation read. */
-export async function pollMessagesAction(conversationId: number, afterId: number): Promise<Message[]> {
+/**
+ * New messages since `afterId` (the open thread asks when /events says one arrived). `seen`: the
+ * thread is in view → read receipts (✓✓ seen); otherwise only delivered.
+ */
+export async function pollMessagesAction(conversationId: number, afterId: number, seen = true): Promise<Message[]> {
   const user = await getSession()
   if (!user || !Number.isSafeInteger(conversationId) || !Number.isSafeInteger(afterId)) return []
   const c = await getConversation(user.userId, conversationId)
   if (!c) return []
   const messages = await listMessages(c.id, Math.max(0, afterId))
-  if (messages.length) await markConversationRead(user.userId, c.id)
+  if (seen) await markConversationRead(user.userId, c.id)
+  else await markDelivered(user.userId, c.id)
   return messages
+}
+
+/** The thread came into view: everything in it is seen now. */
+export async function markSeenAction(conversationId: number) {
+  const user = await getSession()
+  if (!user || !Number.isSafeInteger(conversationId)) return
+  await markConversationRead(user.userId, conversationId) // participants only (checked in the query)
+}
+
+/** What the other person has received / seen — for the ticks on my messages. */
+export async function receiptsAction(conversationId: number): Promise<Receipts | null> {
+  const user = await getSession()
+  if (!user || !Number.isSafeInteger(conversationId)) return null
+  return receiptsFor(user.userId, conversationId)
 }

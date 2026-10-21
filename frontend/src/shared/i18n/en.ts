@@ -733,6 +733,7 @@ export const en = {
   },
 
   messages: {
+    status: { sent: 'Sent', delivered: 'Delivered', seen: 'Seen' },
     title: 'Messages',
     sub: 'Conversations between parents and teachers.',
     empty: 'No conversations yet.',

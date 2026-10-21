@@ -2,14 +2,14 @@
 
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
-import { MAX_MESSAGE, type Message } from '@/entities/conversation'
+import { MAX_MESSAGE, statusOf, type Message, type MessageStatus, type Receipts } from '@/entities/conversation'
 import { Button } from '@/shared/ui/button'
 import { Icon } from '@/shared/ui/icon'
 import { Textarea } from '@/shared/ui/textarea'
 import { cn } from '@/shared/lib/cn'
 import { useLiveEvent } from '@/shared/lib/live-events'
 import { useLocale, useT } from '@/shared/i18n'
-import { pollMessagesAction, sendMessageAction } from '../server/actions'
+import { markSeenAction, pollMessagesAction, receiptsAction, sendMessageAction } from '../server/actions'
 
 /** a slow safety net in case live events can't get through (a strict proxy) — normally they arrive at once */
 const FALLBACK_MS = 30_000
@@ -18,10 +18,22 @@ const FALLBACK_MS = 30_000
  * An open conversation: messages arrive LIVE (pushed over /events the moment they're sent) and a
  * composer. Enter sends, Shift+Enter = new line.
  */
-export function ChatThread({ conversationId, meId, initial }: { conversationId: number; meId: number; initial: Message[] }) {
+export function ChatThread({
+  conversationId,
+  meId,
+  initial,
+  receipts: initialReceipts,
+}: {
+  conversationId: number
+  meId: number
+  initial: Message[]
+  /** what the other person has received / seen — the ticks on my messages */
+  receipts: Receipts
+}) {
   const t = useT()
   const locale = useLocale()
   const [messages, setMessages] = useState(initial)
+  const [receipts, setReceipts] = useState(initialReceipts)
   const [text, setText] = useState('')
   const [pending, start] = useTransition()
   // times in the viewer's zone: only after mount (the server doesn't know it)
@@ -43,7 +55,8 @@ export function ChatThread({ conversationId, meId, initial }: { conversationId: 
     })
 
   const fetchNew = useCallback(async () => {
-    const more = await pollMessagesAction(conversationId, last.current)
+    // in view → they're seen; in a background tab → only delivered (seen once the tab is back)
+    const more = await pollMessagesAction(conversationId, last.current, !document.hidden)
     if (more.length) {
       add(more)
       router.refresh() // the conversation list (last message, unread)
@@ -60,10 +73,30 @@ export function ChatThread({ conversationId, meId, initial }: { conversationId: 
     () => void fetchNew(), // back online: catch up
   )
 
+  // the other side received / saw my messages → update the ticks
+  const refreshReceipts = useCallback(async () => {
+    const r = await receiptsAction(conversationId)
+    if (r) setReceipts(r)
+  }, [conversationId])
+  useLiveEvent('receipt', (d) => {
+    if ((d as { conversationId?: number })?.conversationId === conversationId) void refreshReceipts()
+  })
+
+  // back to this tab: what arrived meanwhile is seen now
   useEffect(() => {
-    const id = setInterval(() => !document.hidden && void fetchNew(), FALLBACK_MS)
+    const onShow = () => document.visibilityState === 'visible' && void markSeenAction(conversationId)
+    document.addEventListener('visibilitychange', onShow)
+    return () => document.removeEventListener('visibilitychange', onShow)
+  }, [conversationId])
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (document.hidden) return
+      void fetchNew()
+      void refreshReceipts()
+    }, FALLBACK_MS)
     return () => clearInterval(id)
-  }, [fetchNew])
+  }, [fetchNew, refreshReceipts])
 
   // braces: scrollIntoView may return a promise, and an effect must return nothing or a cleanup
   useEffect(() => {
@@ -100,7 +133,10 @@ export function ChatThread({ conversationId, meId, initial }: { conversationId: 
               >
                 {m.body}
               </div>
-              <time className="min-h-4 px-1 text-[11px] text-muted-foreground">{mounted && time.format(new Date(m.createdAt * 1000))}</time>
+              <span className="flex min-h-4 items-center gap-1 px-1 text-[11px] text-muted-foreground">
+                <time>{mounted && time.format(new Date(m.createdAt * 1000))}</time>
+                {mine && <Ticks status={statusOf(m, receipts)} />}
+              </span>
             </div>
           )
         })}
@@ -133,5 +169,18 @@ export function ChatThread({ conversationId, meId, initial }: { conversationId: 
         </Button>
       </form>
     </div>
+  )
+}
+
+/** ✓ sent · ✓✓ delivered (grey) · ✓✓ seen (green) — like the messengers people know. */
+function Ticks({ status }: { status: MessageStatus }) {
+  const t = useT()
+  return (
+    <span title={t.messages.status[status]} aria-label={t.messages.status[status]} className="inline-flex">
+      <Icon
+        name={status === 'sent' ? 'tick' : 'tickDouble'}
+        className={cn('size-3.5', status === 'seen' ? 'text-primary' : 'text-muted-foreground')}
+      />
+    </span>
   )
 }

@@ -351,6 +351,10 @@ Not built yet (rough priority):
   user's events (today `chat` = { conversationId }, ids only, participants only); the browser keeps
   ONE EventSource per tab (`shared/lib/live-events.ts`, `useLiveEvent`), reconnects and catches up;
   a 30 s fallback poll covers strict proxies. Behind nginx: `X-Accel-Buffering: no` is set.
+  Message ticks: ✓ sent, ✓✓ delivered (the recipient's app got the live event, or they opened
+  Messages), ✓✓ green seen (the conversation open and in view; a background tab only "delivers").
+  Stored as `parent/teacher_delivered_at` + `_read_at` on `conversations`; changes push a
+  `receipt` event. Messages live in app-db (`conversations`, `messages`), not in IOMAD.
 - 2026-10-21 Course language + ratings (owner). The teacher picks the language a course is taught in
   (`course_listings.language`, list in `shared/config/course-language.ts`), shown on cards and the
   course page. Students rate 1–5 stars (+ optional comment) once they FINISH a course = open its last

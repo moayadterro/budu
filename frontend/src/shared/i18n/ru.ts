@@ -742,6 +742,7 @@ export const ru: typeof en = {
   },
 
   messages: {
+    status: { sent: 'Отправлено', delivered: 'Доставлено', seen: 'Прочитано' },
     title: 'Сообщения',
     sub: 'Переписка родителей и учителей.',
     empty: 'Переписок пока нет.',

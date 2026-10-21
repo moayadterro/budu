@@ -109,6 +109,9 @@ CREATE TABLE IF NOT EXISTS conversations (
 );
 CREATE INDEX IF NOT EXISTS conversations_parent ON conversations (parent_id, last_message_at DESC);
 CREATE INDEX IF NOT EXISTS conversations_teacher ON conversations (teacher_id, last_message_at DESC);
+-- delivery receipts: the newest moment each side's device received the other's messages (✓✓)
+ALTER TABLE conversations ADD COLUMN IF NOT EXISTS parent_delivered_at  timestamptz NOT NULL DEFAULT now();
+ALTER TABLE conversations ADD COLUMN IF NOT EXISTS teacher_delivered_at timestamptz NOT NULL DEFAULT now();
 CREATE TABLE IF NOT EXISTS messages (
   id              bigserial PRIMARY KEY,
   conversation_id bigint NOT NULL REFERENCES conversations (id) ON DELETE CASCADE,

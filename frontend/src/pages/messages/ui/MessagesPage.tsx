@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getConversation, listConversations, listMessages, markConversationRead } from '@/entities/conversation/server'
+import { getConversation, listConversations, listMessages, markConversationRead, markDelivered, receiptsFor } from '@/entities/conversation/server'
 import { requireRole } from '@/entities/session/server'
 import { ChatThread, LiveConversations } from '@/features/chat'
 import { Badge } from '@/shared/ui/badge'
@@ -26,6 +26,8 @@ export async function MessagesPage(props: { params?: Promise<{ conversationId?: 
   if (openId && !open) notFound()
   const messages = open ? await listMessages(open.id) : []
   if (open) await markConversationRead(user.userId, open.id)
+  await markDelivered(user.userId) // opening Messages = everything waiting here reached them (✓✓)
+  const receipts = open ? await receiptsFor(user.userId, open.id) : null
   const conversations = await listConversations(user.userId) // after marking read: this one shows no unread
 
   return (
@@ -91,7 +93,7 @@ export async function MessagesPage(props: { params?: Promise<{ conversationId?: 
                   </div>
                 </div>
               </header>
-              <ChatThread key={open.id} conversationId={open.id} meId={user.userId} initial={messages} />
+              <ChatThread key={open.id} conversationId={open.id} meId={user.userId} initial={messages} receipts={receipts ?? { deliveredAt: 0, readAt: 0 }} />
             </>
           ) : (
             <p className="m-auto text-sm text-muted-foreground">{s.pick}</p>

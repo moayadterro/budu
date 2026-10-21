@@ -2,7 +2,7 @@ import 'server-only'
 import { query } from '@/shared/server/db'
 import { publish } from '@/shared/server/realtime'
 import { defaultInstance, iomadCall } from '@/shared/server/iomad'
-import type { Conversation, Message } from '../model/types'
+import type { Conversation, Message, Receipts } from '../model/types'
 
 /**
  * Parent ↔ teacher conversations in app-db (`conversations`, `messages`). Plain functions over the
@@ -84,9 +84,9 @@ export async function openConversation(parentId: number, teacherId: number, chil
 export async function listMessages(conversationId: number, afterId = 0): Promise<Message[]> {
   const rows = await query<{ id: string; sender_id: number; body: string; created: number }>(
     afterId
-      ? `SELECT id, sender_id, body, extract(epoch FROM created_at)::int AS created FROM messages
+      ? `SELECT id, sender_id, body, extract(epoch FROM created_at)::float8 AS created FROM messages
           WHERE conversation_id = $1 AND id > $2 ORDER BY id`
-      : `SELECT * FROM (SELECT id, sender_id, body, extract(epoch FROM created_at)::int AS created FROM messages
+      : `SELECT * FROM (SELECT id, sender_id, body, extract(epoch FROM created_at)::float8 AS created FROM messages
           WHERE conversation_id = $1 AND $2 = 0 ORDER BY id DESC LIMIT 200) m ORDER BY id`,
     [conversationId, afterId],
   )
@@ -110,26 +110,68 @@ export async function sendMessage(c: Conversation, senderId: number, body: strin
      UPDATE conversations SET last_message_at = (SELECT created_at FROM m),
             ${recipientIsParent ? 'teacher_read_at' : 'parent_read_at'} = (SELECT created_at FROM m)
       WHERE id = $1
-     RETURNING (SELECT id FROM m) AS id, extract(epoch FROM (SELECT created_at FROM m))::int AS created`,
+     RETURNING (SELECT id FROM m) AS id, extract(epoch FROM (SELECT created_at FROM m))::float8 AS created`,
     [c.id, senderId, body],
   )
   // live: both participants' open pages hear about it at once (ids only — they fetch through the usual checks)
-  await publish('budu_chat', { conversationId: c.id, users: [c.parentId, c.teacherId] }).catch((e) => console.error('chat publish failed', e))
+  await publish('budu_chat', { kind: 'message', conversationId: c.id, senderId, users: [c.parentId, c.teacherId] }).catch((e) =>
+    console.error('chat publish failed', e),
+  )
   return {
     message: { id: Number(row.id), senderId, body, createdAt: row.created },
     recipientHadUnread: (prior?.n ?? 0) > 0,
   }
 }
 
-/** The user has seen the conversation up to now. */
+/** the other side's messages newer than my marker `col` exist (only then does a receipt change) */
+const newerThan = (col: 'read_at' | 'delivered_at') =>
+  `EXISTS (SELECT 1 FROM messages m WHERE m.conversation_id = c.id AND m.sender_id <> $1
+            AND m.created_at > CASE WHEN c.parent_id = $1 THEN c.parent_${col} ELSE c.teacher_${col} END)`
+
+/** Tell the senders' open chats that their ✓✓ changed. */
+async function announceReceipts(rows: Array<{ id: string; parent_id: number; teacher_id: number }>) {
+  for (const r of rows) {
+    await publish('budu_chat', { kind: 'receipt', conversationId: Number(r.id), users: [r.parent_id, r.teacher_id] }).catch(() => {})
+  }
+}
+
+/** The user has SEEN the conversation up to now (it's open and in view) — also counts as delivered. */
 export async function markConversationRead(userId: number, id: number) {
-  await query(
-    `UPDATE conversations SET
-        parent_read_at  = CASE WHEN parent_id = $1 THEN now() ELSE parent_read_at END,
-        teacher_read_at = CASE WHEN teacher_id = $1 THEN now() ELSE teacher_read_at END
-      WHERE id = $2 AND (parent_id = $1 OR teacher_id = $1)`,
+  const rows = await query<{ id: string; parent_id: number; teacher_id: number }>(
+    `UPDATE conversations c SET
+        parent_read_at       = CASE WHEN parent_id = $1 THEN now() ELSE parent_read_at END,
+        teacher_read_at      = CASE WHEN teacher_id = $1 THEN now() ELSE teacher_read_at END,
+        parent_delivered_at  = CASE WHEN parent_id = $1 THEN now() ELSE parent_delivered_at END,
+        teacher_delivered_at = CASE WHEN teacher_id = $1 THEN now() ELSE teacher_delivered_at END
+      WHERE id = $2 AND (parent_id = $1 OR teacher_id = $1) AND ${newerThan('read_at')}
+      RETURNING id, parent_id, teacher_id`,
     [userId, id],
   )
+  await announceReceipts(rows)
+}
+
+/** The user's device RECEIVED the other side's messages (one conversation, or all of theirs). */
+export async function markDelivered(userId: number, id?: number) {
+  const rows = await query<{ id: string; parent_id: number; teacher_id: number }>(
+    `UPDATE conversations c SET
+        parent_delivered_at  = CASE WHEN parent_id = $1 THEN now() ELSE parent_delivered_at END,
+        teacher_delivered_at = CASE WHEN teacher_id = $1 THEN now() ELSE teacher_delivered_at END
+      WHERE (parent_id = $1 OR teacher_id = $1) AND ($2::bigint IS NULL OR id = $2) AND ${newerThan('delivered_at')}
+      RETURNING id, parent_id, teacher_id`,
+    [userId, id ?? null],
+  )
+  await announceReceipts(rows)
+}
+
+/** What the OTHER participant has received / seen (for the ✓ / ✓✓ on my messages). */
+export async function receiptsFor(userId: number, id: number): Promise<Receipts | null> {
+  const [row] = await query<{ delivered: number; read: number }>(
+    `SELECT extract(epoch FROM CASE WHEN parent_id = $1 THEN teacher_delivered_at ELSE parent_delivered_at END)::float8 AS delivered,
+            extract(epoch FROM CASE WHEN parent_id = $1 THEN teacher_read_at ELSE parent_read_at END)::float8 AS read
+       FROM conversations WHERE id = $2 AND (parent_id = $1 OR teacher_id = $1)`,
+    [userId, id],
+  )
+  return row ? { deliveredAt: row.delivered, readAt: row.read } : null
 }
 
 /** Unread messages across all of the user's conversations (nav badge). */

@@ -7,5 +7,7 @@ export {
   listMessages,
   sendMessage,
   markConversationRead,
+  markDelivered,
+  receiptsFor,
   unreadMessages,
 } from './conversations'
