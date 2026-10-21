@@ -47,7 +47,7 @@ export async function QuizResultsPage({ params }: { params: Promise<{ courseId: 
           {r.students.map((x) => (
             <div key={x.id} className="flex flex-wrap items-center gap-3 border-b py-2 last:border-0">
               <PersonAvatar person={x} />
-              <div className="min-w-0 flex-1">
+              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <div className="truncate text-sm font-medium">{x.name}</div>
                 <div className="text-xs text-muted-foreground">{x.submittedAt ? <LocalTime seconds={x.submittedAt} /> : '—'}</div>
               </div>

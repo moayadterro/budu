@@ -57,7 +57,7 @@ export async function SchoolExamResultsPage({ params }: { params: Promise<{ quiz
           {rows.map((x) => (
             <div key={x.id} className="flex flex-wrap items-center gap-3 border-b py-2 last:border-0">
               <PersonAvatar person={x} />
-              <div className="min-w-0 flex-1">
+              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <div className="flex items-center gap-2">
                   <span className="truncate text-sm font-medium">{x.name}</span>
                   {x.taker && !x.taker.member && <Badge variant="info">{t.exams.audience.candidate}</Badge>}

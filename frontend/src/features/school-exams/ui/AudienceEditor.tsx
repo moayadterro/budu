@@ -144,7 +144,7 @@ export function AudienceEditor({
           {audience.map((a) => (
             <div key={a.id} className="flex items-center gap-3 rounded-md px-1 py-1.5 hover:bg-muted/50">
               <PersonAvatar person={a} className="size-8" />
-              <div className="min-w-0 flex-1">
+              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <div className="truncate text-sm font-medium">{a.name}</div>
                 <div className="truncate text-xs text-muted-foreground">{a.email}</div>
               </div>
