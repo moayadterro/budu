@@ -55,7 +55,7 @@ export function AppSidebar({ inSchool }: { inSchool: boolean }) {
                     (`!`: the menu button shrinks every <svg> inside it to icon size) */}
                 <span className="flex w-full group-data-[collapsible=icon]:justify-center">
                   <Logo className="h-7! w-auto! group-data-[collapsible=icon]:hidden!" label={t.appName} />
-                  <Logo mark className="hidden! size-5! group-data-[collapsible=icon]:block!" label={t.appName} />
+                  <Logo mark className="hidden! size-8! group-data-[collapsible=icon]:block!" label={t.appName} />
                 </span>
               </Link>
             </SidebarMenuButton>
