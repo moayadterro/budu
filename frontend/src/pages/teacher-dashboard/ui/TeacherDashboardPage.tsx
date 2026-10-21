@@ -13,6 +13,8 @@ import { LocalTime } from '@/shared/ui/local-time'
 import { PersonAvatar } from '@/shared/ui/person-avatar'
 import { ScreenHead } from '@/shared/ui/screen-head'
 import { getGradeScale } from '@/entities/tenant/server'
+import { AnnouncementsCard } from '@/entities/announcement'
+import { listAnnouncements } from '@/entities/announcement/server'
 import { getT } from '@/shared/i18n/server'
 
 /** Teacher home: numbers, answers waiting for a grade, courses. Live IOMAD data. */
@@ -21,9 +23,10 @@ export async function TeacherDashboardPage() {
   const t = await getT()
   const scale = await getGradeScale(user.companyId)
   const s = t.teach
-  const [courses, submissions] = await Promise.all([
+  const [courses, submissions, news] = await Promise.all([
     teacherOverview(user.userId, user.companyId),
     user.companyId ? listSubmissions(user.userId, user.companyId) : Promise.resolve([]),
+    listAnnouncements(user.companyId ? [user.companyId] : [], 5),
   ])
   const toGrade = submissions.filter((x) => x.status === 'submitted')
   const students = courses.reduce((n, c) => n + c.students, 0)
@@ -112,6 +115,11 @@ export async function TeacherDashboardPage() {
           </CardContent>
         </Card>
       </div>
+      {news.length > 0 && (
+        <div className="mt-6">
+          <AnnouncementsCard items={news} />
+        </div>
+      )}
     </>
   )
 }

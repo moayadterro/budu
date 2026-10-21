@@ -1,6 +1,9 @@
 import Link from 'next/link'
 import { requireRole } from '@/entities/session/server'
-import { getTenantName, schoolCourses, schoolPeople } from '@/entities/tenant/server'
+import { AnnouncementsCard } from '@/entities/announcement'
+import { listAnnouncements } from '@/entities/announcement/server'
+import { getTenantName, isSchool, schoolCourses, schoolPeople } from '@/entities/tenant/server'
+import { DeleteAnnouncementButton, NewAnnouncementDialog } from '@/features/announcements'
 import { StatTile } from '@/widgets/teacher-overview'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
@@ -16,10 +19,12 @@ export async function SchoolOverviewPage() {
   const t = await getT()
   const s = t.school
   if (!user.companyId) return <ScreenHead title={t.nav.school} sub={s.overviewSub} />
-  const [name, people, courses] = await Promise.all([
+  const [name, people, courses, inSchool, news] = await Promise.all([
     getTenantName(user.companyId),
     schoolPeople(user.userId, user.companyId),
     schoolCourses(user.userId, user.companyId),
+    isSchool(user.companyId),
+    listAnnouncements([user.companyId], 10),
   ])
   const count = (role: string) => people.filter((p) => p.role === role).length
 
@@ -86,6 +91,16 @@ export async function SchoolOverviewPage() {
           </CardContent>
         </Card>
       </div>
+      {inSchool && (
+        <div className="mt-6">
+          <AnnouncementsCard
+            items={news}
+            sub={t.announcements.sub}
+            action={<NewAnnouncementDialog />}
+            itemActions={Object.fromEntries(news.map((a) => [a.id, <DeleteAnnouncementButton key={a.id} announcementId={a.id} />]))}
+          />
+        </div>
+      )}
     </>
   )
 }

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { ScreenHead } from '@/shared/ui/screen-head'
 import { Button } from '@/shared/ui/button'
-import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card'
 import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/shared/ui/item'
 import { Icon } from '@/shared/ui/icon'
 import { requireRole } from '@/entities/session/server'
@@ -15,6 +15,9 @@ import { NextLessonCard, SchoolEventsCard, TodayCard } from '@/widgets/week-cale
 import { LocalTime } from '@/shared/ui/local-time'
 import { getGradeScale, getTenantName, invitesFor, isSchool } from '@/entities/tenant/server'
 import { Alert, AlertDescription } from '@/shared/ui/alert'
+import { AnnouncementsCard } from '@/entities/announcement'
+import { listAnnouncements } from '@/entities/announcement/server'
+import { getFamily, requestsOfChild } from '@/entities/family/server'
 import { getLocale, getT } from '@/shared/i18n/server'
 
 /** Student dashboard. */
@@ -24,13 +27,16 @@ export async function HomePage() {
   const scale = await getGradeScale(user.companyId)
   const firstName = user.name.split(' ')[0] ?? ''
   const nowSec = Math.floor(Date.now() / 1000)
-  const [courses, homework, classes, locale, invites, agenda] = await Promise.all([
+  const [courses, homework, classes, locale, invites, agenda, family, sentToParents, news] = await Promise.all([
     myCourses(user.userId),
     myHomework(user.userId),
     myClasses(user.userId),
     getLocale(),
     invitesFor(user.userId),
     myWeek(user.userId, nowSec - 86400, nowSec + 8 * 86400),
+    getFamily(user.userId),
+    requestsOfChild(user.userId),
+    listAnnouncements(user.companyId ? [user.companyId] : [], 5),
   ])
   const today = new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date())
   // "School · Class 10": their school and their class (at most one); solo students get no line
@@ -78,6 +84,25 @@ export async function HomePage() {
         </div>
 
         <div className="flex min-w-0 flex-col gap-6">
+          {family.parents.length === 0 && (
+            // until a parent accepts: learning goes better with a parent following along
+            <Card className="border-primary/30 bg-primary/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Icon name="userAdd" className="text-primary" />
+                  {t.family.cardTitle}
+                </CardTitle>
+                <CardDescription>
+                  {sentToParents.length > 0 ? `${t.family.waiting}: ${sentToParents.map((r) => r.parentName).join(', ')}` : t.family.cardSub}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button size="sm" asChild>
+                  <Link href="/account#parents">{t.family.cardAction}</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          )}
           <Card>
             <CardHeader>
               <CardTitle>{t.home.hwTitle}</CardTitle>
@@ -108,6 +133,7 @@ export async function HomePage() {
             </CardContent>
           </Card>
           <SchoolEventsCard items={agenda} />
+          <AnnouncementsCard items={news} />
         </div>
       </div>
     </>
