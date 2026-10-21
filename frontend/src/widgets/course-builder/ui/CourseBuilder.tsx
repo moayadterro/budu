@@ -65,7 +65,7 @@ export function CourseBuilder({ course, authorName }: { course: Course; authorNa
           </CardHeader>
           <CardContent>
             <Button variant="outline" className="w-full" asChild>
-              <Link href={`/teach/classes/${course.id}`}>
+              <Link href={`/courses/${course.id}/students`}>
                 <Icon name="users" />
                 {t.teach.manageStudents}
               </Link>

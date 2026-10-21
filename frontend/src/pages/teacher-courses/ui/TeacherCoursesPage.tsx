@@ -1,7 +1,8 @@
 import Link from 'next/link'
-import { CourseRow, type CourseSummary } from '@/entities/course'
-import { listTeacherCourses } from '@/entities/course/server'
+import { CourseRow } from '@/entities/course'
 import { requireRole } from '@/entities/session/server'
+import { teacherOverview, type CourseOverview } from '@/widgets/teacher-overview/server'
+import { Badge } from '@/shared/ui/badge'
 import { Alert, AlertDescription } from '@/shared/ui/alert'
 import { Button } from '@/shared/ui/button'
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/shared/ui/empty'
@@ -15,10 +16,10 @@ export async function TeacherCoursesPage() {
   const user = await requireRole('teacher')
   const s = t.courses
 
-  let courses: CourseSummary[] = []
+  let courses: CourseOverview[] = []
   let failed = false
   try {
-    courses = user.companyId ? await listTeacherCourses(user.userId, user.companyId) : []
+    courses = await teacherOverview(user.userId, user.companyId)
   } catch (e) {
     console.error('list courses failed', e)
     failed = true
@@ -62,9 +63,21 @@ export async function TeacherCoursesPage() {
             key={c.id}
             course={c}
             action={
-              <Button variant="outline" size="sm" asChild>
-                <Link href={`/courses/${c.id}`}>{s.edit}</Link>
-              </Button>
+              <>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href={`/courses/${c.id}/students`}>{t.teach.studentCount(c.students)}</Link>
+                </Button>
+                {c.toGrade > 0 && (
+                  <Link href={`/grading?course=${c.id}`}>
+                    <Badge variant="info">
+                      {t.teach.cols.toGrade}: {c.toGrade}
+                    </Badge>
+                  </Link>
+                )}
+                <Button variant="outline" size="sm" asChild>
+                  <Link href={`/courses/${c.id}`}>{s.edit}</Link>
+                </Button>
+              </>
             }
           />
         ))}

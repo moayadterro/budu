@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getCourse } from '@/entities/course/server'
 import { requireRole } from '@/entities/session/server'
-import { CourseBuilder } from '@/widgets/course-builder'
+import { CourseBuilder, CourseTabs } from '@/widgets/course-builder'
 import { Button } from '@/shared/ui/button'
 import { Icon } from '@/shared/ui/icon'
 import { ScreenHead } from '@/shared/ui/screen-head'
@@ -27,6 +27,7 @@ export async function CourseBuilderPage({ params }: { params: Promise<{ courseId
         </Link>
       </Button>
       <ScreenHead title={course.title} sub={s.lessonCount(course.lessonCount)} />
+      <CourseTabs courseId={course.id} />
       <CourseBuilder course={course} authorName={user.name} />
     </>
   )

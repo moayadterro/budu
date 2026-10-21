@@ -87,7 +87,7 @@ export async function TeacherDashboardPage() {
             <CardTitle>{s.coursesTitle}</CardTitle>
             <CardAction>
               <Button variant="link" size="sm" className="h-auto p-0" asChild>
-                <Link href="/teach/classes">{t.viewAll}</Link>
+                <Link href="/courses">{t.viewAll}</Link>
               </Button>
             </CardAction>
           </CardHeader>
@@ -95,7 +95,7 @@ export async function TeacherDashboardPage() {
             {courses.length === 0 && <p className="text-sm text-muted-foreground">{s.noClasses}</p>}
             {courses.slice(0, 6).map((c) => (
               <Item key={c.id} size="sm" className="px-2" asChild>
-                <Link href={`/teach/classes/${c.id}`}>
+                <Link href={`/courses/${c.id}/students`}>
                   <ItemMedia className="size-9 rounded-md bg-brand text-primary-foreground">
                     <span className="text-xs font-semibold">{c.title.slice(0, 2).toUpperCase()}</span>
                   </ItemMedia>
