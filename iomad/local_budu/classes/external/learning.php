@@ -416,7 +416,7 @@ class learning extends external_api {
         return new external_function_parameters([
             'courseid' => new external_value(PARAM_INT, 'Course'),
             'userid' => new external_value(PARAM_INT, 'Acting Budu user (teacher, manager, or class teacher of classid)'),
-            'classid' => new external_value(PARAM_INT, 'Only students of this class (0 = everyone)', VALUE_DEFAULT, 0),
+            'classid' => new external_value(PARAM_INT, 'Only students of this class (0 = everyone, -1 = students in no class)', VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -435,8 +435,14 @@ class learning extends external_api {
         if ($course->id == SITEID || (!$classteacher && !self::can_teach($course, $p['userid']))) {
             throw self::deny('see this gradebook');
         }
-        $members = $p['classid']
+        $members = $p['classid'] > 0
             ? array_flip($DB->get_fieldset_select('cohort_members', 'userid', 'cohortid = ?', [$p['classid']]))
+            : null;
+        // -1: students in none of the school's classes (e.g. they bought the course themselves)
+        $inclass = $p['classid'] < 0
+            ? array_flip($DB->get_fieldset_sql("SELECT DISTINCT cm.userid FROM {cohort_members} cm
+                JOIN {cohort} c ON c.id = cm.cohortid AND c.component = 'local_budu'
+               WHERE c.contextid = ?", [\context_coursecat::instance($course->category)->id]))
             : null;
         $homework = [];
         $instances = [];
@@ -459,7 +465,7 @@ class learning extends external_api {
         }
         $rows = [];
         foreach (self::students_of($course->id) as $s) {
-            if ($members !== null && !isset($members[$s->id])) {
+            if (($members !== null && !isset($members[$s->id])) || ($inclass !== null && isset($inclass[$s->id]))) {
                 continue;
             }
             $cells = [];

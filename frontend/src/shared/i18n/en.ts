@@ -628,6 +628,7 @@ export const en = {
     pickClass: 'Choose a class',
     classFilter: 'Class',
     allStudents: 'All students',
+    noClass: 'No class (joined on their own)',
   },
 
   invites: {

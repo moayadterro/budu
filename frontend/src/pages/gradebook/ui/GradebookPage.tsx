@@ -36,7 +36,8 @@ export async function GradebookPage({ searchParams }: { searchParams: Promise<{ 
       ).map((c) => ({ id: c.id, title: c.title }))
   const q = await searchParams
   const wanted = Number(q.course)
-  const classId = Number(q.class) > 0 ? Number(q.class) : 0
+  // a class id, 'none' (students in no class — e.g. they bought the course themselves), or everyone
+  const classId = q.class === 'none' ? -1 : Number(q.class) > 0 ? Number(q.class) : 0
   // a class teacher may open a course they don't teach, for their class (the plugin checks it)
   const viaClass = classId > 0 && !courses.some((c) => c.id === wanted) && wanted > 0
   const courseId = viaClass ? wanted : (courses.find((c) => c.id === wanted)?.id ?? courses[0]?.id)
@@ -47,7 +48,8 @@ export async function GradebookPage({ searchParams }: { searchParams: Promise<{ 
     courseId && user.companyId && (await isSchool(user.companyId))
       ? (await listClasses(user.userId, user.companyId)).filter((k) => k.courseIds.includes(courseId))
       : []
-  const here = (course: number, cls?: number) => (cls ? `/gradebook?course=${course}&class=${cls}` : `/gradebook?course=${course}`)
+  const here = (course: number, cls?: number) =>
+    cls ? `/gradebook?course=${course}&class=${cls < 0 ? 'none' : cls}` : `/gradebook?course=${course}`
 
   const cells = gb?.rows.flatMap((r) => r.cells) ?? []
   const grades = cells.filter((c) => c.grade !== null).map((c) => c.grade!)
@@ -74,6 +76,7 @@ export async function GradebookPage({ searchParams }: { searchParams: Promise<{ 
               options={[
                 { href: here(courseId), label: t.classes.allStudents },
                 ...classes.map((k) => ({ href: here(courseId, k.id), label: k.name })),
+                { href: here(courseId, -1), label: t.classes.noClass },
               ]}
             />
           )}

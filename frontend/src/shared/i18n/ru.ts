@@ -637,6 +637,7 @@ export const ru: typeof en = {
     pickClass: 'Выберите класс',
     classFilter: 'Класс',
     allStudents: 'Все ученики',
+    noClass: 'Без класса (записались сами)',
   },
 
   invites: {

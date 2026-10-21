@@ -635,6 +635,7 @@ export const ar: typeof en = {
     pickClass: 'اختر فصلًا',
     classFilter: 'الفصل',
     allStudents: 'كل الطلاب',
+    noClass: 'بلا صف (انضموا بأنفسهم)',
   },
 
   invites: {
