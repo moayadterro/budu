@@ -18,6 +18,8 @@ import { Alert, AlertDescription } from '@/shared/ui/alert'
 import { AnnouncementsCard } from '@/entities/announcement'
 import { listAnnouncements } from '@/entities/announcement/server'
 import { getFamily, requestsOfChild } from '@/entities/family/server'
+import { QuizStateBadge } from '@/entities/quiz'
+import { myQuizzes } from '@/entities/quiz/server'
 import { getLocale, getT } from '@/shared/i18n/server'
 
 /** Student dashboard. */
@@ -27,7 +29,7 @@ export async function HomePage() {
   const scale = await getGradeScale(user.companyId)
   const firstName = user.name.split(' ')[0] ?? ''
   const nowSec = Math.floor(Date.now() / 1000)
-  const [courses, homework, classes, locale, invites, agenda, family, sentToParents, news] = await Promise.all([
+  const [courses, homework, classes, locale, invites, agenda, family, sentToParents, news, quizzes] = await Promise.all([
     myCourses(user.userId),
     myHomework(user.userId),
     myClasses(user.userId),
@@ -37,7 +39,13 @@ export async function HomePage() {
     getFamily(user.userId),
     requestsOfChild(user.userId),
     listAnnouncements({ schools: user.companyId ? [user.companyId] : [] }, 5),
+    myQuizzes(user.userId),
   ])
+  // quizzes / exams to take now, closing soonest first
+  const openQuizzes = quizzes
+    .filter((q) => q.canStart || q.state === 'inprogress')
+    .sort((a, b) => (a.closesAt ?? Infinity) - (b.closesAt ?? Infinity))
+    .slice(0, 5)
   // school-wide news + their class's + their courses' (fetched after: needs the class and course ids)
   const classNews = await listAnnouncements({ classes: classes.member.map((k) => k.id), courses: courses.map((c) => c.id) }, 5)
   const allNews = [...news, ...classNews].sort((a, b) => b.createdAt - a.createdAt).slice(0, 6)
@@ -130,6 +138,35 @@ export async function HomePage() {
                       </ItemDescription>
                     </ItemContent>
                     <HomeworkStatusBadge scale={scale} status={hw.status} grade={hw.grade} dueAt={hw.dueAt} submittedAt={hw.submittedAt} />
+                  </Link>
+                </Item>
+              ))}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>{t.quiz.homeTitle}</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-1">
+              {openQuizzes.length === 0 && <p className="text-sm text-muted-foreground">{t.quiz.noneOpen}</p>}
+              {openQuizzes.map((q) => (
+                <Item key={q.id} size="sm" asChild className="px-2">
+                  <Link href={`/classes/${q.courseId}/quizzes/${q.id}`}>
+                    <ItemMedia variant="icon" className={q.kind === 'exam' ? 'bg-warning/10 text-warning' : 'bg-info/10 text-info'}>
+                      <Icon name="check" />
+                    </ItemMedia>
+                    <ItemContent className="min-w-0">
+                      <ItemTitle className="truncate">{q.name}</ItemTitle>
+                      <ItemDescription className="truncate">
+                        {t.quiz.kind[q.kind]} · {q.courseTitle}
+                        {q.closesAt && (
+                          <>
+                            {' '}· {t.quiz.list.closes} <LocalTime seconds={q.closesAt} />
+                          </>
+                        )}
+                      </ItemDescription>
+                    </ItemContent>
+                    <QuizStateBadge quiz={q} />
                   </Link>
                 </Item>
               ))}

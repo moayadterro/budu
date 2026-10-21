@@ -1,9 +1,11 @@
 import { redirect } from 'next/navigation'
+import { after } from 'next/server'
 import { ReactNode } from 'react'
 import { SessionProvider } from '@/entities/session'
 import { listNotifications, unreadCount } from '@/entities/notification/server'
 import { getSession } from '@/entities/session/server'
 import { isSchool } from '@/entities/tenant/server'
+import { runQuizReminders } from '@/features/remind-quizzes/server'
 import { PageTransition } from '@/shared/ui/motion'
 import { SidebarInset, SidebarProvider } from '@/shared/ui/sidebar'
 import { AppSidebar } from './AppSidebar'
@@ -13,6 +15,7 @@ import { SiteHeader } from './SiteHeader'
 export async function AppShell({ children }: { children: ReactNode }) {
   const user = await getSession()
   if (!user) redirect('/login')
+  after(runQuizReminders) // background chores ride on page loads (throttled inside)
   const [items, unread, inSchool] = await Promise.all([
     listNotifications(user.userId),
     unreadCount(user.userId),

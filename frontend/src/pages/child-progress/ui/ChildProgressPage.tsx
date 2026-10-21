@@ -1,8 +1,10 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { PERIODS, progress, type Period } from '@/entities/family'
+import { QuizStateBadge } from '@/entities/quiz'
 import { childCourses, childOf } from '@/entities/family/server'
 import { myHomework } from '@/entities/homework/server'
+import { myQuizzes } from '@/entities/quiz/server'
 import { myClasses } from '@/entities/school-class/server'
 import { requireRole } from '@/entities/session/server'
 import { getGradeScale } from '@/entities/tenant/server'
@@ -33,12 +35,14 @@ export async function ChildProgressPage(props: { params: Promise<{ childId: stri
   const t = await getT()
   const s = t.family
   const now = Math.floor(Date.now() / 1000)
-  const [homework, courses, classes, scale] = await Promise.all([
+  const [homework, courses, classes, scale, quizzes] = await Promise.all([
     myHomework(childId),
     childCourses(childId),
     myClasses(childId),
     getGradeScale(child.schools[0]?.companyId ?? null),
+    myQuizzes(childId),
   ])
+  const exams = quizzes.filter((q) => q.kind === 'exam')
   const p = progress(homework, period, now)
   const line = [child.schools[0]?.name, classes.member[0]?.name].filter(Boolean).join(' · ')
   const grade = (g: number) => <span className={cn('font-semibold tabular-nums', toneClass[gradeTone(g)])}>{formatGrade(g, scale)}</span>
@@ -105,6 +109,31 @@ export async function ChildProgressPage(props: { params: Promise<{ childId: stri
                     {h.feedback && <p className="mt-1 border-s-2 ps-3 text-sm whitespace-pre-line text-muted-foreground">{h.feedback}</p>}
                   </div>
                   {grade(h.grade!)}
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>{t.quiz.examsTitle}</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-3">
+              {exams.length === 0 && <p className="text-sm text-muted-foreground">{t.quiz.noExams}</p>}
+              {exams.map((q) => (
+                <div key={q.id} className="flex items-center gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm font-medium">{q.name}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {q.courseTitle}
+                      {q.closesAt && (
+                        <>
+                          {' '}· {t.quiz.list.closes} <LocalTime seconds={q.closesAt} />
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  {q.grade !== null ? grade(q.grade) : <QuizStateBadge quiz={q} />}
                 </div>
               ))}
             </CardContent>

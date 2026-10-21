@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import { AnnouncementsCard } from '@/entities/announcement'
 import { listAnnouncements } from '@/entities/announcement/server'
 import { getCourse, myCourses } from '@/entities/course/server'
+import { QuizStateBadge } from '@/entities/quiz'
+import { myQuizzes } from '@/entities/quiz/server'
 import { HomeworkStatusBadge } from '@/entities/homework'
 import { myHomework } from '@/entities/homework/server'
 import { requireRole } from '@/entities/session/server'
@@ -15,7 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 import { getGradeScale } from '@/entities/tenant/server'
 import { getT } from '@/shared/i18n/server'
 
-/** Student: one course — its announcements, lessons and homework. Live IOMAD data. */
+/** Student: one course — its announcements, lessons, homework and quizzes. Live IOMAD data. */
 export async function ClassHubPage({ params }: { params: Promise<{ courseId: string }> }) {
   const user = await requireRole('student')
   const id = Number((await params).courseId)
@@ -26,6 +28,8 @@ export async function ClassHubPage({ params }: { params: Promise<{ courseId: str
     myCourses(user.userId),
     listAnnouncements({ courses: [id] }, 3),
   ])
+  const quizzes = await myQuizzes(user.userId, id)
+  const openQuizzes = quizzes.filter((q) => q.canStart || q.state === 'inprogress').length
   if (!course) notFound()
   const t = await getT()
   const scale = await getGradeScale(user.companyId)
@@ -68,7 +72,42 @@ export async function ClassHubPage({ params }: { params: Promise<{ courseId: str
             {s.homeworkTab}
             {todo > 0 && <span className="ms-1 rounded-full bg-warning/15 px-1.5 text-xs text-warning tabular-nums">{todo}</span>}
           </TabsTrigger>
+          <TabsTrigger value="quizzes">
+            {t.quiz.list.tab}
+            {openQuizzes > 0 && <span className="ms-1 rounded-full bg-info/15 px-1.5 text-xs text-info tabular-nums">{openQuizzes}</span>}
+          </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="quizzes">
+          <Card className="py-2">
+            <CardContent className="gap-1 px-2">
+              {quizzes.length === 0 && <p className="px-2 py-3 text-sm text-muted-foreground">{t.quiz.list.noneStudent}</p>}
+              {quizzes.map((q) => (
+                <Item key={q.id} size="sm" asChild>
+                  <Link href={`/classes/${id}/quizzes/${q.id}`}>
+                    <ItemMedia variant="icon" className={q.kind === 'exam' ? 'bg-warning/10 text-warning' : 'bg-info/10 text-info'}>
+                      <Icon name="check" />
+                    </ItemMedia>
+                    <ItemContent className="min-w-0">
+                      <ItemTitle className="truncate">{q.name}</ItemTitle>
+                      <ItemDescription className="truncate">
+                        {t.quiz.kind[q.kind]}
+                        {q.closesAt && (
+                          <>
+                            {' '}· {t.quiz.list.closes} <LocalTime seconds={q.closesAt} />
+                          </>
+                        )}
+                      </ItemDescription>
+                    </ItemContent>
+                    <ItemActions>
+                      <QuizStateBadge quiz={q} />
+                    </ItemActions>
+                  </Link>
+                </Item>
+              ))}
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="lessons">
           <Card className="py-2">

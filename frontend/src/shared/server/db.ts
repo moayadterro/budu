@@ -188,6 +188,23 @@ CREATE INDEX IF NOT EXISTS orders_status ON orders (status, created_at);
 CREATE INDEX IF NOT EXISTS orders_student ON orders (student_id, course_id);
 -- at most one open order per student + course (a double click can't create two)
 CREATE UNIQUE INDEX IF NOT EXISTS orders_one_open ON orders (iomad_url, student_id, course_id) WHERE status IN ('pending', 'reported');
+
+-- "closes within a day" quiz reminders already sent (one per student and quiz)
+CREATE TABLE IF NOT EXISTS quiz_reminders (
+  iomad_url text NOT NULL,
+  quiz_id   integer NOT NULL,
+  user_id   integer NOT NULL,
+  sent_at   timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (iomad_url, quiz_id, user_id)
+);
+-- scheduled quizzes already announced (students told when the publish time came)
+CREATE TABLE IF NOT EXISTS quiz_announcements (
+  iomad_url text NOT NULL,
+  quiz_id   integer NOT NULL,
+  open_at   integer NOT NULL,
+  sent_at   timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (iomad_url, quiz_id, open_at)
+);
 `
 
 // One pool per server process (survives dev hot reloads). The schema check re-runs whenever SCHEMA
