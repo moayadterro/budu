@@ -24,6 +24,8 @@ export async function CatalogCoursePage({ params }: { params: Promise<{ courseId
       course={item.course}
       price={item.price}
       currency={currency}
+      rating={item.rating}
+      language={item.listing.language}
       back={{ href: '/catalog', label: s.all }}
       previewHref={`/catalog/${id}/preview`}
       // visitors: a locked lesson → sign in, then back to this course (students land on its Explore page)

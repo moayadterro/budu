@@ -6,6 +6,7 @@ import { COURSE_LIMITS } from '@/entities/course'
 import { createCourse, discardChanges, getCourse, listStudents, publishChanges, saveListing, setCourseImage, updateCourse } from '@/entities/course/server'
 import { notify } from '@/entities/notification/server'
 import { isCurrency } from '@/shared/config/currency'
+import { isCourseLanguage } from '@/shared/config/course-language'
 import { requireRole } from '@/entities/session/server'
 import { formId, formText } from '@/shared/lib/form'
 import type { CourseFormError, CourseFormState } from '../model/types'
@@ -108,7 +109,8 @@ export async function saveListingAction(_prev: ListingState, form: FormData): Pr
   if (!courseId || !Number.isFinite(price) || price < 0 || price > MAX_PRICE || !isCurrency(currency)) return { status: 'error', at }
   const course = await getCourse(user.userId, courseId)
   if (!course?.canEdit) return { status: 'error', at }
-  await saveListing(user.userId, { courseId, listed: form.get('listed') === 'on', price, currency })
+  const language = formText(form, 'language')
+  await saveListing(user.userId, { courseId, listed: form.get('listed') === 'on', price, currency, language: isCourseLanguage(language) ? language : null })
   revalidatePath(`/courses/${courseId}`)
   revalidatePath('/explore')
   return { status: 'saved', at }

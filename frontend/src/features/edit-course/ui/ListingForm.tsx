@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from 'react'
 import { CURRENCIES, type Currency } from '@/shared/config/currency'
+import { COURSE_LANGUAGES, languageName } from '@/shared/config/course-language'
 import { currencyName } from '@/shared/lib/money'
 import { Alert } from '@/shared/ui/alert'
 import { Field } from '@/shared/ui/field'
@@ -21,7 +22,7 @@ export function ListingForm({
 }: {
   courseId: number
   published: boolean
-  listing: { listed: boolean; price: number; currency: Currency }
+  listing: { listed: boolean; price: number; currency: Currency; language: string | null }
 }) {
   const t = useT()
   const locale = useLocale()
@@ -62,6 +63,16 @@ export function ListingForm({
         </Field>
       </div>
       <p className="mt-2 mb-4 text-xs text-muted-foreground">{s.freeHint}</p>
+      <Field label={s.language} hint={s.languageHint}>
+        <NativeSelect name="language" defaultValue={listing.language ?? ''} aria-label={s.language}>
+          <NativeSelectOption value="">{s.languageNone}</NativeSelectOption>
+          {COURSE_LANGUAGES.map((l) => (
+            <NativeSelectOption key={l} value={l}>
+              {languageName(l, locale)}
+            </NativeSelectOption>
+          ))}
+        </NativeSelect>
+      </Field>
       <SubmitButton variant="outline" label={s.save} pendingLabel={s.save} />
     </form>
   )

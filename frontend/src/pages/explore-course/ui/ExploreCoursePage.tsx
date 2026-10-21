@@ -17,12 +17,14 @@ export async function ExploreCoursePage({ params }: { params: Promise<{ courseId
   const item = items.find((i) => i.course.id === id)
   if (!item) notFound()
   const t = await getT()
-  const { course, price } = item
+  const { course, price, rating, listing } = item
   return (
     <CourseDetail
       course={course}
       price={price}
       currency={currency}
+      rating={rating}
+      language={listing.language}
       back={{ href: '/explore', label: t.shop.back }}
       // not in the course yet: lesson 1 is a free preview, the rest are locked
       previewHref={course.enrolled ? null : `/catalog/${course.id}/preview`}

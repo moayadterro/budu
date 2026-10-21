@@ -7,11 +7,12 @@ import { CourseBuilder, CourseTabs } from '@/widgets/course-builder'
 import { Button } from '@/shared/ui/button'
 import { Icon } from '@/shared/ui/icon'
 import { ScreenHead } from '@/shared/ui/screen-head'
-import { getT } from '@/shared/i18n/server'
+import { isCourseLanguage } from '@/shared/config/course-language'
+import { getLocale, getT } from '@/shared/i18n/server'
 
 /** Teacher: edit one course — details, publish, lessons, videos, PDFs, tasks. */
 export async function CourseBuilderPage({ params }: { params: Promise<{ courseId: string }> }) {
-  const t = await getT()
+  const [t, locale] = await Promise.all([getT(), getLocale()])
   const user = await requireRole('teacher')
   const id = Number((await params).courseId)
   if (!Number.isSafeInteger(id) || id <= 0) notFound()
@@ -33,7 +34,8 @@ export async function CourseBuilderPage({ params }: { params: Promise<{ courseId
       <CourseBuilder
         course={course}
         authorName={user.name}
-        listing={listing ?? { listed: false, price: 0, currency }} // new listing: the teacher's own currency
+        // new listing: the teacher's own currency, and their UI language as a first guess for the course's
+        listing={listing ?? { listed: false, price: 0, currency, language: isCourseLanguage(locale) ? locale : null }}
       />
     </>
   )

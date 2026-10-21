@@ -343,6 +343,13 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-21 Course language + ratings (owner). The teacher picks the language a course is taught in
+  (`course_listings.language`, list in `shared/config/course-language.ts`), shown on cards and the
+  course page. Students rate 1–5 stars (+ optional comment) once they FINISH a course = open its last
+  lesson (no progress tracking yet) — asked on that lesson and on the course page until they rate or
+  say "Not now" (`course_finishes`, `course_reviews`, entity `review`, feature `rate-course`).
+  Shown: average stars, reviews count, students enrolled (IOMAD `catalog.students`), latest comments.
+  No reviews yet → 5.0 marked "New" (owner: "initially 5").
 - 2026-10-21 Draft changes (owner): editing a PUBLISHED course never changes what students see until
   "Publish changes". New lessons / items are created hidden; edits of live lesson titles, text pages
   and homework are kept in the plugin table `local_budu_draft` (a new task attachment in file area

@@ -1150,6 +1150,29 @@ export const en = {
     open: 'Go to the course',
   },
 
+  reviews: {
+    title: 'What students say',
+    new: 'New',
+    none: 'No reviews yet',
+    count: (n: number) => `${n} ${n === 1 ? 'review' : 'reviews'}`,
+    summary: (avg: string, n: number) => `${avg} out of 5 — ${n} ${n === 1 ? 'review' : 'reviews'}`,
+    students: (n: number) => `${n} ${n === 1 ? 'student' : 'students'}`,
+    taughtIn: (lang: string) => `Taught in ${lang}`,
+    askTitle: 'How was this course?',
+    yourRating: 'Your rating',
+    askSub: (course: string) => `You reached the end of “${course}”. Your rating helps other students choose.`,
+    starsLabel: 'Rating',
+    starN: (n: number) => `${n} of 5`,
+    label: ['Poor', 'Fair', 'Good', 'Very good', 'Excellent'],
+    commentPh: 'What did you like? What could be better? (optional)',
+    send: 'Send rating',
+    update: 'Update rating',
+    sending: 'Sending…',
+    notNow: 'Not now',
+    thanks: 'Thank you! Your rating is saved.',
+    failed: 'We couldn’t save your rating. Try again.',
+  },
+
   catalog: {
     heroTitle: 'Learn with teachers and schools you trust',
     heroSub: 'Browse every course on Budu and watch the first lesson for free. To join a course — free ones too — create an account.',
@@ -1165,6 +1188,9 @@ export const en = {
   },
 
   market: {
+    language: 'Language of the course',
+    languageHint: 'The language you teach in — shown on the course card.',
+    languageNone: 'Not set',
     title: 'Marketplace',
     sub: 'Show this course in Explore so any student can find it, free or for a price.',
     listed: 'Show in Explore',

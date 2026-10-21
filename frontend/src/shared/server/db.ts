@@ -205,6 +205,32 @@ CREATE TABLE IF NOT EXISTS quiz_announcements (
   sent_at   timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (iomad_url, quiz_id, open_at)
 );
+
+-- the language a course is taught in (ISO 639-1, e.g. 'ru'); NULL = not said
+ALTER TABLE course_listings ADD COLUMN IF NOT EXISTS language text;
+
+-- students' ratings of courses they finished (1–5 stars, optional comment); one per student and course
+CREATE TABLE IF NOT EXISTS course_reviews (
+  iomad_url   text NOT NULL,
+  course_id   integer NOT NULL,
+  user_id     integer NOT NULL,
+  author_name text NOT NULL DEFAULT '',
+  stars       smallint NOT NULL CHECK (stars BETWEEN 1 AND 5),
+  comment     text NOT NULL DEFAULT '',
+  created_at  timestamptz NOT NULL DEFAULT now(),
+  updated_at  timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (iomad_url, course_id, user_id)
+);
+
+-- a student finished a course (opened its last lesson) → asked to rate it; "Not now" hides the ask
+CREATE TABLE IF NOT EXISTS course_finishes (
+  iomad_url    text NOT NULL,
+  course_id    integer NOT NULL,
+  user_id      integer NOT NULL,
+  finished_at  timestamptz NOT NULL DEFAULT now(),
+  dismissed_at timestamptz,
+  PRIMARY KEY (iomad_url, course_id, user_id)
+);
 `
 
 // One pool per server process (survives dev hot reloads). The schema check re-runs whenever SCHEMA

@@ -221,13 +221,15 @@ export type CatalogCourse = {
   enrolled: boolean
   /** cover image file id, null = generated cover */
   imageId: number | null
+  /** students enrolled — "how many took it" */
+  students: number
 }
 
 /** Public facts of these (listed) courses; unpublished ones are left out. */
 export async function catalog(courseIds: number[], viewerId = 0): Promise<CatalogCourse[]> {
   if (!courseIds.length) return []
   const rows = await call<
-    Array<{ id: number; fullname: string; summary: string; school: string; teachers: RawPerson[]; lessons: string[]; enrolled: boolean; image: number }>
+    Array<{ id: number; fullname: string; summary: string; school: string; teachers: RawPerson[]; lessons: string[]; enrolled: boolean; image: number; students?: number }>
   >('catalog', { courseids: courseIds, userid: viewerId })
   return rows.map((r) => ({
     id: r.id,
@@ -238,6 +240,7 @@ export async function catalog(courseIds: number[], viewerId = 0): Promise<Catalo
     lessons: r.lessons,
     enrolled: r.enrolled,
     imageId: r.image || null,
+    students: r.students ?? 0,
   }))
 }
 

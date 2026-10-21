@@ -24,7 +24,7 @@ export function CourseBuilder({
   course: Course
   authorName: string
   /** marketplace listing (Explore): shown or not, price */
-  listing: { listed: boolean; price: number; currency: Currency }
+  listing: { listed: boolean; price: number; currency: Currency; language: string | null }
 }) {
   const t = useT()
   const s = t.courses

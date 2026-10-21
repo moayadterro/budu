@@ -7,7 +7,9 @@ import { QuizStateBadge } from '@/entities/quiz'
 import { myQuizzes } from '@/entities/quiz/server'
 import { HomeworkStatusBadge } from '@/entities/homework'
 import { myHomework } from '@/entities/homework/server'
+import { ratingAsk } from '@/entities/review/server'
 import { requireRole } from '@/entities/session/server'
+import { RateCourseCard } from '@/features/rate-course'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent } from '@/shared/ui/card'
 import { Icon } from '@/shared/ui/icon'
@@ -28,7 +30,7 @@ export async function ClassHubPage({ params }: { params: Promise<{ courseId: str
     myCourses(user.userId),
     listAnnouncements({ courses: [id] }, 3),
   ])
-  const quizzes = await myQuizzes(user.userId, id)
+  const [quizzes, ask] = await Promise.all([myQuizzes(user.userId, id), ratingAsk(user.userId, id)])
   const openQuizzes = quizzes.filter((q) => q.canStart || q.state === 'inprogress').length
   if (!course) notFound()
   const t = await getT()
@@ -58,6 +60,12 @@ export async function ClassHubPage({ params }: { params: Promise<{ courseId: str
         </div>
       </div>
       {course.description && <p className="mb-6 max-w-3xl whitespace-pre-line text-sm text-muted-foreground">{course.description}</p>}
+      {/* finished: ask for a rating until they rate or say "Not now" */}
+      {ask.finished && !ask.mine && !ask.dismissed && (
+        <div className="mb-6 max-w-xl">
+          <RateCourseCard courseId={id} courseTitle={course.title} mine={null} />
+        </div>
+      )}
 
       {news.length > 0 && (
         <div className="mb-6 max-w-3xl">

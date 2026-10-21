@@ -10,7 +10,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { Icon } from '@/shared/ui/icon'
 import { PersonAvatar } from '@/shared/ui/person-avatar'
 import { cn } from '@/shared/lib/cn'
-import { getT } from '@/shared/i18n/server'
+import { Stars, type Rating } from '@/entities/review'
+import { recentReviews } from '@/entities/review/server'
+import { languageName } from '@/shared/config/course-language'
+import { LocalTime } from '@/shared/ui/local-time'
+import { getLocale, getT } from '@/shared/i18n/server'
 
 /**
  * One marketplace course: cover, what's inside, who teaches it, the price — and `action` (Enrol /
@@ -26,6 +30,8 @@ export async function CourseDetail({
   previewHref,
   lockedHref,
   currency,
+  rating,
+  language,
 }: {
   course: CatalogCourse
   price: ShownPrice
@@ -35,9 +41,13 @@ export async function CourseDetail({
   lockedHref?: string | null
   /** the viewer's price currency — changeable right under the price */
   currency: Currency
+  rating: Rating
+  /** what the course is taught in; null = not said */
+  language: string | null
 }) {
-  const t = await getT()
+  const [t, locale, reviews] = await Promise.all([getT(), getLocale(), recentReviews(course.id)])
   const s = t.shop
+  const avg = rating.average.toLocaleString(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })
   return (
     <div className="flex flex-col gap-4">
       <Button variant="ghost" size="sm" className="-ms-2 self-start" asChild>
@@ -49,9 +59,27 @@ export async function CourseDetail({
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="flex min-w-0 flex-col gap-6">
           <CourseCover courseId={course.id} title={course.title} imageId={course.imageId} className="rounded-xl" />
-          <div>
+          <div className="flex flex-col gap-2">
             <h1 className="text-2xl font-semibold tracking-tight">{course.title}</h1>
-            {course.school && <p className="mt-1 text-sm text-muted-foreground">{course.school}</p>}
+            {course.school && <p className="text-sm text-muted-foreground">{course.school}</p>}
+            {/* rating · reviews · students · language */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+              <span className="inline-flex items-center gap-1.5">
+                <Stars value={rating.average} />
+                <span className="font-semibold tabular-nums">{avg}</span>
+                <span className="text-muted-foreground">{rating.count ? t.reviews.count(rating.count) : t.reviews.none}</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                <Icon name="users" className="size-4" />
+                {t.reviews.students(course.students)}
+              </span>
+              {language && (
+                <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                  <Icon name="globe" className="size-4" />
+                  {t.reviews.taughtIn(languageName(language, locale))}
+                </span>
+              )}
+            </div>
           </div>
           {course.description && (
             <Card>
@@ -110,6 +138,27 @@ export async function CourseDetail({
               )}
             </CardContent>
           </Card>
+          {reviews.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>{t.reviews.title}</CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-4">
+                {reviews.map((rv, i) => (
+                  <figure key={i} className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Stars value={rv.stars} />
+                      <span className="font-medium">{rv.authorName}</span>
+                      <span className="text-xs text-muted-foreground">
+                        <LocalTime seconds={rv.at} />
+                      </span>
+                    </div>
+                    <blockquote className="whitespace-pre-line text-sm text-muted-foreground">{rv.comment}</blockquote>
+                  </figure>
+                ))}
+              </CardContent>
+            </Card>
+          )}
         </div>
         <aside className="flex flex-col gap-4 lg:sticky lg:top-20">
           <Card>

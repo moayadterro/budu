@@ -4,7 +4,9 @@ import { LessonItemIcon, LessonMaterials } from '@/entities/course'
 import { getCourse } from '@/entities/course/server'
 import { HomeworkStatusBadge } from '@/entities/homework'
 import { myHomework } from '@/entities/homework/server'
+import { markFinished, ratingAsk } from '@/entities/review/server'
 import { requireRole } from '@/entities/session/server'
+import { RateCourseCard } from '@/features/rate-course'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { Icon } from '@/shared/ui/icon'
@@ -26,6 +28,8 @@ export async function LessonPage({ params }: { params: Promise<{ courseId: strin
   const lesson = course.lessons[index]
   const prev = course.lessons[index - 1]
   const next = course.lessons[index + 1]
+  // the last lesson = the course is finished → ask for a rating (once; "Not now" hides it)
+  const ask = next ? null : (await markFinished(user.userId, courseId), await ratingAsk(user.userId, courseId))
   const t = await getT()
   const scale = await getGradeScale(user.companyId)
   const s = t.learn
@@ -78,6 +82,8 @@ export async function LessonPage({ params }: { params: Promise<{ courseId: strin
           )}
 
           {lesson.items.filter((x) => x.kind !== 'task').length + tasks.length === 0 && <p className="text-sm text-muted-foreground">{s.nothingYet}</p>}
+
+          {ask && !ask.dismissed && <RateCourseCard courseId={courseId} courseTitle={course.title} mine={ask.mine} />}
 
           <div className="flex flex-wrap items-center gap-2">
             {prev && (
