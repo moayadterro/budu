@@ -950,6 +950,7 @@ export const ar: typeof en = {
       gap: (n: number) => `الفراغ ${n}`,
     },
     review: {
+      score: (pct: number, pts: number, max: number) => `${pct}% · ${pts} من ${max} درجة`,
       submitted: 'سُلِّم',
       yourGrade: 'درجتك',
       waiting: 'بعض الإجابات بانتظار المعلم. سيصلك إشعار عند التقييم.',

@@ -4,7 +4,7 @@ import { quizForStudent, reviewAttempt } from '@/entities/quiz/server'
 import { requireRole } from '@/entities/session/server'
 import { getGradeScale } from '@/entities/tenant/server'
 import { QuizReview } from '@/widgets/quiz-review'
-import { formatGrade } from '@/shared/lib/grade-scale'
+import { formatGrade, scaleMax } from '@/shared/lib/grade-scale'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent } from '@/shared/ui/card'
 import { Icon } from '@/shared/ui/icon'
@@ -37,7 +37,14 @@ export async function AttemptReviewPage({ params }: { params: Promise<{ attemptI
         </Button>
       )}
       <h1 className="text-2xl font-semibold tracking-tight">{review.name}</h1>
-      <QuizReview review={review} gradeLabel={review.grade === null ? undefined : formatGrade(review.grade, scale)} />
+      <QuizReview
+        review={review}
+        grade={
+          review.grade === null
+            ? undefined
+            : { label: formatGrade(review.grade, scale), outOf: scaleMax(scale), scaleName: scale === 'percent' ? null : t.scales[scale] }
+        }
+      />
     </div>
   )
 }

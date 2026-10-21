@@ -5,7 +5,7 @@ import { quizForStudent } from '@/entities/quiz/server'
 import { requireRole } from '@/entities/session/server'
 import { getGradeScale } from '@/entities/tenant/server'
 import { StartQuiz } from '@/features/take-quiz'
-import { formatGrade } from '@/shared/lib/grade-scale'
+import { formatGrade, scaleMax } from '@/shared/lib/grade-scale'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent } from '@/shared/ui/card'
 import { Icon } from '@/shared/ui/icon'
@@ -58,9 +58,18 @@ export async function StudentQuizPage({ params }: { params: Promise<{ courseId: 
           </dl>
           <p className="text-xs text-muted-foreground">{quiz.kind === 'exam' ? s.examRules : s.quizRules}</p>
           {quiz.grade !== null && (
-            <div className="flex items-center justify-between rounded-lg border p-3">
-              <span className="text-sm">{s.yourGrade}</span>
-              <span className="text-2xl font-semibold tabular-nums">{formatGrade(quiz.grade, scale)}</span>
+            <div className="flex items-center justify-between gap-3 rounded-lg border p-3">
+              <div>
+                <div className="text-sm">{s.yourGrade}</div>
+                {scale !== 'percent' && <div className="text-xs text-muted-foreground">{t.scales[scale]}</div>}
+              </div>
+              <div className="text-end">
+                <div className="text-2xl font-semibold tabular-nums">
+                  {formatGrade(quiz.grade, scale)}
+                  {scaleMax(scale) && <span className="ms-1 text-sm font-normal text-muted-foreground">{scaleMax(scale)}</span>}
+                </div>
+                <div className="text-xs text-muted-foreground tabular-nums">{Math.round(quiz.grade)}%</div>
+              </div>
             </div>
           )}
           {quiz.needsGrading && <p className="text-sm text-muted-foreground">{t.quiz.review.waiting}</p>}

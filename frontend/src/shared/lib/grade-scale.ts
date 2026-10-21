@@ -50,9 +50,12 @@ export function formatGrade(grade: number, scale: GradeScale): string {
   }
 }
 
-/** "out of" suffix where it helps (0–100 → "/ 100", France → "/ 20"); letters need none. */
+/**
+ * "out of" suffix where the top of the scale is the best grade (0–100 → "/ 100", Russia → "/ 5");
+ * none for letters, or where 1 is best (Germany).
+ */
 export function scaleMax(scale: GradeScale): string | null {
-  return { percent: '/ 100', france: '/ 20', ten: '/ 10', gpa: '/ 4.0' }[scale as string] ?? null
+  return { percent: '/ 100', france: '/ 20', ten: '/ 10', gpa: '/ 4.0', russia: '/ 5' }[scale as string] ?? null
 }
 
 /** Colour band of a 0–100 grade, independent of the scale: good ≥ 85, ok ≥ 60, else low. */

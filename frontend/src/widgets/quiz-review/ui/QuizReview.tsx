@@ -20,11 +20,22 @@ const resultVariant = { correct: 'success', partiallycorrect: 'warning', incorre
 /**
  * A finished attempt: the grade (or "waiting for the teacher"), then each question with the answer
  * given and — when the quiz shows them — result, points, correct answer, explanation, teacher comment.
- * `gradeLabel` = the grade in the school's scale; `gradeForms` = the teacher's grading form per slot.
+ * The grade is shown in the school's scale (`grade`: its label, "out of", the scale's name) with what
+ * it means underneath — the percentage and the points. `gradeForms` = the teacher's grading form per slot.
  */
-export function QuizReview({ review, gradeLabel, gradeForms }: { review: Review; gradeLabel?: string; gradeForms?: Record<number, ReactNode> }) {
+export function QuizReview({
+  review,
+  grade,
+  gradeForms,
+}: {
+  review: Review
+  grade?: { label: string; outOf: string | null; scaleName: string | null }
+  gradeForms?: Record<number, ReactNode>
+}) {
   const t = useT()
   const s = t.quiz.review
+  const maxPoints = review.questions.reduce((n, q) => n + q.maxMark, 0)
+  const points = review.grade === null ? null : Math.round((review.grade / 100) * maxPoints * 100) / 100
   return (
     <div className="flex flex-col gap-4">
       <Card>
@@ -37,7 +48,14 @@ export function QuizReview({ review, gradeLabel, gradeForms }: { review: Review;
             <div className="mt-1 text-sm">{review.needsGrading ? s.waiting : review.grade === null ? s.hidden : s.yourGrade}</div>
           </div>
           {review.grade !== null && (
-            <div className="text-3xl font-semibold tabular-nums">{gradeLabel ?? review.grade}</div>
+            <div className="text-end">
+              <div className="text-3xl font-semibold tabular-nums">
+                {grade?.label ?? review.grade}
+                {grade?.outOf && <span className="ms-1 text-base font-normal text-muted-foreground">{grade.outOf}</span>}
+              </div>
+              <div className="text-xs text-muted-foreground tabular-nums">{s.score(Math.round(review.grade), points ?? 0, maxPoints)}</div>
+              {grade?.scaleName && <div className="text-xs text-muted-foreground">{grade.scaleName}</div>}
+            </div>
           )}
         </CardContent>
       </Card>

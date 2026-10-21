@@ -4,7 +4,7 @@ import { getGradeScale } from '@/entities/tenant/server'
 import { getUserById } from '@/entities/user/server'
 import { GradeAnswer } from '@/features/grade-quiz'
 import { QuizReview } from '@/widgets/quiz-review'
-import { formatGrade } from '@/shared/lib/grade-scale'
+import { formatGrade, scaleMax } from '@/shared/lib/grade-scale'
 import { getT } from '@/shared/i18n/server'
 import { CourseQuizHeader, courseForQuizzes } from './shared'
 
@@ -28,7 +28,15 @@ export async function QuizAttemptPage({ params }: { params: Promise<{ courseId: 
       <h2 className="text-xl font-semibold tracking-tight">
         {student?.name} · {quiz.name}
       </h2>
-      <QuizReview review={review} gradeLabel={review.grade === null ? undefined : formatGrade(review.grade, scale)} gradeForms={forms} />
+      <QuizReview
+        review={review}
+        grade={
+          review.grade === null
+            ? undefined
+            : { label: formatGrade(review.grade, scale), outOf: scaleMax(scale), scaleName: scale === 'percent' ? null : t.scales[scale] }
+        }
+        gradeForms={forms}
+      />
     </div>
   )
 }

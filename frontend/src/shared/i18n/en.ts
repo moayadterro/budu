@@ -943,6 +943,7 @@ export const en = {
       gap: (n: number) => `Gap ${n}`,
     },
     review: {
+      score: (pct: number, pts: number, max: number) => `${pct}% · ${pts} of ${max} points`,
       submitted: 'Submitted',
       yourGrade: 'Your grade',
       waiting: 'Some answers are waiting for the teacher. You’ll be told when it’s graded.',
