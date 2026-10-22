@@ -1,11 +1,10 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { BLOCK_KINDS, normalizeSlug, PAGE_LIMITS, slugValid, type BlockData, type BlockKind } from '@/entities/school-page'
-import { addBlock, deleteBlock, memberPhoto, moveBlock, pageOf, saveBlock, savePage, savePhoto, setCover, slugFree } from '@/entities/school-page/server'
+import { BLOCK_KINDS, PAGE_LIMITS, type BlockData, type BlockKind } from '@/entities/school-page'
+import { addBlock, deleteBlock, memberPhoto, moveBlock, pageOf, saveBlock, savePhoto, setCover, setPublished, setTagline } from '@/entities/school-page/server'
 import { requireRole } from '@/entities/session/server'
 import { isSchool, schoolPeople, setSchoolLogo } from '@/entities/tenant/server'
-import { formText } from '@/shared/lib/form'
 
 /** The signed-in manager's school (only schools have a public page). */
 async function school() {
@@ -26,35 +25,21 @@ const refresh = async (companyId: number) => {
   revalidatePath('/[lang]/schools', 'page')
 }
 
-export type SlugCheck = 'ok' | 'invalid' | 'taken'
-
-/** Live check while typing the address. */
-export async function checkSlugAction(raw: string): Promise<SlugCheck> {
+/** The line under the school's name (saved on its own, right in the profile header). */
+export async function setTaglineAction(tagline: string): Promise<boolean> {
   const companyId = await school()
-  const slug = normalizeSlug(String(raw ?? ''))
-  if (!slugValid(slug)) return 'invalid'
-  return (await slugFree(slug, companyId)) ? 'ok' : 'taken'
+  await setTagline(companyId, String(tagline ?? '').trim().slice(0, PAGE_LIMITS.tagline))
+  await refresh(companyId)
+  return true
 }
 
-export type PageState = { status: 'idle' } | { status: 'saved'; at: number } | { status: 'error'; error: SlugCheck | 'server'; at: number }
-
-/** Address, published, tagline. Publishing needs an address. */
-export async function savePageAction(_prev: PageState, form: FormData): Promise<PageState> {
-  const at = Date.now()
-  try {
-    const companyId = await school()
-    const raw = normalizeSlug(formText(form, 'slug'))
-    const slug = raw || null
-    if (slug && !slugValid(slug)) return { status: 'error', error: 'invalid', at }
-    if (slug && !(await slugFree(slug, companyId))) return { status: 'error', error: 'taken', at }
-    const ok = await savePage(companyId, { slug, published: form.get('published') === 'on', tagline: formText(form, 'tagline').slice(0, PAGE_LIMITS.tagline) })
-    if (!ok) return { status: 'error', error: 'taken', at }
-    await refresh(companyId)
-    return { status: 'saved', at }
-  } catch (e) {
-    console.error('save school page failed', e)
-    return { status: 'error', error: 'server', at }
-  }
+/** Publish (the page goes on the internet and into "Schools on Budu") or take it down. */
+export async function setPublishedAction(published: boolean): Promise<void> {
+  const companyId = await school()
+  const page = await pageOf(companyId)
+  if (!page?.slug) return // every school gets an address when it opens the editor
+  await setPublished(companyId, published === true)
+  await refresh(companyId)
 }
 
 export async function addBlockAction(kind: string): Promise<number | null> {

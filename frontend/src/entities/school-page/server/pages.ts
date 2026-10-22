@@ -2,6 +2,7 @@ import 'server-only'
 import { query } from '@/shared/server/db'
 import { defaultInstance, iomadCall, iomadUpload } from '@/shared/server/iomad'
 import { cleanBlock } from '../lib/clean'
+import { slugFromName, slugValid } from '../lib/slug'
 import { emptyBlock, type Block, type BlockKind, type SchoolPage } from '../model/types'
 
 /**
@@ -55,21 +56,46 @@ export async function slugFree(slug: string, companyId: number): Promise<boolean
   return !row || row.company_id === companyId
 }
 
-/** Address, published, tagline. false = the address was taken meanwhile. */
-export async function savePage(companyId: number, p: { slug: string | null; published: boolean; tagline: string }): Promise<boolean> {
+/** The page's address. false = taken (by another school, meanwhile). */
+export async function setSlug(companyId: number, slug: string): Promise<boolean> {
   try {
-    await query(`UPDATE tenants SET slug = $3 WHERE iomad_url = $1 AND company_id = $2 AND kind = 'school'`, [url(), companyId, p.slug])
+    await query(`UPDATE tenants SET slug = $3 WHERE iomad_url = $1 AND company_id = $2 AND kind = 'school'`, [url(), companyId, slug])
+    return true
   } catch (e) {
     if ((e as { code?: string }).code === '23505') return false // unique: taken
     throw e
   }
-  await query(
-    `INSERT INTO school_pages (iomad_url, company_id, published, tagline) VALUES ($1, $2, $3, $4)
-     ON CONFLICT (iomad_url, company_id) DO UPDATE SET published = EXCLUDED.published, tagline = EXCLUDED.tagline, updated_at = now()`,
-    [url(), companyId, p.published && !!p.slug, p.tagline],
-  )
-  return true
 }
+
+/**
+ * A school without an address gets one from its name ("budu-test-academy"; "-2", "-3" … when
+ * taken; "school-<id>" when the name has no Latin spelling). Returns the address.
+ */
+export async function ensureSlug(companyId: number, name: string): Promise<string> {
+  const [row] = await query<{ slug: string | null }>(`SELECT slug FROM tenants WHERE iomad_url = $1 AND company_id = $2`, [url(), companyId])
+  if (row?.slug) return row.slug
+  const base = slugValid(slugFromName(name)) ? slugFromName(name) : `school-${companyId}`
+  for (let n = 1; n < 50; n++) {
+    const candidate = n === 1 ? base : `${base.slice(0, 37)}-${n}`
+    if ((await slugFree(candidate, companyId)) && (await setSlug(companyId, candidate))) return candidate
+  }
+  const fallback = `school-${companyId}`
+  await setSlug(companyId, fallback)
+  return fallback
+}
+
+/** Upsert the page row's fields. */
+async function savePageFields(companyId: number, fields: { published?: boolean; tagline?: string }) {
+  await query(
+    `INSERT INTO school_pages (iomad_url, company_id, published, tagline) VALUES ($1, $2, COALESCE($3, false), COALESCE($4, ''))
+     ON CONFLICT (iomad_url, company_id) DO UPDATE SET
+       published = COALESCE($3, school_pages.published), tagline = COALESCE($4, school_pages.tagline), updated_at = now()`,
+    [url(), companyId, fields.published ?? null, fields.tagline ?? null],
+  )
+}
+
+export const setPublished = (companyId: number, published: boolean) => savePageFields(companyId, { published })
+export const setTagline = (companyId: number, tagline: string) => savePageFields(companyId, { tagline })
 
 /** Keep an uploaded image in IOMAD for the school's page (manager checked there too). Returns the file id. */
 export async function savePhoto(userId: number, companyId: number, file: File): Promise<number> {

@@ -13,6 +13,7 @@ const alertVariants = cva(
         // Budu: form confirmations / notices
         success: "border-success/30 bg-success/10 text-success",
         info: "border-info/30 bg-info/10 text-info",
+        warning: "border-warning/40 bg-warning/10 text-foreground *:[svg]:text-warning",
       },
     },
     defaultVariants: {

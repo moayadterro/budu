@@ -404,6 +404,12 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-22 School page address & publishing (owner): the address is made from the school's name
+  when the editor first opens (`ensureSlug` / `slugFromName`: Cyrillic transliterated; "-2" when
+  taken; `school-<id>` for names without a Latin spelling) and changed ONLY in Settings → Page
+  address (warning that old links break + confirm). The editor shows the address read-only (copy,
+  open) and one Publish button with a quiet note — no checkbox, no alert (the page exists to be
+  public); Unpublish is a quiet link. The tagline is edited inline in the profile header.
 - 2026-10-22 School page editor opens with a profile header (owner: "like Facebook"): cover across
   the top, logo overlapping it, name + city; round glass camera buttons change them in place
   (empty → file picker; set → Change · Remove, Remove asks first). City and country moved to
