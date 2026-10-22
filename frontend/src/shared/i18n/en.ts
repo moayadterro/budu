@@ -1360,7 +1360,6 @@ export const en = {
     heroTitle: 'Learn with teachers and schools you trust',
     heroSub: 'Browse every course on Budu and watch the first lesson for free. To join a course — free ones too — create an account.',
     all: 'All courses',
-    browse: 'Browse courses without an account',
     signIn: 'Sign in',
     signUp: 'Sign up',
     openApp: 'Open Budu',
