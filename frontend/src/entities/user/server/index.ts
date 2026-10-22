@@ -4,4 +4,4 @@ export { getAccount, updateUser, setPicture, createInvitedUser, getUserById, typ
 export { sendVerificationEmail, sendPasswordResetEmail } from './emails'
 export { roleFor, type Membership } from '../lib/role'
 export { resolveRole } from './role'
-export { getCurrency, rememberVisitorCurrency, setCurrency, syncCurrency, visitorCurrency } from './prefs'
+export { getCurrency, rememberVisitorCurrency, setCurrency, syncCurrency, syncLocale, visitorCurrency } from './prefs'

@@ -2,6 +2,8 @@ import 'server-only'
 import { DEFAULT_CURRENCY, isCurrency, type Currency } from '@/shared/config/currency'
 import { cookies } from 'next/headers'
 import { prefsOfUser, setPref } from '@/shared/server/user-prefs'
+import { isLocale } from '@/shared/i18n'
+import { getLocale, rememberBrowserLocale } from '@/shared/i18n/server'
 
 /** The currency the user sees prices in (Settings; an IOMAD user preference); RUB if not chosen. */
 export async function getCurrency(userId: number): Promise<Currency> {
@@ -30,4 +32,15 @@ export async function rememberVisitorCurrency(currency: Currency) {
 /** At sign-in the account's currency (Settings, else RUB) wins: the browser's cookie follows it. */
 export async function syncCurrency(userId: number) {
   await rememberVisitorCurrency(await getCurrency(userId))
+}
+
+/**
+ * At sign-in the account's language wins (owner: "user settings if he already used the app"): this
+ * browser switches to it, whatever it showed before. A first sign-in keeps what they see now and
+ * saves it as their language (emails and notifications use it too).
+ */
+export async function syncLocale(userId: number) {
+  const saved = (await prefsOfUser(userId)).locale
+  if (isLocale(saved)) await rememberBrowserLocale(saved)
+  else await setPref(userId, 'budu_locale', await getLocale())
 }

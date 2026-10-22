@@ -179,7 +179,9 @@ fixed dark live-classroom stage (`bg-live`, `text-live-foreground` …). Rules:
   client components: `const t = useT()` (`@/shared/i18n`). Never import a dictionary directly or use
   `t` at module level (nav items hold label *keys*). Locale = `budu_locale` cookie (Settings / globe
   menu, `features/switch-language`), else the browser's PREFERRED language if we have it,
-  else English — never a lower-ranked one (owner: German browser → English, not Russian; `matchLocale`). `<html lang dir>` is set in RootLayout:
+  else English — never a lower-ranked one (owner: German browser → English, not Russian; `matchLocale`).
+  At sign-in the ACCOUNT's language (IOMAD pref `budu_locale`) wins and is written to the cookie, so
+  it follows the user to every device; a first sign-in saves what they see as their language (`syncLocale`). `<html lang dir>` is set in RootLayout:
   Arabic is RTL with IBM Plex Sans Arabic (`:root[lang='ar']` in tokens.css) and the sidebar on the
   right. Use logical classes only (`ms-`/`me-`/`ps-`/`pe-`/`start-`/`end-`/`text-start`, `rtl:`).
   Dates via `LocalTime` (viewer's zone + UI language). Emails use the requester's language.
