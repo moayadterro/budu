@@ -22,4 +22,13 @@ $CFG->dataroot  = '/var/www/moodledata';
 $CFG->admin     = 'admin';
 $CFG->directorypermissions = 02777;
 
+// Password policy (owner, 2026-10-22): 8+ characters with upper, lower and a digit — symbols
+// allowed but not required. Forced here so the admin UI can't drift from the frontend's passwordOk().
+$CFG->passwordpolicy          = 1;
+$CFG->minpasswordlength       = 8;
+$CFG->minpassworddigits       = 1;
+$CFG->minpasswordlower        = 1;
+$CFG->minpasswordupper        = 1;
+$CFG->minpasswordnonalphanum  = 0;
+
 require_once(__DIR__ . '/lib/setup.php');

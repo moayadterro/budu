@@ -2,7 +2,8 @@
 import { passwordOk } from '@/shared/lib/password'
 
 export type AccountKind = 'school' | 'teacher' | 'student'
-export const ACCOUNT_KINDS: AccountKind[] = ['school', 'teacher', 'student']
+/** student first — the most common sign-up, and the default */
+export const ACCOUNT_KINDS: AccountKind[] = ['student', 'teacher', 'school']
 
 export type SignUpInput = {
   kind: AccountKind

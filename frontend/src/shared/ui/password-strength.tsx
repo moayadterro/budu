@@ -3,13 +3,12 @@
 import { cn } from '@/shared/lib/cn'
 import { Icon } from './icon'
 
-/** The same rules as Moodle's password policy (shared/lib/password `passwordOk`). */
+/** The same rules as `passwordOk` (shared/lib/password): length, upper, lower, digit. */
 const RULES = [
   { key: 'length', test: (p: string) => p.length >= 8 },
   { key: 'upper', test: (p: string) => /[A-Z]/.test(p) },
   { key: 'lower', test: (p: string) => /[a-z]/.test(p) },
   { key: 'digit', test: (p: string) => /\d/.test(p) },
-  { key: 'symbol', test: (p: string) => /[^A-Za-z0-9]/.test(p) },
 ] as const
 
 export type StrengthLabels = {
@@ -23,8 +22,9 @@ export type StrengthLabels = {
  */
 export function PasswordStrength({ value, labels }: { value: string; labels: StrengthLabels }) {
   if (!value) return null
-  const met = RULES.filter((r) => r.test(value)).length // 0–5
-  const level = met <= 2 ? 0 : met === 3 ? 1 : met === 4 ? 2 : 3
+  const met = RULES.filter((r) => r.test(value)).length // 0–4
+  // all four rules met = strong; a long password with a symbol on top doesn't need more praise
+  const level = met <= 1 ? 0 : met - 1
   const tone = ['bg-destructive', 'bg-warning', 'bg-info', 'bg-success'][level]
   return (
     <div className="-mt-2 mb-4 flex flex-col gap-2" aria-live="polite">

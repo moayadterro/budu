@@ -369,6 +369,10 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-22 Password rule (owner): 8+ characters with an upper-case letter, a lower-case letter and
+  a digit; symbols allowed, not required. Same in the app (`shared/lib/password` passwordOk) and in
+  IOMAD (forced in `iomad/config.php`: minpasswordnonalphanum = 0 — Moodle's setting name). Sign-up
+  is ONE step (owner rejected two steps); student is preselected and listed first.
 - 2026-10-22 Email: Mailpit removed (owner); all mail goes through `no-reply@budu-school.ru`
   (Timeweb SMTP, credentials only in `.env`). The domain had no public DNS yet on 2026-10-22 —
   until SPF/DKIM/DMARC are set at Timeweb, mail may land in spam.

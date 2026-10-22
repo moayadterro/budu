@@ -1,61 +1,73 @@
 'use client'
 
-import { useActionState, useState } from 'react'
+import { FormEvent, useActionState, useState, useTransition } from 'react'
 import Link from 'next/link'
-import { motion } from 'motion/react'
+import { motion, useReducedMotion } from 'motion/react'
 import { Alert } from '@/shared/ui/alert'
-import { buttonVariants } from '@/shared/ui/button'
+import { Button, buttonVariants } from '@/shared/ui/button'
 import { Field } from '@/shared/ui/field'
 import { Icon, IconName } from '@/shared/ui/icon'
 import { Input } from '@/shared/ui/input'
-import { NativeSelect as Select, NativeSelectOption } from '@/shared/ui/native-select'
+import { NativeSelect as Select } from '@/shared/ui/native-select'
 import { PasswordInput } from '@/shared/ui/password-input'
 import { PasswordMatch, PasswordStrength } from '@/shared/ui/password-strength'
-import { SubmitButton } from '@/shared/ui/submit-button'
 import { Appear } from '@/shared/ui/motion'
 import { cn } from '@/shared/lib/cn'
-import { useT } from '@/shared/i18n'
+import { useLocale, useT } from '@/shared/i18n'
 import { signUp } from '../server/actions'
 import { ACCOUNT_KINDS, AccountKind, initialSignUpState } from '../model/types'
 
 /** Countries offered first; names come from the browser's locale data. */
 const COUNTRIES = ['RU', 'BY', 'KZ', 'UZ', 'KG', 'TJ', 'AZ', 'AM', 'AE', 'SA', 'EG', 'JO', 'IQ', 'SY', 'LB', 'TR', 'US', 'GB', 'DE']
-const countryName = new Intl.DisplayNames(['en'], { type: 'region' })
-const KIND_ICON: Record<AccountKind, IconName> = { school: 'layers', teacher: 'board', student: 'book' }
+const KIND_ICON: Record<AccountKind, IconName> = { student: 'book', teacher: 'board', school: 'layers' }
 
-function Section({ children }: { children: React.ReactNode }) {
-  return <div className="mb-3 mt-1 text-[11px] font-bold uppercase tracking-[.1em] text-primary">{children}</div>
-}
-
-/** One sign-up for schools, independent teachers and students (server action → IOMAD). */
+/**
+ * One sign-up for students, teachers and schools (server action → IOMAD), on ONE step (owner). Kept
+ * short: the account type is a compact segmented switch (student by default); teachers and schools
+ * just add their city / country (and a school its name).
+ * Submitted via a transition (not <form action>) so a server error doesn't wipe what was typed.
+ */
 export function SignUpForm() {
   const t = useT()
+  const s = t.signUp
+  const locale = useLocale()
+  const reduce = useReducedMotion()
+  const [kind, setKind] = useState<AccountKind>('student')
   const [pw, setPw] = useState('')
   const [pw2, setPw2] = useState('')
-  const [kind, setKind] = useState<AccountKind>('school')
-  const [state, action] = useActionState(signUp, initialSignUpState)
+  const [state, dispatch] = useActionState(signUp, initialSignUpState)
+  const [pending, start] = useTransition()
+  const workspace = kind !== 'student'
+  const countryName = new Intl.DisplayNames([locale], { type: 'region' })
 
   if (state.status === 'success') {
     return (
-      <Appear>
-        <span className="mb-3 grid h-10 w-10 place-items-center rounded-full bg-success text-primary-foreground">
-          <Icon name="tick" className="h-5 w-5" strokeWidth={2.4} />
+      <Appear className="flex flex-col items-start gap-3">
+        <span className="grid size-12 place-items-center rounded-2xl bg-success/15 text-success">
+          <Icon name="tick" className="size-6" />
         </span>
-        <h2 className="text-lg font-bold">{t.signUp.checkEmail}</h2>
-        <p className="mt-2 text-[13.5px] text-muted-foreground">{t.signUp.checkEmailBody(state.email)}</p>
-        <Link href="/login" className={buttonVariants({ className: 'mt-5 w-full' })}>
-          {t.signUp.signIn}
+        <h2 className="text-lg font-semibold">{s.checkEmail}</h2>
+        <p className="text-sm text-muted-foreground">{s.checkEmailBody(state.email)}</p>
+        <Link href="/login" className={buttonVariants({ size: 'lg', className: 'mt-2 w-full' })}>
+          {s.signIn}
         </Link>
       </Appear>
     )
   }
 
+  const submit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const data = new FormData(e.currentTarget)
+    start(() => dispatch(data))
+  }
+
   return (
     <>
-      <form action={action}>
+      <form onSubmit={submit}>
         <input type="hidden" name="kind" value={kind} />
-        <Section>{t.signUp.kindLabel}</Section>
-        <div role="radiogroup" className="mb-5 grid gap-2 sm:grid-cols-3">
+
+        {/* who you are: a compact segmented switch + one line about the choice */}
+        <div role="radiogroup" aria-label={s.kindLabel} className="grid grid-cols-3 gap-1 rounded-xl bg-muted p-1">
           {ACCOUNT_KINDS.map((k) => (
             <button
               key={k}
@@ -64,57 +76,43 @@ export function SignUpForm() {
               aria-checked={kind === k}
               onClick={() => setKind(k)}
               className={cn(
-                // phones: compact rows (icon · title + text); from sm up: three cards side by side
-                'relative isolate grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-0.5 rounded-xl border p-3 text-start transition-all sm:flex sm:flex-col sm:items-start sm:gap-1.5',
-                kind === k ? 'border-primary shadow-sm' : 'border-border hover:border-input hover:bg-muted/40',
+                'relative flex h-10 items-center justify-center gap-1.5 rounded-lg text-sm font-medium transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
+                kind === k ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
               )}
             >
               {kind === k && (
-                <motion.span
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.18 }}
-                  className="absolute inset-0 -z-10 rounded-xl bg-primary/10"
-                />
+                <motion.span layoutId="signup-kind" transition={{ duration: reduce ? 0 : 0.2 }} className="absolute inset-0 rounded-lg bg-background shadow-sm" />
               )}
-              <span
-                className={cn(
-                  'row-span-2 grid size-9 place-items-center rounded-lg transition-colors',
-                  kind === k ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground',
-                )}
-              >
-                <Icon name={KIND_ICON[k]} className="size-4.5" />
-              </span>
-              <b className="text-sm">{t.signUp.kinds[k].title}</b>
-              <span className="text-xs leading-snug text-muted-foreground">{t.signUp.kinds[k].desc}</span>
+              <Icon name={KIND_ICON[k]} className={cn('relative size-4', kind === k && 'text-primary')} />
+              <span className="relative">{s.short[k]}</span>
             </button>
           ))}
         </div>
+        <p className="mt-2 mb-6 text-sm text-muted-foreground">{s.kinds[kind].desc}</p>
 
-        {kind === 'school' && (
-          <>
-            <Section>{t.signUp.schoolSection}</Section>
-            <Field label={t.signUp.schoolName}>
-              <Input name="schoolName" required maxLength={100} />
-            </Field>
-          </>
-        )}
-
-        <Section>{t.signUp.accountSection}</Section>
         <div className="grid grid-cols-2 gap-3">
-          <Field label={t.signUp.firstName}>
+          <Field label={s.firstName}>
             <Input name="firstName" required autoComplete="given-name" />
           </Field>
-          <Field label={t.signUp.lastName}>
+          <Field label={s.lastName}>
             <Input name="lastName" required autoComplete="family-name" />
           </Field>
         </div>
-        {kind !== 'student' && (
+        <Field label={s.email}>
+          <Input name="email" type="email" required autoComplete="email" />
+        </Field>
+        {/* teachers and schools: where they work (a school also its name) */}
+        {kind === 'school' && (
+          <Field label={s.schoolName}>
+            <Input name="schoolName" required maxLength={100} />
+          </Field>
+        )}
+        {workspace && (
           <div className="grid grid-cols-2 gap-3">
-            <Field label={t.signUp.city}>
+            <Field label={s.city}>
               <Input name="city" required />
             </Field>
-            <Field label={t.signUp.country}>
+            <Field label={s.country}>
               <Select name="country" required defaultValue="RU" className="w-full">
                 {COUNTRIES.map((c) => (
                   <option key={c} value={c}>
@@ -125,29 +123,32 @@ export function SignUpForm() {
             </Field>
           </div>
         )}
-        <Field label={t.signUp.email}>
-          <Input name="email" type="email" required autoComplete="email" />
-        </Field>
-        <Field label={t.signUp.password}>
+        <Field label={s.password}>
           <PasswordInput name="password" required minLength={8} autoComplete="new-password" value={pw} onChange={(e) => setPw(e.target.value)} />
         </Field>
-      <PasswordStrength value={pw} labels={t.signUp.strength} />
-        <Field label={t.signUp.confirmPassword}>
+        <PasswordStrength value={pw} labels={s.strength} />
+        <Field label={s.confirmPassword}>
           <PasswordInput name="confirmPassword" required minLength={8} autoComplete="new-password" value={pw2} onChange={(e) => setPw2(e.target.value)} />
         </Field>
-      <PasswordMatch password={pw} confirm={pw2} labels={t.signUp} />
+        <PasswordMatch password={pw} confirm={pw2} labels={s} />
 
         {state.status === 'error' && (
           <Appear>
-            <Alert variant="destructive">{t.signUp.errors[state.error]}</Alert>
+            <Alert variant="destructive" className="mb-4">
+              {s.errors[state.error]}
+            </Alert>
           </Appear>
         )}
-        <SubmitButton label={t.signUp.submit} pendingLabel={t.signUp.submitting} size="lg" className="w-full" />
+
+        {/* a little air between the last field and the button */}
+        <Button type="submit" size="lg" className="mt-6 w-full" disabled={pending}>
+          {pending ? s.submitting : s.submit}
+        </Button>
       </form>
-      <p className="mt-5 text-center text-[13px] text-muted-foreground">
-        {t.signUp.haveAccount}{' '}
+      <p className="mt-6 text-center text-sm text-muted-foreground">
+        {s.haveAccount}{' '}
         <Link href="/login" className="font-semibold text-primary">
-          {t.signUp.signIn}
+          {s.signIn}
         </Link>
       </p>
     </>
