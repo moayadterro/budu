@@ -9,6 +9,7 @@ import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTi
 import { Icon } from '@/shared/ui/icon'
 import { ScreenHead } from '@/shared/ui/screen-head'
 import { getT } from '@/shared/i18n/server'
+import { reportError } from '@/shared/server/errors'
 
 /** Teacher: the courses they publish (live IOMAD data). */
 export async function TeacherCoursesPage() {
@@ -21,7 +22,7 @@ export async function TeacherCoursesPage() {
   try {
     courses = await teacherOverview(user.userId, user.companyId)
   } catch (e) {
-    console.error('list courses failed', e)
+    reportError('list courses failed', e)
     failed = true
   }
 

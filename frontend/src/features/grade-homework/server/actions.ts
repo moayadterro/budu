@@ -8,6 +8,8 @@ import { getGradeScale } from '@/entities/tenant/server'
 import { formatGrade } from '@/shared/lib/grade-scale'
 import { requireRole } from '@/entities/session/server'
 import { formId, formText } from '@/shared/lib/form'
+import { reportError } from '@/shared/server/errors'
+import { audit } from '@/shared/server/audit'
 
 export type GradeState = { status: 'idle' } | { status: 'saved'; at: number } | { status: 'error'; error: 'invalid' | 'server' }
 
@@ -25,6 +27,7 @@ export async function gradeAction(_prev: GradeState, form: FormData): Promise<Gr
   try {
     const value = Math.round(grade * 10) / 10
     await gradeSubmission(user.userId, homeworkId, studentId, value, feedback)
+    audit('homeworkGraded', { target: `homework ${homeworkId}`, details: { student: studentId, grade: value } })
     const sub = await getSubmission(user.userId, homeworkId, studentId)
     if (sub) {
       const scale = await getGradeScale(user.companyId)
@@ -36,7 +39,7 @@ export async function gradeAction(_prev: GradeState, form: FormData): Promise<Gr
       )
     }
   } catch (e) {
-    console.error('grade failed', e)
+    reportError('grade failed', e)
     return { status: 'error', error: 'server' }
   }
   revalidatePath('/', 'layout')

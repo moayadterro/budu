@@ -5,6 +5,8 @@ import { normalizeSlug, slugReserved, slugValid } from '@/entities/school-page'
 import { pageOf, setSlug, slugFree } from '@/entities/school-page/server'
 import { requireRole } from '@/entities/session/server'
 import { isSchool } from '@/entities/tenant/server'
+import { reportError } from '@/shared/server/errors'
+import { audit } from '@/shared/server/audit'
 
 export type SlugCheck = 'ok' | 'invalid' | 'reserved' | 'taken'
 
@@ -31,11 +33,12 @@ export async function changeSlugAction(raw: string): Promise<AddressResult> {
     const slug = normalizeSlug(String(raw ?? ''))
     if (!slugValid(slug)) return { ok: false, error: slugReserved(slug) ? 'reserved' : 'invalid' }
     if (!(await slugFree(slug, companyId)) || !(await setSlug(companyId, slug))) return { ok: false, error: 'taken' }
+    audit('schoolUsernameChanged', { details: { username: slug } })
     revalidatePath('/school', 'layout')
     revalidatePath('/[lang]/schools', 'layout')
     return { ok: true, slug: (await pageOf(companyId))?.slug ?? slug }
   } catch (e) {
-    console.error('change school address failed', e)
+    reportError('change school address failed', e)
     return { ok: false, error: 'server' }
   }
 }

@@ -5,6 +5,8 @@ import { query } from '@/shared/server/db'
 import { splitFullName } from '@/shared/lib/person-name'
 import { createAccount, SignUpConflict } from './createAccount'
 import { AccountKind, SignUpInput, SignUpState, validate } from '../model/types'
+import { reportError } from '@/shared/server/errors'
+import { audit } from '@/shared/server/audit'
 
 /** Server action behind the sign-up form (school, teacher or student). */
 export async function signUp(_prev: SignUpState, form: FormData): Promise<SignUpState> {
@@ -36,10 +38,14 @@ export async function signUp(_prev: SignUpState, form: FormData): Promise<SignUp
       )
     }
     await sendVerificationEmail({ id: created.userId, email: created.email, firstname: splitFullName(input.fullName)!.first })
+    audit('signUp', {
+      actor: { userId: created.userId, name: input.fullName.trim(), role: input.kind, companyId: created.companyId ?? null },
+      details: { kind: input.kind, email: created.email, ...(created.tenantName ? { school: created.tenantName } : {}) },
+    })
     return { status: 'success', email: created.email }
   } catch (e) {
     if (e instanceof SignUpConflict) return { status: 'error', error: e.code }
-    console.error('sign-up failed', e)
+    reportError('sign-up failed', e)
     return { status: 'error', error: 'server' }
   }
 }

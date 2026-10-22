@@ -8,6 +8,7 @@ import { getUserById } from '@/entities/user/server'
 import { formId } from '@/shared/lib/form'
 import { getSession, refreshSessionsOf, requireRole } from '@/entities/session/server'
 import { answerParentRequest } from '@/entities/family/server'
+import { audit } from '@/shared/server/audit'
 
 /** The invited person accepts or declines; the inviting manager is told. Accept → their new home. */
 export async function answerInviteAction(form: FormData) {
@@ -18,6 +19,7 @@ export async function answerInviteAction(form: FormData) {
   if (!inviteId) return
   const invite = await answerInvite(user.userId, inviteId, accept)
   if (!invite) return
+  audit(accept ? 'schoolInviteAccepted' : 'schoolInviteDeclined', { target: `invite ${inviteId}`, details: { school: invite.school, role: invite.role } })
   if (invite.invitedById) {
     const manager = await getUserById(invite.invitedById)
     if (manager) {
@@ -39,6 +41,7 @@ export async function cancelInviteAction(form: FormData) {
   const inviteId = formId(form, 'inviteId')
   if (!inviteId || !user.companyId) return
   await cancelInvite(user.companyId, inviteId)
+  audit('schoolInviteCancelled', { target: `invite ${inviteId}` })
   revalidatePath('/', 'layout')
 }
 
@@ -50,6 +53,7 @@ export async function answerParentRequestAction(form: FormData) {
   const accept = form.get('answer') === 'accept'
   if (!requestId) return
   const answered = await answerParentRequest(user.userId, requestId, accept)
+  if (answered) audit(accept ? 'parentRequestAccepted' : 'parentRequestDeclined', { target: `request ${requestId}` })
   if (!answered) return
   const child = await getUserById(answered.childId)
   if (child) await notify([child], 'parentAnswered', { parent: user.name, answer: accept ? 'accepted' : 'declined' }, '/account')

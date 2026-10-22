@@ -4,6 +4,7 @@ import { parentsOf } from '@/entities/family/server'
 import { closingSoon, openingNow } from '@/entities/quiz/server'
 import { query } from '@/shared/server/db'
 import { defaultInstance } from '@/shared/server/iomad'
+import { reportError } from '@/shared/server/errors'
 
 /**
  * Quiz chores, run at most every few minutes per server process, triggered after page responses (no
@@ -46,7 +47,7 @@ export async function runQuizReminders() {
       }
     }
   } catch (e) {
-    console.error('quiz reminders failed', e)
+    reportError('quiz reminders failed', e)
   } finally {
     state.running = false
   }

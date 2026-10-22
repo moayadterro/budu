@@ -8,6 +8,8 @@ import { formFile, formText } from '@/shared/lib/form'
 import { passwordOk } from '@/shared/lib/password'
 import { defaultInstance, iomadCheckPassword } from '@/shared/server/iomad'
 import { NAME_MAX, PHOTO_MAX_BYTES, PHOTO_TYPES, type ProfileError, type ProfileState } from '../model/types'
+import { reportError } from '@/shared/server/errors'
+import { audit } from '@/shared/server/audit'
 
 const saved = (): ProfileState => ({ status: 'saved', at: Date.now() })
 const fail = (error: ProfileError): ProfileState => ({ status: 'error', error })
@@ -25,7 +27,7 @@ export async function updatePhoto(_prev: ProfileState, form: FormData): Promise<
     const pictureId = await setPicture(user.userId, user.email, file)
     await updateSessionProfile(user.userId, { pictureId })
   } catch (e) {
-    console.error('update photo failed', e)
+    reportError('update photo failed', e)
     return fail('server')
   }
   refreshShell()
@@ -48,8 +50,9 @@ export async function saveName(_prev: ProfileState, form: FormData): Promise<Pro
   try {
     await updateUser(user.userId, { firstname, lastname })
     await updateSessionProfile(user.userId, { name: `${firstname} ${lastname}` })
+    audit('nameChanged', { details: { from: user.name, to: `${firstname} ${lastname}` } })
   } catch (e) {
-    console.error('save name failed', e)
+    reportError('save name failed', e)
     return fail('server')
   }
   refreshShell()
@@ -70,8 +73,9 @@ export async function changePassword(_prev: ProfileState, form: FormData): Promi
     if (!check.ok) return fail(check.reason === 'locked' ? 'locked' : 'wrongPassword')
     await updateUser(user.userId, { password: next })
     await revokeOtherSessions(user.userId)
+    audit('passwordChanged')
   } catch (e) {
-    console.error('change password failed', e)
+    reportError('change password failed', e)
     return fail('server')
   }
   return saved()

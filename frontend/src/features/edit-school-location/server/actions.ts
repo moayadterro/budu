@@ -5,6 +5,7 @@ import { requireRole } from '@/entities/session/server'
 import { isSchool, setSchoolLocation } from '@/entities/tenant/server'
 import { isCountry } from '@/shared/config/countries'
 import { formText } from '@/shared/lib/form'
+import { reportError } from '@/shared/server/errors'
 
 export type LocationState = { status: 'idle' } | { status: 'saved'; at: number } | { status: 'error'; at: number }
 
@@ -20,7 +21,7 @@ export async function saveLocationAction(_prev: LocationState, form: FormData): 
     revalidatePath('/[lang]/schools', 'layout')
     return { status: 'saved', at }
   } catch (e) {
-    console.error('save school location failed', e)
+    reportError('save school location failed', e)
     return { status: 'error', at }
   }
 }

@@ -14,6 +14,8 @@ import { composeMail } from '@/shared/server/mail-layout'
 import { appUrl, sendMail } from '@/shared/server/mailer'
 import { issuedRecently, issueToken } from '@/shared/server/tokens'
 import { splitFullName } from '@/shared/lib/person-name'
+import { reportError } from '@/shared/server/errors'
+import { audit } from '@/shared/server/audit'
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const INVITE_DAYS = 7
@@ -46,11 +48,12 @@ export async function addAudienceAction(quizId: number, input: { classIds?: numb
       if (k?.canManage && k.companyId === companyId) k.students.forEach((s) => ids.add(s.id))
     }
     const added = await setExamAudience(user.userId, companyId, quizId, [...ids], [])
+    audit('examAudienceAdded', { target: `quiz ${quizId}`, details: { classes: classIds.length, students: studentIds.size, added: added.length } })
     await tellAdded(ctx, added)
     revalidatePath(`/school/exams/${quizId}`)
     return { ok: true, added: added.length }
   } catch (e) {
-    console.error('add exam audience failed', e)
+    reportError('add exam audience failed', e)
     return { ok: false }
   }
 }
@@ -139,7 +142,7 @@ export async function inviteCandidatesAction(quizId: number, input: Candidate[])
         continue
       }
       const id = await createInvitedUser({ email, firstname: name.first, middlename: name.middle, lastname: name.last }).catch((e) => {
-        console.error('exam candidate account failed', e)
+        reportError('exam candidate account failed', e)
         return null
       })
       if (id === null) {
@@ -154,15 +157,20 @@ export async function inviteCandidatesAction(quizId: number, input: Candidate[])
     for (const a of toAdd) if (outcomes[a.row] === 'added' && !added.includes(a.id)) outcomes[a.row] = 'already'
     for (const m of toEmail) {
       await sendExamInvite(ctx, m).catch((e) => {
-        console.error('exam invite email failed', e)
+        reportError('exam invite email failed', e)
         outcomes[m.row] = 'mailFailed'
       })
     }
     await tellAdded(ctx, added.filter((id) => !toEmail.some((m) => m.id === id)))
+    audit('examCandidatesInvited', {
+      target: `quiz ${quizId}`,
+      details: Object.fromEntries([...new Set(outcomes)].map((o) => [o, outcomes.filter((x) => x === o).length])),
+      ok: outcomes.every((o) => !['badEmail', 'needName', 'admin', 'failed', 'mailFailed'].includes(o)),
+    })
     revalidatePath(`/school/exams/${quizId}`)
     return { ok: true, rows: outcomes }
   } catch (e) {
-    console.error('invite exam candidates failed', e)
+    reportError('invite exam candidates failed', e)
     return { ok: false }
   }
 }
@@ -209,9 +217,10 @@ export async function remindAction(quizId: number, userIds: number[]): Promise<R
       { school, exam: ctx.quiz.name },
       `/classes/${ctx.quiz.courseId}/quizzes/${quizId}`,
     )
+    audit('examReminded', { target: `quiz ${quizId}`, details: { invited, reminded: claimed.size, recent } })
     return { ok: true, invited, reminded: claimed.size, recent }
   } catch (e) {
-    console.error('exam reminders failed', e)
+    reportError('exam reminders failed', e)
     return { ok: false }
   }
 }
@@ -227,9 +236,10 @@ export async function resendExamInviteAction(quizId: number, userId: number): Pr
     const account = await getAccount(person.email)
     if (!account.found || !account.suspended) return 'failed'
     await sendExamInvite(ctx, { id: account.id, email: account.email, firstname: account.firstname })
+    audit('examInviteResent', { target: `quiz ${quizId}`, details: { user: userId, email: account.email } })
     return 'sent'
   } catch (e) {
-    console.error('resend exam invite failed', e)
+    reportError('resend exam invite failed', e)
     return 'failed'
   }
 }
@@ -239,6 +249,7 @@ export async function removeFromAudienceAction(quizId: number, userId: number) {
   const ctx = await managerExam(quizId)
   if (!ctx || !Number.isSafeInteger(userId)) return
   await setExamAudience(ctx.user.userId, ctx.companyId, quizId, [], [userId])
+  audit('examTakerRemoved', { target: `quiz ${quizId}`, details: { user: userId } })
   revalidatePath(`/school/exams/${quizId}`)
 }
 
@@ -267,10 +278,11 @@ export async function inviteToSchoolAction(quizId: number, userIds: number[]): P
         invited++
       }
     }
+    audit('examPassersInvitedToSchool', { target: `quiz ${quizId}`, details: { invited } })
     revalidatePath(`/school/exams/${quizId}/results`)
     return { ok: true, invited }
   } catch (e) {
-    console.error('invite exam takers failed', e)
+    reportError('invite exam takers failed', e)
     return { ok: false }
   }
 }

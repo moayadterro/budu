@@ -2,6 +2,7 @@ import 'server-only'
 import { CURRENCIES } from '@/shared/config/currency'
 import type { Rates } from '@/shared/lib/money'
 import { query } from './db'
+import { reportError } from '@/shared/server/errors'
 
 /**
  * Exchange rates (units per 1 USD) in app-db `fx_rates`, refreshed at most once a day from a free
@@ -35,7 +36,7 @@ async function ensureFresh() {
   if (!row?.stale) return
   // one refresh at a time per server process
   g.__buduFx ??= refresh()
-    .catch((e) => console.error('exchange rates refresh failed; keeping the last rates', e))
+    .catch((e) => reportError('exchange rates refresh failed; keeping the last rates', e))
     .finally(() => (g.__buduFx = undefined))
   await g.__buduFx
 }

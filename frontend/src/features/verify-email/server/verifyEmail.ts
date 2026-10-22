@@ -1,6 +1,8 @@
 import 'server-only'
 import { updateUser } from '@/entities/user/server'
 import { consumeToken, releaseToken } from '@/shared/server/tokens'
+import { reportError } from '@/shared/server/errors'
+import { audit } from '@/shared/server/audit'
 
 /** Confirms an email link: un-suspends the IOMAD account so it can sign in. SERVER-SIDE ONLY. */
 export async function verifyEmail(token: string | undefined): Promise<boolean> {
@@ -9,9 +11,10 @@ export async function verifyEmail(token: string | undefined): Promise<boolean> {
   if (!userId) return false
   try {
     await updateUser(userId, { suspended: 0 })
+    audit('emailVerified', { actor: null, target: `user ${userId}` })
     return true
   } catch (e) {
-    console.error('email verification failed', e)
+    reportError('email verification failed', e)
     await releaseToken('verify_email', token)
     return false
   }

@@ -6,6 +6,8 @@ import { query } from '@/shared/server/db'
 import { sendMail } from '@/shared/server/mailer'
 import { getLocale } from '@/shared/i18n/server'
 import { CONTACT_TOPICS, type ContactTopic } from '../model/topics'
+import { reportError } from '@/shared/server/errors'
+import { audit } from '@/shared/server/audit'
 
 export type ContactState =
   | { status: 'idle' }
@@ -39,6 +41,7 @@ export async function sendContactAction(_prev: ContactState, form: FormData): Pr
     )
     if (n >= PER_HOUR) return { status: 'error', error: 'tooMany' }
     const locale = await getLocale()
+    audit('contactMessage', { details: { topic, name, email } })
     await query(`INSERT INTO contact_messages (name, email, topic, message, locale, ip_hash) VALUES ($1, $2, $3, $4, $5, $6)`, [
       name,
       email,
@@ -51,11 +54,11 @@ export async function sendContactAction(_prev: ContactState, form: FormData): Pr
     if (to) {
       const body = `${message}\n\n— ${name} <${email}> · ${topic} · ${locale}`
       await sendMail({ to, subject: `[Budu · ${topic}] ${name}`, text: body, html: `<pre style="font-family:inherit;white-space:pre-wrap">${escapeHtml(body)}</pre>` }).catch(
-        (e) => console.error('contact email failed', e),
+        (e) => reportError('contact email failed', e),
       )
     }
   } catch (e) {
-    console.error('contact form failed', e)
+    reportError('contact form failed', e)
     return { status: 'error', error: 'server' }
   }
   return { status: 'sent' }

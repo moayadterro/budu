@@ -12,6 +12,8 @@ import { requireRole } from '@/entities/session/server'
 import { getTenantName, isSchool, schoolPeople } from '@/entities/tenant/server'
 import { formId, formText } from '@/shared/lib/form'
 import type { SessionUser } from '@/entities/session'
+import { reportError } from '@/shared/server/errors'
+import { audit } from '@/shared/server/audit'
 
 export type AnnouncementState = { status: 'idle' } | { status: 'saved'; at: number } | { status: 'error'; error: 'invalid' | 'server'; at: number }
 
@@ -81,6 +83,7 @@ export async function postAnnouncementAction(_prev: AnnouncementState, form: For
     const classIds = [...new Set(form.getAll('classIds').map(Number))].filter((n) => Number.isSafeInteger(n) && n > 0)
     const t = await resolveTarget(user, formText(form, 'audience'), formId(form, 'targetId'), classIds)
     if (!t || !t.companyId) return { status: 'error', error: 'invalid', at }
+    audit('announcementPosted', { companyId: t.companyId, details: { title, audience: t.audience, to: t.label } })
     await createAnnouncement({ companyId: t.companyId, author: { id: user.userId, name: user.name }, audience: t.audience, target: t.target, title, body })
     const preview = body.length > 300 ? `${body.slice(0, 300)}…` : body
     await notify(
@@ -90,7 +93,7 @@ export async function postAnnouncementAction(_prev: AnnouncementState, form: For
       '/',
     )
   } catch (e) {
-    console.error('post announcement failed', e)
+    reportError('post announcement failed', e)
     return { status: 'error', error: 'server', at }
   }
   revalidatePath('/', 'layout')

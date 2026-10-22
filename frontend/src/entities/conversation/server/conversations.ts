@@ -3,6 +3,7 @@ import { query } from '@/shared/server/db'
 import { publish } from '@/shared/server/realtime'
 import { defaultInstance, iomadCall } from '@/shared/server/iomad'
 import type { Conversation, Message, Receipts } from '../model/types'
+import { reportError } from '@/shared/server/errors'
 
 /**
  * Parent ↔ teacher conversations in app-db (`conversations`, `messages`). Plain functions over the
@@ -115,7 +116,7 @@ export async function sendMessage(c: Conversation, senderId: number, body: strin
   )
   // live: both participants' open pages hear about it at once (ids only — they fetch through the usual checks)
   await publish('budu_chat', { kind: 'message', conversationId: c.id, senderId, users: [c.parentId, c.teacherId] }).catch((e) =>
-    console.error('chat publish failed', e),
+    reportError('chat publish failed', e),
   )
   return {
     message: { id: Number(row.id), senderId, body, createdAt: row.created },

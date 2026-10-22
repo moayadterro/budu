@@ -8,6 +8,7 @@ import { hashSecret, newSecret } from '@/shared/server/tokens'
 import { SESSION_COOKIE } from '@/shared/config/auth'
 import type { Role } from '@/shared/config/nav'
 import type { SessionUser } from '../model/types'
+import { reportError } from '@/shared/server/errors'
 
 /**
  * Server sessions: random cookie value, only its hash in app-db, 30-day expiry,
@@ -86,7 +87,7 @@ async function refresh(hash: string, user: SessionUser): Promise<SessionUser | n
     )
     return { ...user, role, companyId, name, pictureId }
   } catch (e) {
-    console.error('session refresh failed; keeping current session', e)
+    reportError('session refresh failed; keeping current session', e)
     return user
   }
 }

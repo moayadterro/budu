@@ -5,6 +5,8 @@ import { BLOCK_KINDS, PAGE_LIMITS, type BlockData, type BlockKind } from '@/enti
 import { addBlock, deleteBlock, memberPhoto, moveBlock, pageOf, saveBlock, savePhoto, setCover, setPublished, setTagline } from '@/entities/school-page/server'
 import { requireRole } from '@/entities/session/server'
 import { isSchool, schoolPeople, setSchoolLogo } from '@/entities/tenant/server'
+import { reportError } from '@/shared/server/errors'
+import { audit } from '@/shared/server/audit'
 
 /** The signed-in manager's school (only schools have a public page). */
 async function school() {
@@ -39,6 +41,7 @@ export async function setPublishedAction(published: boolean): Promise<void> {
   const page = await pageOf(companyId)
   if (!page?.slug) return // every school gets an address when it opens the editor
   await setPublished(companyId, published === true)
+  audit(published === true ? 'schoolPagePublished' : 'schoolPageUnpublished', { details: { username: page.slug } })
   await refresh(companyId)
 }
 
@@ -116,7 +119,7 @@ export async function uploadPhotoAction(form: FormData): Promise<PhotoResult> {
   try {
     return { ok: true, id: await savePhoto(userId, companyId, file) }
   } catch (e) {
-    console.error('school photo upload failed', e)
+    reportError('school photo upload failed', e)
     return { ok: false, error: 'server' }
   }
 }
@@ -139,7 +142,7 @@ export async function setLogoAction(form: FormData): Promise<PhotoResult> {
     await refresh(companyId)
     return { ok: true, id: id ?? 0 }
   } catch (e) {
-    console.error('school logo failed', e)
+    reportError('school logo failed', e)
     return { ok: false, error: 'server' }
   }
 }

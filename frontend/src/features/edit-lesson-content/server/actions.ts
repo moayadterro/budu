@@ -7,6 +7,8 @@ import { requireRole } from '@/entities/session/server'
 import { MAX_UPLOAD_BYTES } from '@/shared/config/upload'
 import { formFile, formId, formText } from '@/shared/lib/form'
 import type { ContentFormState } from '../model/types'
+import { reportError } from '@/shared/server/errors'
+import { audit } from '@/shared/server/audit'
 
 const saved = (): ContentFormState => ({ status: 'saved', at: Date.now() })
 const fail = (error: Extract<ContentFormState, { status: 'error' }>['error']): ContentFormState => ({ status: 'error', error })
@@ -28,7 +30,7 @@ export async function saveTaskAction(_prev: ContentFormState, form: FormData): P
     // a new task in a published course waits as a draft — students are told on "Publish changes"
     await saveTask(user.userId, courseId, lessonId, taskId, { name, instructions, dueAt, file })
   } catch (e) {
-    console.error('save task failed', e)
+    reportError('save task failed', e)
     return fail('server')
   }
   revalidatePath(`/courses/${courseId}`)
@@ -48,7 +50,7 @@ export async function saveTextAction(_prev: ContentFormState, form: FormData): P
   try {
     await savePage(user.userId, courseId, lessonId, pageId, { name, html })
   } catch (e) {
-    console.error('save text failed', e)
+    reportError('save text failed', e)
     return fail('server')
   }
   revalidatePath(`/courses/${courseId}`)
@@ -61,6 +63,7 @@ export async function deleteItemAction(form: FormData) {
   const itemId = formId(form, 'itemId')
   if (!courseId || !itemId) return
   await deleteLessonItem(user.userId, courseId, itemId)
+  audit('lessonItemDeleted', { target: `course ${courseId}`, details: { item: itemId } })
   revalidatePath(`/courses/${courseId}`)
 }
 

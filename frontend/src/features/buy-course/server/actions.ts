@@ -8,6 +8,7 @@ import { openOrder, placeOrder, reportPaid } from '@/entities/order/server'
 import { requireRole } from '@/entities/session/server'
 import { formId } from '@/shared/lib/form'
 import { getRates } from '@/shared/server/fx'
+import { audit } from '@/shared/server/audit'
 
 /** The course, if it is listed in Explore and published (null otherwise). */
 async function forSale(courseId: number, viewerId: number) {
@@ -24,6 +25,7 @@ export async function enrolFreeAction(form: FormData) {
   const sale = courseId ? await forSale(courseId, user.userId) : null
   if (!sale || sale.listing.price > 0) return
   if (!sale.course.enrolled) await enrolLearner(courseId, user.userId)
+  audit('courseEnrolledFree', { target: `course ${courseId}`, details: { title: sale.course.title } })
   revalidatePath('/', 'layout')
   redirect(`/classes/${courseId}`)
 }
@@ -48,6 +50,7 @@ export async function startOrderAction(courseId: number): Promise<OrderView> {
     currency: sale.listing.currency,
     amountRub,
   })
+  audit('orderPlaced', { target: `order ${order.number}`, details: { course: sale.course.title, price: `${sale.listing.price} ${sale.listing.currency}`, rub: amountRub } })
   revalidatePath(`/explore/${courseId}`)
   return view(order)
 }
@@ -57,6 +60,7 @@ export async function reportPaidAction(orderId: number): Promise<OrderView> {
   const user = await requireRole('student')
   if (!Number.isSafeInteger(orderId)) return null
   const order = await reportPaid(user.userId, orderId)
+  if (order) audit('orderReportedPaid', { target: `order ${order.number}`, details: { course: order.courseTitle } })
   revalidatePath('/explore', 'layout')
   return order ? view(order) : null
 }

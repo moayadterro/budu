@@ -9,6 +9,8 @@ import { QUESTION_TYPES, type QuestionData, type QuizKind } from '@/entities/qui
 import { deleteQuiz, getQuiz, moveQuestion, publishQuiz, quizResults, saveQuestion, saveQuiz } from '@/entities/quiz/server'
 import { requireRole } from '@/entities/session/server'
 import { formId, formText } from '@/shared/lib/form'
+import { reportError } from '@/shared/server/errors'
+import { audit } from '@/shared/server/audit'
 
 export type QuizFormState = { status: 'idle' } | { status: 'saved'; at: number } | { status: 'error'; error: 'invalid' | 'dates' | 'server'; at: number }
 
@@ -48,7 +50,7 @@ export async function saveQuizAction(_prev: QuizFormState, form: FormData): Prom
       classIds,
     })
   } catch (e) {
-    console.error('save quiz failed', e)
+    reportError('save quiz failed', e)
     return { status: 'error', error: 'server', at }
   }
   const base = baseOf(form, courseId)
@@ -72,6 +74,7 @@ export async function publishQuizAction(quizId: number, published: boolean, publ
   const wasLive = quiz.published && !(quiz.opensAt && quiz.opensAt > now)
   try {
     await publishQuiz(user.userId, quizId, published, at)
+    if (published) audit('quizPublished', { target: `quiz ${quizId}`, details: { name: quiz.name, kind: quiz.kind, ...(at ? { at } : {}) } })
     if (published && !at && !wasLive) {
       const [course, results] = await Promise.all([getCourse(user.userId, quiz.courseId), quizResults(user.userId, quizId)])
       const students = results?.students ?? []
@@ -83,7 +86,7 @@ export async function publishQuizAction(quizId: number, published: boolean, publ
       }
     }
   } catch (e) {
-    console.error('publish quiz failed', e)
+    reportError('publish quiz failed', e)
     return 'server'
   }
   revalidatePath('/', 'layout')
@@ -96,6 +99,7 @@ export async function deleteQuizAction(form: FormData) {
   const courseId = formId(form, 'courseId')
   if (!quizId || !courseId) return
   await deleteQuiz(user.userId, quizId)
+  audit('quizDeleted', { target: `quiz ${quizId}`, details: { course: courseId } })
   const base = baseOf(form, courseId)
   revalidatePath(base, 'layout')
   redirect(base)
@@ -114,7 +118,7 @@ export async function saveQuestionAction(quizId: number, slot: number, q: Questi
   try {
     await saveQuestion(user.userId, quizId, slot, { text, mark, data: q.data })
   } catch (e) {
-    console.error('save question failed', e)
+    reportError('save question failed', e)
     return 'server'
   }
   revalidatePath('/', 'layout')

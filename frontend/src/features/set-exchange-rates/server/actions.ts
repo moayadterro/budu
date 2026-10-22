@@ -5,6 +5,7 @@ import { requireRole } from '@/entities/session/server'
 import { CURRENCIES } from '@/shared/config/currency'
 import { formText } from '@/shared/lib/form'
 import { setOverride } from '@/shared/server/fx'
+import { audit } from '@/shared/server/audit'
 
 export type RatesState = { status: 'idle' } | { status: 'saved'; at: number } | { status: 'error'; at: number }
 
@@ -18,6 +19,7 @@ export async function saveRatesAction(_prev: RatesState, form: FormData): Promis
   })
   if (values.some(({ v }) => v !== null && (!Number.isFinite(v) || v <= 0 || v > 1e9))) return { status: 'error', at }
   for (const { c, v } of values) await setOverride(c, v, admin.userId)
+  audit('exchangeRatesChanged', { details: Object.fromEntries(values.filter(({ v }) => v !== null).map(({ c, v }) => [c, v])) })
   revalidatePath('/', 'layout')
   return { status: 'saved', at }
 }

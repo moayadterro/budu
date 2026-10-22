@@ -6,6 +6,8 @@ import { deleteLesson, discardChanges, moveLesson, saveLesson } from '@/entities
 import { requireRole } from '@/entities/session/server'
 import { formId, formText } from '@/shared/lib/form'
 import type { LessonFormState } from '../model/types'
+import { reportError } from '@/shared/server/errors'
+import { audit } from '@/shared/server/audit'
 
 /** Adds a lesson at the end (no lessonId) or renames one. */
 export async function saveLessonAction(_prev: LessonFormState, form: FormData): Promise<LessonFormState> {
@@ -19,7 +21,7 @@ export async function saveLessonAction(_prev: LessonFormState, form: FormData): 
   try {
     await saveLesson(user.userId, courseId, lessonId, title, description)
   } catch (e) {
-    console.error('save lesson failed', e)
+    reportError('save lesson failed', e)
     return { status: 'error', error: 'server' }
   }
   revalidatePath(`/courses/${courseId}`)
@@ -32,6 +34,7 @@ export async function deleteLessonAction(form: FormData) {
   const lessonId = formId(form, 'lessonId')
   if (!courseId || !lessonId) return
   await deleteLesson(user.userId, courseId, lessonId)
+  audit('lessonDeleted', { target: `course ${courseId}`, details: { lesson: lessonId } })
   revalidatePath(`/courses/${courseId}`)
 }
 

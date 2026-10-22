@@ -5,6 +5,8 @@ import { revokeUserSessions } from '@/entities/session/server'
 import { getAccount, sendPasswordResetEmail, updateUser } from '@/entities/user/server'
 import { consumeToken, issuedRecently, releaseToken } from '@/shared/server/tokens'
 import { passwordOk } from '@/shared/lib/password'
+import { reportError } from '@/shared/server/errors'
+import { audit } from '@/shared/server/audit'
 
 export type ForgotState = { status: 'idle' } | { status: 'sent' }
 export type ResetState = { status: 'idle' } | { status: 'error'; error: 'invalidLink' | 'weakPassword' | 'server' }
@@ -21,9 +23,10 @@ export async function requestPasswordReset(_prev: ForgotState, form: FormData): 
     // Unconfirmed (suspended) accounts confirm their email first; throttle repeats.
     if (account.found && !account.suspended && !(await issuedRecently('reset_password', account.id, 60))) {
       await sendPasswordResetEmail(account)
+      audit('passwordResetRequested', { actor: null, target: `user ${account.id}`, details: { email: account.email } })
     }
   } catch (e) {
-    console.error('password reset request failed', e)
+    reportError('password reset request failed', e)
   }
   return { status: 'sent' }
 }
@@ -39,8 +42,9 @@ export async function resetPassword(_prev: ResetState, form: FormData): Promise<
   try {
     await updateUser(userId, { password })
     await revokeUserSessions(userId)
+    audit('passwordReset', { actor: null, target: `user ${userId}` })
   } catch (e) {
-    console.error('password reset failed', e)
+    reportError('password reset failed', e)
     await releaseToken('reset_password', token) // let them retry with the same link
     return { status: 'error', error: 'server' }
   }

@@ -6,6 +6,8 @@ import { notify } from '@/entities/notification/server'
 import { getQuiz, gradeAnswer, teacherReview } from '@/entities/quiz/server'
 import { requireRole } from '@/entities/session/server'
 import { getUserById } from '@/entities/user/server'
+import { reportError } from '@/shared/server/errors'
+import { audit } from '@/shared/server/audit'
 
 /**
  * Teacher grades one answer. When the attempt has nothing left to grade, the student (and, for an exam,
@@ -16,6 +18,7 @@ export async function gradeAnswerAction(attemptId: number, slot: number, mark: n
   if (!Number.isSafeInteger(attemptId) || !Number.isSafeInteger(slot) || !Number.isFinite(mark) || mark < 0) return 'invalid'
   try {
     const r = await gradeAnswer(user.userId, attemptId, slot, mark, String(comment ?? '').slice(0, 5000))
+    audit('answerGraded', { target: `attempt ${attemptId}`, details: { question: slot, mark } })
     if (!r.needsgrading) {
       const [review, student] = await Promise.all([teacherReview(user.userId, attemptId), getUserById(r.studentid)])
       const quiz = review ? await getQuiz(user.userId, review.quizId) : null
@@ -28,7 +31,7 @@ export async function gradeAnswerAction(attemptId: number, slot: number, mark: n
       }
     }
   } catch (e) {
-    console.error('grade answer failed', e)
+    reportError('grade answer failed', e)
     return 'server'
   }
   revalidatePath('/courses', 'layout')

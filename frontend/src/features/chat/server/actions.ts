@@ -8,6 +8,7 @@ import { notify } from '@/entities/notification/server'
 import { getSession, requireRole } from '@/entities/session/server'
 import { getUserById } from '@/entities/user/server'
 import { formId } from '@/shared/lib/form'
+import { audit } from '@/shared/server/audit'
 
 /**
  * Start (or reopen) a conversation. A parent writes to a teacher of one of their child's courses;
@@ -27,6 +28,7 @@ export async function startConversationAction(form: FormData) {
     if (!(await getFamily(childId)).parents.some((p) => p.id === withId)) return
     id = await openConversation(withId, user.userId, childId)
   }
+  audit('conversationStarted', { target: `conversation ${id}`, details: { child: childId, with: withId } })
   redirect(`/messages/${id}`)
 }
 

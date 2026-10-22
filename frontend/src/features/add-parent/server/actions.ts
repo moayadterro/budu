@@ -12,6 +12,8 @@ import { getLocale, getT } from '@/shared/i18n/server'
 import { composeMail } from '@/shared/server/mail-layout'
 import { appUrl, sendMail } from '@/shared/server/mailer'
 import { issueToken } from '@/shared/server/tokens'
+import { reportError } from '@/shared/server/errors'
+import { audit } from '@/shared/server/audit'
 
 export type AddParentState =
   | { status: 'idle' }
@@ -40,6 +42,7 @@ export async function addParentAction(_prev: AddParentState, form: FormData): Pr
       const { parents } = await getFamily(user.userId)
       if (parents.some((p) => p.id === account.id)) return { status: 'error', error: 'already', at }
       if (!(await createParentRequest(user.userId, account.id))) return { status: 'error', error: 'pending', at }
+      audit('parentRequested', { target: `user ${account.id}`, details: { email, existing: true } })
       await notify(
         [{ id: account.id, email: account.email, name: `${account.firstname} ${account.lastname}`.trim() }],
         'parentRequest',
@@ -49,6 +52,7 @@ export async function addParentAction(_prev: AddParentState, form: FormData): Pr
     } else {
       const id = await createInvitedUser({ email, firstname, lastname })
       await createParentRequest(user.userId, id)
+      audit('parentRequested', { target: `user ${id}`, details: { email, existing: false } })
       const token = await issueToken('invite', id, INVITE_DAYS * 24 * 60)
       const t = await getT() // the parent has no language yet: use the child's
       await sendMail({
@@ -64,7 +68,7 @@ export async function addParentAction(_prev: AddParentState, form: FormData): Pr
       })
     }
   } catch (e) {
-    console.error('add parent failed', e)
+    reportError('add parent failed', e)
     return { status: 'error', error: 'server', at }
   }
   revalidatePath('/', 'layout')
@@ -84,6 +88,7 @@ export async function cancelParentRequestAction(form: FormData) {
   const id = formId(form, 'requestId')
   if (!id) return
   await cancelParentRequest(user.userId, id)
+  audit('parentRequestCancelled', { target: `request ${id}` })
   revalidatePath('/', 'layout')
 }
 
@@ -95,6 +100,7 @@ export async function removeParentAction(form: FormData) {
   const { parents } = await getFamily(user.userId)
   if (!parents.some((p) => p.id === parentId)) return
   await unlinkParent(parentId, user.userId)
+  audit('parentRemoved', { target: `user ${parentId}` })
   await refreshSessionsOf(parentId) // their role may change (no children left)
   revalidatePath('/', 'layout')
 }

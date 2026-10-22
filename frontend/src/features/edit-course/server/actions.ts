@@ -10,6 +10,8 @@ import { isCourseLanguage } from '@/shared/config/course-language'
 import { requireRole } from '@/entities/session/server'
 import { formId, formText } from '@/shared/lib/form'
 import type { CourseFormError, CourseFormState } from '../model/types'
+import { reportError } from '@/shared/server/errors'
+import { audit } from '@/shared/server/audit'
 
 function readDetails(form: FormData): { title: string; description: string } | CourseFormError {
   const title = formText(form, 'title')
@@ -29,8 +31,9 @@ export async function createCourseAction(_prev: CourseFormState, form: FormData)
   let id: number
   try {
     id = await createCourse(user.userId, user.companyId, details.title, details.description)
+    audit('courseCreated', { target: `course ${id}`, details: { title: details.title } })
   } catch (e) {
-    console.error('create course failed', e)
+    reportError('create course failed', e)
     return { status: 'error', error: 'server' }
   }
   revalidatePath('/courses')
@@ -46,8 +49,9 @@ export async function saveCourseDetails(_prev: CourseFormState, form: FormData):
   if (typeof details === 'string') return { status: 'error', error: details }
   try {
     await updateCourse(user.userId, courseId, { ...details, published: formText(form, 'published') === '1' })
+  audit(formText(form, 'published') === '1' ? 'coursePublished' : 'courseUnpublished', { target: `course ${courseId}`, details: { title: details.title } })
   } catch (e) {
-    console.error('save course failed', e)
+    reportError('save course failed', e)
     return { status: 'error', error: 'server' }
   }
   revalidatePath(`/courses/${courseId}`)
@@ -71,6 +75,7 @@ export async function publishChangesAction(form: FormData) {
   const courseId = formId(form, 'courseId')
   if (!courseId) return
   const tasks = await publishChanges(user.userId, courseId)
+  audit('courseChangesPublished', { target: `course ${courseId}` })
   if (tasks.length) {
     const [course, students] = await Promise.all([getCourse(user.userId, courseId), listStudents(user.userId, courseId)])
     for (const task of tasks) {
@@ -111,6 +116,7 @@ export async function saveListingAction(_prev: ListingState, form: FormData): Pr
   if (!course?.canEdit) return { status: 'error', at }
   const language = formText(form, 'language')
   await saveListing(user.userId, { courseId, listed: form.get('listed') === 'on', price, currency })
+  audit('courseListingSaved', { target: `course ${courseId}`, details: { listed: form.get('listed') === 'on', price, currency } })
   await setCourseLanguage(user.userId, courseId, isCourseLanguage(language) ? language : '') // an IOMAD course field
   revalidatePath(`/courses/${courseId}`)
   revalidatePath('/explore')
@@ -136,7 +142,7 @@ export async function setCourseCoverAction(_prev: CoverState, form: FormData): P
   try {
     await setCourseImage(user.userId, courseId, remove ? null : image)
   } catch (e) {
-    console.error('course cover failed', e)
+    reportError('course cover failed', e)
     return { status: 'error', error: 'server', at }
   }
   revalidatePath('/', 'layout')

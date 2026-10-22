@@ -6,6 +6,7 @@ import { prefsOf, setPref } from '@/shared/server/user-prefs'
 import { renderNotification } from '../lib/render'
 import { CHANNELS } from './channels'
 import type { AppNotification, NotificationKind, NotificationParams, Recipient } from '../model/types'
+import { reportError } from '@/shared/server/errors'
 
 /**
  * Notifications: a row per recipient in app-db (the bell) + every delivery channel (email today, push
@@ -44,7 +45,7 @@ export async function notify(recipients: Recipient[], kind: NotificationKind, pa
         try {
           await channel.send(delivery)
         } catch (e) {
-          console.error(`notification ${channel.name} to user ${recipient.id} failed`, e)
+          reportError(`notification ${channel.name} to user ${recipient.id} failed`, e)
         }
       }
     }),

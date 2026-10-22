@@ -7,6 +7,8 @@ import { notify } from '@/entities/notification/server'
 import { quizForStudent, reviewAttempt, saveAttempt, startAttempt } from '@/entities/quiz/server'
 import { requireRole } from '@/entities/session/server'
 import { formId } from '@/shared/lib/form'
+import { reportError } from '@/shared/server/errors'
+import { audit } from '@/shared/server/audit'
 
 /** Start (or continue) a quiz → the attempt screen. */
 export async function startAttemptAction(form: FormData) {
@@ -29,11 +31,12 @@ export async function saveAnswersAction(attemptId: number, answers: Record<numbe
   if (JSON.stringify(answers).length > 200_000) return { ok: false }
   try {
     const r = await saveAttempt(user.userId, attemptId, answers, finish)
+    if (finish) audit('quizSubmitted', { target: `attempt ${attemptId}` }) // autosaves are not logged
     if (r.finished && finish) await afterSubmit(user.userId, user.name, attemptId, r.needsgrading)
     if (r.finished) revalidatePath('/', 'layout')
     return { ok: true, finished: r.finished, needsGrading: r.needsgrading }
   } catch (e) {
-    console.error('save quiz answers failed', e)
+    reportError('save quiz answers failed', e)
     return { ok: false }
   }
 }
@@ -52,6 +55,6 @@ async function afterSubmit(studentId: number, studentName: string, attemptId: nu
       await notify(parents, 'examResult', { child: studentName, quiz: quiz.name, grade: String(Math.round(review.grade)) }, '/family')
     }
   } catch (e) {
-    console.error('quiz submit notifications failed', e)
+    reportError('quiz submit notifications failed', e)
   }
 }

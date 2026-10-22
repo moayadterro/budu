@@ -6,6 +6,7 @@ import { addSchoolEvent, deleteSchoolEvent } from '@/entities/schedule/server'
 import { requireRole } from '@/entities/session/server'
 import { getTenantName, schoolPeople } from '@/entities/tenant/server'
 import { formId, formText } from '@/shared/lib/form'
+import { reportError } from '@/shared/server/errors'
 
 export type EventState = { status: 'idle' } | { status: 'saved'; at: number } | { status: 'error'; error: 'invalid' | 'server' }
 
@@ -28,7 +29,7 @@ export async function addSchoolEventAction(_prev: EventState, form: FormData): P
       '/timetable',
     )
   } catch (e) {
-    console.error('add school event failed', e)
+    reportError('add school event failed', e)
     return { status: 'error', error: 'server' }
   }
   revalidatePath('/', 'layout')

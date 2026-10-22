@@ -6,6 +6,8 @@ import { COURSE_LIMITS } from '@/entities/course'
 import { addMaterial, getCourse } from '@/entities/course/server'
 import { getSession } from '@/entities/session/server'
 import { MAX_UPLOAD_BYTES } from '@/shared/config/upload'
+import { reportError } from '@/shared/server/errors'
+import { audit } from '@/shared/server/audit'
 
 /**
  * Resumable uploads of lesson materials (tus protocol, https://tus.io): the browser sends 5 MB pieces
@@ -69,8 +71,12 @@ function create() {
         // streamed from disk — never the whole video in memory
         const blob = await openAsBlob(`${DIR}/${upload.id}`, { type: m.filetype || 'application/octet-stream' })
         await addMaterial(userId, Number(m.courseId), Number(m.lessonId), new File([blob], m.filename, { type: blob.type }), name)
+        audit('materialUploaded', {
+          target: `course ${m.courseId}`,
+          details: { lesson: Number(m.lessonId), file: m.filename, type: m.filetype, mb: Math.round(((upload.size ?? 0) / 1048576) * 10) / 10 },
+        })
       } catch (e) {
-        console.error('resumable upload: moving to IOMAD failed', e)
+        reportError('resumable upload: moving to IOMAD failed', e)
         throw new Rejected(500, 'server')
       } finally {
         await store.remove(upload.id).catch(() => {})
@@ -95,6 +101,6 @@ export async function cleanUpUploads() {
   try {
     await tus().server.cleanUpExpiredUploads()
   } catch (e) {
-    console.error('upload cleanup failed', e)
+    reportError('upload cleanup failed', e)
   }
 }

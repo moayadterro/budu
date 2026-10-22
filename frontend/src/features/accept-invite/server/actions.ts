@@ -6,6 +6,8 @@ import { notify } from '@/entities/notification/server'
 import { getUserById, updateUser } from '@/entities/user/server'
 import { passwordOk } from '@/shared/lib/password'
 import { consumeToken, releaseToken } from '@/shared/server/tokens'
+import { reportError } from '@/shared/server/errors'
+import { audit } from '@/shared/server/audit'
 
 export type AcceptState = { status: 'idle' } | { status: 'error'; error: 'invalidLink' | 'weakPassword' | 'server' }
 
@@ -21,8 +23,9 @@ export async function acceptInvite(_prev: AcceptState, form: FormData): Promise<
   if (!userId) return { status: 'error', error: 'invalidLink' }
   try {
     await updateUser(userId, { password, suspended: 0 })
+    audit('inviteLinkAccepted', { actor: null, target: `user ${userId}` })
   } catch (e) {
-    console.error('accept invite failed', e)
+    reportError('accept invite failed', e)
     await releaseToken('invite', token)
     return { status: 'error', error: 'server' }
   }
@@ -34,7 +37,7 @@ export async function acceptInvite(_prev: AcceptState, form: FormData): Promise<
       await notify(kids, 'parentAnswered', { parent: parent?.name ?? '', answer: 'accepted' }, '/account')
     }
   } catch (e) {
-    console.error('linking the invited parent failed', e) // the account is active; the child can ask again
+    reportError('linking the invited parent failed', e) // the account is active; the child can ask again
   }
   redirect('/login?invited=1')
 }

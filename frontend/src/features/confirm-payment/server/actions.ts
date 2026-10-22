@@ -7,6 +7,7 @@ import { decideOrder } from '@/entities/order/server'
 import { requireRole } from '@/entities/session/server'
 import { getUserById } from '@/entities/user/server'
 import { formId } from '@/shared/lib/form'
+import { audit } from '@/shared/server/audit'
 
 /**
  * Platform admin, after checking the transfer and the receipt: confirm (→ the student is enrolled and
@@ -19,6 +20,7 @@ export async function decideOrderAction(form: FormData) {
   if (!orderId) return
   const order = await decideOrder(orderId, admin.userId, confirm)
   if (!order) return
+  audit(confirm ? 'paymentConfirmed' : 'paymentRejected', { target: `order ${order.number}`, details: { course: order.courseTitle, student: order.studentId } })
   if (confirm) await enrolLearner(order.courseId, order.studentId)
   const student = await getUserById(order.studentId)
   if (student) {

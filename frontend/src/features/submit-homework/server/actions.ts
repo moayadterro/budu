@@ -7,6 +7,8 @@ import { requireRole } from '@/entities/session/server'
 import { MAX_UPLOAD_BYTES } from '@/shared/config/upload'
 import { formFiles, formId } from '@/shared/lib/form'
 import { IomadError } from '@/shared/server/iomad'
+import { reportError } from '@/shared/server/errors'
+import { audit } from '@/shared/server/audit'
 
 export type SubmitState =
   | { status: 'idle' }
@@ -26,6 +28,7 @@ export async function submitHomeworkAction(_prev: SubmitState, form: FormData): 
   if (files.some((f) => f.size > MAX_UPLOAD_BYTES)) return { status: 'error', error: 'tooBig' }
   try {
     const r = await submitHomework(user.userId, homeworkId, answer, files)
+    audit('homeworkSubmitted', { target: `homework ${homeworkId}`, details: { files: files.length } })
     await notify(
       r.teachers.map((p) => ({ id: p.id, email: p.email, name: p.name })),
       'homeworkSubmitted',
@@ -34,7 +37,7 @@ export async function submitHomeworkAction(_prev: SubmitState, form: FormData): 
     )
   } catch (e) {
     if (e instanceof IomadError && /submissionsclosed/.test(e.code + e.message)) return { status: 'error', error: 'closed' }
-    console.error('submit homework failed', e)
+    reportError('submit homework failed', e)
     return { status: 'error', error: 'server' }
   }
   revalidatePath('/', 'layout')

@@ -8,6 +8,8 @@ import { defaultInstance, iomadCheckPassword } from '@/shared/server/iomad'
 import { hasPendingToken, issuedRecently } from '@/shared/server/tokens'
 import { homeFor } from '@/shared/config/nav'
 import { safeNext } from '@/shared/lib/password'
+import { reportError } from '@/shared/server/errors'
+import { audit } from '@/shared/server/audit'
 
 export type SignInState =
   | { status: 'idle' }
@@ -29,15 +31,22 @@ export async function signIn(_prev: SignInState, form: FormData): Promise<SignIn
   let destination: string
   try {
     const account = await getAccount(email)
-    if (!account.found) return { status: 'error', error: 'invalid' }
+    if (!account.found) {
+      audit('signInFailed', { actor: null, details: { email, reason: 'noAccount' }, ok: false })
+      return { status: 'error', error: 'invalid' }
+    }
     if (account.suspended) {
+      audit('signInFailed', { actor: null, target: `user ${account.id}`, details: { email, reason: 'notActive' }, ok: false })
       // Suspended + pending confirmation link = never confirmed; anything else stays generic.
       return (await hasPendingToken('verify_email', account.id))
         ? { status: 'notVerified', email: account.email }
         : { status: 'error', error: 'invalid' }
     }
     const check = await iomadCheckPassword(defaultInstance(), account.username, password)
-    if (!check.ok) return { status: 'error', error: check.reason === 'locked' ? 'locked' : 'invalid' }
+    if (!check.ok) {
+      audit('signInFailed', { actor: null, target: `user ${account.id}`, details: { email, reason: check.reason === 'locked' ? 'locked' : 'wrongPassword' }, ok: false })
+      return { status: 'error', error: check.reason === 'locked' ? 'locked' : 'invalid' }
+    }
     const { role, companyId } = await resolveRole(account.memberships, account.siteadmin, account.children)
     await createSession({
       userId: account.id,
@@ -47,13 +56,14 @@ export async function signIn(_prev: SignInState, form: FormData): Promise<SignIn
       email: account.email,
       pictureId: account.picture || null,
     })
+    audit('signIn', { actor: { userId: account.id, name: `${account.firstname} ${account.lastname}`.trim(), role, companyId } })
     await syncLocale(account.id) // their saved language wins in this browser (first sign-in: saves the current one)
     await syncCurrency(account.id) // the public catalog (signed out) then shows their Settings currency
     // a student without a parent gets the "add your parent" step once (they can skip it)
     const step = role === 'student' && (await needsParentStep(account.id)) ? '/welcome/parent' : null
     destination = safeNext(form.get('next')) ?? step ?? homeFor(role)
   } catch (e) {
-    console.error('sign-in failed', e)
+    reportError('sign-in failed', e)
     return { status: 'error', error: 'server' }
   }
   redirect(destination) // outside try: redirect() works by throwing
@@ -72,7 +82,7 @@ export async function resendVerification(_prev: SignInState, form: FormData): Pr
       await sendVerificationEmail(account)
     }
   } catch (e) {
-    console.error('resend verification failed', e)
+    reportError('resend verification failed', e)
   }
   return { status: 'resent' }
 }

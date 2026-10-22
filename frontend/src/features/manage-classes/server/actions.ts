@@ -15,6 +15,8 @@ import {
 import { requireRole } from '@/entities/session/server'
 import { getTenantName } from '@/entities/tenant/server'
 import { formId, formText } from '@/shared/lib/form'
+import { reportError } from '@/shared/server/errors'
+import { audit } from '@/shared/server/audit'
 
 export type ClassFormState = { status: 'idle' } | { status: 'saved'; at: number } | { status: 'error'; at: number }
 
@@ -34,8 +36,9 @@ export async function createClassAction(_prev: ClassFormState, form: FormData): 
   let id: number
   try {
     id = await saveClass(user.userId, user.companyId, 0, name, formText(form, 'description').slice(0, 1000))
+    audit('classCreated', { target: `class ${id}`, details: { name } })
   } catch (e) {
-    console.error('create class failed', e)
+    reportError('create class failed', e)
     return { status: 'error', at: Date.now() }
   }
   refresh()
@@ -50,7 +53,7 @@ export async function renameClassAction(_prev: ClassFormState, form: FormData): 
   try {
     await saveClass(user.userId, user.companyId, classId, name, formText(form, 'description').slice(0, 1000))
   } catch (e) {
-    console.error('rename class failed', e)
+    reportError('rename class failed', e)
     return { status: 'error', at: Date.now() }
   }
   refresh()
@@ -62,6 +65,7 @@ export async function deleteClassAction(form: FormData) {
   const classId = formId(form, 'classId')
   if (!classId) return
   await deleteClass(user.userId, classId)
+  audit('classDeleted', { target: `class ${classId}` })
   refresh()
   redirect('/school/classes')
 }
@@ -74,6 +78,7 @@ export async function addStudentsAction(_prev: ClassFormState, form: FormData): 
   if (!classId || !add.length) return { status: 'error', at: Date.now() }
   try {
     await setClassStudents(user.userId, classId, add, [])
+    audit('classStudentsAdded', { target: `class ${classId}`, details: { students: add.length } })
     const cls = await getClass(user.userId, classId)
     if (cls) {
       const school = (await getTenantName(cls.companyId)) ?? ''
@@ -81,7 +86,7 @@ export async function addStudentsAction(_prev: ClassFormState, form: FormData): 
       await notify(added, 'addedToClass', { class: cls.name, school, by: user.name }, '/classes')
     }
   } catch (e) {
-    console.error('add students failed', e)
+    reportError('add students failed', e)
     return { status: 'error', at: Date.now() }
   }
   refresh()
@@ -94,6 +99,7 @@ export async function removeFromClassAction(form: FormData) {
   const studentId = formId(form, 'studentId')
   if (!classId || !studentId) return
   await setClassStudents(user.userId, classId, [], [studentId])
+  audit('classStudentRemoved', { target: `class ${classId}`, details: { student: studentId } })
   refresh()
 }
 
@@ -103,8 +109,9 @@ export async function saveClassTeachersAction(_prev: ClassFormState, form: FormD
   if (!classId) return { status: 'error', at: Date.now() }
   try {
     await setClassTeachers(user.userId, classId, ids(form, 'teacherId'))
+    audit('classTeachersChanged', { target: `class ${classId}`, details: { teachers: ids(form, 'teacherId').length } })
   } catch (e) {
-    console.error('save class teachers failed', e)
+    reportError('save class teachers failed', e)
     return { status: 'error', at: Date.now() }
   }
   refresh()
@@ -124,12 +131,13 @@ export async function linkClassAction(_prev: ClassFormState, form: FormData): Pr
     // tell only the students the class newly brings into the course
     const before = new Set((await listStudents(user.userId, courseId)).map((s) => s.id))
     await linkClassCourse(user.userId, classId, courseId, true)
+    audit('classEnrolledInCourse', { target: `class ${classId}`, details: { course: courseId } })
     const [after, course] = await Promise.all([listStudents(user.userId, courseId), getCourse(user.userId, courseId)])
     if (course?.published) {
       await notify(after.filter((s) => !before.has(s.id)), 'enrolled', { course: course.title, by: user.name }, `/classes/${courseId}`)
     }
   } catch (e) {
-    console.error('link class failed', e)
+    reportError('link class failed', e)
     return { status: 'error', at: Date.now() }
   }
   refresh()
@@ -142,5 +150,6 @@ export async function unlinkClassAction(form: FormData) {
   const courseId = formId(form, 'courseId')
   if (!classId || !courseId) return
   await linkClassCourse(user.userId, classId, courseId, false)
+  audit('classRemovedFromCourse', { target: `class ${classId}`, details: { course: courseId } })
   refresh()
 }

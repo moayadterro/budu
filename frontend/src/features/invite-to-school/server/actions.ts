@@ -11,6 +11,8 @@ import { getLocale, getT } from '@/shared/i18n/server'
 import { composeMail } from '@/shared/server/mail-layout'
 import { appUrl, sendMail } from '@/shared/server/mailer'
 import { issueToken } from '@/shared/server/tokens'
+import { reportError } from '@/shared/server/errors'
+import { audit } from '@/shared/server/audit'
 
 export type InviteState = { status: 'idle' } | { status: 'created' | 'invited' | 'pending' | 'already' | 'invalid' | 'server'; at: number }
 
@@ -40,6 +42,7 @@ export async function inviteToSchool(_prev: InviteState, form: FormData): Promis
       if (people.some((p) => p.id === account.id)) return { status: 'already', at }
       const created = await createInvite(user.companyId, account.id, role, { id: user.userId, name: user.name })
       if (!created) return { status: 'pending', at }
+      audit('schoolInviteSent', { target: `user ${account.id}`, details: { email, role, existing: true } })
       await notify(
         [{ id: account.id, email: account.email, name: `${account.firstname} ${account.lastname}`.trim() }],
         'schoolInvite',
@@ -52,6 +55,7 @@ export async function inviteToSchool(_prev: InviteState, form: FormData): Promis
 
     const id = await createInvitedUser({ email, firstname, lastname })
     await addToSchool(user.companyId, id, role)
+    audit('schoolInviteSent', { target: `user ${id}`, details: { email, role, existing: false } })
     const token = await issueToken('invite', id, INVITE_DAYS * 24 * 60)
     const t = await getT() // the person has no language yet: use the inviting manager's
     await sendMail({
@@ -68,7 +72,7 @@ export async function inviteToSchool(_prev: InviteState, form: FormData): Promis
     revalidatePath('/', 'layout')
     return { status: 'created', at }
   } catch (e) {
-    console.error('invite failed', e)
+    reportError('invite failed', e)
     return { status: 'server', at }
   }
 }
@@ -80,5 +84,6 @@ export async function changeSchoolRole(userId: number, role: SchoolRole) {
   const people = await schoolPeople(user.userId, user.companyId)
   if (!people.some((p) => p.id === userId)) return
   await setSchoolRole(user.userId, user.companyId, userId, role)
+  audit('roleChanged', { target: `user ${userId}`, details: { role } })
   revalidatePath('/', 'layout')
 }

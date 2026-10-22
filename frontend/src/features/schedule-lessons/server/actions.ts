@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { addLessons, deleteSeries } from '@/entities/schedule/server'
 import { requireRole } from '@/entities/session/server'
 import { formId, formText } from '@/shared/lib/form'
+import { reportError } from '@/shared/server/errors'
 
 export type LessonsState = { status: 'idle' } | { status: 'saved'; at: number } | { status: 'error'; error: 'invalid' | 'tooMany' | 'server' }
 
@@ -26,7 +27,7 @@ export async function addLessonsAction(_prev: LessonsState, form: FormData): Pro
   try {
     await addLessons(user.userId, courseId, classId, formText(form, 'room').slice(0, 200), Math.round(minutes * 60), starts)
   } catch (e) {
-    console.error('add lessons failed', e)
+    reportError('add lessons failed', e)
     return { status: 'error', error: 'server' }
   }
   revalidatePath('/', 'layout')
