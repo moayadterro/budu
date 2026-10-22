@@ -170,7 +170,8 @@ Design is a first-class task here, not decoration. For every screen or component
    (blue, purple, the theme green … several cards may each have their own colour) — never mix
    three colours in one gradient. No borders/rings on showcase cards (soft surfaces + soft shadow
    instead). No orange/amber accents on public pages (owner: "not in my theme"); no big solid-green
-   blocks — light tints.
+   blocks — light tints. NEVER a coloured glow, halo or coloured shadow behind a card (owner,
+   2026-10-23: "not cool at all, don't do that again") — card shadows are soft and neutral.
 10. **Verify by looking.** Open it in the browser (desktop AND narrow width) before saying it's done;
    say what was and wasn't checked. If the owner doesn't like a change, revert it fully, no argument.
 
