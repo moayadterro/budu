@@ -140,7 +140,13 @@ Design is a first-class task here, not decoration. For every screen or component
    (respect reduced motion). Every state designed: empty, loading, error, success.
 7. **All three languages and both themes.** Check RU (long words), AR (RTL: logical classes, mirrored
    arrows) and dark mode; plurals via `plural()`.
-8. **Verify by looking.** Open it in the browser (desktop AND narrow width) before saying it's done;
+8. **Showcase, not boxes (owner, 2026-10-22).** For public / highlight content (school page blocks,
+   rankings, people) don't default to a grid of bordered cards — that reads as "old". Do what the
+   top-students podium does: content floating on the page, a layout with meaning (winner centred,
+   raised, bigger), depth from gradients that fade into the background and a soft glow, big
+   photos/initials with a ring, small custom badges from tokens (round medal) instead of emoji;
+   hierarchy by size, not borders. Dark mode = lower opacities; RTL mirrors; phones keep it.
+9. **Verify by looking.** Open it in the browser (desktop AND narrow width) before saying it's done;
    say what was and wasn't checked. If the owner doesn't like a change, revert it fully, no argument.
 
 **Everything visual is a token in `frontend/src/shared/theme/tokens.css`** — the ONLY theme file

@@ -184,31 +184,44 @@ function SpotlightBlock({ d }: { d: BlockData['spotlight'] }) {
   )
 }
 
+/** Per place: where it stands on the podium (2 · 1 · 3), how big, how tall its step. */
+const PODIUM = [
+  { order: 'order-2', avatar: 'size-24 text-3xl sm:size-36 sm:text-4xl', medal: 'size-9 text-base sm:size-11 sm:text-lg', name: 'text-base sm:text-xl', step: 'h-24 from-gold/45 sm:h-32 dark:from-gold/25' },
+  { order: 'order-1', avatar: 'size-20 text-2xl sm:size-28 sm:text-3xl', medal: 'size-8 text-sm sm:size-9 sm:text-base', name: 'text-sm sm:text-lg', step: 'h-16 from-silver/55 sm:h-20 dark:from-silver/25' },
+  { order: 'order-3', avatar: 'size-20 text-2xl sm:size-28 sm:text-3xl', medal: 'size-8 text-sm sm:size-9 sm:text-base', name: 'text-sm sm:text-lg', step: 'h-10 from-bronze/45 sm:h-12 dark:from-bronze/25' },
+]
+
+/**
+ * The top 3 as a podium: the winner in the middle, raised and glowing, 2nd and 3rd beside. No cards —
+ * people on soft steps that fade into the page. (Reading order stays 1, 2, 3 for screen readers.)
+ */
 function TopBlock({ d, title }: { d: BlockData['top']; title: string }) {
   return (
     <>
       <H2>{d.heading || title}</H2>
-      <ol className="grid gap-3 sm:grid-cols-3">
-        {d.items.map((x, i) => (
-          <li
-            key={i}
-            className={cn('flex flex-col items-center gap-2 rounded-2xl border bg-card p-6 text-center', i === 0 && 'border-highlight/50 bg-highlight/5 sm:-translate-y-2')}
-          >
-            {/* their profile photo when they are a member with one, else their initials — same size, so the row stays even */}
-            <span className="relative mb-1" aria-hidden>
-              {x.fileId ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={fileSrc(x.fileId)} alt="" loading="lazy" className="size-24 rounded-full object-cover shadow-md ring-4 ring-background" />
-              ) : (
-                <InitialsAvatar initials={initials(x.name)} color="var(--color-primary)" className="size-24 text-2xl ring-4 ring-background" />
-              )}
-              <Medal place={i + 1} className="absolute -end-0.5 -bottom-0.5 size-9 text-base" />
-            </span>
-            <span className="sr-only">{i + 1}.</span>
-            <p className="text-lg font-semibold text-balance">{x.name}</p>
-            {x.note && <p className="text-sm text-muted-foreground">{x.note}</p>}
-          </li>
-        ))}
+      <ol className="grid grid-cols-3 items-end gap-2 sm:gap-6">
+        {d.items.map((x, i) => {
+          const p = PODIUM[i]!
+          return (
+            <li key={i} className={cn('flex min-w-0 flex-col items-center text-center', p.order)}>
+              <span className="relative isolate" aria-hidden>
+                {i === 0 && <span className="absolute inset-0 -z-10 scale-150 rounded-full bg-gold/40 blur-2xl dark:bg-gold/20" />}
+                {/* their profile photo when they are a member with one, else their initials */}
+                {x.fileId ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={fileSrc(x.fileId)} alt="" loading="lazy" className={cn('rounded-full object-cover shadow-lg ring-4 ring-background', p.avatar)} />
+                ) : (
+                  <InitialsAvatar initials={initials(x.name)} color="var(--color-primary)" className={cn('shadow-lg ring-4 ring-background', p.avatar)} />
+                )}
+                <Medal place={i + 1} className={cn('absolute -end-0.5 -bottom-0.5', p.medal)} />
+              </span>
+              <span className="sr-only">{i + 1}.</span>
+              <p className={cn('mt-3 w-full font-semibold text-balance break-words', p.name)}>{x.name}</p>
+              {x.note && <p className="mt-0.5 w-full text-xs text-balance text-muted-foreground sm:text-sm">{x.note}</p>}
+              <span aria-hidden className={cn('mt-4 w-full rounded-t-3xl bg-linear-to-b to-transparent', p.step)} />
+            </li>
+          )
+        })}
       </ol>
     </>
   )
