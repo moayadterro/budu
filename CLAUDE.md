@@ -166,7 +166,12 @@ Design is a first-class task here, not decoration. For every screen or component
    raised, bigger), depth from gradients that fade into the background and a soft glow, big
    photos/initials with a ring, small custom badges from tokens (round medal) instead of emoji;
    hierarchy by size, not borders. Dark mode = lower opacities; RTL mirrors; phones keep it.
-9. **Verify by looking.** Open it in the browser (desktop AND narrow width) before saying it's done;
+9. **Colour & gradients (owner, 2026-10-23).** Each card / glow uses ONE hue fading into the page
+   (blue, purple, the theme green … several cards may each have their own colour) — never mix
+   three colours in one gradient. No borders/rings on showcase cards (soft surfaces + soft shadow
+   instead). No orange/amber accents on public pages (owner: "not in my theme"); no big solid-green
+   blocks — light tints.
+10. **Verify by looking.** Open it in the browser (desktop AND narrow width) before saying it's done;
    say what was and wasn't checked. If the owner doesn't like a change, revert it fully, no argument.
 
 **Everything visual is a token in `frontend/src/shared/theme/tokens.css`** — the ONLY theme file
