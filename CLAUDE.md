@@ -5,7 +5,9 @@ Guidance for Claude Code working in this repo. Read this first — it is the pro
 "Status", "Decision log" and "Open questions" below in the same session.
 
 ## What Budu is
+
 Budu (Russian "Буду", "I will") is a multi-tenant online learning platform: schools first, but not only schools. Every organisation is a **tenant** (an IOMAD "company") with its own users, courses, branding and seats:
+
 - **Schools / institutions** — run classes, enrol students, buy seats (B2B).
 - **Companies / training centres** — staff training, onboarding, certification (B2B).
 - **Independent teachers** — publish courses under their own name (a solo teacher is just a one-person tenant).
@@ -14,6 +16,7 @@ Budu (Russian "Буду", "I will") is a multi-tenant online learning platform: 
 Market focus: RU / AR / EN audiences; live + self-paced + marketplace in one place.
 
 ## Architecture (do not drift from this)
+
 - **IOMAD = system of record** for tenants (companies), identity, users, roles, courses, enrolment, assignments, and the **gradebook**. IOMAD is a multi-tenant fork of Moodle 4.5 LTS, so Moodle docs/APIs apply, plus IOMAD's `block_iomad_company_admin_*` web-service functions for tenants. Never write its DB directly — integrate through the **Web Services REST API** (enable Web Services on day one). Built from source in `iomad/` (branch `IOMAD_405_STABLE`).
 - **Tenancy:** a tenant (school, company, solo teacher) is an **IOMAD company** inside one IOMAD instance, not a separate install. Each tenant record in app-db stores `iomad_url` + `company_id`, and every IOMAD call is parameterized by those two fields — never hardcode a single IOMAD URL (keeps it shard-ready).
 - **BigBlueButton = live classes** (recording, in-session chat). Runs on its own server (not containerised here).
@@ -22,6 +25,7 @@ Market focus: RU / AR / EN audiences; live + self-paced + marketplace in one pla
 - Chat: BBB chat in-session; IOMAD (Moodle) Forum for persistent class discussion; add Supabase/Realtime only if a custom in-app chat is needed later.
 
 ## Product rules (from the design spec — don't change without the owner)
+
 - **Roles:** student, teacher, manager (school). A solo teacher = a one-person tenant.
 - **Grades:** always stored 0–100; displayed in the tenant's chosen scale (0–100, A–F, GPA 4.0, ECTS,
   Germany 1–5, France 0–20, Russia 1–5, Russia 1–5 + ECTS "5A/4B/4C/3D/3E/2F", 0–10, Japan S/A/B/C).
@@ -31,6 +35,7 @@ Market focus: RU / AR / EN audiences; live + self-paced + marketplace in one pla
   arranges the deal off-app. Students can also buy courses individually or "ask school".
 
 ## Repo layout
+
 ```
 docker-compose.yml      # app-db (postgres 18) · iomad + iomad-db (mariadb 11.8) · frontend; BBB not included; email = a real SMTP mailbox
 .env.example            # copy to .env, then replace every change_me with random values (never commit .env)
@@ -48,17 +53,18 @@ frontend/
 ```
 
 ## Frontend architecture — Feature-Sliced Design
+
 Docs: https://feature-sliced.design/ . Layers, top to bottom. **A layer may only import from layers
 below it**, and never from a sibling slice on the same layer (no feature → feature imports).
 
-| Layer | What goes there | Examples here |
-|---|---|---|
-| `src/app` | app-wide setup: root layout, global styles, providers | `layouts/RootLayout`, `styles/globals.css` |
-| `src/pages` | one slice per screen; composes widgets/features/entities | `home`, `timetable`, `classes`, `class-hub`, `lesson`, `homework`, `explore`, `live`, `account`, `admin-tenants`, `login`, `register`, `forgot-password`, `reset-password`, `verify-email` |
-| `src/widgets` | big self-contained UI blocks used by pages | `app-shell`, `week-calendar`, `class-hub`, `course-catalog`, `live-classroom` |
-| `src/features` | one user action each (interactive, may call the server) | `sign-in`, `sign-up`, `sign-out`, `reset-password`, `verify-email`, `switch-theme`, `mark-lesson-complete`, `submit-homework`, `request-course`, `upload-avatar` |
-| `src/entities` | business objects: their model + display UI | `session` (signed-in user), `user` (IOMAD accounts), `tenant`, `subject`, `lesson`, `homework`, `course` |
-| `src/shared` | no business logic; reused everywhere | `ui` (kit), `lib` (cn, color, password), `server` (IOMAD client, db, tokens, mailer), `mock` (prototype data), `config` (nav, roles, auth), `i18n`, `theme` |
+| Layer          | What goes there                                          | Examples here                                                                                                                                                                              |
+| -------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `src/app`      | app-wide setup: root layout, global styles, providers    | `layouts/RootLayout`, `styles/globals.css`                                                                                                                                                 |
+| `src/pages`    | one slice per screen; composes widgets/features/entities | `home`, `timetable`, `classes`, `class-hub`, `lesson`, `homework`, `explore`, `live`, `account`, `admin-tenants`, `login`, `register`, `forgot-password`, `reset-password`, `verify-email` |
+| `src/widgets`  | big self-contained UI blocks used by pages               | `app-shell`, `week-calendar`, `class-hub`, `course-catalog`, `live-classroom`                                                                                                              |
+| `src/features` | one user action each (interactive, may call the server)  | `sign-in`, `sign-up`, `sign-out`, `reset-password`, `verify-email`, `switch-theme`, `mark-lesson-complete`, `submit-homework`, `request-course`, `upload-avatar`                           |
+| `src/entities` | business objects: their model + display UI               | `session` (signed-in user), `user` (IOMAD accounts), `tenant`, `subject`, `lesson`, `homework`, `course`                                                                                   |
+| `src/shared`   | no business logic; reused everywhere                     | `ui` (kit), `lib` (cn, color, password), `server` (IOMAD client, db, tokens, mailer), `mock` (prototype data), `config` (nav, roles, auth), `i18n`, `theme`                                |
 
 Slice layout: `ui/` (components), `model/` (types, client state, validation), `lib/`, `config/`,
 `server/` (server-only code), plus an `index.ts` **public API**. Import slices only through it:
@@ -66,6 +72,7 @@ Slice layout: `ui/` (components), `model/` (types, client state, validation), `l
 `shared` is the exception: import per segment (`@/shared/ui/button`, `@/shared/lib/cn`).
 
 **Server code & security — NO API routes (two exceptions: `/files`, `/uploads`, see Decision log); the browser talks to server actions.**
+
 - `server/actions.ts` (file starts with `'use server'`) = **server actions**: the only server code the
   browser can call. Each one is a public endpoint — validate input, check the session/role inside it.
 - Every other file in a `server/` folder is a **private helper** (db, tokens, IOMAD, mail, cookies) and
@@ -85,6 +92,7 @@ from `shared/server/seo`, strings in `t.seo`), add it to `src/app/seo/sitemap.ts
 Unbuilt screens stay in `shared/config/nav.ts` with `href: null` (rendered disabled).
 
 ## UI conventions
+
 - **shadcn/ui (real components)**: generated by the shadcn CLI into `src/shared/ui` (style
   `radix-vega`, Radix primitives, `components.json` aliases point at FSD folders). Add one with
   `docker compose exec -T frontend npx shadcn@4.21.3 add <name> -y` — then fix its imports: the CLI
@@ -130,7 +138,9 @@ Unbuilt screens stay in `shared/config/nav.ts` with `href: null` (rendered disab
 - Mock data lives in `shared/mock` and is replaced screen by screen with IOMAD data.
 
 ## Design principles — how to work on ANY screen (owner, 2026-10-22: "always think like this")
+
 Design is a first-class task here, not decoration. For every screen or component:
+
 1. **Research first, then design.** Look at how the best current products solve it (Apple HIG,
    Linear, Stripe, Airbnb, Telegram …) and say what you took from where. Aim for a 2027 feel —
    clean, calm, confident — but never at the cost of clarity.
@@ -168,6 +178,7 @@ shadcn classes: `bg-background`, `bg-card`, `text-foreground`, `text-muted-foreg
 `bg-sidebar` … Budu extras: `success`/`warning`/`info` (tints via opacity, `bg-success/10`),
 `highlight` (amber CTA), `subject-purple`/`subject-terra`, `bg-brand` (gradient utility), and the
 fixed dark live-classroom stage (`bg-live`, `text-live-foreground` …). Rules:
+
 - Fonts: body Montserrat (`--font-app`; Arabic letters: Tajawal — owner); headings Geologica (`--font-head` →
   `font-heading`, applied in globals.css to h1–h6 and shadcn card/dialog/sheet/empty titles; Arabic
   heading letters in Noto Kufi Arabic — owner asked for Kufi). Loaded from Google Fonts in RootLayout.
@@ -177,6 +188,7 @@ fixed dark live-classroom stage (`bg-live`, `text-live-foreground` …). Rules:
 - Base styles go in `@layer base` in `src/app/styles/globals.css` (unlayered CSS would beat utilities).
 
 ## Conventions
+
 - TypeScript + Tailwind utilities. Use `cn()` for conditional classes.
 - Dark mode = same tokens, dark values (`.dark` class; 'system' follows the OS). Don't add a parallel colour system.
 - **Localization: English, Russian, Arabic** (up to ~10 planned). The languages are ONE list,
@@ -190,7 +202,7 @@ fixed dark live-classroom stage (`bg-live`, `text-live-foreground` …). Rules:
   `ru.ts` and `ar.ts` are typed `typeof en`, so a missing key fails the build — add every new string
   to all three. Server components / server code: `const t = await getT()` (`@/shared/i18n/server`);
   client components: `const t = useT()` (`@/shared/i18n`). Never import a dictionary directly or use
-  `t` at module level (nav items hold label *keys*). Locale = `budu_locale` cookie (Settings / globe
+  `t` at module level (nav items hold label _keys_). Locale = `budu_locale` cookie (Settings / globe
   menu, `features/switch-language`), else the browser's PREFERRED language if we have it,
   else English — never a lower-ranked one (owner: German browser → English, not Russian; `matchLocale`).
   At sign-in the ACCOUNT's language (IOMAD pref `budu_locale`) wins and is written to the cookie, so
@@ -202,8 +214,10 @@ fixed dark live-classroom stage (`bg-live`, `text-live-foreground` …). Rules:
 - Keep it **simple-first** — minimal implementations, no premature complexity.
 
 ## Roles
+
 `admin` (platform administrator) · `manager` (runs a school/company) · `teacher` · `student` ·
 `parent` (follows their children; linked in IOMAD, see Decision log).
+
 - Resolved at sign-in **from IOMAD**, first match wins (`entities/user/lib/role.ts` → `roleFor`):
   IOMAD site admin → admin; school manager → manager; educator → teacher; other manager → manager;
   parent of ≥ 1 child → parent; else → student. One role per session for now (multi-role switching =
@@ -217,11 +231,13 @@ fixed dark live-classroom stage (`bg-live`, `text-live-foreground` …). Rules:
   `requireRole`, and record it in the Decision log.
 
 ## Auth (IOMAD = identity; app-db = sessions & one-time tokens)
+
 Routes (public): `/login`, `/register`, `/forgot-password`, `/reset-password?token=`, `/verify-email?token=`.
 Everything else needs a session: `proxy.ts` redirects when the cookie is missing (fast), and
 `AppShell` validates it against Postgres (`getSession()`), so expired/revoked sessions also bounce.
 Sessions re-read role/name from IOMAD every 5 minutes (`refreshed_at`): role changes apply without
 signing out; a suspended/deleted account's sessions end. (An email change in IOMAD also ends them.)
+
 - **Register** (`features/sign-up`): school → IOMAD company + manager; teacher → own one-person company,
   manager + educator; student → independent learner (joins a school later by invite). The account is
   then **suspended in IOMAD** until the emailed confirmation link (48 h, single-use) is opened.
@@ -242,7 +258,9 @@ signing out; a suspended/deleted account's sessions end. (An email change in IOM
   Mailpit 2026-10-22): `no-reply@budu-school.ru` on Timeweb (`smtp.timeweb.ru:465`, SSL); settings
   `SMTP_*`, `MAIL_FROM`, `APP_URL` in `.env`. Dev emails now really go out — test with your own address. Email text lives in
   `t.email`; EVERY email uses ONE layout, `shared/server/mail-layout.ts` `composeMail`: modern and
-  minimal, everything CENTRED (owner — same in Arabic): logo loaded from the site
+  minimal; ONLY the logo is centred, everything else follows the reading edge (owner, 2026-10-22:
+  "centred" was meant for the logo; right in Arabic); optional `details` box and numbered `steps`
+  ("what's next") for longer emails — write short paragraphs, not one dense block: logo loaded from the site
   (`public/email-logo.png`) when APP_URL is a real domain — no attachment; on localhost it travels
   inline (cid, no file name; `src/assets/logo-email.png`) because nobody can reach your Mac; heading, message, one green button that
   works in Outlook, link fallback, quiet footer, plain-text twin —
@@ -254,6 +272,7 @@ signing out; a suspended/deleted account's sessions end. (An email change in IOM
   users into a school, changing email from Settings.
 
 ## Running
+
 ```bash
 cp .env.example .env            # fill every change_me with random values (DB users/names too)
 docker compose up -d --build    # first IOMAD boot builds + installs (a few minutes)
@@ -261,6 +280,7 @@ docker compose up -d --build    # first IOMAD boot builds + installs (a few minu
 T=$(docker compose exec -T -u www-data iomad php /usr/local/share/budu/ws-setup.php | tr -d '\r\n')
 sed -i '' "s/^IOMAD_WS_TOKEN=.*/IOMAD_WS_TOKEN=$T/" .env && docker compose up -d frontend
 ```
+
 - Frontend http://localhost:3000 · IOMAD `IOMAD_URL` (currently http://localhost:9999; host port =
   `IOMAD_PORT`, keep both in sync) · Postgres on 5432.
 - IOMAD admin login: `IOMAD_ADMIN_USER` / `IOMAD_ADMIN_PASSWORD` from `.env`.
@@ -274,7 +294,9 @@ sed -i '' "s/^IOMAD_WS_TOKEN=.*/IOMAD_WS_TOKEN=$T/" .env && docker compose up -d
 - Typecheck: `docker compose exec -T frontend npx tsc --noEmit`.
 
 ## Status (update this as work lands)
+
 Built and verified:
+
 - Infra: IOMAD 4.5 (multi-tenant Moodle) from source, MariaDB, app Postgres, Next.js frontend.
 - IOMAD API: restricted integration user + token; `local_budu` plugin; account lockout after 10 failures.
 - Auth: register (school / teacher / student; no password confirmation — owner: forgotten = reset) → email confirmation → sign in →
@@ -296,8 +318,14 @@ Built and verified:
 - School exams without a course (tested 2026-10-21, API + browser): managers' nav Exams
   (`/school/exams`). An exam lives in the school's hidden exam space (`local_budu` `school_exams.php`)
   and is given to an audience: whole classes (current students), chosen students, or candidates
-  pasted as "Name, email" lines (new people get an invite link naming the exam; existing accounts
-  are added + notified). Results show pass / fail colours; "Invite to school" (one or all who passed)
+  as rows of full name + email (pasting a list fills rows; new people get an invite link naming the
+  exam; existing accounts are added + notified). Results are per row: rows that worked leave the
+  form, problem rows stay with their own reason (bad email, new person without a name, platform
+  admin, account not created). The exam page's "Invited" list is about chasing people, NOT results
+  (scores stay on Results): each person is Invitation not accepted → Exam not started → Exam started;
+  filters for the first two, ⋯ → Resend invitation / Remind about the exam, and "remind all" for a
+  filtered group (confirm first). Reminders = bell + email (`examNudge`), at most one per person
+  per hour (`exam_nudges`); a single invite resend is throttled to 60 s. Results show pass / fail colours; "Invite to school" (one or all who passed)
   uses the normal school invite (they still accept). Candidates take it from their home page.
 - Quizzes & exams (tested 2026-10-21, API + browser, RU UI): Moodle's quiz engine via `local_budu`
   `quizzes.php`. A quiz belongs to a course (optionally only some classes = their groups). Kinds: quiz
@@ -319,7 +347,7 @@ Built and verified:
   the RUB transfer amount uses the same figure). The Settings currency is mirrored into the
   `budu_currency` cookie (on change and at sign-in), so the signed-out catalog matches. Free → "Enrol for free" (no school step). Paid → order
   (`orders`, number BU-000001) + popup: transfer the RUB amount to +79219263517 via Sberbank / SBP
-  with the order number, receipt to billing@budu.ru (`shared/config/payment.ts`) → "I've paid" →
+  with the order number, receipt to billing@budu-school.ru (`shared/config/payment.ts`) → "I've paid" →
   platform admin confirms at `/admin/payments` → enrolled + notified. Admin confirm step not
   browser-tested (needs the IOMAD admin password).
 - Parents (tested 2026-10-21 in the browser, all paths): after sign-in a student without a parent
@@ -376,11 +404,12 @@ Built and verified:
   the bottom; back online → green "Back online" for 3 s (like YouTube).
 - Teacher course builder (live IOMAD data): `/courses` (my courses), `/courses/new`, `/courses/:id`
   (details, publish/draft, lessons add/rename/move/delete, upload video/PDF/files, tasks with due date
-  + attachment). Files via `/files/:id`. Tested in the browser 2026-10-20.
+  - attachment). Files via `/files/:id`. Tested in the browser 2026-10-20.
 - Resumable lesson-material uploads (tus, 5 MB pieces, progress / speed / time left, continues after
   a dropped connection or a reload, cancel). Protocol + ownership tested 2026-10-21.
 
 Not built yet (rough priority):
+
 1. Still mock: live classroom. Live courses at a set time (BBB) — later. Real payment provider (then
    orders confirm themselves); images in rich text; course search / filters in Explore.
    Video: transcoding / CDN (Kinescope, Bunny Stream or self-hosted HLS) behind `/files` later —
@@ -404,6 +433,11 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-22 Invite forms report per person (owner: "10 students, each a different problem"):
+  one row per person, never one message for the whole batch; failing rows stay marked. Invited
+  accounts get a unique username (emails like a+b@x / a_b@x map to the same one → random ending).
+  Changing a school username is not dangerous: its confirm uses `ConfirmDialog tone="primary"`
+  (green), red stays for delete/remove only. Result messages sit under the button that was pressed.
 - 2026-10-22 School page address & publishing (owner): the address is made from the school's name
   when the editor first opens (`ensureSlug` / `slugFromName`: Cyrillic transliterated; "-2" when
   taken; `school-<id>` for names without a Latin spelling) and changed ONLY in Settings → Page
@@ -546,7 +580,7 @@ Not built yet (rough priority):
 - 2026-10-21 Marketplace & money (owner): prices in the teacher's currency, shown converted to each
   user's currency (Settings; platform default RUB). Rates: free daily service (open.er-api.com, USD
   base) + admin overrides (e.g. a market rate for SYP). No payment provider yet: manual transfer to
-  the platform's phone (Sberbank/SBP) + receipt to billing@budu.ru; orders tracked, admin confirms →
+  the platform's phone (Sberbank/SBP) + receipt to billing@budu-school.ru; orders tracked, admin confirms →
   auto-enrol. Free courses: students enrol themselves, no school approval. Listing/price/orders live
   in app-db; enrolment stays in IOMAD (`local_budu_enrol_learner`).
 - 2026-10-21 Lesson text = Moodle mod_page edited with Tiptap (`@tiptap/react` 3.31.4, owner chose a
@@ -615,8 +649,8 @@ Not built yet (rough priority):
 - 2026-10-20 ONE exception to "no API routes": `GET /files/:fileId` (`src/app/routes/lesson-file.ts`)
   streams lesson files from IOMAD (`webservice/pluginfile.php`, Range → video seeking) after
   `local_budu_file_access`. Uploads go through server actions (limit 250 MB, `shared/config/upload.ts`
-  + next.config.js + iomad/php.ini). Only video/audio/image/PDF are served inline; everything else
-  downloads, with a sandbox CSP (uploaded HTML must never run on our origin).
+  - next.config.js + iomad/php.ini). Only video/audio/image/PDF are served inline; everything else
+    downloads, with a sandbox CSP (uploaded HTML must never run on our origin).
 - 2026-10-19 Stack upgraded to current versions: Next 16 (proxy, async request APIs), React 19
   (`useActionState`), TypeScript 6, Tailwind 4 (theme now only in tokens.css), Node 24 LTS,
   Postgres 18 (dump/restore into new volume `app-db-data-18`), MariaDB 11.8 LTS (in place,
@@ -642,6 +676,7 @@ Not built yet (rough priority):
   official `mariadb` image.
 
 ## Open questions (ask the owner)
+
 - Public site facts still empty in `shared/config/site.ts`: support/hello emails, Telegram, WhatsApp,
   company legal details (INN, OGRN, address); and the real free-school limits (placeholder 5 / 50).
 - Old Postgres 16 volume `budu_app-db-data` is kept for rollback; delete it once 18 is confirmed fine
@@ -663,6 +698,7 @@ Nothing a user, visitor or attacker can see may tell what Budu runs on or how it
   the machine (nginx in front of the frontend; IOMAD admin via SSH tunnel). Never publish them.
 
 ## Working with the owner (Moayad)
+
 - Prefers security by default: random, non-guessable DB users/names, no defaults in compose,
   secrets only in `.env` (never echo them).
 - Wants things built from the design prototype, not redesigned; one screen fully, then the next.
@@ -670,6 +706,7 @@ Nothing a user, visitor or attacker can see may tell what Budu runs on or how it
   ("use zustand", "use motion") count as approval for that dependency.
 
 ## Gotchas we hit
+
 - Moodle 4.5: `question_get_default_category($contextid)` has no "create" flag — use
   `question_make_default_categories([$ctx])` when it returns false. A quiz's pass mark lives on its
   grade item, not the quiz row. `quiz_update_events($quiz)` — the 2nd arg is an override, not the cm.
@@ -719,12 +756,15 @@ Nothing a user, visitor or attacker can see may tell what Budu runs on or how it
   miss; drive forms with `form_input` + `requestSubmit()` and read results as page text.
 
 ## Self-hosting / Russia reachability
+
 Both IOMAD and BBB are self-hosted on purpose: some foreign IPs are blocked for Russian users, and live media is unforgiving of bad routing. Place servers where RU students can reach them. BBB additionally needs TURN/coturn and an open UDP media range.
 
 ## AI layer (future, not built)
+
 BBB records a class → "recording ready" webhook → speech-to-text (Whisper) → LLM summary/quiz → written back into IOMAD via API. Enable recording + webhooks + web-services early so the data exists.
 
 ## Design reference
+
 The design prototype is the visual spec: artifact "Lumio" (the old name),
 https://claude.ai/artifact/BzMTBJSEPLvtBDJbtqtjwv — read it with the Artifact tool (`action: read`).
 It contains every screen (student / teacher / manager: timetable, gradebook, courses, course builder,
