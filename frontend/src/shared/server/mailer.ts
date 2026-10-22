@@ -20,7 +20,7 @@ export async function sendMail(mail: {
   text: string
   html: string
   /** inline pictures (e.g. the logo, referenced as cid:…) */
-  attachments?: Array<{ filename: string; content: Buffer; cid: string }>
+  attachments?: Array<{ filename: false; content: Buffer; cid: string; contentType: string; contentDisposition: 'inline' }>
 }) {
   await transport().sendMail({ from: process.env.MAIL_FROM, ...mail })
 }

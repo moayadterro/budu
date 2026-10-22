@@ -23,9 +23,17 @@ const logoPng = (() => {
   }
 })()
 
+/**
+ * Where the logo picture comes from. On a real domain: the website itself (public/email-logo.png) —
+ * no attachment, like every modern sender. On localhost (dev) nobody outside can load it, so it
+ * travels inside the email as an inline part (cid).
+ */
+const publicSite = () => !/^https?:\/\/(localhost|127\.|0\.0\.0\.0)/.test(process.env.APP_URL ?? 'http://localhost')
+
 /** Centered logo: the picture when we have it, else the wordmark in text. */
 function logoHtml() {
-  if (logoPng) return `<img src="cid:budu-logo" width="140" alt="Budu School" style="display:block;margin:0 auto;width:140px;height:auto;border:0">`
+  const src = publicSite() ? appUrl('/email-logo.png') : logoPng ? 'cid:budu-logo' : null
+  if (src) return `<img src="${src}" width="140" alt="Budu School" style="display:block;margin:0 auto;width:140px;height:auto;border:0">`
   return `<div style="font-family:${FONT};text-align:center;line-height:1">
   <span style="font-size:28px;font-weight:800;letter-spacing:-0.5px;color:${C.ink}">budu</span><br>
   <span style="font-size:9px;font-weight:700;letter-spacing:5px;color:${C.ink}">SCHOOL</span>
@@ -100,7 +108,8 @@ export function composeMail(
 </body>
 </html>`
 
-  // the logo travels inside the email (no external image to block)
-  const attachments = logoPng ? [{ filename: 'budu.png', content: logoPng, cid: 'budu-logo' }] : []
+  // dev only: the logo travels inside the email, marked inline and without a file name, so mail apps
+  // show it in the body rather than as an attachment
+  const attachments = !publicSite() && logoPng ? [{ filename: false as const, content: logoPng, cid: 'budu-logo', contentType: 'image/png', contentDisposition: 'inline' as const }] : []
   return { text, html, attachments }
 }

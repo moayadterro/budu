@@ -216,8 +216,9 @@ signing out; a suspended/deleted account's sessions end. (An email change in IOM
   Mailpit 2026-10-22): `no-reply@budu-school.ru` on Timeweb (`smtp.timeweb.ru:465`, SSL); settings
   `SMTP_*`, `MAIL_FROM`, `APP_URL` in `.env`. Dev emails now really go out — test with your own address. Email text lives in
   `t.email`; EVERY email uses ONE layout, `shared/server/mail-layout.ts` `composeMail`: modern and
-  minimal, everything CENTRED (owner — same in Arabic): logo (`src/assets/logo-email.png`, sent inline
-  as cid:budu-logo; text wordmark until the file exists), heading, message, one green button that
+  minimal, everything CENTRED (owner — same in Arabic): logo loaded from the site
+  (`public/email-logo.png`) when APP_URL is a real domain — no attachment; on localhost it travels
+  inline (cid, no file name; `src/assets/logo-email.png`) because nobody can reach your Mac; heading, message, one green button that
   works in Outlook, link fallback, quiet footer, plain-text twin —
   the only place hex colours are allowed outside tokens.css (clients can't read CSS variables).
 - IOMAD side: `iomad/local_budu` (plugin: `get_account` incl. `siteadmin`, `check_password`) + `iomad/ws-setup.php`
