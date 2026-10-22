@@ -8,7 +8,7 @@ import type { Messages } from '@/shared/i18n'
 const OG_LOCALE: Partial<Record<Locale, string>> = { en: 'en_US', ru: 'ru_RU', ar: 'ar_AR' }
 const og = (l: Locale) => OG_LOCALE[l] ?? l
 
-type StaticPage = 'home' | 'catalog' | 'schools' | 'pricing' | 'about' | 'help' | 'contact' | 'privacy'
+type StaticPage = 'home' | 'catalog' | 'schools' | 'pricing' | 'about' | 'help' | 'contact' | 'privacy' | 'terms'
 
 /**
  * Metadata for a public page that exists in every language (SEO): title, description, its own

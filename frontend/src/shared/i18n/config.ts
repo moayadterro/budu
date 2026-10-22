@@ -51,7 +51,7 @@ export function matchLocale(acceptLanguage: string | null | undefined): Locale {
  * at /<code>/x (/ru/pricing, /ar/schools/…). The URL then decides the language (the proxy passes it
  * on in LOCALE_HEADER). Signed-in screens and auth pages are not localized by URL.
  */
-export const LOCALIZED_PATHS = ['/catalog', '/schools', '/pricing', '/about', '/help', '/contact', '/privacy']
+export const LOCALIZED_PATHS = ['/catalog', '/schools', '/pricing', '/about', '/help', '/contact', '/privacy', '/terms']
 export const LOCALE_HEADER = 'x-budu-locale'
 
 export const isLocalizedPath = (path: string) =>

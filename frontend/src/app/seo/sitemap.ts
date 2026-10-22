@@ -3,7 +3,7 @@ import { catalog, listedCourses } from '@/entities/course/server'
 import { publishedSchoolSlugs } from '@/entities/tenant/server'
 import { DEFAULT_LOCALE, LANGUAGES, localePath } from '@/shared/i18n'
 
-const PAGES = ['/', '/catalog', '/schools', '/pricing', '/about', '/help', '/contact', '/privacy']
+const PAGES = ['/', '/catalog', '/schools', '/pricing', '/about', '/help', '/contact', '/privacy', '/terms']
 
 /**
  * /sitemap.xml — every public page in every language (English at /x, others at /<code>/x), each
