@@ -1,4 +1,5 @@
 import 'server-only'
+import { splitFullName } from '@/shared/lib/person-name'
 import { defaultInstance, iomadCall, IomadInstance } from '@/shared/server/iomad'
 import type { SignUpInput } from '../model/types'
 
@@ -47,7 +48,8 @@ export async function createAccount(input: SignUpInput) {
   let companyId: number | null = null
   let tenantName = ''
   if (input.kind !== 'student') {
-    let name = input.kind === 'school' ? input.schoolName!.trim() : `${input.firstName.trim()} ${input.lastName.trim()}`
+    const n = splitFullName(input.fullName)!
+    let name = input.kind === 'school' ? input.schoolName!.trim() : `${n.first} ${n.last}`
     if (await companyExists(iomad, name)) {
       if (input.kind === 'school') throw new SignUpConflict('schoolTaken')
       name = `${name} (${Math.random().toString(36).slice(2, 6)})` // two teachers may share a name
@@ -59,14 +61,16 @@ export async function createAccount(input: SignUpInput) {
     tenantName = name
   }
 
+  const person = splitFullName(input.fullName)!
   const [user] = await iomadCall<Array<{ id: number }>>(iomad, 'core_user_create_users', {
     users: [
       {
         username,
         auth: 'manual',
         password: input.password,
-        firstname: input.firstName.trim(),
-        lastname: input.lastName.trim(),
+        firstname: person.first,
+        lastname: person.last,
+        ...(person.middle ? { middlename: person.middle } : {}), // отчество
         email,
         ...(input.country ? { country: input.country } : {}),
       },

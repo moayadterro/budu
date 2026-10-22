@@ -89,14 +89,9 @@ export function SignUpForm() {
         </div>
         <p className="mt-2 mb-6 text-sm text-muted-foreground">{s.kinds[kind].desc}</p>
 
-        <div className="grid grid-cols-2 gap-3">
-          <Field label={s.firstName}>
-            <Input name="firstName" required autoComplete="given-name" />
-          </Field>
-          <Field label={s.lastName}>
-            <Input name="lastName" required autoComplete="family-name" />
-          </Field>
-        </div>
+        <Field label={s.fullName} hint={s.fullNameHint}>
+          <Input name="fullName" required autoComplete="name" maxLength={200} placeholder={s.fullNamePh} />
+        </Field>
         <Field label={s.email}>
           <Input name="email" type="email" required autoComplete="email" />
         </Field>

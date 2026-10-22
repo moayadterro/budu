@@ -375,6 +375,9 @@ Not built yet (rough priority):
   is ONE step (owner rejected two steps); student is preselected and listed first.
   No "repeat password" field anywhere (sign-up, reset, invite, Settings) — owner: if you forget it,
   reset it; the show/hide toggle covers typos.
+  Names: ONE "full name" field (owner: Russians have an отчество) → `shared/lib/person-name`
+  `splitFullName` → IOMAD firstname / middlename (отчество, found by its ending) / lastname; both
+  "Имя Отчество Фамилия" and "Фамилия Имя Отчество" work; non-patronymic names: first word = first name.
 - 2026-10-22 Email: Mailpit removed (owner); all mail goes through `no-reply@budu-school.ru`
   (Timeweb SMTP, credentials only in `.env`). The domain had no public DNS yet on 2026-10-22 —
   until SPF/DKIM/DMARC are set at Timeweb, mail may land in spam.

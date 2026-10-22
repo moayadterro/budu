@@ -2,6 +2,7 @@
 
 import { updateUser, sendVerificationEmail } from '@/entities/user/server'
 import { query } from '@/shared/server/db'
+import { splitFullName } from '@/shared/lib/person-name'
 import { createAccount, SignUpConflict } from './createAccount'
 import { AccountKind, SignUpInput, SignUpState, validate } from '../model/types'
 
@@ -13,8 +14,7 @@ export async function signUp(_prev: SignUpState, form: FormData): Promise<SignUp
   }
   const input: SignUpInput = {
     kind: get('kind') as AccountKind,
-    firstName: get('firstName') ?? '',
-    lastName: get('lastName') ?? '',
+    fullName: get('fullName') ?? '',
     email: get('email') ?? '',
     password: get('password') ?? '',
     schoolName: get('schoolName'),
@@ -35,7 +35,7 @@ export async function signUp(_prev: SignUpState, form: FormData): Promise<SignUp
         [created.iomadUrl, created.companyId, input.kind, created.tenantName],
       )
     }
-    await sendVerificationEmail({ id: created.userId, email: created.email, firstname: input.firstName.trim() })
+    await sendVerificationEmail({ id: created.userId, email: created.email, firstname: splitFullName(input.fullName)!.first })
     return { status: 'success', email: created.email }
   } catch (e) {
     if (e instanceof SignUpConflict) return { status: 'error', error: e.code }
