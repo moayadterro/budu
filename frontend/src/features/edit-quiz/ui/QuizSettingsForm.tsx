@@ -6,6 +6,7 @@ import { cn } from "@/shared/lib/cn";
 import { Alert } from "@/shared/ui/alert";
 import { Field } from "@/shared/ui/field";
 import { Input } from "@/shared/ui/input";
+import { DateTimeInput } from "@/shared/ui/date-input";
 import { SubmitButton } from "@/shared/ui/submit-button";
 import { Textarea } from "@/shared/ui/textarea";
 import { useT } from "@/shared/i18n";
@@ -116,11 +117,7 @@ export function QuizSettingsForm({
 
       <div className="grid items-start gap-x-4 @lg:grid-cols-2">
         <Field label={s.closes} hint={s.closesHint}>
-          <Input
-            type="datetime-local"
-            value={closes}
-            onChange={(e) => setCloses(e.target.value)}
-          />
+          <DateTimeInput value={closes} onChange={setCloses} clearable defaultTime="23:59" />
         </Field>
         <Field label={s.timeLimit} hint={s.timeLimitHint}>
           <Input

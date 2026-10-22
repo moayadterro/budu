@@ -4,6 +4,7 @@ import { FormEvent, useActionState, useMemo, useRef, useState } from 'react'
 import { Alert } from '@/shared/ui/alert'
 import { Field } from '@/shared/ui/field'
 import { Input } from '@/shared/ui/input'
+import { DateInput } from '@/shared/ui/date-input'
 import { Label } from '@/shared/ui/label'
 import { Appear } from '@/shared/ui/motion'
 import { NativeSelect, NativeSelectOption } from '@/shared/ui/native-select'
@@ -102,10 +103,10 @@ export function AddLessonsForm({ courseId, classes }: { courseId: number; classe
           </NativeSelect>
         </Field>
         <Field label={s.from}>
-          <Input name="from" type="date" required defaultValue={iso(today)} />
+          <DateInput name="from" required defaultValue={iso(today)} />
         </Field>
         <Field label={s.until}>
-          <Input name="until" type="date" required defaultValue={iso(new Date(today.getTime() + 16 * 7 * 86400000))} />
+          <DateInput name="until" required defaultValue={iso(new Date(today.getTime() + 16 * 7 * 86400000))} />
         </Field>
       </div>
       <Field label={s.room}>

@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react'
 import { Button } from '@/shared/ui/button'
 import { ConfirmButton } from '@/shared/ui/confirm-button'
 import { Icon } from '@/shared/ui/icon'
-import { Input } from '@/shared/ui/input'
+import { DateTimeInput } from '@/shared/ui/date-input'
 import { LocalTime } from '@/shared/ui/local-time'
 import { useT } from '@/shared/i18n'
 import { fromLocalInput } from '../lib/time'
@@ -71,7 +71,7 @@ export function PublishQuiz({
             <label className="text-sm font-medium" htmlFor={`publish-at-${quizId}`}>
               {s.scheduleAt}
             </label>
-            <Input id={`publish-at-${quizId}`} type="datetime-local" value={when} onChange={(e) => setWhen(e.target.value)} />
+            <DateTimeInput id={`publish-at-${quizId}`} value={when} onChange={setWhen} />
             <p className="text-xs text-muted-foreground">{s.scheduleHint}</p>
             <div className="flex gap-2">
               <Button

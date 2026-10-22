@@ -121,6 +121,9 @@ Unbuilt screens stay in `shared/config/nav.ts` with `href: null` (rendered disab
 - Next 16: `cookies()`, `headers()`, `params`, `searchParams` are **async** (await them); page props
   are `{ params: Promise<…> }`.
 - Password fields use `PasswordInput` (`shared/ui/password-input`): show/hide toggle, every form.
+- Dates: NEVER `<input type="date">` / `datetime-local` — browsers draw them in the BROWSER's language
+  (owner saw Russian dates in the Arabic UI). Use `DateInput` / `DateTimeInput` (`shared/ui/date-input`):
+  label + calendar in the UI language via Intl, week starts per language, RTL mirrored; same value strings.
 - Mock data lives in `shared/mock` and is replaced screen by screen with IOMAD data.
 
 ## Design principles — how to work on ANY screen (owner, 2026-10-22: "always think like this")

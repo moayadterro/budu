@@ -7,6 +7,7 @@ import { Alert } from '@/shared/ui/alert'
 import { Button } from '@/shared/ui/button'
 import { Field } from '@/shared/ui/field'
 import { Input } from '@/shared/ui/input'
+import { DateTimeInput } from '@/shared/ui/date-input'
 import { Textarea } from '@/shared/ui/textarea'
 import { SubmitButton } from '@/shared/ui/submit-button'
 import { useT } from '@/shared/i18n'
@@ -68,7 +69,7 @@ export function TaskForm({
         <Textarea name="instructions" maxLength={COURSE_LIMITS.text} defaultValue={task?.instructions} placeholder={s.instructionsPh} />
       </Field>
       <Field label={s.due}>
-        <Input type="datetime-local" value={due} onChange={(e) => setDue(e.target.value)} className="max-w-[260px]" />
+        <DateTimeInput value={due} onChange={setDue} clearable defaultTime="23:59" className="max-w-[360px]" />
       </Field>
       <div className="mb-4">
         <span className="mb-2 block text-sm font-medium">{task?.files.length ? s.replaceAttachment : s.attachment}</span>

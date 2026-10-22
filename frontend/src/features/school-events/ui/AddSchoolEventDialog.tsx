@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Field } from '@/shared/ui/field'
 import { Icon } from '@/shared/ui/icon'
 import { Input } from '@/shared/ui/input'
+import { DateInput } from '@/shared/ui/date-input'
 import { SubmitButton } from '@/shared/ui/submit-button'
 import { useT } from '@/shared/i18n'
 import { addSchoolEventAction, type EventState } from '../server/actions'
@@ -69,7 +70,7 @@ export function AddSchoolEventDialog({ defaultDate }: { defaultDate: string }) {
             <Input name="title" required maxLength={200} placeholder={s.eventTitlePh} />
           </Field>
           <Field label={s.date}>
-            <Input name="date" type="date" required defaultValue={defaultDate} />
+            <DateInput name="date" required defaultValue={defaultDate} />
           </Field>
           <label className="mb-4 flex items-center gap-2 text-sm font-medium">
             <input type="checkbox" checked={allDay} onChange={(e) => setAllDay(e.target.checked)} className="size-4 accent-primary" />

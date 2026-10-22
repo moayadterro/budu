@@ -8,6 +8,7 @@ import { Button } from '@/shared/ui/button'
 import { Field } from '@/shared/ui/field'
 import { Icon } from '@/shared/ui/icon'
 import { Input } from '@/shared/ui/input'
+import { DateInput } from '@/shared/ui/date-input'
 import { Textarea } from '@/shared/ui/textarea'
 import { pictureSrc } from '@/shared/lib/person'
 import { useT } from '@/shared/i18n'
@@ -100,7 +101,7 @@ export function BlockForm({ block, people, onDone }: { block: Block; people: Mem
               <div key={String(n.id)} className="rounded-lg border p-3">
                 <div className="grid gap-x-3 sm:grid-cols-[10rem_1fr]">
                   <Field label={s.date}>
-                    <Input type="date" value={String(n.date ?? today())} onChange={(e) => setItem(i, 'date', e.target.value)} />
+                    <DateInput value={String(n.date ?? today())} onChange={(v) => setItem(i, 'date', v || today())} />
                   </Field>
                   <Field label={s.newsTitle}>
                     <Input value={String(n.title ?? '')} onChange={(e) => setItem(i, 'title', e.target.value)} maxLength={L.heading} />
