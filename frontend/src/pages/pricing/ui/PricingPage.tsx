@@ -95,7 +95,7 @@ export async function PricingPage() {
         </ul>
         {'soon' in p && (
           <p className="mt-auto flex items-center gap-2 pt-2 text-sm text-muted-foreground">
-            <Icon name="spark" className="size-4 text-subject-purple" />
+            <Icon name="spark" className="size-4 text-warning" />
             {p.soon}
           </p>
         )}
@@ -147,7 +147,7 @@ export async function PricingPage() {
       {/* coming soon: the two biggest ideas wide on top, the other three below */}
       <section className="flex flex-col gap-8">
         <div className="flex flex-col items-center gap-3 text-center">
-          <p className="text-xs font-semibold tracking-wider text-primary uppercase dark:text-success">{s.soonEyebrow}</p>
+          <p className="text-xs font-semibold tracking-wider text-warning uppercase">{s.soonEyebrow}</p>
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">{s.soonTitle}</h2>
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-6">
@@ -171,7 +171,8 @@ export async function PricingPage() {
                 <div className="flex min-w-0 flex-col gap-1.5">
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="font-semibold">{item.title}</h3>
-                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary dark:text-success">{s.soonBadge}</span>
+                    {/* "coming soon" is amber everywhere — green means it already exists */}
+                    <span className="rounded-full bg-warning/12 px-2 py-0.5 text-xs font-medium text-warning">{s.soonBadge}</span>
                   </div>
                   <p className="text-sm leading-relaxed text-muted-foreground">{item.text}</p>
                 </div>
