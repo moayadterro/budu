@@ -13,8 +13,8 @@ import { getT } from '@/shared/i18n/server'
  * fading into the page (never several colours mixed): students blue, teachers purple, schools the
  * theme's green — the school plan in the middle, lifted. Soft surfaces, large radii, soft shadows.
  * Depth without colour (UI/UX Pro Max "soft UI" + "aurora"): a fine dot texture fading out behind
- * the hero and the closing band, layered soft shadows instead of borders, and the school plan as a
- * frosted glass card over a slowly drifting green glow (motion only when the user allows it).
+ * the hero and the closing band, layered soft NEUTRAL shadows instead of borders; the school plan is
+ * a clean white card lifted in the middle. Never a coloured glow or coloured shadow behind a card.
  */
 
 /** One hue per card: the top fade, the icon tile and (coming soon) the glow — complete class names. */
@@ -109,10 +109,8 @@ export async function PricingPage() {
       <section className="grid items-stretch gap-6 lg:grid-cols-3 lg:items-center lg:gap-5">
         {side('students', 'book', 'blue', '/register?as=student')}
 
-        <div className="relative isolate">
-          {/* the glow lives BEHIND the glass card and drifts slowly */}
-          <div aria-hidden className="pointer-events-none absolute -inset-x-6 -inset-y-10 -z-10 rounded-[3rem] bg-primary/30 blur-3xl motion-safe:animate-aurora dark:bg-primary/20" />
-        <article className="flex flex-col gap-6 rounded-3xl bg-card/75 p-6 shadow-[inset_0_1px_0_color-mix(in_oklch,var(--background)_80%,transparent),0_24px_60px_-20px_color-mix(in_oklch,var(--primary)_35%,transparent)] backdrop-blur-xl backdrop-saturate-150 sm:p-8 lg:py-12">
+        {/* a clean card with a soft NEUTRAL shadow — never a coloured glow/shadow behind it (owner) */}
+        <article className="flex flex-col gap-6 rounded-3xl bg-card p-6 shadow-[0_1px_2px_color-mix(in_oklch,var(--foreground)_6%,transparent),0_24px_48px_-16px_color-mix(in_oklch,var(--foreground)_16%,transparent)] sm:p-8 lg:py-12">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <span className="grid size-11 place-items-center rounded-2xl bg-primary text-primary-foreground">
@@ -143,7 +141,6 @@ export async function PricingPage() {
             ))}
           </ul>
         </article>
-        </div>
 
         {side('teachers', 'board', 'purple', '/register?as=teacher')}
       </section>
