@@ -120,8 +120,9 @@ export async function setSchoolLogo(userId: number, companyId: number, file: Fil
 }
 
 /** The school's city (the IOMAD company's; the manager is checked there). */
-export async function setSchoolCity(userId: number, companyId: number, city: string) {
-  await iomadCall(defaultInstance(), 'local_budu_set_school_city', { companyid: companyId, userid: userId, city })
+/** The school's city and country (the IOMAD company's own fields; country = ISO code like "RU"). */
+export async function setSchoolLocation(userId: number, companyId: number, city: string, country: string) {
+  await iomadCall(defaultInstance(), 'local_budu_set_school_city', { companyid: companyId, userid: userId, city, country })
 }
 
 /** The school's / teacher workspace's name — the IOMAD company's (null if unknown). */

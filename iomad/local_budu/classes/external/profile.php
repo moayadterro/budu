@@ -175,17 +175,26 @@ class profile extends external_api {
             'companyid' => new external_value(PARAM_INT, 'School'),
             'userid' => new external_value(PARAM_INT, 'Acting Budu user (manager)'),
             'city' => new external_value(PARAM_TEXT, 'City'),
+            'country' => new external_value(PARAM_ALPHA, 'ISO 3166 code ("RU"); empty = leave as it is', VALUE_DEFAULT, ''),
         ]);
     }
 
-    public static function set_school_city(int $companyid, int $userid, string $city): array {
+    /** The school's city and country (the IOMAD company's own fields). */
+    public static function set_school_city(int $companyid, int $userid, string $city, string $country = ''): array {
         global $DB;
-        $p = self::validate_parameters(self::set_school_city_parameters(), compact('companyid', 'userid', 'city'));
+        $p = self::validate_parameters(self::set_school_city_parameters(), compact('companyid', 'userid', 'city', 'country'));
         self::setup();
         if (!school::is_manager($p['companyid'], $p['userid'])) {
             throw new \moodle_exception('nopermissions', 'error', '', 'edit this school');
         }
         $DB->set_field('company', 'city', \core_text::substr(trim($p['city']), 0, 120), ['id' => $p['companyid']]);
+        $country = strtoupper($p['country']);
+        if ($country !== '') {
+            if (!array_key_exists($country, get_string_manager()->get_list_of_countries())) {
+                throw new \invalid_parameter_exception('unknown country');
+            }
+            $DB->set_field('company', 'country', $country, ['id' => $p['companyid']]);
+        }
         return ['id' => $p['companyid']];
     }
 

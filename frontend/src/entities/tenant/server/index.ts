@@ -7,7 +7,7 @@ export {
   getTenantName,
   schoolsInfo,
   publicSchools, publishedSchoolSlugs,
-  setSchoolCity,
+  setSchoolLocation,
   setSchoolLogo,
   isSchool,
   schoolsAmong,

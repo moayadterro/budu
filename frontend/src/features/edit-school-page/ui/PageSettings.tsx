@@ -68,10 +68,6 @@ export function PageSettings({ page, origin }: { page: SchoolPage; origin: strin
         </p>
       )}
 
-      <Field label={s.city}>
-        <Input name="city" defaultValue={page.city} maxLength={120} placeholder={s.cityPh} />
-      </Field>
-
       <Field label={s.tagline}>
         <Input name="tagline" defaultValue={page.tagline} maxLength={PAGE_LIMITS.tagline} placeholder={s.taglinePh} />
       </Field>

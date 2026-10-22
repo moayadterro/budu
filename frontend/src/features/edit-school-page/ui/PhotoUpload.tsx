@@ -138,19 +138,3 @@ export function PhotosField({ items, onChange }: { items: Photo[]; onChange: (it
     </div>
   )
 }
-
-/** The hero's cover photo — saved as soon as it's chosen. */
-export function CoverField({ value, onSave }: { value: number | null; onSave: (id: number | null) => Promise<void> }) {
-  const [current, setCurrent] = useState(value)
-  const [, start] = useTransition()
-  return (
-    <PhotoField
-      wide
-      value={current}
-      onChange={(id) => {
-        setCurrent(id)
-        start(() => onSave(id))
-      }}
-    />
-  )
-}

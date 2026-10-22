@@ -401,6 +401,11 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-22 School page editor opens with a profile header (owner: "like Facebook"): cover across
+  the top, logo overlapping it, name + city; round glass camera buttons change them in place
+  (empty → file picker; set → Change · Remove, Remove asks first). City and country moved to
+  Settings → Location (`features/edit-school-location`; IOMAD company fields via
+  `local_budu_set_school_city`, country = ISO code, names from Intl in the UI language).
 - 2026-10-22 Terms of use at `/terms` (all languages) next to the privacy policy; both use
   `widgets/legal-document` (same layout, operator details from SITE.legal). Plain rules matching how
   Budu works — have a lawyer review both before launch. Footer: logo bigger at the start edge, no
