@@ -21,7 +21,7 @@ export async function PublicFooter() {
   ]
   return (
     <footer className="mt-20 bg-muted/30">
-      <div className="mx-auto max-w-6xl px-4 pt-14 pb-6">
+      <div className="mx-auto max-w-6xl px-4 pt-12 pb-5">
         <div className="grid gap-10 sm:grid-cols-3 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
           <div className="flex flex-col items-start gap-4 sm:col-span-3 lg:col-span-1">
             <Link href="/" aria-label={t.appName} className="rounded-lg focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none">
@@ -43,7 +43,7 @@ export async function PublicFooter() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-8 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
           <p className="py-1.5 text-xs text-muted-foreground">{s.rights(new Date().getFullYear())}</p>
           <nav aria-label={`${l.privacy} · ${l.terms}`} className="flex flex-wrap gap-x-3">
             <Link href="/privacy" className={LINK.replace('text-sm', 'text-xs')}>
