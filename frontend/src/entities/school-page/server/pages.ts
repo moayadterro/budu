@@ -21,7 +21,7 @@ const PAGE_SELECT = `SELECT t.company_id, t.slug, extract(epoch FROM t.created_a
 
 /** name and city come from the IOMAD company (one source) */
 async function toPage(r: PageRow): Promise<SchoolPage> {
-  const [info] = await iomadCall<Array<{ id: number; name: string; city: string }>>(defaultInstance(), 'local_budu_schools', { companyids: [r.company_id] })
+  const [info] = await iomadCall<Array<{ id: number; name: string; city: string; logo: number }>>(defaultInstance(), 'local_budu_schools', { companyids: [r.company_id] })
   return {
     companyId: r.company_id,
     name: info?.name ?? '',
@@ -31,6 +31,7 @@ async function toPage(r: PageRow): Promise<SchoolPage> {
     published: !!r.published,
     tagline: r.tagline ?? '',
     coverId: r.cover_file,
+    logoId: info?.logo || null,
   }
 }
 

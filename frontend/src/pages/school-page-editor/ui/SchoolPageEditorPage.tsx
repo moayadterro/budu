@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import { blocksOf, pageOf } from '@/entities/school-page/server'
 import { requireRole } from '@/entities/session/server'
 import { isSchool, schoolPeople } from '@/entities/tenant/server'
-import { BlocksEditor, CoverEditor, PageSettings } from '@/features/edit-school-page'
+import { BlocksEditor, CoverEditor, LogoEditor, PageSettings } from '@/features/edit-school-page'
 import { appUrl } from '@/shared/server/mailer'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card'
 import { ScreenHead } from '@/shared/ui/screen-head'
@@ -41,6 +41,15 @@ export async function SchoolPageEditorPage() {
           </CardHeader>
           <CardContent>
             <PageSettings page={page} origin={appUrl('/').replace(/\/$/, '')} />
+          </CardContent>
+        </Card>
+        <Card size="sm">
+          <CardHeader>
+            <CardTitle>{s.logo}</CardTitle>
+            <CardDescription>{s.logoSub}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <LogoEditor value={page.logoId} name={page.name} />
           </CardContent>
         </Card>
         <Card size="sm">

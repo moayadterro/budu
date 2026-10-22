@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { BLOCK_KINDS, normalizeSlug, PAGE_LIMITS, slugValid, type BlockKind } from '@/entities/school-page'
 import { addBlock, deleteBlock, moveBlock, pageOf, saveBlock, savePage, savePhoto, setCover, slugFree } from '@/entities/school-page/server'
 import { requireRole } from '@/entities/session/server'
-import { isSchool, setSchoolCity } from '@/entities/tenant/server'
+import { isSchool, setSchoolCity, setSchoolLogo } from '@/entities/tenant/server'
 import { formText } from '@/shared/lib/form'
 
 /** The signed-in manager's school (only schools have a public page). */
@@ -119,4 +119,20 @@ export async function setCoverAction(fileId: number | null) {
   const companyId = await school()
   await setCover(companyId, fileId && Number.isSafeInteger(fileId) ? fileId : null)
   await refresh(companyId)
+}
+
+/** The school's logo (IOMAD's company logo — the same one IOMAD shows). No file = remove it. */
+export async function setLogoAction(form: FormData): Promise<PhotoResult> {
+  const { userId, companyId } = await manager()
+  const file = form.get('photo')
+  if (file !== null && !(file instanceof File && PHOTO_TYPES.includes(file.type))) return { ok: false, error: 'type' }
+  if (file instanceof File && file.size > PHOTO_MAX) return { ok: false, error: 'size' }
+  try {
+    const id = await setSchoolLogo(userId, companyId, file instanceof File ? file : null)
+    await refresh(companyId)
+    return { ok: true, id: id ?? 0 }
+  } catch (e) {
+    console.error('school logo failed', e)
+    return { ok: false, error: 'server' }
+  }
 }

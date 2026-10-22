@@ -37,6 +37,12 @@ export async function SchoolPageView({ page, blocks }: { page: SchoolPage; block
             <div className="absolute inset-0 -z-10 bg-linear-to-t from-live/85 via-live/35 to-transparent" />
           </>
         )}
+        {page.logoId && (
+          <span className="mb-5 grid size-20 place-items-center overflow-hidden rounded-2xl bg-background p-2.5 shadow-lg ring-1 ring-foreground/10 sm:size-24">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={fileSrc(page.logoId)} alt="" className="size-full object-contain" />
+          </span>
+        )}
         <h1 className="max-w-3xl text-3xl font-semibold tracking-tight text-balance sm:text-5xl">{page.name}</h1>
         {page.tagline && <p className="mt-3 max-w-2xl text-lg text-pretty opacity-90">{page.tagline}</p>}
         <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm opacity-85">

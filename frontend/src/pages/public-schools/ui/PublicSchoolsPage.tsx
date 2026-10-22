@@ -40,7 +40,14 @@ export async function PublicSchoolsPage() {
               {(() => {
                 const card = (
                   <>
-                    <InitialsAvatar initials={initials(x.name)} color="var(--color-primary)" className="size-12 rounded-xl" />
+                    {x.logoId ? (
+                      <span className="grid size-14 flex-none place-items-center overflow-hidden rounded-xl border bg-background p-1.5">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={`/files/${x.logoId}`} alt="" className="size-full object-contain" />
+                      </span>
+                    ) : (
+                      <InitialsAvatar initials={initials(x.name)} color="var(--color-primary)" className="size-14 rounded-xl" />
+                    )}
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-semibold">{x.name}</p>
                       <p className="truncate text-sm text-muted-foreground">

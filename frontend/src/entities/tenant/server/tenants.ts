@@ -1,5 +1,5 @@
 import 'server-only'
-import { defaultInstance, iomadCall } from '@/shared/server/iomad'
+import { defaultInstance, iomadCall, iomadUpload } from '@/shared/server/iomad'
 import { toPerson, type Person, type RawPerson } from '@/shared/lib/person'
 import { query } from '@/shared/server/db'
 import { DEFAULT_SCALE, isGradeScale, type GradeScale } from '@/shared/lib/grade-scale'
@@ -62,15 +62,15 @@ export async function setGradeScale(companyId: number, scale: GradeScale) {
  * Name, city and country of schools — from the IOMAD company (the source; app-db keeps only Budu's
  * own settings about a school, never a second copy of these).
  */
-export async function schoolsInfo(companyIds: number[]): Promise<Map<number, { name: string; city: string; country: string }>> {
+export async function schoolsInfo(companyIds: number[]): Promise<Map<number, { name: string; city: string; country: string; logoId: number | null }>> {
   const ids = [...new Set(companyIds)].filter((id) => id > 0)
   if (!ids.length) return new Map()
-  const rows = await iomadCall<Array<{ id: number; name: string; city: string; country: string }>>(defaultInstance(), 'local_budu_schools', { companyids: ids })
-  return new Map(rows.map((r) => [r.id, { name: r.name, city: r.city, country: r.country }]))
+  const rows = await iomadCall<Array<{ id: number; name: string; city: string; country: string; logo: number }>>(defaultInstance(), 'local_budu_schools', { companyids: ids })
+  return new Map(rows.map((r) => [r.id, { name: r.name, city: r.city, country: r.country, logoId: r.logo || null }]))
 }
 
 /** Schools on the public "Schools on Budu" page = those whose own page is published (one switch). */
-export async function publicSchools(): Promise<Array<{ name: string; city: string; since: number; slug: string }>> {
+export async function publicSchools(): Promise<Array<{ name: string; city: string; since: number; slug: string; logoId: number | null }>> {
   const rows = await query<{ company_id: number; since: number; slug: string }>(
     `SELECT t.company_id, extract(epoch FROM t.created_at)::int AS since, t.slug
        FROM tenants t JOIN school_pages p ON p.iomad_url = t.iomad_url AND p.company_id = t.company_id
@@ -80,7 +80,14 @@ export async function publicSchools(): Promise<Array<{ name: string; city: strin
   const info = await schoolsInfo(rows.map((r) => r.company_id))
   return rows
     .filter((r) => info.has(r.company_id))
-    .map((r) => ({ name: info.get(r.company_id)!.name, city: info.get(r.company_id)!.city, since: r.since, slug: r.slug }))
+    .map((r) => ({ name: info.get(r.company_id)!.name, city: info.get(r.company_id)!.city, since: r.since, slug: r.slug, logoId: info.get(r.company_id)!.logoId }))
+}
+
+/** The school's logo = IOMAD's company logo (null = remove). Returns the new logo file id. */
+export async function setSchoolLogo(userId: number, companyId: number, file: File | null): Promise<number | null> {
+  const draft = file ? await iomadUpload(defaultInstance(), file) : 0
+  const r = await iomadCall<{ id: number }>(defaultInstance(), 'local_budu_set_school_logo', { companyid: companyId, userid: userId, draftitemid: draft })
+  return r.id || null
 }
 
 /** The school's city (the IOMAD company's; the manager is checked there). */

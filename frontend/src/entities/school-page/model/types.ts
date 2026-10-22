@@ -25,6 +25,8 @@ export type SchoolPage = {
   published: boolean
   tagline: string
   coverId: number | null
+  /** the school's logo (IOMAD company logo), null = none */
+  logoId: number | null
   city: string
   /** unix seconds — "on Budu since" */
   since: number

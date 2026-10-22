@@ -8,6 +8,7 @@ export {
   schoolsInfo,
   publicSchools,
   setSchoolCity,
+  setSchoolLogo,
   isSchool,
   schoolsAmong,
   schoolPeople,
