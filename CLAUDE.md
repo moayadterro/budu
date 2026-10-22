@@ -396,7 +396,10 @@ Not built yet (rough priority):
   `/files`; `file_access` makes that area public; plugin `lib.php` pluginfile + `save_school_photo`).
   Drafts: only the school's managers see them (with a banner). ONE switch (owner): published page =
   listed on `/schools` (card opens the page); unpublished = private, not listed, page 404. City lives
-  on the IOMAD company, edited in the page settings. Privacy: editors remind managers to publish students only with families' consent.
+  on the IOMAD company, edited in the page settings.
+  Logo = IOMAD's own company logo (system context `core_admin/logo<companyid>` + config, what IOMAD's
+  admin uses; `local_budu_set_school_logo`, PNG/JPG/GIF/WebP — no SVG), public via `/files`; shown in
+  the page hero and on `/schools` cards. Privacy: editors remind managers to publish students only with families' consent.
 - 2026-10-22 Password rule (owner): 8+ characters with an upper-case letter, a lower-case letter and
   a digit; symbols allowed, not required. Same in the app (`shared/lib/password` passwordOk) and in
   IOMAD (forced in `iomad/config.php`: minpasswordnonalphanum = 0 — Moodle's setting name). Sign-up

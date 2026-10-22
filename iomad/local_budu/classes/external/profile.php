@@ -107,8 +107,57 @@ class profile extends external_api {
             return [];
         }
         [$in, $params] = $DB->get_in_or_equal($ids);
-        return array_values(array_map(fn($c) => ['id' => (int)$c->id, 'name' => $c->name, 'city' => (string)$c->city, 'country' => (string)$c->country],
+        return array_values(array_map(fn($c) => ['id' => (int)$c->id, 'name' => $c->name, 'city' => (string)$c->city,
+            'country' => (string)$c->country, 'logo' => self::logo_file_id((int)$c->id)],
             $DB->get_records_select('company', "id $in", $params, '', 'id, name, city, country')));
+    }
+
+    /** The school's logo — IOMAD's own company logo (system context, core_admin/logo<companyid>); 0 = none. */
+    public static function logo_file_id(int $companyid): int {
+        foreach (get_file_storage()->get_area_files(\context_system::instance()->id, 'core_admin', 'logo' . $companyid, 0, 'id', false) as $f) {
+            return (int)$f->get_id();
+        }
+        return 0;
+    }
+
+    public static function set_school_logo_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'companyid' => new external_value(PARAM_INT, 'School'),
+            'userid' => new external_value(PARAM_INT, 'Acting Budu user (manager)'),
+            'draftitemid' => new external_value(PARAM_INT, 'Draft area with the new logo; 0 = remove the logo'),
+        ]);
+    }
+
+    /** Set (or remove) the school's logo — the same place IOMAD's company settings use. */
+    public static function set_school_logo(int $companyid, int $userid, int $draftitemid): array {
+        $p = self::validate_parameters(self::set_school_logo_parameters(), compact('companyid', 'userid', 'draftitemid'));
+        self::setup();
+        if (!school::is_manager($p['companyid'], $p['userid'])) {
+            throw new \moodle_exception('nopermissions', 'error', '', 'edit this school');
+        }
+        $ctx = \context_system::instance();
+        $area = 'logo' . $p['companyid'];
+        $fs = get_file_storage();
+        if (!$p['draftitemid']) {
+            $fs->delete_area_files($ctx->id, 'core_admin', $area);
+            set_config($area, '', 'core_admin');
+            return ['id' => 0];
+        }
+        file_save_draft_area_files($p['draftitemid'], $ctx->id, 'core_admin', $area, 0, ['subdirs' => 0, 'maxfiles' => 1]);
+        $files = $fs->get_area_files($ctx->id, 'core_admin', $area, 0, 'id', false);
+        $file = reset($files);
+        if (!$file || !in_array($file->get_mimetype(), ['image/png', 'image/jpeg', 'image/gif', 'image/webp'], true)) {
+            $fs->delete_area_files($ctx->id, 'core_admin', $area);
+            set_config($area, '', 'core_admin');
+            throw new \moodle_exception('invalidfiletype', 'error');
+        }
+        set_config($area, $file->get_filepath() . $file->get_filename(), 'core_admin'); // IOMAD's themes read this
+        theme_reset_all_caches();
+        return ['id' => (int)$file->get_id()];
+    }
+
+    public static function set_school_logo_returns(): external_single_structure {
+        return new external_single_structure(['id' => new external_value(PARAM_INT, 'Logo file id (0 = removed)')]);
     }
 
     public static function schools_returns(): external_multiple_structure {
@@ -117,6 +166,7 @@ class profile extends external_api {
             'name' => new external_value(PARAM_TEXT, 'Name'),
             'city' => new external_value(PARAM_TEXT, 'City'),
             'country' => new external_value(PARAM_ALPHA, 'Country (ISO 3166-1)'),
+            'logo' => new external_value(PARAM_INT, 'Logo file id (served by /files), 0 = none'),
         ]));
     }
 

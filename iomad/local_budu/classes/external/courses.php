@@ -1001,6 +1001,11 @@ class courses extends external_api {
             $path = '/' . $ctx->id . '/course/overviewfiles' . $file->get_filepath() . $file->get_filename();
             return ['allowed' => true, 'path' => $path] + self::file_info($file);
         }
+        if (preg_match('/^core_admin\/logo\d+$/', $area) && $file->get_contextid() == \context_system::instance()->id) {
+            // A school's logo (IOMAD company logo) — public, like IOMAD serves it ("anyone can view logos").
+            $path = '/' . $file->get_contextid() . '/core_admin/' . $file->get_filearea() . '/0x0/0/' . $file->get_filename();
+            return ['allowed' => true, 'path' => $path] + self::file_info($file);
+        }
         if ($area === 'local_budu/schoolpage') {
             // A photo on a school's public page — public by design (anyone, visitors too).
             $path = '/' . $file->get_contextid() . '/local_budu/schoolpage/' . $file->get_itemid() . $file->get_filepath() . $file->get_filename();

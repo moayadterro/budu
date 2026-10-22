@@ -134,6 +134,12 @@ $functions = [
         'description' => 'Set a course’s teaching language.',
         'type' => 'write',
     ],
+    'local_budu_set_school_logo' => [
+        'classname' => \local_budu\external\profile::class,
+        'methodname' => 'set_school_logo',
+        'description' => 'Set or remove a school’s logo (IOMAD company logo).',
+        'type' => 'write',
+    ],
     'local_budu_save_school_photo' => [
         'classname' => \local_budu\external\school_page::class,
         'methodname' => 'save_school_photo',
