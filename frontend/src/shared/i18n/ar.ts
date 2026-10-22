@@ -1263,7 +1263,6 @@ export const ar: typeof en = {
     schools: {
       title: 'المدارس على Budu',
       sub: 'مدارس تعلّم مع Budu ووافقت على الظهور هنا.',
-      since: (year: number) => `على Budu منذ ${year}`,
       empty: 'لا توجد مدارس معروضة بعد.',
       emptyHint: 'تظهر المدرسة هنا عندما تنشر صفحتها على Budu.',
       joinTitle: 'انضم بمدرستك إلى Budu',

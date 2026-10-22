@@ -1265,7 +1265,6 @@ export const ru: typeof en = {
     schools: {
       title: 'Школы на Budu',
       sub: 'Школы, которые учат с Budu и согласились появиться здесь.',
-      since: (year: number) => `На Budu с ${year} года`,
       empty: 'Пока здесь нет школ.',
       emptyHint: 'Школа появляется здесь, когда публикует свою страницу на Budu.',
       joinTitle: 'Подключите свою школу',

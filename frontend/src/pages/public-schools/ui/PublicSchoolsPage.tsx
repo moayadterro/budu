@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { publicSchools } from '@/entities/tenant/server'
 import { BrandImage } from '@/shared/ui/brand-image'
+import { cn } from '@/shared/lib/cn'
 import { Button } from '@/shared/ui/button'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/shared/ui/empty'
 import { Icon } from '@/shared/ui/icon'
@@ -35,35 +36,44 @@ export async function PublicSchoolsPage() {
           </EmptyHeader>
         </Empty>
       ) : (
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {schools.map((x) => (
-            <li key={`${x.name}-${x.since}`}>
-              {(() => {
-                const card = (
-                  <>
-                    {x.logoId ? (
-                      <BrandImage src={`/files/${x.logoId}`} className="size-14 flex-none rounded-xl border" />
-                    ) : (
-                      <InitialsAvatar initials={initials(x.name)} color="var(--color-primary)" className="size-14 rounded-xl" />
-                    )}
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-semibold">{x.name}</p>
-                      <p className="truncate text-sm text-muted-foreground">
-                        {[x.city, s.since(new Date(x.since * 1000).getFullYear())].filter(Boolean).join(' · ')}
-                      </p>
-                    </div>
-                    {x.slug && <Icon name="chevRight" className="size-4 flex-none text-muted-foreground rtl:-scale-x-100" />}
-                  </>
-                )
-                // a published school page → the card opens it
-                return x.slug ? (
-                  <Link href={`/schools/${x.slug}`} className="flex items-center gap-4 rounded-xl border bg-card p-5 transition-all hover:-translate-y-0.5 hover:shadow-md">
-                    {card}
-                  </Link>
-                ) : (
-                  <div className="flex items-center gap-4 rounded-xl border bg-card p-5">{card}</div>
-                )
-              })()}
+            <li key={x.slug}>
+              <Link
+                href={`/schools/${x.slug}`}
+                className="group flex h-full flex-col overflow-hidden rounded-2xl border bg-card shadow-xs transition-all hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
+              >
+                {/* the school's cover photo — or a calm brand strip with its logo */}
+                <div className="relative aspect-[16/9] overflow-hidden bg-brand">
+                  {x.coverId ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={`/files/${x.coverId}`} alt="" loading="lazy" className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
+                  ) : (
+                    x.logoId && (
+                      <div className="grid size-full place-items-center">
+                        <BrandImage src={`/files/${x.logoId}`} className="size-24 rounded-2xl shadow-lg" />
+                      </div>
+                    )
+                  )}
+                </div>
+                <div className={cn('relative flex flex-1 flex-col gap-1 px-5 pb-5', (x.logoId && x.coverId) || !x.logoId ? 'pt-10' : 'pt-4')}>
+                  {/* logo / photo overlapping the strip (when the strip shows a cover photo) */}
+                  <span className="absolute -top-8 start-5">
+                    {x.logoId && x.coverId ? (
+                      <BrandImage src={`/files/${x.logoId}`} className="size-16 rounded-xl border-4 border-card shadow-sm" />
+                    ) : !x.logoId ? (
+                      <InitialsAvatar initials={initials(x.name)} color="var(--color-primary)" className="size-16 rounded-xl border-4 border-card text-lg" />
+                    ) : null}
+                  </span>
+                  <h2 className="line-clamp-2 text-lg font-semibold leading-snug">{x.name}</h2>
+                  {x.city && (
+                    <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <Icon name="pin" className="size-4 flex-none" />
+                      {x.city}
+                    </p>
+                  )}
+                </div>
+              </Link>
             </li>
           ))}
         </ul>

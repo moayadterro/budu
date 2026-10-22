@@ -70,9 +70,9 @@ export async function schoolsInfo(companyIds: number[]): Promise<Map<number, { n
 }
 
 /** Schools on the public "Schools on Budu" page = those whose own page is published (one switch). */
-export async function publicSchools(): Promise<Array<{ name: string; city: string; since: number; slug: string; logoId: number | null }>> {
-  const rows = await query<{ company_id: number; since: number; slug: string }>(
-    `SELECT t.company_id, extract(epoch FROM t.created_at)::int AS since, t.slug
+export async function publicSchools(): Promise<Array<{ name: string; city: string; slug: string; logoId: number | null; coverId: number | null }>> {
+  const rows = await query<{ company_id: number; slug: string; cover_file: number | null }>(
+    `SELECT t.company_id, t.slug, p.cover_file
        FROM tenants t JOIN school_pages p ON p.iomad_url = t.iomad_url AND p.company_id = t.company_id
       WHERE t.iomad_url = $1 AND t.kind = 'school' AND p.published AND t.slug IS NOT NULL ORDER BY t.created_at`,
     [defaultInstance().url],
@@ -80,7 +80,7 @@ export async function publicSchools(): Promise<Array<{ name: string; city: strin
   const info = await schoolsInfo(rows.map((r) => r.company_id))
   return rows
     .filter((r) => info.has(r.company_id))
-    .map((r) => ({ name: info.get(r.company_id)!.name, city: info.get(r.company_id)!.city, since: r.since, slug: r.slug, logoId: info.get(r.company_id)!.logoId }))
+    .map((r) => ({ name: info.get(r.company_id)!.name, city: info.get(r.company_id)!.city, slug: r.slug, logoId: info.get(r.company_id)!.logoId, coverId: r.cover_file }))
 }
 
 /** The school's logo = IOMAD's company logo (null = remove). Returns the new logo file id. */

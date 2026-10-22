@@ -1256,7 +1256,6 @@ export const en = {
     schools: {
       title: 'Schools on Budu',
       sub: 'Schools that teach with Budu and chose to be listed here.',
-      since: (year: number) => `On Budu since ${year}`,
       empty: 'No schools are listed yet.',
       emptyHint: 'Schools appear here once they publish their own page on Budu.',
       joinTitle: 'Bring your school to Budu',
