@@ -433,6 +433,13 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-22 Pricing model & page (owner): "learning should be fun" — students get free access (we
+  support them), teachers start without paying (the AI creator kit will be paid), schools PAY by
+  their number of students (price on request; no free school tier is advertised any more —
+  `SITE.freeSchool` is no longer shown). Don't over-promise "free". The page is light (no solid green
+  blocks — owner: "too green"); the school plan sits in the middle with a light green tint; plan
+  buttons open `/register?as=student|teacher|school`. Coming soon on the page: AI creator kit,
+  online certificates, games for free time, co-working rooms, interest circles («кружки по интересам»).
 - 2026-10-22 A public page's address language (/ru/…, /ar/…) is saved as the browser's language
   only for VISITORS (proxy). Signed-in users keep their own choice — a public page left open in
   another tab kept flipping the app's language before.
@@ -696,7 +703,7 @@ Not built yet (rough priority):
 ## Open questions (ask the owner)
 
 - Public site facts still empty in `shared/config/site.ts`: support/hello emails, Telegram, WhatsApp,
-  company legal details (INN, OGRN, address); and the real free-school limits (placeholder 5 / 50).
+  company legal details (INN, OGRN, address). School prices by student count (the page says "on request").
 - Old Postgres 16 volume `budu_app-db-data` is kept for rollback; delete it once 18 is confirmed fine
   (`docker volume rm budu_app-db-data`). Backups from the upgrade were only in the session scratchpad.
 - Owner (2026-10-20): all current data is test data — a full wipe is acceptable when useful.
