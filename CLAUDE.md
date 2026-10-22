@@ -342,6 +342,8 @@ Built and verified:
   first/last name, password change (current password checked by IOMAD, other devices signed out),
   language, theme. Tested 2026-10-21.
 - UI fully in English / Russian / Arabic (RTL), switchable in Settings or the header globe menu.
+- School public page (tested 2026-10-22 as a manager + visitor): `/school/page` editor, public
+  `/schools/<slug>` with hero + 5 block kinds, photos via IOMAD, draft preview for managers only.
 - Connection strip (`shared/ui/connection-status`, in RootLayout, every page): offline → dark strip at
   the bottom; back online → green "Back online" for 3 s (like YouTube).
 - Teacher course builder (live IOMAD data): `/courses` (my courses), `/courses/new`, `/courses/:id`
@@ -374,6 +376,15 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-22 School public pages (owner): `/schools/<slug>` (not `/school/<slug>` — that's the
+  manager area). Managers edit at `/school/page` (nav "School page"): address (live check; a–z 0–9 -,
+  3–40, reserved words), Published, tagline, cover, and blocks — text, photos (≤6), news (dated),
+  spotlight (one person), top students (🥇🥈🥉). Stored in app-db (`tenants.slug`, `school_pages`,
+  `school_page_blocks` JSON, cleaned per kind by `entities/school-page` `cleanBlock`; rendered as
+  TEXT, never HTML). Photos live in IOMAD (category context, `local_budu/schoolpage`, served via
+  `/files`; `file_access` makes that area public; plugin `lib.php` pluginfile + `save_school_photo`).
+  Drafts: only the school's managers see them (with a banner). `/schools` cards link to published
+  pages. Privacy: editors remind managers to publish students only with families' consent.
 - 2026-10-22 Password rule (owner): 8+ characters with an upper-case letter, a lower-case letter and
   a digit; symbols allowed, not required. Same in the app (`shared/lib/password` passwordOk) and in
   IOMAD (forced in `iomad/config.php`: minpasswordnonalphanum = 0 — Moodle's setting name). Sign-up

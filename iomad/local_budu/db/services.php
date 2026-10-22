@@ -92,6 +92,12 @@ $functions = [
         'description' => 'Drop a published course’s pending changes (all, or one lesson / item).',
         'type' => 'write',
     ],
+    'local_budu_save_school_photo' => [
+        'classname' => \local_budu\external\school_page::class,
+        'methodname' => 'save_school_photo',
+        'description' => 'Keep an uploaded image for a school’s public page.',
+        'type' => 'write',
+    ],
     'local_budu_preview_lesson' => [
         'classname' => \local_budu\external\courses::class,
         'methodname' => 'preview_lesson',

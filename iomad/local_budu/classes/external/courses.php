@@ -999,6 +999,11 @@ class courses extends external_api {
             $path = '/' . $ctx->id . '/course/overviewfiles' . $file->get_filepath() . $file->get_filename();
             return ['allowed' => true, 'path' => $path] + self::file_info($file);
         }
+        if ($area === 'local_budu/schoolpage') {
+            // A photo on a school's public page — public by design (anyone, visitors too).
+            $path = '/' . $file->get_contextid() . '/local_budu/schoolpage/' . $file->get_itemid() . $file->get_filepath() . $file->get_filename();
+            return ['allowed' => true, 'path' => $path] + self::file_info($file);
+        }
         if ($area === 'assignsubmission_file/submission_files') {
             // A homework answer: its author, or someone who grades in that course.
             $ctx = \context::instance_by_id($file->get_contextid(), IGNORE_MISSING);
