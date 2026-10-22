@@ -27,11 +27,21 @@ export const LOCALE_NAMES = Object.fromEntries(LANGUAGES.map((l) => [l.code, l.n
 export const isLocale = (v: unknown): v is Locale => typeof v === 'string' && (LOCALES as string[]).includes(v)
 export const dirOf = (locale: Locale): 'ltr' | 'rtl' => LANGUAGES.find((l) => l.code === locale)?.dir ?? 'ltr'
 
-/** Best supported match for an Accept-Language header ("ru-RU,ru;q=0.9,en;q=0.8" → "ru"). */
+/**
+ * The browser's PREFERRED language if Budu has it, else English (owner: an unsupported first
+ * language — German, French … — opens English, never a lower-ranked fallback like Russian).
+ * "ru-RU,ru;q=0.9,en;q=0.8" → "ru" · "de-DE,de;q=0.9,ru;q=0.5" → "en".
+ */
 export function matchLocale(acceptLanguage: string | null | undefined): Locale {
-  for (const part of (acceptLanguage ?? '').split(',')) {
-    const code = part.trim().split(';')[0].split('-')[0].toLowerCase()
-    if (isLocale(code)) return code
-  }
-  return DEFAULT_LOCALE
+  const ranked = (acceptLanguage ?? '')
+    .split(',')
+    .map((part, i) => {
+      const [tag = '', ...params] = part.trim().split(';')
+      const q = Number(params.find((p) => p.trim().startsWith('q='))?.trim().slice(2) ?? 1)
+      return { code: tag.split('-')[0]!.toLowerCase(), q: Number.isFinite(q) ? q : 0, i }
+    })
+    .filter((x) => x.code && x.code !== '*' && x.q > 0)
+    .sort((a, b) => b.q - a.q || a.i - b.i)
+  const first = ranked[0]?.code
+  return isLocale(first) ? first : DEFAULT_LOCALE
 }
