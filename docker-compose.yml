@@ -19,7 +19,8 @@ services:
       # Postgres 18 images keep data under /var/lib/postgresql/<major>/; mount the parent
       - app-db-data-18:/var/lib/postgresql
     ports:
-      - '5432:5432'
+      # only this machine (never the internet): the app reaches it inside the compose network
+      - '127.0.0.1:5432:5432'
 
   # ---- Frontend (Next.js + Tailwind) ----
   frontend:
@@ -43,7 +44,7 @@ services:
       UPLOAD_DIR: /uploads
       DATABASE_URL: postgres://${APP_DB_USER:?set in .env}:${APP_DB_PASSWORD:?set in .env}@app-db:5432/${APP_DB_NAME:?set in .env}
     ports:
-      - '3000:3000'
+      - '127.0.0.1:3000:3000' # behind nginx on the server; never exposed directly
     volumes:
       - ./frontend:/app          # live reload in dev
       - /app/node_modules        # keep the image's node_modules
@@ -82,7 +83,9 @@ services:
       IOMAD_ADMIN_PASSWORD: ${IOMAD_ADMIN_PASSWORD:?set in .env}
       IOMAD_ADMIN_EMAIL: ${IOMAD_ADMIN_EMAIL:?set in .env}
     ports:
-      - '${IOMAD_PORT:-8080}:80'
+      # IOMAD is internal: the frontend talks to http://iomad; the host port is for the admin only
+      # (from the machine itself / an SSH tunnel) — it must never be reachable from the internet
+      - '127.0.0.1:${IOMAD_PORT:-8080}:80'
     volumes:
       - iomad-moodledata:/var/www/moodledata
     depends_on:

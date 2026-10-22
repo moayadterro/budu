@@ -9,6 +9,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && docker-php-ext-install -j"$(nproc)" gd intl zip soap mysqli opcache exif
 
 COPY php.ini /usr/local/etc/php/conf.d/iomad.ini
+# don't announce Apache's version or OS in headers / error pages
+RUN printf 'ServerTokens Prod\nServerSignature Off\n' > /etc/apache2/conf-enabled/zz-budu-hide.conf
 
 ARG IOMAD_BRANCH=IOMAD_405_STABLE
 RUN cd / && rm -rf /var/www/html \

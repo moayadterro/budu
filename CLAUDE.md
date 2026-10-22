@@ -637,6 +637,17 @@ Not built yet (rough priority):
   "Test School Alpha/Gamma/Beta", "Test Teacher", "Test Teacher (…)", users `*@example.test`.
 - Accounts created before 2026-10-19 were never suspended, so they can sign in without confirming.
 
+## Never reveal the stack (owner, 2026-10-22 — security)
+Nothing a user, visitor or attacker can see may tell what Budu runs on or how it works inside:
+- UI text (all roles, admins too) never names IOMAD, Moodle, databases, frameworks or services, and
+  never explains where data is stored or shown. Labels say what a thing is; hints only carry a real
+  limit or consequence ("3–40 characters", "anyone can see the page"). No "it also goes to X".
+- Errors shown to users are our own words (never pass `e.message` from IOMAD/DB through).
+- Headers: `poweredByHeader: false` (no X-Powered-By: Next.js); IOMAD `expose_php = Off` and Apache
+  `ServerTokens Prod` / `ServerSignature Off`. robots.txt lists only what must be hidden from search.
+- Ports: app-db, frontend and IOMAD are bound to 127.0.0.1 in docker-compose — reachable only from
+  the machine (nginx in front of the frontend; IOMAD admin via SSH tunnel). Never publish them.
+
 ## Working with the owner (Moayad)
 - Prefers security by default: random, non-guessable DB users/names, no defaults in compose,
   secrets only in `.env` (never echo them).
