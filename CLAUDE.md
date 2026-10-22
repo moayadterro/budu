@@ -433,6 +433,21 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-22 Logging (owner: "I want to know everything that happens"). IOMAD's own event log is on
+  but ~73% of it is "web service function called" by the integration account — it can't say WHO.
+  So app-db keeps: `audit_log` (Admin → Activity: real person, role, school, action, target,
+  details, ok, IP hash; `audit()` from `shared/server/audit`, actions + English-only labels in
+  `shared/config/audit.ts` — owner: events in English; kept 1 year) and `error_log` (Admin → Errors:
+  one row per distinct error with a counter, stack, page, user; kept 90 days). EVERY error goes
+  through `reportError(where, e)` (`shared/server/errors`) — never bare `console.error`; uncaught
+  ones via `instrumentation.ts` `onRequestError` (client-disconnect noise ignored); browser crashes
+  via the error screens (`pages/error`, `app/error.tsx`, `app/(shell)/error.tsx`,
+  `app/global-error.tsx`). Production only (NODE_ENV=production + a real APP_URL) emails each
+  error to ALERT_EMAIL, at most once per 15 min per error; localhost never emails. Log only what
+  matters (owner: "no trash"): money, access, exams, students' work and grades, who can see what,
+  publishing / deleting, families — never page views, language/currency/photo, small content edits,
+  autosaves or chat messages. New event = add it to a group in `AUDIT_GROUPS` + `AUDIT_LABELS`
+  (`shared/config/audit.ts`) and call `audit()` where it succeeds.
 - 2026-10-22 Invite forms report per person (owner: "10 students, each a different problem"):
   one row per person, never one message for the whole batch; failing rows stay marked. Invited
   accounts get a unique username (emails like a+b@x / a_b@x map to the same one → random ending).
