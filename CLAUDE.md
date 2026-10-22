@@ -165,7 +165,7 @@ shadcn classes: `bg-background`, `bg-card`, `text-foreground`, `text-muted-foreg
 `bg-sidebar` … Budu extras: `success`/`warning`/`info` (tints via opacity, `bg-success/10`),
 `highlight` (amber CTA), `subject-purple`/`subject-terra`, `bg-brand` (gradient utility), and the
 fixed dark live-classroom stage (`bg-live`, `text-live-foreground` …). Rules:
-- Fonts: body Golos Text (`--font-app`; Arabic letters: Tajawal — owner); headings Geologica (`--font-head` →
+- Fonts: body Montserrat (`--font-app`; Arabic letters: Tajawal — owner); headings Geologica (`--font-head` →
   `font-heading`, applied in globals.css to h1–h6 and shadcn card/dialog/sheet/empty titles; Arabic
   heading letters in Noto Kufi Arabic — owner asked for Kufi). Loaded from Google Fonts in RootLayout.
 - **Never hardcode hex/oklch, `white`/`black`, or rgba** in components; add a token instead.
