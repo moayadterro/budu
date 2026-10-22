@@ -433,6 +433,9 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-22 A public page's address language (/ru/…, /ar/…) is saved as the browser's language
+  only for VISITORS (proxy). Signed-in users keep their own choice — a public page left open in
+  another tab kept flipping the app's language before.
 - 2026-10-22 Logging (owner: "I want to know everything that happens"). IOMAD's own event log is on
   but ~73% of it is "web service function called" by the integration account — it can't say WHO.
   So app-db keeps: `audit_log` (Admin → Activity: real person, role, school, action, target,
