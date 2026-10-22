@@ -1,0 +1,262 @@
+<?php
+namespace local_budu\external;
+
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_multiple_structure;
+use core_external\external_single_structure;
+use core_external\external_value;
+
+/**
+ * Data that belongs to IOMAD's own records (so the website AND the future mobile API read one
+ * source): users' Budu preferences (Moodle user preferences), schools' name / city (the IOMAD
+ * company), course completion (Moodle's course_completions) and a course's teaching language (a
+ * course custom field, shortname budu_language).
+ */
+class profile extends external_api {
+
+    /** Budu preferences we keep per user, with the values allowed. */
+    const PREFS = [
+        'budu_locale' => '/^(en|ru|ar)$/',
+        'budu_currency' => '/^[A-Z]{3}$/',
+        'budu_parent_skipped' => '/^1$/',
+    ];
+
+    private static function setup(): void {
+        self::validate_context(\context_system::instance());
+    }
+
+    // ----- preferences -------------------------------------------------------
+
+    public static function get_prefs_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'userids' => new external_multiple_structure(new external_value(PARAM_INT, 'User')),
+        ]);
+    }
+
+    /** Budu preferences of these users (missing = not set). */
+    public static function get_prefs(array $userids): array {
+        global $DB;
+        $p = self::validate_parameters(self::get_prefs_parameters(), compact('userids'));
+        self::setup();
+        $ids = array_values(array_unique(array_filter(array_map('intval', $p['userids']))));
+        if (!$ids) {
+            return [];
+        }
+        [$in, $params] = $DB->get_in_or_equal($ids);
+        [$names, $nparams] = $DB->get_in_or_equal(array_keys(self::PREFS));
+        $out = [];
+        foreach ($ids as $id) {
+            $out[$id] = ['userid' => $id, 'locale' => '', 'currency' => '', 'parentskipped' => false];
+        }
+        foreach ($DB->get_records_select('user_preferences', "userid $in AND name $names", array_merge($params, $nparams), '', 'id, userid, name, value') as $r) {
+            $key = ['budu_locale' => 'locale', 'budu_currency' => 'currency', 'budu_parent_skipped' => 'parentskipped'][$r->name];
+            $out[$r->userid][$key] = $key === 'parentskipped' ? $r->value === '1' : $r->value;
+        }
+        return array_values($out);
+    }
+
+    public static function get_prefs_returns(): external_multiple_structure {
+        return new external_multiple_structure(new external_single_structure([
+            'userid' => new external_value(PARAM_INT, 'User'),
+            'locale' => new external_value(PARAM_ALPHA, 'UI language (en / ru / ar), empty = not chosen'),
+            'currency' => new external_value(PARAM_ALPHA, 'Price currency (ISO 4217), empty = default'),
+            'parentskipped' => new external_value(PARAM_BOOL, 'Skipped the "add your parent" step'),
+        ]));
+    }
+
+    public static function set_pref_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'userid' => new external_value(PARAM_INT, 'User (the signed-in user — the frontend checks the session)'),
+            'name' => new external_value(PARAM_ALPHAEXT, 'budu_locale | budu_currency | budu_parent_skipped'),
+            'value' => new external_value(PARAM_RAW, 'New value'),
+        ]);
+    }
+
+    public static function set_pref(int $userid, string $name, string $value): array {
+        global $DB;
+        $p = self::validate_parameters(self::set_pref_parameters(), compact('userid', 'name', 'value'));
+        self::setup();
+        if (!isset(self::PREFS[$p['name']]) || !preg_match(self::PREFS[$p['name']], $p['value'])
+                || !$DB->record_exists('user', ['id' => $p['userid'], 'deleted' => 0])) {
+            throw new \invalid_parameter_exception('preference');
+        }
+        set_user_preference($p['name'], $p['value'], $p['userid']);
+        return ['id' => $p['userid']];
+    }
+
+    public static function set_pref_returns(): external_single_structure {
+        return new external_single_structure(['id' => new external_value(PARAM_INT, 'User')]);
+    }
+
+    // ----- schools (IOMAD companies) ------------------------------------------
+
+    public static function schools_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'companyids' => new external_multiple_structure(new external_value(PARAM_INT, 'Company')),
+        ]);
+    }
+
+    /** Name, city and country of these schools — straight from the IOMAD company. */
+    public static function schools(array $companyids): array {
+        global $DB;
+        $p = self::validate_parameters(self::schools_parameters(), compact('companyids'));
+        self::setup();
+        $ids = array_values(array_unique(array_filter(array_map('intval', $p['companyids']))));
+        if (!$ids) {
+            return [];
+        }
+        [$in, $params] = $DB->get_in_or_equal($ids);
+        return array_values(array_map(fn($c) => ['id' => (int)$c->id, 'name' => $c->name, 'city' => (string)$c->city, 'country' => (string)$c->country],
+            $DB->get_records_select('company', "id $in", $params, '', 'id, name, city, country')));
+    }
+
+    public static function schools_returns(): external_multiple_structure {
+        return new external_multiple_structure(new external_single_structure([
+            'id' => new external_value(PARAM_INT, 'Company'),
+            'name' => new external_value(PARAM_TEXT, 'Name'),
+            'city' => new external_value(PARAM_TEXT, 'City'),
+            'country' => new external_value(PARAM_ALPHA, 'Country (ISO 3166-1)'),
+        ]));
+    }
+
+    public static function set_school_city_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'companyid' => new external_value(PARAM_INT, 'School'),
+            'userid' => new external_value(PARAM_INT, 'Acting Budu user (manager)'),
+            'city' => new external_value(PARAM_TEXT, 'City'),
+        ]);
+    }
+
+    public static function set_school_city(int $companyid, int $userid, string $city): array {
+        global $DB;
+        $p = self::validate_parameters(self::set_school_city_parameters(), compact('companyid', 'userid', 'city'));
+        self::setup();
+        if (!school::is_manager($p['companyid'], $p['userid'])) {
+            throw new \moodle_exception('nopermissions', 'error', '', 'edit this school');
+        }
+        $DB->set_field('company', 'city', \core_text::substr(trim($p['city']), 0, 120), ['id' => $p['companyid']]);
+        return ['id' => $p['companyid']];
+    }
+
+    public static function set_school_city_returns(): external_single_structure {
+        return new external_single_structure(['id' => new external_value(PARAM_INT, 'Company')]);
+    }
+
+    // ----- course completion ---------------------------------------------------
+
+    public static function complete_course_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'courseid' => new external_value(PARAM_INT, 'Course'),
+            'userid' => new external_value(PARAM_INT, 'The student who reached its end'),
+        ]);
+    }
+
+    /** Mark the course completed for a student enrolled in it (idempotent). */
+    public static function complete_course(int $courseid, int $userid): array {
+        global $CFG;
+        require_once($CFG->dirroot . '/completion/completion_completion.php');
+        $p = self::validate_parameters(self::complete_course_parameters(), compact('courseid', 'userid'));
+        self::setup();
+        $course = get_course($p['courseid']);
+        if (!$course->visible || !is_enrolled(\context_course::instance($course->id), $p['userid'], '', true)) {
+            throw new \moodle_exception('nopermissions', 'error', '', 'complete this course');
+        }
+        $cc = new \completion_completion(['userid' => $p['userid'], 'course' => $course->id]);
+        if (!$cc->is_complete()) {
+            $cc->mark_complete();
+        }
+        return ['completed' => true];
+    }
+
+    public static function complete_course_returns(): external_single_structure {
+        return new external_single_structure(['completed' => new external_value(PARAM_BOOL, 'Completed')]);
+    }
+
+    public static function completed_courses_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'userid' => new external_value(PARAM_INT, 'Student'),
+            'courseids' => new external_multiple_structure(new external_value(PARAM_INT, 'Course'), 'Only these (empty = all)', VALUE_DEFAULT, []),
+        ]);
+    }
+
+    /** Which courses this student has completed (and when). */
+    public static function completed_courses(int $userid, array $courseids = []): array {
+        global $DB;
+        $p = self::validate_parameters(self::completed_courses_parameters(), compact('userid', 'courseids'));
+        self::setup();
+        $where = 'userid = ? AND timecompleted IS NOT NULL';
+        $params = [$p['userid']];
+        if ($p['courseids']) {
+            [$in, $cp] = $DB->get_in_or_equal(array_map('intval', $p['courseids']));
+            $where .= " AND course $in";
+            $params = array_merge($params, $cp);
+        }
+        return array_values(array_map(fn($r) => ['courseid' => (int)$r->course, 'timecompleted' => (int)$r->timecompleted],
+            $DB->get_records_select('course_completions', $where, $params, '', 'id, course, timecompleted')));
+    }
+
+    public static function completed_courses_returns(): external_multiple_structure {
+        return new external_multiple_structure(new external_single_structure([
+            'courseid' => new external_value(PARAM_INT, 'Course'),
+            'timecompleted' => new external_value(PARAM_INT, 'When'),
+        ]));
+    }
+
+    // ----- course teaching language (custom field budu_language) ------------------
+
+    /** The budu_language course custom field (created on first use). */
+    public static function language_field_id(): int {
+        global $DB;
+        $id = (int)$DB->get_field('customfield_field', 'id', ['shortname' => 'budu_language']);
+        if ($id) {
+            return $id;
+        }
+        $handler = \core_course\customfield\course_handler::create();
+        $catid = (int)$DB->get_field('customfield_category', 'id', ['component' => 'core_course', 'area' => 'course', 'name' => 'Budu'])
+            ?: $handler->create_category('Budu');
+        $category = \core_customfield\category_controller::create($catid);
+        $field = \core_customfield\field_controller::create(0, (object)['type' => 'text'], $category);
+        $handler->save_field_configuration($field, (object)[
+            'name' => 'Teaching language', 'shortname' => 'budu_language', 'description' => '', 'descriptionformat' => FORMAT_PLAIN,
+            'configdata' => ['required' => 0, 'uniquevalues' => 0, 'locked' => 0, 'visibility' => 2, 'defaultvalue' => '',
+                'displaysize' => 10, 'maxlength' => 10, 'ispassword' => 0, 'link' => '', 'linktarget' => ''],
+        ]);
+        return (int)$field->get('id');
+    }
+
+    /** Teaching language of these courses (courseid => code). */
+    public static function course_languages(array $courseids): array {
+        global $DB;
+        if (!$courseids) {
+            return [];
+        }
+        $fieldid = self::language_field_id();
+        [$in, $params] = $DB->get_in_or_equal(array_map('intval', $courseids));
+        return $DB->get_records_select_menu('customfield_data', "fieldid = ? AND instanceid $in", array_merge([$fieldid], $params), '', 'instanceid, value');
+    }
+
+    public static function set_course_language_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'courseid' => new external_value(PARAM_INT, 'Course'),
+            'userid' => new external_value(PARAM_INT, 'Acting Budu user (may edit the course)'),
+            'language' => new external_value(PARAM_ALPHA, 'ISO 639-1 code, empty = not said'),
+        ]);
+    }
+
+    public static function set_course_language(int $courseid, int $userid, string $language): array {
+        $p = self::validate_parameters(self::set_course_language_parameters(), compact('courseid', 'userid', 'language'));
+        self::setup();
+        if (!has_capability('moodle/course:manageactivities', \context_course::instance($p['courseid']), $p['userid'])) {
+            throw new \moodle_exception('nopermissions', 'error', '', 'edit this course');
+        }
+        self::language_field_id();
+        $handler = \core_course\customfield\course_handler::create();
+        $handler->instance_form_save((object)['id' => $p['courseid'], 'customfield_budu_language' => \core_text::strtolower(substr($p['language'], 0, 5))]);
+        return ['id' => $p['courseid']];
+    }
+
+    public static function set_course_language_returns(): external_single_structure {
+        return new external_single_structure(['id' => new external_value(PARAM_INT, 'Course')]);
+    }
+}

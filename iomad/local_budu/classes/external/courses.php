@@ -414,6 +414,7 @@ class courses extends external_api {
             'id' => $course->id, 'fullname' => $course->fullname, 'summary' => $course->summary, 'visible' => (bool)$course->visible,
             'lessons' => count($lessons), 'timemodified' => $course->timemodified, 'canedit' => $canedit, 'lessonlist' => $lessons,
             'image' => self::image_id($course->id), 'changes' => count($rows),
+            'language' => (string)(profile::course_languages([$course->id])[$course->id] ?? ''),
         ];
     }
 
@@ -422,6 +423,7 @@ class courses extends external_api {
             'canedit' => new external_value(PARAM_BOOL, 'The user may edit'),
             'lessonlist' => new external_multiple_structure(self::lesson_structure()),
             'changes' => new external_value(PARAM_INT, 'Unpublished changes (editors; 0 for others)'),
+            'language' => new external_value(PARAM_ALPHA, 'Teaching language (ISO 639-1), empty = not said'),
         ]);
     }
 

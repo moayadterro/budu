@@ -35,6 +35,13 @@ const FUNCTIONS = [
     'local_budu_file_access',
     'local_budu_preview_lesson',
     'local_budu_save_school_photo',
+    'local_budu_get_prefs',
+    'local_budu_set_pref',
+    'local_budu_schools',
+    'local_budu_set_school_city',
+    'local_budu_complete_course',
+    'local_budu_completed_courses',
+    'local_budu_set_course_language',
     'local_budu_publish_changes',
     'local_budu_discard_changes',
     // Students, homework and grades (iomad/local_budu/classes/external/learning.php).

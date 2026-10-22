@@ -92,6 +92,48 @@ $functions = [
         'description' => 'Drop a published course’s pending changes (all, or one lesson / item).',
         'type' => 'write',
     ],
+    'local_budu_get_prefs' => [
+        'classname' => \local_budu\external\profile::class,
+        'methodname' => 'get_prefs',
+        'description' => 'Budu preferences of users (language, currency, parent step).',
+        'type' => 'read',
+    ],
+    'local_budu_set_pref' => [
+        'classname' => \local_budu\external\profile::class,
+        'methodname' => 'set_pref',
+        'description' => 'Set a Budu user preference.',
+        'type' => 'write',
+    ],
+    'local_budu_schools' => [
+        'classname' => \local_budu\external\profile::class,
+        'methodname' => 'schools',
+        'description' => 'Name, city and country of schools (IOMAD companies).',
+        'type' => 'read',
+    ],
+    'local_budu_set_school_city' => [
+        'classname' => \local_budu\external\profile::class,
+        'methodname' => 'set_school_city',
+        'description' => 'Change a school’s city.',
+        'type' => 'write',
+    ],
+    'local_budu_complete_course' => [
+        'classname' => \local_budu\external\profile::class,
+        'methodname' => 'complete_course',
+        'description' => 'Mark a course completed for a student.',
+        'type' => 'write',
+    ],
+    'local_budu_completed_courses' => [
+        'classname' => \local_budu\external\profile::class,
+        'methodname' => 'completed_courses',
+        'description' => 'Courses a student has completed.',
+        'type' => 'read',
+    ],
+    'local_budu_set_course_language' => [
+        'classname' => \local_budu\external\profile::class,
+        'methodname' => 'set_course_language',
+        'description' => 'Set a course’s teaching language.',
+        'type' => 'write',
+    ],
     'local_budu_save_school_photo' => [
         'classname' => \local_budu\external\school_page::class,
         'methodname' => 'save_school_photo',
