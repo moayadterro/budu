@@ -8,8 +8,7 @@ const LINK =
 
 /**
  * The public pages' footer, in the header's language: no border lines — the soft muted band, the
- * logo and what Budu is, Product · Company · Help, then a small floating bar (like the header's
- * island) with © and the legal pages.
+ * logo and what Budu is, Product · Company · Help, then a quiet last line with © and the legal pages.
  */
 export async function PublicFooter() {
   const t = await getT()
@@ -44,7 +43,7 @@ export async function PublicFooter() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col gap-2 rounded-2xl bg-background/70 px-5 py-3 shadow-sm ring-1 ring-foreground/8 backdrop-blur sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-12 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
           <p className="py-1.5 text-xs text-muted-foreground">{s.rights(new Date().getFullYear())}</p>
           <nav aria-label={`${l.privacy} · ${l.terms}`} className="flex flex-wrap gap-x-3">
             <Link href="/privacy" className={LINK.replace('text-sm', 'text-xs')}>

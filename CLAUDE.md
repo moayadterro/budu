@@ -398,7 +398,7 @@ Not built yet (rough priority):
 - 2026-10-22 Terms of use at `/terms` (all languages) next to the privacy policy; both use
   `widgets/legal-document` (same layout, operator details from SITE.legal). Plain rules matching how
   Budu works — have a lawyer review both before launch. Footer: logo bigger at the start edge, no
-  border lines, links with the header's hover style, © + Privacy · Terms in a small floating bar.
+  border lines, links with the header's hover style, © + Privacy · Terms as a quiet last line.
 - 2026-10-22 SEO: public pages have one address per language (owner): English at `/x`, others at
   `/<code>/x` (`/ru/pricing`, `/ar/schools/…`). Routes live in `app/(public)/[lang]/…`; the proxy
   rewrites English addresses to `/en/…` internally (`/en/…` itself redirects to `/…`) and passes the
