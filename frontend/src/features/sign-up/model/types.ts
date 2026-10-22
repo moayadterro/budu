@@ -11,7 +11,6 @@ export type SignUpInput = {
   lastName: string
   email: string
   password: string
-  confirmPassword: string
   /** school only */
   schoolName?: string
   /** school + teacher (their tenant's location) */
@@ -20,7 +19,7 @@ export type SignUpInput = {
   country?: string
 }
 
-export type SignUpError = 'invalid' | 'weakPassword' | 'mismatch' | 'emailTaken' | 'schoolTaken' | 'server'
+export type SignUpError = 'invalid' | 'weakPassword' | 'emailTaken' | 'schoolTaken' | 'server'
 
 export type SignUpState =
   | { status: 'idle' }
@@ -39,7 +38,6 @@ export function validate(input: SignUpInput): SignUpError | null {
   if (![input.firstName, input.lastName, input.email, input.password].every(filled) || !emailOk(input.email)) return 'invalid'
   if (input.kind === 'school' && (!filled(input.schoolName) || input.schoolName!.trim().length > 100)) return 'invalid'
   if (input.kind !== 'student' && (!filled(input.city) || !/^[A-Z]{2}$/.test(input.country ?? ''))) return 'invalid'
-  if (input.password !== input.confirmPassword) return 'mismatch'
   if (!passwordOk(input.password)) return 'weakPassword'
   return null
 }

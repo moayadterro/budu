@@ -61,10 +61,8 @@ export async function changePassword(_prev: ProfileState, form: FormData): Promi
   const user = await requireRole(...ROLES)
   const current = String(form.get('current') ?? '')
   const next = String(form.get('password') ?? '')
-  const confirm = String(form.get('confirmPassword') ?? '')
-  if (!current || !next || !confirm) return fail('invalid')
+  if (!current || !next) return fail('invalid')
   if (!passwordOk(next)) return fail('weak')
-  if (next !== confirm) return fail('mismatch')
   try {
     const account = await getAccount(user.email)
     if (!account.found) return fail('server')

@@ -17,7 +17,6 @@ export async function signUp(_prev: SignUpState, form: FormData): Promise<SignUp
     lastName: get('lastName') ?? '',
     email: get('email') ?? '',
     password: get('password') ?? '',
-    confirmPassword: get('confirmPassword') ?? '',
     schoolName: get('schoolName'),
     city: get('city'),
     country: get('country'),

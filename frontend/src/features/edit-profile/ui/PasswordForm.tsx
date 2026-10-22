@@ -29,9 +29,6 @@ export function PasswordForm() {
       <Field label={s.newPassword} hint={s.passwordRules}>
         <PasswordInput name="password" required autoComplete="new-password" />
       </Field>
-      <Field label={s.confirmPassword}>
-        <PasswordInput name="confirmPassword" required autoComplete="new-password" />
-      </Field>
       <div className="flex items-center gap-3">
         <SubmitButton label={s.changePassword} pendingLabel={s.changing} />
         {state.status === 'saved' && (

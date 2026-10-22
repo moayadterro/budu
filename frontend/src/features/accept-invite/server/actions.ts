@@ -7,7 +7,7 @@ import { getUserById, updateUser } from '@/entities/user/server'
 import { passwordOk } from '@/shared/lib/password'
 import { consumeToken, releaseToken } from '@/shared/server/tokens'
 
-export type AcceptState = { status: 'idle' } | { status: 'error'; error: 'invalidLink' | 'mismatch' | 'weakPassword' | 'server' }
+export type AcceptState = { status: 'idle' } | { status: 'error'; error: 'invalidLink' | 'weakPassword' | 'server' }
 
 /**
  * Invited person chooses a password → account activated in IOMAD → sign in. A parent invited by a
@@ -16,7 +16,6 @@ export type AcceptState = { status: 'idle' } | { status: 'error'; error: 'invali
 export async function acceptInvite(_prev: AcceptState, form: FormData): Promise<AcceptState> {
   const token = String(form.get('token') ?? '')
   const password = String(form.get('password') ?? '')
-  if (password !== String(form.get('confirm') ?? '')) return { status: 'error', error: 'mismatch' }
   if (!passwordOk(password)) return { status: 'error', error: 'weakPassword' }
   const userId = token ? await consumeToken('invite', token) : null
   if (!userId) return { status: 'error', error: 'invalidLink' }

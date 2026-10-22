@@ -6,7 +6,6 @@ export type ProfileError =
   | 'wrongPassword'
   | 'locked'
   | 'weak'
-  | 'mismatch'
   | 'server'
 export type ProfileState = { status: 'idle' } | { status: 'saved'; at: number } | { status: 'error'; error: ProfileError }
 

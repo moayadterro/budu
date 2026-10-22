@@ -10,7 +10,7 @@ import { Icon, IconName } from '@/shared/ui/icon'
 import { Input } from '@/shared/ui/input'
 import { NativeSelect as Select } from '@/shared/ui/native-select'
 import { PasswordInput } from '@/shared/ui/password-input'
-import { PasswordMatch, PasswordStrength } from '@/shared/ui/password-strength'
+import { PasswordStrength } from '@/shared/ui/password-strength'
 import { Appear } from '@/shared/ui/motion'
 import { cn } from '@/shared/lib/cn'
 import { useLocale, useT } from '@/shared/i18n'
@@ -34,7 +34,6 @@ export function SignUpForm() {
   const reduce = useReducedMotion()
   const [kind, setKind] = useState<AccountKind>('student')
   const [pw, setPw] = useState('')
-  const [pw2, setPw2] = useState('')
   const [state, dispatch] = useActionState(signUp, initialSignUpState)
   const [pending, start] = useTransition()
   const workspace = kind !== 'student'
@@ -127,10 +126,6 @@ export function SignUpForm() {
           <PasswordInput name="password" required minLength={8} autoComplete="new-password" value={pw} onChange={(e) => setPw(e.target.value)} />
         </Field>
         <PasswordStrength value={pw} labels={s.strength} />
-        <Field label={s.confirmPassword}>
-          <PasswordInput name="confirmPassword" required minLength={8} autoComplete="new-password" value={pw2} onChange={(e) => setPw2(e.target.value)} />
-        </Field>
-        <PasswordMatch password={pw} confirm={pw2} labels={s} />
 
         {state.status === 'error' && (
           <Appear>

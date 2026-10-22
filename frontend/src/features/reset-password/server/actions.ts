@@ -7,7 +7,7 @@ import { consumeToken, issuedRecently, releaseToken } from '@/shared/server/toke
 import { passwordOk } from '@/shared/lib/password'
 
 export type ForgotState = { status: 'idle' } | { status: 'sent' }
-export type ResetState = { status: 'idle' } | { status: 'error'; error: 'invalidLink' | 'mismatch' | 'weakPassword' | 'server' }
+export type ResetState = { status: 'idle' } | { status: 'error'; error: 'invalidLink' | 'weakPassword' | 'server' }
 
 const text = (form: FormData, k: string) => {
   const v = form.get(k)
@@ -28,11 +28,10 @@ export async function requestPasswordReset(_prev: ForgotState, form: FormData): 
   return { status: 'sent' }
 }
 
-/** New password (+ confirmation) for a valid link → IOMAD, then sign out everywhere. */
+/** A new password for a valid link → IOMAD, then sign out everywhere. */
 export async function resetPassword(_prev: ResetState, form: FormData): Promise<ResetState> {
   const token = text(form, 'token')
   const password = text(form, 'password')
-  if (password !== text(form, 'confirm')) return { status: 'error', error: 'mismatch' }
   if (!passwordOk(password)) return { status: 'error', error: 'weakPassword' }
 
   const userId = token ? await consumeToken('reset_password', token) : null

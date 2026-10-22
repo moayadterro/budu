@@ -50,15 +50,3 @@ export function PasswordStrength({ value, labels }: { value: string; labels: Str
     </div>
   )
 }
-
-/** "✓ Passwords match" / "Passwords don't match" under the confirmation field (once it has text). */
-export function PasswordMatch({ password, confirm, labels }: { password: string; confirm: string; labels: { match: string; noMatch: string } }) {
-  if (!confirm) return null
-  const ok = password === confirm
-  return (
-    <p className={cn('-mt-2 mb-4 flex items-center gap-1.5 text-xs font-medium', ok ? 'text-success' : 'text-destructive')} aria-live="polite">
-      <Icon name={ok ? 'tick' : 'close'} className="size-3.5" />
-      {ok ? labels.match : labels.noMatch}
-    </p>
-  )
-}
