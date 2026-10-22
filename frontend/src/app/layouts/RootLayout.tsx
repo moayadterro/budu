@@ -1,6 +1,5 @@
 import '../styles/globals.css'
 import type { Metadata } from 'next'
-import Script from 'next/script'
 import { dirOf, I18nProvider } from '@/shared/i18n'
 import { getLocale } from '@/shared/i18n/server'
 import { THEME_KEY } from '@/shared/theme/key'
@@ -22,7 +21,8 @@ export async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang={locale} dir={dirOf(locale)} suppressHydrationWarning>
       <head>
-        <Script id="no-flash-theme" strategy="beforeInteractive">{noFlash}</Script>
+        {/* plain server-rendered script: runs before paint; next/script re-renders it on the client and React 19 warns */}
+        <script id="no-flash-theme" dangerouslySetInnerHTML={{ __html: noFlash }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link
