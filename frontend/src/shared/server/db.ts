@@ -232,6 +232,14 @@ CREATE INDEX IF NOT EXISTS orders_student ON orders (student_id, course_id);
 CREATE UNIQUE INDEX IF NOT EXISTS orders_one_open ON orders (iomad_url, student_id, course_id) WHERE status IN ('pending', 'reported');
 
 -- "closes within a day" quiz reminders already sent (one per student and quiz)
+-- "you haven't started the exam yet" reminders a manager sent (at most one per person per hour)
+CREATE TABLE IF NOT EXISTS exam_nudges (
+  iomad_url text NOT NULL,
+  quiz_id   integer NOT NULL,
+  user_id   integer NOT NULL,
+  sent_at   timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (iomad_url, quiz_id, user_id)
+);
 CREATE TABLE IF NOT EXISTS quiz_reminders (
   iomad_url text NOT NULL,
   quiz_id   integer NOT NULL,

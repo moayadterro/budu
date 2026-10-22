@@ -98,6 +98,7 @@ export function ConfirmDialog({
   description,
   icon = 'trash',
   keepLabel,
+  tone = 'danger',
   onConfirm,
 }: {
   open: boolean
@@ -107,14 +108,20 @@ export function ConfirmDialog({
   description?: string
   icon?: IconName
   keepLabel?: string
+  /** 'primary' for a change that is fine to make but still has a consequence (e.g. a new username) */
+  tone?: 'danger' | 'primary'
   onConfirm: () => void
 }) {
   const t = useT()
+  const primary = tone === 'primary'
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent className="gap-0 overflow-hidden rounded-3xl p-0 shadow-2xl data-[size=default]:max-w-[calc(100%-2rem)] data-[size=default]:sm:max-w-sm">
         <AlertDialogHeader className="flex flex-col items-center gap-2 px-6 pt-7 pb-5 text-center sm:group-data-[size=default]/alert-dialog-content:place-items-center sm:group-data-[size=default]/alert-dialog-content:text-center">
-          <div className="mb-2 grid size-14 place-items-center rounded-full bg-destructive/10 text-destructive" aria-hidden>
+          <div
+            className={cn('mb-2 grid size-14 place-items-center rounded-full', primary ? 'bg-primary/10 text-primary' : 'bg-destructive/10 text-destructive')}
+            aria-hidden
+          >
             <Icon name={icon} className="size-7" />
           </div>
           <AlertDialogTitle className="text-lg leading-snug font-semibold text-balance">{confirmLabel}</AlertDialogTitle>
@@ -124,7 +131,7 @@ export function ConfirmDialog({
         <AlertDialogFooter className="flex-col gap-2 px-6 pb-6 sm:flex-col">
           <AlertDialogAction
             size="lg"
-            variant="danger"
+            variant={primary ? 'default' : 'danger'}
             className="h-12 w-full rounded-xl text-base"
             onClick={() => {
               onOpenChange(false)

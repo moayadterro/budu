@@ -1,12 +1,12 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { normalizeSlug, slugValid } from '@/entities/school-page'
+import { normalizeSlug, slugReserved, slugValid } from '@/entities/school-page'
 import { pageOf, setSlug, slugFree } from '@/entities/school-page/server'
 import { requireRole } from '@/entities/session/server'
 import { isSchool } from '@/entities/tenant/server'
 
-export type SlugCheck = 'ok' | 'invalid' | 'taken'
+export type SlugCheck = 'ok' | 'invalid' | 'reserved' | 'taken'
 
 async function school() {
   const user = await requireRole('manager')
@@ -18,7 +18,7 @@ async function school() {
 export async function checkSlugAction(raw: string): Promise<SlugCheck> {
   const companyId = await school()
   const slug = normalizeSlug(String(raw ?? ''))
-  if (!slugValid(slug)) return 'invalid'
+  if (!slugValid(slug)) return slugReserved(slug) ? 'reserved' : 'invalid'
   return (await slugFree(slug, companyId)) ? 'ok' : 'taken'
 }
 
@@ -29,7 +29,7 @@ export async function changeSlugAction(raw: string): Promise<AddressResult> {
   try {
     const companyId = await school()
     const slug = normalizeSlug(String(raw ?? ''))
-    if (!slugValid(slug)) return { ok: false, error: 'invalid' }
+    if (!slugValid(slug)) return { ok: false, error: slugReserved(slug) ? 'reserved' : 'invalid' }
     if (!(await slugFree(slug, companyId)) || !(await setSlug(companyId, slug))) return { ok: false, error: 'taken' }
     revalidatePath('/school', 'layout')
     revalidatePath('/[lang]/schools', 'layout')

@@ -1,5 +1,6 @@
 import 'server-only'
 // Server-only public API of the quiz entity.
+export { claimExamNudges } from './nudges'
 export {
   courseQuizzes,
   saveQuiz,

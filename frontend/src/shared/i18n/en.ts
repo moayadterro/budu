@@ -5,6 +5,11 @@ export const en = {
   currencySearch: "Search currency",
   currencyNone: "Nothing found",
   moreActions: "More actions",
+  pager: {
+    range: (from: number, to: number, total: number) => `${from}–${to} of ${total}`,
+    prev: "Previous page",
+    next: "Next page",
+  },
   datePick: "Pick a date",
   dateClear: "Clear",
   monthPrev: "Previous month",
@@ -130,7 +135,8 @@ export const en = {
 
   admin: {
     tenantsTitle: "Tenants",
-    tenantsSub: "Every school, company and independent teacher on Budu.",
+    tenantsSub:
+      "Every school, company and independent teacher on Budu.",
     total: (n: number) => `${n} tenants`,
     cols: {
       name: "Name",
@@ -561,7 +567,7 @@ export const en = {
         title: (p: Record<string, string>) =>
           `Payment not confirmed: ${p.course}`,
         body: (p: Record<string, string>) =>
-          `We couldn’t confirm your payment for “${p.course}” (order ${p.order}). Please write to billing@budu.ru.`,
+          `We couldn’t confirm your payment for “${p.course}” (order ${p.order}). Please write to billing@budu-school.ru.`,
       },
       quizPublished: {
         title: (p: Record<string, string>) =>
@@ -596,6 +602,11 @@ export const en = {
         title: (p: Record<string, string>) => `${p.school}: ${p.exam}`,
         body: (p: Record<string, string>) =>
           `You’re invited to take the exam “${p.exam}” at ${p.school}. Open it to see when it’s open and how long you have.`,
+      },
+      examNudge: {
+        title: (p: Record<string, string>) => `Reminder: ${p.exam}`,
+        body: (p: Record<string, string>) =>
+          `The exam “${p.exam}” at ${p.school} is waiting for you — you haven’t started it yet.`,
       },
       addedToSchool: {
         title: (p: Record<string, string>) => `You joined ${p.school}`,
@@ -671,11 +682,9 @@ export const en = {
     countrySearch: "Search country",
     countryPick: "Choose a country",
     address: "School username",
-    addressWarn:
-      "Changing it changes your page link. Old links will stop working.",
     addressConfirm: (name: string) => `Change the school username to @${name}?`,
     addressConfirmDesc: "Old links to your page will stop working.",
-    addressChange: "Change school username",
+    addressChange: "Change",
     gradeScale: "Grade scale",
     gradeScaleSub:
       "How grades are shown to teachers and students. Teachers always enter 0–100.",
@@ -1242,29 +1251,101 @@ export const en = {
       add: "Add",
       addCount: (n: number) => (n ? `Add ${n}` : "Add"),
       candidatesHint:
-        "One person per line: name and email. New people get an email to activate their account; people with an account just get the exam.",
-      candidatesPh:
-        "Anna Petrova, anna@example.com\nOmar Haddad, omar@example.com",
-      invite: "Invite",
-      list: (n: number) =>
-        n === 1 ? "1 person takes it" : `${n} people take it`,
+        "New people get an email to activate their account; people who already have one get the exam right away.",
+      fullName: "Full name",
+      email: "Email",
+      addRow: "Add another",
+      removeRow: "Remove row",
+      pasteHint: "or paste a list — one person per line",
+      inviteCount: (n: number) => (n > 1 ? `Invite ${n}` : "Invite"),
+      listTitle: "Invited",
+      listSummary: (people: number, invited: number, notStarted: number) =>
+        [
+          `${people} ${people === 1 ? "person" : "people"} invited`,
+          invited ? `${invited} ${invited === 1 ? "invitation hasn’t" : "invitations haven’t"} been accepted yet` : "",
+          notStarted ? `${notStarted} ${notStarted === 1 ? "person hasn’t" : "people haven’t"} started the exam yet` : "",
+        ]
+          .filter(Boolean)
+          .join(" · "),
+      filterLabel: "Show",
+      filter: { all: "All", invited: "Invitation not accepted", notStarted: "Exam not started" },
+      status: { invited: "Invitation not accepted", notStarted: "Exam not started", started: "Exam started" },
+      remindOne: "Remind about the exam",
+      remindToast: {
+        sending: "Sending…",
+        sendingOne: (name: string) => `Reminding ${name}…`,
+        done: (r: { invited: number; reminded: number; recent: number }) =>
+          [
+            r.invited ? `Invitation sent again to ${r.invited === 1 ? "1 person" : `${r.invited} people`}.` : "",
+            r.reminded ? `Reminder sent to ${r.reminded === 1 ? "1 person" : `${r.reminded} people`}.` : "",
+            r.recent ? `${r.recent === 1 ? "1 person was" : `${r.recent} people were`} already reminded in the last hour.` : "",
+          ]
+            .filter(Boolean)
+            .join(" ") || "Nobody needed a reminder.",
+      },
+      bulk: {
+        invited: "Send the invitation again to all of them",
+        notStarted: "Remind all of them",
+        send: "Send",
+        invitedTitle: (n: number) => `Send the invitation again to ${n === 1 ? "1 person" : `${n} people`}?`,
+        notStartedTitle: (n: number) => `Remind ${n === 1 ? "1 person" : `${n} people`} about the exam?`,
+        desc: "Each of them gets an email. Anyone reminded in the last hour is skipped.",
+      },
+      searchPeople: "Search by name or email",
+      noPeopleMatch: "No one matches.",
       empty: "Nobody yet — add classes, students or candidates.",
       candidate: "Candidate",
-      notActivated: "Not activated yet",
+      searchClasses: "Search classes",
+      allClasses: "All classes",
+      noClassMatch: "No matching classes.",
+      selected: (students: string) => `Selected: ${students}`,
+      emptyClass: "No students yet",
       remove: "Remove",
       failed: "Something went wrong. Try again.",
-      result: (added: number, invited: number, skipped: number) =>
+      added: (n: number) =>
+        n === 1
+          ? "Done — the exam is waiting on their home page."
+          : n
+            ? `Done — ${n} people will find the exam on their home page.`
+            : "They already have this exam.",
+      rowError: {
+        badEmail: "Check this email.",
+        needName: "This person is new — add their first and last name.",
+        admin: "This is a platform administrator account — it can’t take exams.",
+        failed: "Couldn’t create an account for this email. Check it and try again.",
+      },
+      sent: (c: { invited: number; added: number; already: number; mailFailed: number; left: number }) =>
         [
-          `Added ${added}.`,
-          invited
-            ? `Invited ${invited} new ${invited === 1 ? "person" : "people"} by email.`
-            : "",
-          skipped
-            ? `Skipped ${skipped} (check the email, and a name for new people).`
-            : "",
+          c.invited === 1 ? "Invitation sent." : c.invited ? `${c.invited} invitations sent.` : "",
+          c.added === 1
+            ? "1 person with an account got the exam."
+            : c.added
+              ? `${c.added} people with an account got the exam.`
+              : "",
+          c.already === 1 ? "1 already had it." : c.already ? `${c.already} already had it.` : "",
+          c.mailFailed === 1
+            ? "1 email didn’t go out — resend it from the list below."
+            : c.mailFailed
+              ? `${c.mailFailed} emails didn’t go out — resend them from the list below.`
+              : "",
+          c.left === 1
+            ? "Fix the highlighted row and send again."
+            : c.left
+              ? `Fix the ${c.left} highlighted rows and send again.`
+              : "",
         ]
           .filter(Boolean)
           .join(" "),
+      resend: "Resend invitation",
+      resendToast: {
+        sending: (email: string) => `Sending the invitation to ${email}…`,
+        sent: (email: string) => `Invitation sent to ${email}`,
+      },
+      resendResult: {
+        sent: "Invitation sent again",
+        recent: "Just sent — give it a minute",
+        failed: "Couldn’t send. Try again.",
+      },
     },
     results: {
       passedCount: (p: number, n: number) => `${p} of ${n} passed`,
@@ -1889,7 +1970,8 @@ export const en = {
         ok: "",
         invalid:
           "Use 3–40 latin letters, numbers or dashes (not at the start or end).",
-        taken: "This address is already taken.",
+        reserved: "This username isn’t available. Try another one.",
+        taken: "This username is already taken.",
         server: "Couldn’t save. Try again.",
       },
       city: "City",
@@ -1956,8 +2038,7 @@ export const en = {
       unpublish: "Unpublish",
       live: "Live",
       notLive: "Not published",
-      publishNote:
-        "Publishing makes this page visible to everyone on the internet.",
+      publishNote: "Publishing makes this page visible to everyone on the internet.",
       copyLink: "Copy link",
       copied: "Copied",
       changeAddress: "Change school username",
@@ -2295,10 +2376,14 @@ export const en = {
     footer:
       "Budu — learning that brings school, teachers and families together.",
     examInvite: {
-      subject: (school: string) => `${school} invites you to an exam on Budu`,
-      body: (p: { school: string; exam: string; by: string }) =>
-        `${p.by} invited you to take “${p.exam}” at ${p.school}. Choose a password to activate your Budu account — the exam will be on your home page. The link works for 7 days.`,
-      action: "Choose your password",
+      subject: (exam: string) => `You’re invited to the exam “${exam}”`,
+      title: "You’re invited to an exam",
+      body: (p: { school: string; by: string }) => `${p.by} from ${p.school} invites you to take an exam.`,
+      details: { exam: "Exam", school: "School", by: "Invited by" },
+      stepsTitle: "What’s next",
+      steps: ["Set a password — the button below.", "Open the exam on your home page and start it when you’re ready."],
+      action: "Set a password",
+      validity: "The link works for 7 days.",
     },
     parentInvite: {
       subject: (child: string) =>

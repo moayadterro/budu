@@ -26,6 +26,7 @@ const LOOK: Record<NotificationKind, Look> = {
   examResult: { icon: 'star', tone: 'success' },
   quizReminder: { icon: 'clock', tone: 'warning' },
   examInvite: { icon: 'check', tone: 'info' },
+  examNudge: { icon: 'clock', tone: 'warning' },
 }
 
 export const notificationLook = (kind: NotificationKind): Look => LOOK[kind] ?? { icon: 'bell', tone: 'muted' }

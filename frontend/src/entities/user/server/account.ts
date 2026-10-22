@@ -55,19 +55,27 @@ export const usernameFor = (email: string) => email.toLowerCase().replace(/[^a-z
  * Creates an IOMAD account for an invited person: suspended, with a random password nobody knows,
  * until they choose their own through the invite link. Returns the new user id.
  */
-export async function createInvitedUser(p: { email: string; firstname: string; lastname: string }): Promise<number> {
+export async function createInvitedUser(p: { email: string; firstname: string; middlename?: string; lastname: string }): Promise<number> {
   const { randomBytes } = await import('crypto')
-  const [user] = await iomadCall<Array<{ id: number }>>(defaultInstance(), 'core_user_create_users', {
-    users: [
-      {
-        username: usernameFor(p.email),
-        auth: 'manual',
-        password: `${randomBytes(18).toString('base64url')}aA1!`,
-        firstname: p.firstname,
-        lastname: p.lastname,
-        email: p.email,
-      },
-    ],
+  const create = (username: string) =>
+    iomadCall<Array<{ id: number }>>(defaultInstance(), 'core_user_create_users', {
+      users: [
+        {
+          username,
+          auth: 'manual',
+          password: `${randomBytes(18).toString('base64url')}aA1!`,
+          firstname: p.firstname,
+          ...(p.middlename ? { middlename: p.middlename } : {}),
+          lastname: p.lastname,
+          email: p.email,
+        },
+      ],
+    })
+  // different emails can map to the same username ("a+b@x" and "a_b@x" → "a_b@x"), which IOMAD
+  // refuses as an invalid parameter — then try once more with a short random ending
+  const [user] = await create(usernameFor(p.email)).catch((e) => {
+    if (!(e instanceof IomadError) || e.code !== 'invalidparameter') throw e
+    return create(`${usernameFor(p.email)}-${randomBytes(3).toString('hex')}`)
   })
   await updateUser(user.id, { suspended: 1 }) // until they choose a password via the invite link
   return user.id

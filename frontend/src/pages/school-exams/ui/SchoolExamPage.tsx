@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { examAudience } from '@/entities/quiz/server'
+import { examAudience, quizResults } from '@/entities/quiz/server'
 import { listClasses } from '@/entities/school-class/server'
 import { schoolPeople } from '@/entities/tenant/server'
 import { PublishQuiz, QuizQuestions, QuizSettingsForm } from '@/features/edit-quiz'
@@ -13,11 +13,14 @@ import { BackLink, managerExam } from './shared'
 export async function SchoolExamPage({ params }: { params: Promise<{ quizId: string }> }) {
   const { user, companyId, quiz } = await managerExam((await params).quizId)
   const t = await getT()
-  const [audience, classes, people] = await Promise.all([
+  const [audience, classes, people, results] = await Promise.all([
     examAudience(user.userId, companyId, quiz.id),
     listClasses(user.userId, companyId),
     schoolPeople(user.userId, companyId),
+    quizResults(user.userId, quiz.id),
   ])
+  // who has an attempt — the list only says "started"; scores live on the Results page
+  const started = new Set((results?.students ?? []).filter((s) => s.state !== 'notstarted').map((s) => s.id))
   const given = new Set(audience.map((a) => a.id))
   const students = people.filter((p) => p.role === 'student' && !p.pending && !given.has(p.id))
   return (
@@ -42,7 +45,7 @@ export async function SchoolExamPage({ params }: { params: Promise<{ quizId: str
             <CardContent>
               <AudienceEditor
                 quizId={quiz.id}
-                audience={audience}
+                audience={audience.map((a) => ({ ...a, started: started.has(a.id) }))}
                 classes={classes.map((k) => ({ id: k.id, name: k.name, studentCount: k.studentCount }))}
                 students={students.map((p) => ({ id: p.id, name: p.name, email: p.email, pictureId: p.pictureId }))}
               />

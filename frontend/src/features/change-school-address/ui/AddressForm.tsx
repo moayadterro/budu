@@ -12,8 +12,8 @@ import { changeSlugAction, checkSlugAction, type SlugCheck } from '../server/act
 
 /**
  * The school's username (Settings) — its page lives at /schools/<username>. Made from the school's
- * name; changing it breaks every link people saved or shared, so a small line always says so and
- * saving asks first.
+ * name; changing it breaks every link people saved or shared, so saving asks first (the alert says
+ * old links stop working).
  */
 export function AddressForm({ slug: current, origin }: { slug: string; origin: string }) {
   const t = useT()
@@ -35,7 +35,6 @@ export function AddressForm({ slug: current, origin }: { slug: string; origin: s
     return () => clearTimeout(id)
   }, [value, changed])
 
-  const host = origin.replace(/^https?:\/\//, '')
   const save = () =>
     start(async () => {
       const r = await changeSlugAction(value)
@@ -61,7 +60,8 @@ export function AddressForm({ slug: current, origin }: { slug: string; origin: s
           value={slug}
           onChange={(ev) => {
             setResult(null)
-            setSlug(ev.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))
+            // "Budu Academy" → "budu-academy" (spaces become dashes, other symbols are dropped)
+            setSlug(ev.target.value.toLowerCase().replace(/[\s_]+/g, '-').replace(/[^a-z0-9-]/g, ''))
           }}
           maxLength={40}
           aria-label={s.address}
@@ -80,7 +80,7 @@ export function AddressForm({ slug: current, origin }: { slug: string; origin: s
       {/* the saved address opens the page; a new one being typed is only a preview (no page there yet) */}
       {changed ? (
         <p dir="ltr" className="truncate text-xs text-muted-foreground">
-          {host}/schools/<span className="font-medium text-foreground">{value || '…'}</span>
+          {origin}/schools/<span className="font-medium text-foreground">{value || '…'}</span>
         </p>
       ) : (
         <a
@@ -91,7 +91,7 @@ export function AddressForm({ slug: current, origin }: { slug: string; origin: s
           className="group flex w-fit max-w-full items-center gap-1 truncate text-xs text-muted-foreground transition-colors hover:text-primary"
         >
           <span className="truncate">
-            {host}/schools/<span className="font-medium text-foreground group-hover:text-primary">{current}</span>
+            {origin}/schools/<span className="font-medium text-foreground group-hover:text-primary">{current}</span>
           </span>
           <Icon name="external" className="size-3 flex-none" />
         </a>
@@ -102,12 +102,6 @@ export function AddressForm({ slug: current, origin }: { slug: string; origin: s
         </p>
       )}
       {result && result !== 'saved' && <p className="text-xs font-medium text-destructive">{result === 'server' ? e.failed : e.slugErrors[result]}</p>}
-      <div className="flex items-center gap-2.5 rounded-xl bg-warning/10 p-2 pe-3">
-        <span className="grid size-7 flex-none place-items-center rounded-lg bg-warning/15 text-warning" aria-hidden>
-          <Icon name="alert" className="size-4" />
-        </span>
-        <p className="text-xs leading-relaxed text-foreground/80">{s.addressWarn}</p>
-      </div>
       <div className="mt-1 flex items-center gap-3">
         <Button type="button" disabled={!changed || check !== 'ok' || pending} onClick={() => setConfirming(true)}>
           {s.addressChange}
@@ -118,6 +112,7 @@ export function AddressForm({ slug: current, origin }: { slug: string; origin: s
         open={confirming}
         onOpenChange={setConfirming}
         icon="link"
+        tone="primary"
         label={s.addressChange}
         confirmLabel={s.addressConfirm(value)}
         description={s.addressConfirmDesc}

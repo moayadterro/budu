@@ -22,6 +22,11 @@ export const ar: typeof en = {
   currencySearch: "ابحث عن عملة",
   currencyNone: "لا توجد نتائج",
   moreActions: "إجراءات أخرى",
+  pager: {
+    range: (from: number, to: number, total: number) => `${from}–${to} من ${total}`,
+    prev: "الصفحة السابقة",
+    next: "الصفحة التالية",
+  },
   datePick: "اختر تاريخًا",
   dateClear: "مسح",
   monthPrev: "الشهر السابق",
@@ -146,7 +151,8 @@ export const ar: typeof en = {
 
   admin: {
     tenantsTitle: "المؤسسات",
-    tenantsSub: "كل المدارس والشركات والمعلمين المستقلين على Budu.",
+    tenantsSub:
+      "كل المدارس والشركات والمعلمين المستقلين على Budu.",
     total: (n: number) =>
       plural(n, "مؤسسة واحدة", "مؤسستان", "مؤسسات", "مؤسسة"),
     cols: {
@@ -565,7 +571,7 @@ export const ar: typeof en = {
       orderRejected: {
         title: (p: Record<string, string>) => `لم يتم تأكيد الدفع: ${p.course}`,
         body: (p: Record<string, string>) =>
-          `لم نتمكن من تأكيد دفعتك لمقرر «${p.course}» (الطلب ${p.order}). يرجى مراسلة billing@budu.ru.`,
+          `لم نتمكن من تأكيد دفعتك لمقرر «${p.course}» (الطلب ${p.order}). يرجى مراسلة billing@budu-school.ru.`,
       },
       quizPublished: {
         title: (p: Record<string, string>) =>
@@ -600,6 +606,11 @@ export const ar: typeof en = {
         title: (p: Record<string, string>) => `${p.school}: ${p.exam}`,
         body: (p: Record<string, string>) =>
           `أنت مدعو لأداء امتحان «${p.exam}» في ${p.school}. افتحه لمعرفة موعده والوقت المتاح.`,
+      },
+      examNudge: {
+        title: (p: Record<string, string>) => `تذكير: ${p.exam}`,
+        body: (p: Record<string, string>) =>
+          `امتحان «${p.exam}» في ${p.school} بانتظارك — لم تبدأه بعد.`,
       },
       addedToSchool: {
         title: (p: Record<string, string>) => `انضممت إلى ${p.school}`,
@@ -674,11 +685,9 @@ export const ar: typeof en = {
     countrySearch: "ابحث عن دولة",
     countryPick: "اختر دولة",
     address: "اسم مستخدم المدرسة",
-    addressWarn:
-      "عند تغييره يتغيّر رابط صفحتك، وتتوقف الروابط القديمة عن العمل.",
     addressConfirm: (name: string) => `تغيير اسم مستخدم المدرسة إلى @${name}؟`,
     addressConfirmDesc: "ستتوقف الروابط القديمة لصفحتك عن العمل.",
-    addressChange: "تغيير اسم مستخدم المدرسة",
+    addressChange: "تغيير",
     gradeScale: "سُلّم الدرجات",
     gradeScaleSub:
       "كيف تظهر الدرجات للمعلمين والطلاب. يُدخل المعلمون الدرجة دائمًا من 0 إلى 100.",
@@ -1226,25 +1235,101 @@ export const ar: typeof en = {
       add: "إضافة",
       addCount: (n: number) => (n ? `إضافة (${n})` : "إضافة"),
       candidatesHint:
-        "شخص واحد في كل سطر: الاسم والبريد. يصل الأشخاص الجدد بريد لتفعيل حساباتهم؛ ومن لديه حساب يحصل على الامتحان مباشرة.",
-      candidatesPh: "آنا بتروفا، anna@example.com\nعمر حداد، omar@example.com",
-      invite: "دعوة",
-      list: (n: number) => `يؤديه ${n}`,
+        "يتلقى الأشخاص الجدد بريدًا لتفعيل حساباتهم؛ ومن لديه حساب يحصل على الامتحان فورًا.",
+      fullName: "الاسم الكامل",
+      email: "البريد الإلكتروني",
+      addRow: "إضافة شخص آخر",
+      removeRow: "إزالة السطر",
+      pasteHint: "أو الصق قائمة — شخص في كل سطر",
+      inviteCount: (n: number) => (n > 1 ? `دعوة ${n}` : "دعوة"),
+      listTitle: "المدعوون",
+      listSummary: (people: number, invited: number, notStarted: number) =>
+        [
+          `دُعي ${plural(people, "شخص واحد", "شخصان", "أشخاص", "شخصًا")}`,
+          invited ? `${plural(invited, "دعوة واحدة", "دعوتان", "دعوات", "دعوة")} لم تُقبل بعد` : "",
+          notStarted ? `لم يبدأ ${plural(notStarted, "شخص واحد", "شخصان", "أشخاص", "شخصًا")} الامتحان بعد` : "",
+        ]
+          .filter(Boolean)
+          .join(" · "),
+      filterLabel: "عرض",
+      filter: { all: "الكل", invited: "لم تُقبل الدعوة", notStarted: "لم يبدأ الامتحان" },
+      status: { invited: "لم تُقبل الدعوة", notStarted: "لم يبدأ الامتحان", started: "بدأ الامتحان" },
+      remindOne: "تذكير بالامتحان",
+      remindToast: {
+        sending: "جارٍ الإرسال…",
+        sendingOne: (name: string) => `جارٍ تذكير ${name}…`,
+        done: (r: { invited: number; reminded: number; recent: number }) =>
+          [
+            r.invited ? `أُعيد إرسال الدعوة إلى ${plural(r.invited, "شخص واحد", "شخصين", "أشخاص", "شخصًا")}.` : "",
+            r.reminded ? `أُرسل التذكير إلى ${plural(r.reminded, "شخص واحد", "شخصين", "أشخاص", "شخصًا")}.` : "",
+            r.recent ? `سبق تذكير ${plural(r.recent, "شخص واحد", "شخصين", "أشخاص", "شخصًا")} خلال الساعة الأخيرة.` : "",
+          ]
+            .filter(Boolean)
+            .join(" ") || "لا أحد يحتاج إلى تذكير.",
+      },
+      bulk: {
+        invited: "إعادة إرسال الدعوة للجميع",
+        notStarted: "تذكير الجميع",
+        send: "إرسال",
+        invitedTitle: (n: number) => `إعادة إرسال الدعوة إلى ${plural(n, "شخص واحد", "شخصين", "أشخاص", "شخصًا")}؟`,
+        notStartedTitle: (n: number) => `تذكير ${plural(n, "شخص واحد", "شخصين", "أشخاص", "شخصًا")} بالامتحان؟`,
+        desc: "سيتلقى كل منهم بريدًا. من ذُكّر خلال الساعة الأخيرة لن يُرسل إليه.",
+      },
+      searchPeople: "ابحث بالاسم أو البريد",
+      noPeopleMatch: "لا أحد مطابق.",
       empty: "لا أحد بعد — أضف صفوفًا أو طلابًا أو مرشحين.",
       candidate: "مرشح",
-      notActivated: "لم يُفعَّل بعد",
+      searchClasses: "البحث عن صف",
+      allClasses: "كل الصفوف",
+      noClassMatch: "لا صفوف مطابقة.",
+      selected: (students: string) => `المحدّد: ${students}`,
+      emptyClass: "لا طلاب بعد",
       remove: "إزالة",
       failed: "حدث خطأ ما. حاول مرة أخرى.",
-      result: (added: number, invited: number, skipped: number) =>
+      added: (n: number) =>
+        n === 1
+          ? "تمّ — الامتحان بانتظاره في صفحته الرئيسية."
+          : n
+            ? `تمّت إضافة ${plural(n, "شخص واحد", "شخصين", "أشخاص", "شخصًا")} — سيجدون الامتحان في صفحتهم الرئيسية.`
+            : "لديهم هذا الامتحان بالفعل.",
+      rowError: {
+        badEmail: "تحقّق من البريد الإلكتروني.",
+        needName: "هذا شخص جديد — أضف اسمه الأول واسم العائلة.",
+        admin: "هذا حساب مدير المنصة — لا يمكنه أداء الامتحانات.",
+        failed: "تعذّر إنشاء حساب لهذا البريد. تحقّق منه وحاول مرة أخرى.",
+      },
+      sent: (c: { invited: number; added: number; already: number; mailFailed: number; left: number }) =>
         [
-          `أُضيف ${added}.`,
-          invited ? `دُعي ${invited} عبر البريد.` : "",
-          skipped
-            ? `تم تخطي ${skipped} (تحقق من البريد واسم الأشخاص الجدد).`
+          c.invited === 1
+            ? "أُرسلت الدعوة."
+            : c.invited
+              ? `أُرسلت ${plural(c.invited, "دعوة واحدة", "دعوتان", "دعوات", "دعوة")}.`
+              : "",
+          c.added
+            ? `حصل ${plural(c.added, "شخص واحد", "شخصان", "أشخاص", "شخصًا")} لديهم حساب على الامتحان.`
             : "",
+          c.already ? `كان الامتحان لدى ${plural(c.already, "شخص واحد", "شخصين", "أشخاص", "شخصًا")} من قبل.` : "",
+          c.mailFailed
+            ? `لم يُرسل ${plural(c.mailFailed, "بريد واحد", "بريدان", "رسائل", "رسالة")} — أعد الإرسال من القائمة أدناه.`
+            : "",
+          c.left === 1
+            ? "صحّح السطر المحدّد وأرسل مجددًا."
+            : c.left
+              ? `صحّح الأسطر المحدّدة (${c.left}) وأرسل مجددًا.`
+              : "",
         ]
           .filter(Boolean)
           .join(" "),
+      resend: "إعادة إرسال الدعوة",
+      resendToast: {
+        sending: (email: string) => `جارٍ إرسال الدعوة إلى ${email}…`,
+        sent: (email: string) => `أُرسلت الدعوة إلى ${email}`,
+      },
+      resendResult: {
+        sent: "أُعيد إرسال الدعوة",
+        recent: "أُرسلت للتو — انتظر دقيقة",
+        failed: "تعذّر الإرسال. حاول مرة أخرى.",
+      },
     },
     results: {
       passedCount: (p: number, n: number) => `نجح ${p} من ${n}`,
@@ -1858,7 +1943,8 @@ export const ar: typeof en = {
         ok: "",
         invalid:
           "استخدم 3–40 من الأحرف اللاتينية أو الأرقام أو الشرطات (ليس في البداية أو النهاية).",
-        taken: "هذا العنوان مستخدم بالفعل.",
+        reserved: "اسم المستخدم هذا غير متاح. جرّب اسمًا آخر.",
+        taken: "اسم المستخدم هذا مستخدم بالفعل.",
         server: "تعذّر الحفظ. حاول مرة أخرى.",
       },
       city: "المدينة",
@@ -2241,10 +2327,14 @@ export const ar: typeof en = {
     fallback: "إن لم يعمل الزر، انسخ هذا الرابط إلى المتصفح:",
     footer: "Budu — تعلّم يجمع المدرسة والمعلمين والعائلات.",
     examInvite: {
-      subject: (school: string) => `${school} يدعوك إلى امتحان على Budu`,
-      body: (p: { school: string; exam: string; by: string }) =>
-        `دعاك ${p.by} لأداء «${p.exam}» في ${p.school}. اختر كلمة مرور لتفعيل حسابك في Budu — سيظهر الامتحان في صفحتك الرئيسية. الرابط صالح لمدة 7 أيام.`,
-      action: "اختر كلمة المرور",
+      subject: (exam: string) => `دعوة إلى امتحان «${exam}»`,
+      title: "أنت مدعو إلى امتحان",
+      body: (p: { school: string; by: string }) => `يدعوك ${p.by} من «${p.school}» إلى أداء امتحان.`,
+      details: { exam: "الامتحان", school: "المدرسة", by: "صاحب الدعوة" },
+      stepsTitle: "الخطوات التالية",
+      steps: ["اختر كلمة مرور — الزر أدناه.", "افتح الامتحان من صفحتك الرئيسية وابدأه عندما تكون مستعدًا."],
+      action: "اختيار كلمة المرور",
+      validity: "الرابط صالح لمدة 7 أيام.",
     },
     parentInvite: {
       subject: (child: string) => `${child} يدعوك إلى Budu كولي أمر`,

@@ -16,6 +16,11 @@ export const ru: typeof en = {
   currencySearch: "Найти валюту",
   currencyNone: "Ничего не найдено",
   moreActions: "Ещё действия",
+  pager: {
+    range: (from: number, to: number, total: number) => `${from}–${to} из ${total}`,
+    prev: "Предыдущая страница",
+    next: "Следующая страница",
+  },
   datePick: "Выберите дату",
   dateClear: "Очистить",
   monthPrev: "Предыдущий месяц",
@@ -141,7 +146,8 @@ export const ru: typeof en = {
 
   admin: {
     tenantsTitle: "Организации",
-    tenantsSub: "Все школы, компании и независимые учителя на Budu.",
+    tenantsSub:
+      "Все школы, компании и независимые учителя на Budu.",
     total: (n: number) =>
       `${n} ${plural(n, "организация", "организации", "организаций")}`,
     cols: {
@@ -580,7 +586,7 @@ export const ru: typeof en = {
         title: (p: Record<string, string>) =>
           `Оплата не подтверждена: ${p.course}`,
         body: (p: Record<string, string>) =>
-          `Не удалось подтвердить оплату курса «${p.course}» (заказ ${p.order}). Напишите на billing@budu.ru.`,
+          `Не удалось подтвердить оплату курса «${p.course}» (заказ ${p.order}). Напишите на billing@budu-school.ru.`,
       },
       quizPublished: {
         title: (p: Record<string, string>) =>
@@ -616,6 +622,11 @@ export const ru: typeof en = {
         title: (p: Record<string, string>) => `${p.school}: ${p.exam}`,
         body: (p: Record<string, string>) =>
           `Вас пригласили сдать экзамен «${p.exam}» в «${p.school}». Откройте, чтобы узнать, когда он открыт и сколько времени у вас будет.`,
+      },
+      examNudge: {
+        title: (p: Record<string, string>) => `Напоминание: ${p.exam}`,
+        body: (p: Record<string, string>) =>
+          `Экзамен «${p.exam}» в ${p.school} ждёт вас — вы ещё не начали его.`,
       },
       addedToSchool: {
         title: (p: Record<string, string>) => `Вы в школе «${p.school}»`,
@@ -690,11 +701,9 @@ export const ru: typeof en = {
     countrySearch: "Поиск страны",
     countryPick: "Выберите страну",
     address: "Юзернейм школы",
-    addressWarn:
-      "При изменении меняется ссылка на страницу. Старые ссылки перестанут работать.",
     addressConfirm: (name: string) => `Изменить юзернейм школы на @${name}?`,
     addressConfirmDesc: "Старые ссылки на вашу страницу перестанут работать.",
-    addressChange: "Изменить юзернейм школы",
+    addressChange: "Изменить",
     gradeScale: "Шкала оценок",
     gradeScaleSub:
       "Как оценки показываются учителям и ученикам. Учителя всегда ставят 0–100.",
@@ -1256,26 +1265,105 @@ export const ru: typeof en = {
       add: "Добавить",
       addCount: (n: number) => (n ? `Добавить (${n})` : "Добавить"),
       candidatesHint:
-        "По одному человеку в строке: имя и email. Новые люди получат письмо для активации аккаунта; у кого аккаунт есть — просто получат экзамен.",
-      candidatesPh:
-        "Анна Петрова, anna@example.com\nОмар Хаддад, omar@example.com",
-      invite: "Пригласить",
-      list: (n: number) => `Сдают: ${n}`,
-      empty: "Пока никого — добавьте классы, учеников или кандидатов.",
-      candidate: "Кандидат",
-      notActivated: "Ещё не активирован",
-      remove: "Убрать",
-      failed: "Что-то пошло не так. Попробуйте ещё раз.",
-      result: (added: number, invited: number, skipped: number) =>
+        "Новые люди получат письмо для активации аккаунта; у кого аккаунт уже есть — получат экзамен сразу.",
+      fullName: "Полное имя",
+      email: "Email",
+      addRow: "Добавить ещё",
+      removeRow: "Убрать строку",
+      pasteHint: "или вставьте список — по человеку в строке",
+      inviteCount: (n: number) => (n > 1 ? `Пригласить ${n}` : "Пригласить"),
+      listTitle: "Приглашённые",
+      listSummary: (people: number, invited: number, notStarted: number) =>
         [
-          `Добавлено: ${added}.`,
-          invited ? `Приглашено по email: ${invited}.` : "",
-          skipped
-            ? `Пропущено: ${skipped} (проверьте email и имя для новых людей).`
+          `${people} ${plural(people, "человек приглашён", "человека приглашены", "человек приглашены")}`,
+          invited
+            ? `${invited} ${plural(invited, "приглашение", "приглашения", "приглашений")} ещё не ${invited % 10 === 1 && invited % 100 !== 11 ? "принято" : "приняты"}`
+            : "",
+          notStarted
+            ? `${notStarted} ${plural(notStarted, "человек", "человека", "человек")} ещё не ${notStarted % 10 === 1 && notStarted % 100 !== 11 ? "начал" : "начали"} экзамен`
             : "",
         ]
           .filter(Boolean)
+          .join(" · "),
+      filterLabel: "Показать",
+      filter: { all: "Все", invited: "Приглашение не принято", notStarted: "Экзамен не начат" },
+      status: { invited: "Приглашение не принято", notStarted: "Экзамен не начат", started: "Экзамен начат" },
+      remindOne: "Напомнить об экзамене",
+      remindToast: {
+        sending: "Отправляем…",
+        sendingOne: (name: string) => `Напоминаем: ${name}…`,
+        done: (r: { invited: number; reminded: number; recent: number }) =>
+          [
+            r.invited ? `Приглашение отправлено ещё раз: ${r.invited} ${plural(r.invited, "человек", "человека", "человек")}.` : "",
+            r.reminded ? `Напоминание отправлено: ${r.reminded} ${plural(r.reminded, "человек", "человека", "человек")}.` : "",
+            r.recent ? `${r.recent} ${plural(r.recent, "человеку", "людям", "людям")} уже напоминали в последний час.` : "",
+          ]
+            .filter(Boolean)
+            .join(" ") || "Напоминать никому не нужно.",
+      },
+      bulk: {
+        invited: "Отправить приглашение ещё раз всем",
+        notStarted: "Напомнить всем",
+        send: "Отправить",
+        invitedTitle: (n: number) => `Отправить приглашение ещё раз — ${n} ${plural(n, "человек", "человека", "человек")}?`,
+        notStartedTitle: (n: number) => `Напомнить об экзамене — ${n} ${plural(n, "человек", "человека", "человек")}?`,
+        desc: "Каждый получит письмо. Тем, кому уже напоминали в последний час, не отправим.",
+      },
+      searchPeople: "Поиск по имени или email",
+      noPeopleMatch: "Никого не нашли.",
+      empty: "Пока никого — добавьте классы, учеников или кандидатов.",
+      candidate: "Кандидат",
+      searchClasses: "Поиск класса",
+      allClasses: "Все классы",
+      noClassMatch: "Таких классов нет.",
+      selected: (students: string) => `Выбрано: ${students}`,
+      emptyClass: "Пока нет учеников",
+      remove: "Убрать",
+      failed: "Что-то пошло не так. Попробуйте ещё раз.",
+      added: (n: number) =>
+        n === 1
+          ? "Готово — экзамен уже ждёт на главной странице."
+          : n
+            ? `Готово — ${n} ${plural(n, "человек", "человека", "человек")} увидят экзамен на главной странице.`
+            : "Этот экзамен у них уже есть.",
+      rowError: {
+        badEmail: "Проверьте email.",
+        needName: "Это новый человек — укажите имя и фамилию.",
+        admin: "Это аккаунт администратора платформы — он не может сдавать экзамены.",
+        failed: "Не удалось создать аккаунт для этого email. Проверьте его и попробуйте ещё раз.",
+      },
+      sent: (c: { invited: number; added: number; already: number; mailFailed: number; left: number }) =>
+        [
+          c.invited === 1
+            ? "Приглашение отправлено."
+            : c.invited
+              ? `Отправили ${c.invited} ${plural(c.invited, "приглашение", "приглашения", "приглашений")}.`
+              : "",
+          c.added
+            ? `${c.added} ${plural(c.added, "человек", "человека", "человек")} с аккаунтом ${c.added === 1 ? "получил" : "получили"} экзамен.`
+            : "",
+          c.already ? `У ${c.already} ${plural(c.already, "человека", "человек", "человек")} он уже был.` : "",
+          c.mailFailed
+            ? `${c.mailFailed} ${plural(c.mailFailed, "письмо не ушло", "письма не ушли", "писем не ушли")} — отправьте ещё раз из списка ниже.`
+            : "",
+          c.left === 1
+            ? "Исправьте отмеченную строку и отправьте снова."
+            : c.left
+              ? `Исправьте отмеченные строки (${c.left}) и отправьте снова.`
+              : "",
+        ]
+          .filter(Boolean)
           .join(" "),
+      resend: "Отправить ещё раз",
+      resendToast: {
+        sending: (email: string) => `Отправляем приглашение на ${email}…`,
+        sent: (email: string) => `Приглашение отправлено на ${email}`,
+      },
+      resendResult: {
+        sent: "Приглашение отправлено ещё раз",
+        recent: "Только что отправили — подождите минуту",
+        failed: "Не удалось отправить. Попробуйте ещё раз.",
+      },
     },
     results: {
       passedCount: (p: number, n: number) => `сдали ${p} из ${n}`,
@@ -1899,7 +1987,8 @@ export const ru: typeof en = {
         ok: "",
         invalid:
           "Используйте 3–40 латинских букв, цифр или дефисов (не в начале и не в конце).",
-        taken: "Этот адрес уже занят.",
+        reserved: "Этот юзернейм недоступен. Попробуйте другой.",
+        taken: "Этот юзернейм уже занят.",
         server: "Не удалось сохранить. Попробуйте ещё раз.",
       },
       city: "Город",
@@ -1968,8 +2057,7 @@ export const ru: typeof en = {
       unpublish: "Снять с публикации",
       live: "Опубликована",
       notLive: "Не опубликована",
-      publishNote:
-        "После публикации страницу увидит любой человек в интернете.",
+      publishNote: "После публикации страницу увидит любой человек в интернете.",
       copyLink: "Копировать ссылку",
       copied: "Скопировано",
       changeAddress: "Изменить юзернейм школы",
@@ -2302,11 +2390,14 @@ export const ru: typeof en = {
     fallback: "Если кнопка не работает, скопируйте ссылку в браузер:",
     footer: "Budu — обучение, которое объединяет школу, учителей и семьи.",
     examInvite: {
-      subject: (school: string) =>
-        `«${school}» приглашает вас на экзамен в Budu`,
-      body: (p: { school: string; exam: string; by: string }) =>
-        `${p.by} приглашает вас сдать «${p.exam}» в «${p.school}». Задайте пароль, чтобы активировать аккаунт Budu — экзамен будет на главной странице. Ссылка действует 7 дней.`,
+      subject: (exam: string) => `Приглашение на экзамен «${exam}»`,
+      title: "Вас пригласили на экзамен",
+      body: (p: { school: string; by: string }) => `${p.by} из «${p.school}» приглашает вас сдать экзамен.`,
+      details: { exam: "Экзамен", school: "Школа", by: "Кто пригласил" },
+      stepsTitle: "Что дальше",
+      steps: ["Задайте пароль — кнопка ниже.", "Откройте экзамен на главной странице и начните, когда будете готовы."],
       action: "Задать пароль",
+      validity: "Ссылка действует 7 дней.",
     },
     parentInvite: {
       subject: (child: string) => `${child} приглашает вас в Budu как родителя`,

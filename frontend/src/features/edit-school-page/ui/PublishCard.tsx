@@ -21,7 +21,7 @@ export function PublishCard({ slug, published, origin }: { slug: string; publish
   const [copied, setCopied] = useState(false)
   const [pending, start] = useTransition()
   const path = `/schools/${slug}`
-  const shown = `${origin.replace(/^https?:\/\//, '')}${path}`
+  const shown = `${origin}${path}`
 
   const toggle = (next: boolean) =>
     start(async () => {

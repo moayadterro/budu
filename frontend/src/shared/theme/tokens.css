@@ -58,6 +58,7 @@
 
   /* ---- Budu extras ---- */
   --success: oklch(0.596 0.145 163.225);
+  --success-foreground: oklch(0.985 0 0); /* text on a solid green surface (success toast) */
   --warning: oklch(0.666 0.157 58.318);
   --info: oklch(0.546 0.142 251.7);
   --highlight: oklch(0.769 0.165 70.08); /* amber call-to-action on the brand gradient */
@@ -121,6 +122,7 @@
   --sidebar-ring: oklch(0.556 0 0);
 
   --success: oklch(0.696 0.17 162.48);
+  --success-foreground: oklch(0.21 0.04 163); /* dark text: white on this lighter green is too faint */
   --warning: oklch(0.769 0.165 70.08);
   --info: oklch(0.685 0.169 237.323);
   --highlight: oklch(0.769 0.165 70.08);
@@ -177,6 +179,7 @@
 
   /* Budu extras (tints: use opacity, e.g. bg-success/10) */
   --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
   --color-info: var(--info);
   --color-highlight: var(--highlight);
