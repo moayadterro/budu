@@ -21,8 +21,11 @@ export class IomadError extends Error {
   constructor(
     public code: string,
     message: string,
+    /** for the error log: which IOMAD function, its exception class and debug text (never shown to users) */
+    public details: Record<string, unknown> = {},
   ) {
     super(message)
+    this.name = 'IomadError'
   }
 }
 
@@ -51,7 +54,7 @@ export async function iomadCall<T>(inst: IomadInstance, fn: string, params: Reco
 
   for (let attempt = 0; ; attempt++) {
     const res = await fetch(`${inst.url}/webservice/rest/server.php`, { method: 'POST', body, cache: 'no-store' })
-    if (!res.ok) throw new IomadError('http', `IOMAD ${fn}: HTTP ${res.status}`)
+    if (!res.ok) throw new IomadError('http', `IOMAD ${fn}: HTTP ${res.status}`, { function: fn, status: res.status })
 
     const data = await res.json()
     // Moodle reports errors as HTTP 200 with an exception payload
@@ -60,7 +63,12 @@ export async function iomadCall<T>(inst: IomadInstance, fn: string, params: Reco
         await new Promise((r) => setTimeout(r, 150 * (attempt + 1)))
         continue
       }
-      throw new IomadError(data.errorcode ?? 'exception', `IOMAD ${fn}: ${data.message}`)
+      throw new IomadError(data.errorcode ?? 'exception', `IOMAD ${fn}: ${data.message}`, {
+        function: fn,
+        errorcode: data.errorcode,
+        exception: data.exception,
+        ...(data.debuginfo ? { debuginfo: String(data.debuginfo).slice(0, 2000) } : {}),
+      })
     }
     return data as T
   }

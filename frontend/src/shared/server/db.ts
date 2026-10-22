@@ -232,6 +232,46 @@ CREATE INDEX IF NOT EXISTS orders_student ON orders (student_id, course_id);
 CREATE UNIQUE INDEX IF NOT EXISTS orders_one_open ON orders (iomad_url, student_id, course_id) WHERE status IN ('pending', 'reported');
 
 -- "closes within a day" quiz reminders already sent (one per student and quiz)
+-- activity log (Admin → Activity): who did what — the real person, not IOMAD's integration account
+CREATE TABLE IF NOT EXISTS audit_log (
+  id         bigserial PRIMARY KEY,
+  at         timestamptz NOT NULL DEFAULT now(),
+  user_id    integer,
+  user_name  text,
+  role       text,
+  company_id integer,
+  action     text NOT NULL,
+  target     text,
+  details    jsonb NOT NULL DEFAULT '{}',
+  ok         boolean NOT NULL DEFAULT true,
+  ip_hash    text
+);
+CREATE INDEX IF NOT EXISTS audit_log_at ON audit_log (at DESC);
+CREATE INDEX IF NOT EXISTS audit_log_user ON audit_log (user_id, at DESC);
+CREATE INDEX IF NOT EXISTS audit_log_company ON audit_log (company_id, at DESC);
+CREATE INDEX IF NOT EXISTS audit_log_action ON audit_log (action, at DESC);
+-- errors (Admin → Errors), one row per distinct error with a counter; emailed in production
+CREATE TABLE IF NOT EXISTS error_log (
+  fingerprint text PRIMARY KEY,
+  source      text NOT NULL,
+  place       text NOT NULL,
+  message     text NOT NULL,
+  stack       text,
+  page        text,
+  user_id     integer,
+  company_id  integer,
+  count       integer NOT NULL DEFAULT 1,
+  since_email integer NOT NULL DEFAULT 1,
+  first_at    timestamptz NOT NULL DEFAULT now(),
+  last_at     timestamptz NOT NULL DEFAULT now(),
+  emailed_at  timestamptz
+);
+CREATE INDEX IF NOT EXISTS error_log_last ON error_log (last_at DESC);
+-- the latest occurrence's context: who (name/role), their browser, request kind, IOMAD's own reason …
+ALTER TABLE error_log ADD COLUMN IF NOT EXISTS user_name text;
+ALTER TABLE error_log ADD COLUMN IF NOT EXISTS user_role text;
+ALTER TABLE error_log ADD COLUMN IF NOT EXISTS user_agent text;
+ALTER TABLE error_log ADD COLUMN IF NOT EXISTS details jsonb NOT NULL DEFAULT '{}';
 -- "you haven't started the exam yet" reminders a manager sent (at most one per person per hour)
 CREATE TABLE IF NOT EXISTS exam_nudges (
   iomad_url text NOT NULL,

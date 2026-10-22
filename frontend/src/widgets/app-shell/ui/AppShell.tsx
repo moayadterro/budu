@@ -7,6 +7,7 @@ import { getSession } from '@/entities/session/server'
 import { isSchool } from '@/entities/tenant/server'
 import { runQuizReminders } from '@/features/remind-quizzes/server'
 import { cleanUpUploads } from '@/features/upload-material/server'
+import { pruneLogs } from '@/shared/server/audit'
 import { PageTransition } from '@/shared/ui/motion'
 import { SidebarInset, SidebarProvider } from '@/shared/ui/sidebar'
 import { AppSidebar } from './AppSidebar'
@@ -18,6 +19,7 @@ export async function AppShell({ children }: { children: ReactNode }) {
   if (!user) redirect('/login')
   after(runQuizReminders) // background chores ride on page loads (throttled inside)
   after(cleanUpUploads)
+  after(pruneLogs)
   const [items, unread, inSchool] = await Promise.all([
     listNotifications(user.userId),
     unreadCount(user.userId),

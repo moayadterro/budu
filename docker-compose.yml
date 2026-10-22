@@ -35,6 +35,7 @@ services:
       APP_URL: ${APP_URL:-http://localhost:3000}
       MAIL_FROM: ${MAIL_FROM:?set in .env}
       CONTACT_EMAIL: ${CONTACT_EMAIL:-}   # where the public Contact form sends (empty = only stored)
+      ALERT_EMAIL: ${ALERT_EMAIL:-}       # production errors are emailed here (never from localhost)
       SMTP_HOST: ${SMTP_HOST:?set in .env}
       SMTP_PORT: ${SMTP_PORT:-465}
       SMTP_USER: ${SMTP_USER:?set in .env}
