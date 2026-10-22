@@ -27,12 +27,12 @@ const KIND_ICON: Record<AccountKind, IconName> = { student: 'book', teacher: 'bo
  * just add their city / country (and a school its name).
  * Submitted via a transition (not <form action>) so a server error doesn't wipe what was typed.
  */
-export function SignUpForm() {
+export function SignUpForm({ initialKind = 'student' }: { initialKind?: AccountKind }) {
   const t = useT()
   const s = t.signUp
   const locale = useLocale()
   const reduce = useReducedMotion()
-  const [kind, setKind] = useState<AccountKind>('student')
+  const [kind, setKind] = useState<AccountKind>(initialKind)
   const [pw, setPw] = useState('')
   const [state, dispatch] = useActionState(signUp, initialSignUpState)
   const [pending, start] = useTransition()
