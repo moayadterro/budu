@@ -25,7 +25,7 @@ const logoPng = (() => {
 
 /** Centered logo: the picture when we have it, else the wordmark in text. */
 function logoHtml() {
-  if (logoPng) return `<img src="cid:budu-logo" width="120" alt="Budu" style="display:block;margin:0 auto;width:120px;height:auto;border:0">`
+  if (logoPng) return `<img src="cid:budu-logo" width="140" alt="Budu School" style="display:block;margin:0 auto;width:140px;height:auto;border:0">`
   return `<div style="font-family:${FONT};text-align:center;line-height:1">
   <span style="font-size:28px;font-weight:800;letter-spacing:-0.5px;color:${C.ink}">budu</span><br>
   <span style="font-size:9px;font-weight:700;letter-spacing:5px;color:${C.ink}">SCHOOL</span>
