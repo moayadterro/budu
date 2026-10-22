@@ -48,14 +48,14 @@ export function PublicHeader({ signedIn }: { signedIn: boolean }) {
   return (
     // the header keeps one bar's height in the page; the island is laid over it, so the open menu
     // floats above the content instead of pushing it down
-    <header className="sticky top-0 z-30 h-[4.25rem]">
+    <header className="sticky top-0 z-30 h-[4.25rem] sm:h-[5.25rem]">
       <div
         className={cn(
-          'absolute inset-x-3 top-3 mx-auto max-w-6xl rounded-2xl sm:inset-x-4 transition-[background-color,box-shadow,backdrop-filter] duration-300',
+          'absolute inset-x-3 top-3 mx-auto max-w-6xl rounded-2xl sm:inset-x-4 sm:top-4 transition-[background-color,box-shadow,backdrop-filter] duration-300',
           raised ? 'bg-background/75 shadow-lg ring-1 shadow-foreground/5 ring-foreground/8 backdrop-blur-xl backdrop-saturate-150' : 'bg-transparent',
         )}
       >
-        <div className="flex h-14 items-center gap-1 ps-3 pe-2 sm:gap-2">
+        <div className="flex h-14 items-center gap-1 ps-3 pe-2 sm:h-16 sm:gap-2 sm:px-6">
           <Link href="/" className="me-2 flex items-center rounded-lg focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none" aria-label={t.appName}>
             <Logo className="h-7 w-auto" label={t.appName} />
           </Link>
