@@ -24,6 +24,14 @@ const TONE = {
   green: { fade: 'from-primary/8 dark:from-primary/14', tile: 'bg-primary/12 text-primary', glow: 'bg-primary/20' },
 } as const
 type Tone = keyof typeof TONE
+
+/** What a school gets, as app icons: one deep hue per icon (lighter at the top, like Apple's icons). */
+const APPS = [
+  { key: 'portal', icon: 'globe', tile: 'bg-linear-to-b from-primary/75 to-primary' },
+  { key: 'schedule', icon: 'cal', tile: 'bg-linear-to-b from-info/75 to-info' },
+  { key: 'exams', icon: 'task', tile: 'bg-linear-to-b from-subject-purple/75 to-subject-purple' },
+  { key: 'gradebook', icon: 'report', tile: 'bg-linear-to-b from-foreground/70 to-foreground text-background' },
+] as const
 export async function PricingPage() {
   const t = await getT()
   const s = t.site.pricing
@@ -173,19 +181,37 @@ export async function PricingPage() {
         </div>
       </section>
 
-      {/* closing invitation for schools, on the same light green */}
-      <section className="relative isolate flex flex-col items-center gap-5 overflow-hidden rounded-3xl bg-muted/40 px-6 py-14 text-center sm:px-12 sm:py-16">
-        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-dots" />
-        <div aria-hidden className="pointer-events-none absolute -top-32 start-1/2 -z-10 h-72 w-120 max-w-full -translate-x-1/2 rounded-full bg-primary/20 blur-3xl motion-safe:animate-aurora rtl:translate-x-1/2 dark:bg-primary/15" />
-        <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-balance sm:text-4xl">{s.cta.title}</h2>
-        <p className="max-w-xl text-pretty text-muted-foreground">{s.cta.sub}</p>
-        <div className="mt-2 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row">
-          <Button size="lg" className="h-12 px-6 text-base" asChild>
+      {/* closing invitation for schools, the Apple way: no box, no background — big type on white
+          space, the four things a school gets as app-style icons (each one deep, one-hue squircle),
+          one button and a quiet "›" link */}
+      <section className="flex flex-col items-center gap-8 py-4 text-center sm:py-10">
+        <ul className="flex flex-wrap justify-center gap-5 sm:gap-8">
+          {APPS.map((a) => (
+            <li key={a.key} className="flex w-18 flex-col items-center gap-2 sm:w-20">
+              <span
+                className={cn(
+                  'grid size-16 place-items-center rounded-[1.35rem] text-primary-foreground shadow-[0_1px_1px_color-mix(in_oklch,var(--foreground)_8%,transparent),0_8px_20px_-8px_color-mix(in_oklch,var(--foreground)_25%,transparent)] sm:size-18 sm:rounded-[1.5rem]',
+                  a.tile,
+                )}
+              >
+                <Icon name={a.icon} className="size-7 sm:size-8" />
+              </span>
+              <span className="text-xs font-medium text-muted-foreground">{s.cta.apps[a.key]}</span>
+            </li>
+          ))}
+        </ul>
+        <div className="flex flex-col items-center gap-4">
+          <h2 className="max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl">{s.cta.title}</h2>
+          <p className="max-w-2xl text-lg text-pretty text-muted-foreground sm:text-xl">{s.cta.sub}</p>
+        </div>
+        <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-6">
+          <Button size="lg" className="h-12 px-7 text-base" asChild>
             <Link href="/register?as=school">{s.cta.primary}</Link>
           </Button>
-          <Button variant="secondary" size="lg" className="h-12 bg-background px-6 text-base shadow-sm hover:bg-background/70" asChild>
-            <Link href="/contact?topic=school">{s.cta.secondary}</Link>
-          </Button>
+          <Link href="/contact?topic=school" className="group flex items-center gap-1 text-base font-medium text-primary dark:text-success">
+            <span className="group-hover:underline group-hover:underline-offset-4">{s.cta.secondary}</span>
+            <Icon name="chevRight" className="size-4 transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5" />
+          </Link>
         </div>
       </section>
 

@@ -1711,6 +1711,7 @@ export const en = {
         clubs: { title: "Interest circles", text: "Students who love the same things — robotics, chess, poetry — find each other and start a circle." },
       },
       cta: {
+        apps: { portal: "Portal", schedule: "Schedule", exams: "Exams", gradebook: "Gradebook" },
         title: "Bring your school to Budu",
         sub: "Your portal, schedule, exams and gradebook in one place. Create a school account and look around — we’ll prepare a price for your number of students.",
         primary: "Create a school account",
