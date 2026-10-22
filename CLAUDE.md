@@ -32,7 +32,7 @@ Market focus: RU / AR / EN audiences; live + self-paced + marketplace in one pla
 
 ## Repo layout
 ```
-docker-compose.yml      # app-db (postgres 18) · iomad + iomad-db (mariadb 11.8) · frontend · mailpit (dev email); BBB not included
+docker-compose.yml      # app-db (postgres 18) · iomad + iomad-db (mariadb 11.8) · frontend; BBB not included; email = a real SMTP mailbox
 .env.example            # copy to .env, then replace every change_me with random values (never commit .env)
 iomad/                  # IOMAD image built from source (no maintained upstream image)
   Dockerfile            #   php:8.3.x-apache (pinned) + IOMAD_405_STABLE + our files
@@ -187,8 +187,9 @@ signing out; a suspended/deleted account's sessions end. (An email change in IOM
 - Tokens/sessions: random secrets, **only sha256 hashes stored** (`shared/server/tokens.ts`).
   Tables (`sessions`, `auth_tokens`, `tenants`) are created by `shared/server/db.ts` (`SCHEMA`); it
   re-applies whenever `SCHEMA` changes — additive, idempotent statements only (no real migrations yet).
-- Email: `shared/server/mailer.ts` (nodemailer). Dev: **Mailpit** catches everything — inbox
-  http://localhost:8025. Prod: set `SMTP_*`, `MAIL_FROM`, `APP_URL` in `.env`. Email text lives in
+- Email: `shared/server/mailer.ts` (nodemailer) through a REAL mailbox, also in dev (owner removed
+  Mailpit 2026-10-22): `no-reply@budu-school.ru` on Timeweb (`smtp.timeweb.ru:465`, SSL); settings
+  `SMTP_*`, `MAIL_FROM`, `APP_URL` in `.env`. Dev emails now really go out — test with your own address. Email text lives in
   `t.email`; email HTML is plain on purpose (clients can't use the CSS tokens).
 - IOMAD side: `iomad/local_budu` (plugin: `get_account` incl. `siteadmin`, `check_password`) + `iomad/ws-setup.php`
   (integration user/role/token, allowed functions, lockout). New IOMAD function needed → add it to
@@ -205,7 +206,7 @@ T=$(docker compose exec -T -u www-data iomad php /usr/local/share/budu/ws-setup.
 sed -i '' "s/^IOMAD_WS_TOKEN=.*/IOMAD_WS_TOKEN=$T/" .env && docker compose up -d frontend
 ```
 - Frontend http://localhost:3000 · IOMAD `IOMAD_URL` (currently http://localhost:9999; host port =
-  `IOMAD_PORT`, keep both in sync) · Mailpit inbox http://localhost:8025 · Postgres on 5432.
+  `IOMAD_PORT`, keep both in sync) · Postgres on 5432.
 - IOMAD admin login: `IOMAD_ADMIN_USER` / `IOMAD_ADMIN_PASSWORD` from `.env`.
 - Re-run `ws-setup.php` (idempotent) after changing its function/capability lists or the plugin.
 - After adding frontend deps: `docker compose up -d --build -V frontend` (`-V` refreshes node_modules).
@@ -218,7 +219,7 @@ sed -i '' "s/^IOMAD_WS_TOKEN=.*/IOMAD_WS_TOKEN=$T/" .env && docker compose up -d
 
 ## Status (update this as work lands)
 Built and verified:
-- Infra: IOMAD 4.5 (multi-tenant Moodle) from source, MariaDB, app Postgres, Mailpit, Next.js 14 frontend.
+- Infra: IOMAD 4.5 (multi-tenant Moodle) from source, MariaDB, app Postgres, Next.js frontend.
 - IOMAD API: restricted integration user + token; `local_budu` plugin; account lockout after 10 failures.
 - Auth: register (school / teacher / student, confirm password) → email confirmation → sign in →
   sign out; forgot/reset password; sessions in Postgres; route protection. Tested end to end.
@@ -343,6 +344,9 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-22 Email: Mailpit removed (owner); all mail goes through `no-reply@budu-school.ru`
+  (Timeweb SMTP, credentials only in `.env`). The domain had no public DNS yet on 2026-10-22 —
+  until SPF/DKIM/DMARC are set at Timeweb, mail may land in spam.
 - 2026-10-22 Public site (owner): /about (+ #values), /pricing, /schools, /help, /contact, /privacy
   in the `(public)` group with a shared footer; header nav Courses · Pricing · Schools · About. ALL
   public facts live in `shared/config/site.ts` (emails, Telegram/WhatsApp, legal details, free

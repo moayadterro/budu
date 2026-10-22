@@ -1,7 +1,7 @@
 import 'server-only'
 import nodemailer, { Transporter } from 'nodemailer'
 
-/** Outgoing email (Mailpit in dev, real SMTP in prod — see .env). SERVER-SIDE ONLY. */
+/** Outgoing email through the real SMTP mailbox in .env (SMTP_*, MAIL_FROM). SERVER-SIDE ONLY. */
 
 const g = globalThis as unknown as { __buduMailer?: Transporter }
 

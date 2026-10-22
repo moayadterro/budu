@@ -30,15 +30,15 @@ services:
       # server-side only: IOMAD as seen from inside the compose network
       IOMAD_API_URL: http://iomad
       IOMAD_WS_TOKEN: ${IOMAD_WS_TOKEN:-}
-      # links in emails, and where email goes (Mailpit in dev; a real SMTP provider in prod)
+      # links in emails, and where email goes: the real SMTP mailbox from .env (Timeweb today)
       APP_URL: ${APP_URL:-http://localhost:3000}
-      MAIL_FROM: ${MAIL_FROM:-Budu <no-reply@budu.local>}
+      MAIL_FROM: ${MAIL_FROM:?set in .env}
       CONTACT_EMAIL: ${CONTACT_EMAIL:-}   # where the public Contact form sends (empty = only stored)
-      SMTP_HOST: ${SMTP_HOST:-mailpit}
-      SMTP_PORT: ${SMTP_PORT:-1025}
-      SMTP_USER: ${SMTP_USER:-}
-      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
-      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_HOST: ${SMTP_HOST:?set in .env}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_USER: ${SMTP_USER:?set in .env}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:?set in .env}
+      SMTP_SECURE: ${SMTP_SECURE:-true}
       NEXT_PUBLIC_BBB_URL: ${BBB_URL:-}
       UPLOAD_DIR: /uploads
       DATABASE_URL: postgres://${APP_DB_USER:?set in .env}:${APP_DB_PASSWORD:?set in .env}@app-db:5432/${APP_DB_NAME:?set in .env}
@@ -50,14 +50,6 @@ services:
       - upload-chunks:/uploads   # resumable uploads in progress (tus); finished files go to IOMAD
     depends_on:
       - app-db
-      - mailpit
-
-  # ---- Mailpit (dev only): catches every email; inbox at http://localhost:8025 ----
-  mailpit:
-    image: axllent/mailpit:v1.31.4
-    restart: unless-stopped
-    ports:
-      - '127.0.0.1:8025:8025'
 
   # ---- IOMAD (multi-tenant Moodle: tenants, users, courses, enrolment, gradebook) ----
   iomad-db:
