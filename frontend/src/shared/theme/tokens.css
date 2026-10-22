@@ -209,3 +209,26 @@
 @utility bg-brand {
   background-image: var(--gradient-brand);
 }
+
+/* bg-dots: a fine dot texture from the text colour, fading out towards the edges (hero / bands) */
+@utility bg-dots {
+  background-image: radial-gradient(color-mix(in oklch, var(--foreground) 14%, transparent) 1px, transparent 1.2px);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 30%, transparent 80%);
+}
+
+/* animate-aurora: a slow drift for a soft one-hue glow (motion-safe: only when motion is allowed) */
+@keyframes aurora-drift {
+  0% {
+    transform: translate3d(-6%, -4%, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(5%, 3%, 0) scale(1.08);
+  }
+  100% {
+    transform: translate3d(-3%, 5%, 0) scale(0.96);
+  }
+}
+@utility animate-aurora {
+  animation: aurora-drift 14s ease-in-out infinite alternate;
+}

@@ -12,6 +12,9 @@ import { getT } from '@/shared/i18n/server'
  * Design (owner: "2027, modern and simple"): no borders, no orange, and every gradient is ONE hue
  * fading into the page (never several colours mixed): students blue, teachers purple, schools the
  * theme's green — the school plan in the middle, lifted. Soft surfaces, large radii, soft shadows.
+ * Depth without colour (UI/UX Pro Max "soft UI" + "aurora"): a fine dot texture fading out behind
+ * the hero and the closing band, layered soft shadows instead of borders, and the school plan as a
+ * frosted glass card over a slowly drifting green glow (motion only when the user allows it).
  */
 
 /** One hue per card: the top fade, the icon tile and (coming soon) the glow — complete class names. */
@@ -35,7 +38,12 @@ export async function PricingPage() {
     const p = s[key]
     const c = TONE[tone]
     return (
-      <article className={cn('flex flex-col gap-6 rounded-3xl bg-linear-to-b to-muted/40 p-6 sm:p-8', c.fade)}>
+      <article
+        className={cn(
+          'flex flex-col gap-6 rounded-3xl bg-linear-to-b to-card p-6 shadow-[0_1px_2px_color-mix(in_oklch,var(--foreground)_5%,transparent),0_12px_32px_-12px_color-mix(in_oklch,var(--foreground)_12%,transparent)] transition-transform duration-300 motion-safe:hover:-translate-y-1 sm:p-8',
+          c.fade,
+        )}
+      >
         <div className="flex items-center gap-3">
           <span className={cn('grid size-11 place-items-center rounded-2xl', c.tile)}>
             <Icon name={icon} className="size-5" />
@@ -81,9 +89,10 @@ export async function PricingPage() {
       {/* hero: one soft green glow fading into the page */}
       <section className="relative isolate flex flex-col items-center gap-5 pt-6 text-center sm:pt-12">
         <div aria-hidden className="pointer-events-none absolute inset-x-0 -top-28 -z-10 flex justify-center">
-          <div className="h-72 w-160 max-w-full rounded-full bg-primary/15 blur-3xl dark:bg-primary/10" />
+          <div className="h-72 w-160 max-w-full rounded-full bg-primary/15 blur-3xl motion-safe:animate-aurora dark:bg-primary/10" />
         </div>
-        <p className="text-xs font-semibold tracking-wider text-primary uppercase">{s.eyebrow}</p>
+        <div aria-hidden className="pointer-events-none absolute -inset-x-4 -top-20 bottom-0 -z-10 bg-dots" />
+        <p className="text-xs font-semibold tracking-wider text-primary uppercase dark:text-success">{s.eyebrow}</p>
         <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl">{s.title}</h1>
         <p className="max-w-2xl text-lg text-pretty text-muted-foreground">{s.sub}</p>
         <ul className="mt-1 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
@@ -100,7 +109,10 @@ export async function PricingPage() {
       <section className="grid items-stretch gap-6 lg:grid-cols-3 lg:items-center lg:gap-5">
         {side('students', 'book', 'blue', '/register?as=student')}
 
-        <article className="flex flex-col gap-6 rounded-3xl bg-linear-to-b from-primary/12 to-primary/4 p-6 shadow-2xl shadow-primary/10 sm:p-8 lg:py-12 dark:from-primary/18 dark:to-primary/6">
+        <div className="relative isolate">
+          {/* the glow lives BEHIND the glass card and drifts slowly */}
+          <div aria-hidden className="pointer-events-none absolute -inset-x-6 -inset-y-10 -z-10 rounded-[3rem] bg-primary/30 blur-3xl motion-safe:animate-aurora dark:bg-primary/20" />
+        <article className="flex flex-col gap-6 rounded-3xl bg-card/75 p-6 shadow-[inset_0_1px_0_color-mix(in_oklch,var(--background)_80%,transparent),0_24px_60px_-20px_color-mix(in_oklch,var(--primary)_35%,transparent)] backdrop-blur-xl backdrop-saturate-150 sm:p-8 lg:py-12">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <span className="grid size-11 place-items-center rounded-2xl bg-primary text-primary-foreground">
@@ -108,7 +120,7 @@ export async function PricingPage() {
               </span>
               <h2 className="text-lg font-semibold">{school.name}</h2>
             </div>
-            <span className="rounded-full bg-primary/12 px-3 py-1 text-xs font-semibold text-primary">{school.badge}</span>
+            <span className="rounded-full bg-primary/12 px-3 py-1 text-xs font-semibold text-primary dark:text-success">{school.badge}</span>
           </div>
           <div>
             <p className="font-heading text-3xl font-semibold tracking-tight text-balance sm:text-4xl lg:text-3xl xl:text-4xl">{school.price}</p>
@@ -118,7 +130,7 @@ export async function PricingPage() {
             <Button size="lg" className="h-auto min-h-12 w-full py-3 text-base whitespace-normal" asChild>
               <Link href="/register?as=school">{school.cta}</Link>
             </Button>
-            <Link href="/contact?topic=school" className="self-center rounded-md px-2 py-1 text-center text-sm text-balance text-primary underline-offset-4 hover:underline">
+            <Link href="/contact?topic=school" className="self-center rounded-md px-2 py-1 text-center text-sm text-balance text-primary underline-offset-4 dark:text-success hover:underline">
               {school.quote}
             </Link>
           </div>
@@ -131,6 +143,7 @@ export async function PricingPage() {
             ))}
           </ul>
         </article>
+        </div>
 
         {side('teachers', 'board', 'purple', '/register?as=teacher')}
       </section>
@@ -143,7 +156,7 @@ export async function PricingPage() {
       {/* coming soon: the two biggest ideas wide on top, the other three below */}
       <section className="flex flex-col gap-8">
         <div className="flex flex-col items-center gap-3 text-center">
-          <p className="text-xs font-semibold tracking-wider text-primary uppercase">{s.soonEyebrow}</p>
+          <p className="text-xs font-semibold tracking-wider text-primary uppercase dark:text-success">{s.soonEyebrow}</p>
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">{s.soonTitle}</h2>
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-6">
@@ -167,7 +180,7 @@ export async function PricingPage() {
                 <div className="flex min-w-0 flex-col gap-1.5">
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="font-semibold">{item.title}</h3>
-                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">{s.soonBadge}</span>
+                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary dark:text-success">{s.soonBadge}</span>
                   </div>
                   <p className="text-sm leading-relaxed text-muted-foreground">{item.text}</p>
                 </div>
@@ -178,7 +191,9 @@ export async function PricingPage() {
       </section>
 
       {/* closing invitation for schools, on the same light green */}
-      <section className="flex flex-col items-center gap-5 rounded-3xl bg-linear-to-b from-primary/10 to-primary/4 px-6 py-14 text-center sm:px-12 sm:py-16 dark:from-primary/16 dark:to-primary/6">
+      <section className="relative isolate flex flex-col items-center gap-5 overflow-hidden rounded-3xl bg-muted/40 px-6 py-14 text-center sm:px-12 sm:py-16">
+        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-dots" />
+        <div aria-hidden className="pointer-events-none absolute -top-32 start-1/2 -z-10 h-72 w-120 max-w-full -translate-x-1/2 rounded-full bg-primary/20 blur-3xl motion-safe:animate-aurora rtl:translate-x-1/2 dark:bg-primary/15" />
         <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-balance sm:text-4xl">{s.cta.title}</h2>
         <p className="max-w-xl text-pretty text-muted-foreground">{s.cta.sub}</p>
         <div className="mt-2 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row">
