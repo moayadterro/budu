@@ -19,6 +19,8 @@
 :root {
   /* Golos Text covers Latin + Cyrillic; Arabic pages switch to IBM Plex Sans Arabic */
   --font-app: 'Golos Text', ui-sans-serif, system-ui, sans-serif;
+  /* headings: Geologica (Latin + Cyrillic); Arabic letters fall back to IBM Plex Sans Arabic */
+  --font-head: 'Geologica', 'IBM Plex Sans Arabic', 'Golos Text', ui-sans-serif, system-ui, sans-serif;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -135,7 +137,7 @@
 
 @theme inline {
   --font-sans: var(--font-app);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-head);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);

@@ -12,6 +12,12 @@
   body {
     @apply bg-background text-foreground antialiased;
   }
+  /* every heading and shadcn title in the heading font (Geologica) */
+  h1, h2, h3, h4, h5, h6,
+  [data-slot='card-title'], [data-slot='dialog-title'], [data-slot='alert-dialog-title'],
+  [data-slot='sheet-title'], [data-slot='empty-title'] {
+    @apply font-heading;
+  }
   /* Tailwind 4 no longer gives buttons a pointer cursor. */
   button:not(:disabled),
   [role='button']:not([aria-disabled='true']) {
