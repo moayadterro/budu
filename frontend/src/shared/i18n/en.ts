@@ -1627,6 +1627,8 @@ export const en = {
   },
 
   email: {
+    fallback: 'If the button doesn’t work, copy this link into your browser:',
+    footer: 'Budu — learning that brings school, teachers and families together.',
     examInvite: {
       subject: (school: string) => `${school} invites you to an exam on Budu`,
       body: (p: { school: string; exam: string; by: string }) =>
@@ -1648,11 +1650,13 @@ export const en = {
     greeting: (name: string) => `Hi ${name},`,
     signature: '— The Budu team',
     verify: {
+      title: 'Confirm your email',
       subject: 'Confirm your email for Budu',
       body: 'Confirm your email address to activate your Budu account. The link works for 48 hours.',
       action: 'Confirm email',
     },
     reset: {
+      title: 'Reset your password',
       subject: 'Reset your Budu password',
       body: 'Someone (hopefully you) asked to reset your Budu password. The link works once and expires in 1 hour.',
       action: 'Choose a new password',

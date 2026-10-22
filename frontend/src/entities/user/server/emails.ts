@@ -15,7 +15,7 @@ export async function sendVerificationEmail(user: { id: number; email: string; f
   await sendMail({
     to: user.email,
     subject: t.email.verify.subject,
-    ...composeMail(t, dir, { name: user.firstname, body: t.email.verify.body, action: t.email.verify.action, link }),
+    ...composeMail(t, dir, { title: t.email.verify.title, name: user.firstname, body: t.email.verify.body, action: t.email.verify.action, link }),
   })
 }
 
@@ -27,6 +27,6 @@ export async function sendPasswordResetEmail(user: { id: number; email: string; 
   await sendMail({
     to: user.email,
     subject: t.email.reset.subject,
-    ...composeMail(t, dir, { name: user.firstname, body: t.email.reset.body, action: t.email.reset.action, link, footer: t.email.reset.ignore }),
+    ...composeMail(t, dir, { title: t.email.reset.title, name: user.firstname, body: t.email.reset.body, action: t.email.reset.action, link, footer: t.email.reset.ignore }),
   })
 }

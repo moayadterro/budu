@@ -1637,6 +1637,8 @@ export const ru: typeof en = {
   },
 
   email: {
+    fallback: 'Если кнопка не работает, скопируйте ссылку в браузер:',
+    footer: 'Budu — обучение, которое объединяет школу, учителей и семьи.',
     examInvite: {
       subject: (school: string) => `«${school}» приглашает вас на экзамен в Budu`,
       body: (p: { school: string; exam: string; by: string }) =>
@@ -1658,11 +1660,13 @@ export const ru: typeof en = {
     greeting: (name: string) => `Здравствуйте, ${name}!`,
     signature: '— Команда Budu',
     verify: {
+      title: 'Подтвердите почту',
       subject: 'Подтвердите почту для Budu',
       body: 'Подтвердите адрес почты, чтобы активировать аккаунт Budu. Ссылка действует 48 часов.',
       action: 'Подтвердить почту',
     },
     reset: {
+      title: 'Сброс пароля',
       subject: 'Восстановление пароля Budu',
       body: 'Кто-то (надеемся, вы) запросил смену пароля Budu. Ссылка одноразовая и действует 1 час.',
       action: 'Задать новый пароль',

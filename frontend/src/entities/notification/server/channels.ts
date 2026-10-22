@@ -30,6 +30,7 @@ const email: Channel = {
       to: recipient.email,
       subject: title,
       ...composeMail(t, dirOf(locale), {
+        title,
         name: recipient.name.split(' ')[0] || recipient.name,
         body,
         action: t.notify.open,

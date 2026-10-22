@@ -215,7 +215,9 @@ signing out; a suspended/deleted account's sessions end. (An email change in IOM
 - Email: `shared/server/mailer.ts` (nodemailer) through a REAL mailbox, also in dev (owner removed
   Mailpit 2026-10-22): `no-reply@budu-school.ru` on Timeweb (`smtp.timeweb.ru:465`, SSL); settings
   `SMTP_*`, `MAIL_FROM`, `APP_URL` in `.env`. Dev emails now really go out — test with your own address. Email text lives in
-  `t.email`; email HTML is plain on purpose (clients can't use the CSS tokens).
+  `t.email`; EVERY email uses ONE layout, `shared/server/mail-layout.ts` `composeMail` (logo in
+  HTML tables, heading, button that works in Outlook, link fallback, footer, RTL, plain-text twin) —
+  the only place hex colours are allowed outside tokens.css (clients can't read CSS variables).
 - IOMAD side: `iomad/local_budu` (plugin: `get_account` incl. `siteadmin`, `check_password`) + `iomad/ws-setup.php`
   (integration user/role/token, allowed functions, lockout). New IOMAD function needed → add it to
   `FUNCTIONS` (and any capability) there and re-run the script.

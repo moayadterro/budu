@@ -55,6 +55,7 @@ export async function addParentAction(_prev: AddParentState, form: FormData): Pr
         to: email,
         subject: t.email.parentInvite.subject(user.name),
         ...composeMail(t, dirOf(await getLocale()), {
+          title: t.email.parentInvite.subject(user.name),
           name: firstname,
           body: t.email.parentInvite.body(user.name),
           action: t.email.parentInvite.action,

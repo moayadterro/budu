@@ -1634,6 +1634,8 @@ export const ar: typeof en = {
   },
 
   email: {
+    fallback: 'إن لم يعمل الزر، انسخ هذا الرابط إلى المتصفح:',
+    footer: 'Budu — تعلّم يجمع المدرسة والمعلمين والعائلات.',
     examInvite: {
       subject: (school: string) => `${school} يدعوك إلى امتحان على Budu`,
       body: (p: { school: string; exam: string; by: string }) =>
@@ -1655,11 +1657,13 @@ export const ar: typeof en = {
     greeting: (name: string) => `مرحبًا ${name}،`,
     signature: '— فريق Budu',
     verify: {
+      title: 'أكّد بريدك الإلكتروني',
       subject: 'أكّد بريدك الإلكتروني في Budu',
       body: 'أكّد عنوان بريدك لتفعيل حسابك في Budu. يعمل الرابط لمدة 48 ساعة.',
       action: 'تأكيد البريد',
     },
     reset: {
+      title: 'إعادة تعيين كلمة المرور',
       subject: 'إعادة تعيين كلمة مرور Budu',
       body: 'طلب أحدهم (نأمل أن تكون أنت) إعادة تعيين كلمة مرورك في Budu. يعمل الرابط مرة واحدة وتنتهي صلاحيته بعد ساعة.',
       action: 'اختيار كلمة مرور جديدة',

@@ -80,6 +80,7 @@ export async function addAudienceAction(quizId: number, input: { classIds?: numb
         to: email,
         subject: t.email.examInvite.subject(school),
         ...composeMail(t, dir, {
+          title: t.email.examInvite.subject(school),
           name: firstname,
           body: t.email.examInvite.body({ school, exam: quiz.name, by: user.name }),
           action: t.email.examInvite.action,

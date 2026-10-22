@@ -58,6 +58,7 @@ export async function inviteToSchool(_prev: InviteState, form: FormData): Promis
       to: email,
       subject: t.email.invite.subject(school),
       ...composeMail(t, dirOf(await getLocale()), {
+        title: t.email.invite.subject(school),
         name: firstname,
         body: t.email.invite.body({ school, by: user.name, role: t.role[role] }),
         action: t.email.invite.action,
