@@ -1519,6 +1519,12 @@ export const en = {
   },
 
   signUp: {
+    strength: {
+      levels: ['Weak', 'Fair', 'Good', 'Strong'],
+      rules: { length: '8+ characters', upper: 'A capital letter', lower: 'A lowercase letter', digit: 'A number', symbol: 'A symbol (!?#…)' },
+    },
+    match: 'Passwords match',
+    noMatch: 'Passwords don’t match yet',
     title: 'Create your account',
     sub: 'Pick what fits you. You can be invited to a school later.',
     kindLabel: 'I am signing up as',
@@ -1555,6 +1561,8 @@ export const en = {
   },
 
   auth: {
+    backToSignIn: 'Back to sign in',
+    backToSite: 'Back to the website',
     signIn: {
       title: 'Welcome back',
       sub: 'Sign in to your Budu account.',

@@ -10,6 +10,7 @@ import { Icon, IconName } from '@/shared/ui/icon'
 import { Input } from '@/shared/ui/input'
 import { NativeSelect as Select, NativeSelectOption } from '@/shared/ui/native-select'
 import { PasswordInput } from '@/shared/ui/password-input'
+import { PasswordMatch, PasswordStrength } from '@/shared/ui/password-strength'
 import { SubmitButton } from '@/shared/ui/submit-button'
 import { Appear } from '@/shared/ui/motion'
 import { cn } from '@/shared/lib/cn'
@@ -29,6 +30,8 @@ function Section({ children }: { children: React.ReactNode }) {
 /** One sign-up for schools, independent teachers and students (server action → IOMAD). */
 export function SignUpForm() {
   const t = useT()
+  const [pw, setPw] = useState('')
+  const [pw2, setPw2] = useState('')
   const [kind, setKind] = useState<AccountKind>('school')
   const [state, action] = useActionState(signUp, initialSignUpState)
 
@@ -61,8 +64,9 @@ export function SignUpForm() {
               aria-checked={kind === k}
               onClick={() => setKind(k)}
               className={cn(
-                'relative isolate flex flex-col gap-1.5 rounded-xl border p-3 text-start transition-colors',
-                kind === k ? 'border-primary' : 'border-border hover:border-input',
+                // phones: compact rows (icon · title + text); from sm up: three cards side by side
+                'relative isolate grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-0.5 rounded-xl border p-3 text-start transition-all sm:flex sm:flex-col sm:items-start sm:gap-1.5',
+                kind === k ? 'border-primary shadow-sm' : 'border-border hover:border-input hover:bg-muted/40',
               )}
             >
               {kind === k && (
@@ -73,9 +77,16 @@ export function SignUpForm() {
                   className="absolute inset-0 -z-10 rounded-xl bg-primary/10"
                 />
               )}
-              <Icon name={KIND_ICON[k]} className={cn('h-5 w-5', kind === k ? 'text-primary' : 'text-muted-foreground')} />
-              <b className="text-[13px]">{t.signUp.kinds[k].title}</b>
-              <span className="text-[11.5px] leading-snug text-muted-foreground">{t.signUp.kinds[k].desc}</span>
+              <span
+                className={cn(
+                  'row-span-2 grid size-9 place-items-center rounded-lg transition-colors',
+                  kind === k ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground',
+                )}
+              >
+                <Icon name={KIND_ICON[k]} className="size-4.5" />
+              </span>
+              <b className="text-sm">{t.signUp.kinds[k].title}</b>
+              <span className="text-xs leading-snug text-muted-foreground">{t.signUp.kinds[k].desc}</span>
             </button>
           ))}
         </div>
@@ -117,19 +128,21 @@ export function SignUpForm() {
         <Field label={t.signUp.email}>
           <Input name="email" type="email" required autoComplete="email" />
         </Field>
-        <Field label={t.signUp.password} hint={t.signUp.passwordHint}>
-          <PasswordInput name="password" required minLength={8} autoComplete="new-password" />
+        <Field label={t.signUp.password}>
+          <PasswordInput name="password" required minLength={8} autoComplete="new-password" value={pw} onChange={(e) => setPw(e.target.value)} />
         </Field>
+      <PasswordStrength value={pw} labels={t.signUp.strength} />
         <Field label={t.signUp.confirmPassword}>
-          <PasswordInput name="confirmPassword" required minLength={8} autoComplete="new-password" />
+          <PasswordInput name="confirmPassword" required minLength={8} autoComplete="new-password" value={pw2} onChange={(e) => setPw2(e.target.value)} />
         </Field>
+      <PasswordMatch password={pw} confirm={pw2} labels={t.signUp} />
 
         {state.status === 'error' && (
           <Appear>
             <Alert variant="destructive">{t.signUp.errors[state.error]}</Alert>
           </Appear>
         )}
-        <SubmitButton label={t.signUp.submit} pendingLabel={t.signUp.submitting} className="w-full" />
+        <SubmitButton label={t.signUp.submit} pendingLabel={t.signUp.submitting} size="lg" className="w-full" />
       </form>
       <p className="mt-5 text-center text-[13px] text-muted-foreground">
         {t.signUp.haveAccount}{' '}

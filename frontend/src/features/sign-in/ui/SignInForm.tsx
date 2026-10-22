@@ -58,7 +58,7 @@ export function SignInForm({ next, notice }: { next?: string; notice?: 'verified
             {s.forgot}
           </Link>
         </div>
-        <SubmitButton label={s.submit} pendingLabel={s.submitting} className="w-full" />
+        <SubmitButton label={s.submit} pendingLabel={s.submitting} size="lg" className="w-full" />
       </form>
 
       <p className="mt-5 text-center text-[13px] text-muted-foreground">

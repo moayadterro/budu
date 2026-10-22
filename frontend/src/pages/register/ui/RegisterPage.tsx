@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { getSession } from '@/entities/session/server'
 import { SignUpForm } from '@/features/sign-up'
 import { homeFor } from '@/shared/config/nav'
-import { AuthCard } from '@/shared/ui/auth-card'
+import { AuthShell } from '@/widgets/auth-shell'
 import { getT } from '@/shared/i18n/server'
 
 export async function RegisterPage() {
@@ -11,13 +11,13 @@ export async function RegisterPage() {
   const session = await getSession()
   if (session) redirect(homeFor(session.role))
   return (
-    <AuthCard wide title={t.signUp.title} sub={t.signUp.sub}>
+    <AuthShell back={{ href: '/login', label: t.auth.backToSignIn }} wide title={t.signUp.title} sub={t.signUp.sub}>
       <SignUpForm />
       <p className="mt-6 text-center text-sm text-muted-foreground">
         <Link href="/catalog" className="font-medium text-primary underline-offset-4 hover:underline">
           {t.catalog.browse}
         </Link>
       </p>
-    </AuthCard>
+    </AuthShell>
   )
 }

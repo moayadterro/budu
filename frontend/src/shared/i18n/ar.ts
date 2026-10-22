@@ -1526,6 +1526,12 @@ export const ar: typeof en = {
   },
 
   signUp: {
+    strength: {
+      levels: ['ضعيفة', 'مقبولة', 'جيدة', 'قوية'],
+      rules: { length: '8 أحرف أو أكثر', upper: 'حرف كبير', lower: 'حرف صغير', digit: 'رقم', symbol: 'رمز (!?#…)' },
+    },
+    match: 'كلمتا المرور متطابقتان',
+    noMatch: 'كلمتا المرور غير متطابقتين بعد',
     title: 'أنشئ حسابك',
     sub: 'اختر ما يناسبك. يمكن دعوتك إلى مدرسة لاحقًا.',
     kindLabel: 'أسجّل بصفتي',
@@ -1562,6 +1568,8 @@ export const ar: typeof en = {
   },
 
   auth: {
+    backToSignIn: 'العودة إلى تسجيل الدخول',
+    backToSite: 'العودة إلى الموقع',
     signIn: {
       title: 'مرحبًا بعودتك',
       sub: 'سجّل الدخول إلى حسابك في Budu.',

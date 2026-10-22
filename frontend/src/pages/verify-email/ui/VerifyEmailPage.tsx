@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { verifyEmail } from '@/features/verify-email/server'
-import { AuthCard } from '@/shared/ui/auth-card'
+import { AuthShell } from '@/widgets/auth-shell'
 import { buttonVariants } from '@/shared/ui/button'
 import { getT } from '@/shared/i18n/server'
 
@@ -10,10 +10,10 @@ export async function VerifyEmailPage(props: { searchParams: Promise<{ token?: s
   const ok = await verifyEmail(searchParams.token)
   const s = t.auth.verify
   return (
-    <AuthCard title={ok ? s.okTitle : s.failTitle} sub={ok ? s.okBody : s.failBody}>
+    <AuthShell back={{ href: '/login', label: t.auth.backToSignIn }} title={ok ? s.okTitle : s.failTitle} sub={ok ? s.okBody : s.failBody}>
       <Link href={ok ? '/login?verified=1' : '/login'} className={buttonVariants({ className: 'w-full' })}>
         {s.toSignIn}
       </Link>
-    </AuthCard>
+    </AuthShell>
   )
 }

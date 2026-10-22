@@ -1,12 +1,12 @@
 import { ForgotPasswordForm } from '@/features/reset-password'
-import { AuthCard } from '@/shared/ui/auth-card'
+import { AuthShell } from '@/widgets/auth-shell'
 import { getT } from '@/shared/i18n/server'
 
 export async function ForgotPasswordPage() {
   const t = await getT()
   return (
-    <AuthCard title={t.auth.forgot.title} sub={t.auth.forgot.sub}>
+    <AuthShell back={{ href: '/login', label: t.auth.backToSignIn }} title={t.auth.forgot.title} sub={t.auth.forgot.sub}>
       <ForgotPasswordForm />
-    </AuthCard>
+    </AuthShell>
   )
 }

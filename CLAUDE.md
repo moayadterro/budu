@@ -99,7 +99,9 @@ Unbuilt screens stay in `shared/config/nav.ts` with `href: null` (rendered disab
   Lists with many rows (lessons, lesson items): no red button per row — put the row's actions in a
   quiet "⋯" `MoreMenu` (ordinary actions, a divider, then the red one, which opens `ConfirmDialog`).
   Our own helpers in shared/ui: `Field`, `SubmitButton`, `ConfirmButton`, `PasswordInput`,
-  `ScreenHead`, `AuthCard`, `InitialsAvatar`, `LocalTime`, `Icon`.
+  `PasswordStrength`/`PasswordMatch`, `ScreenHead`, `InitialsAvatar`, `LocalTime`, `Icon`.
+  Auth screens use `AuthShell` (widgets/auth-shell): split screen on desktop (form + brand panel),
+  form only on phones, `back` = "← Back to sign in" above the title.
 - **Icons: Hugeicons** (free set, `@hugeicons/react` + `@hugeicons/core-free-icons`). App code uses
   `<Icon name="book" />` (`shared/ui/icon.tsx` maps names → icons); add a name there. Don't cast
   strings to `IconName` — a missing name crashes at runtime ("currentIcon is not iterable").
