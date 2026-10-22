@@ -4,8 +4,8 @@
  * the receipt emailed to billing. The platform admin confirms the order (Admin → Payments).
  */
 export const PAYMENT = {
-  phone: '+79219263517',
-  receiptEmail: 'billing@budu.ru',
+  phone: "+79219263517",
+  receiptEmail: "billing@budu-school.ru",
   /** transfers are made in this currency */
-  currency: 'RUB',
-} as const
+  currency: "RUB",
+} as const;
