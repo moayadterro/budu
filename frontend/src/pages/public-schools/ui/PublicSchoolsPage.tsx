@@ -36,14 +36,29 @@ export async function PublicSchoolsPage() {
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {schools.map((x) => (
-            <li key={`${x.name}-${x.since}`} className="flex items-center gap-4 rounded-xl border bg-card p-5">
-              <InitialsAvatar initials={initials(x.name)} color="var(--color-primary)" className="size-12 rounded-xl" />
-              <div className="min-w-0">
-                <p className="truncate font-semibold">{x.name}</p>
-                <p className="truncate text-sm text-muted-foreground">
-                  {[x.city, s.since(new Date(x.since * 1000).getFullYear())].filter(Boolean).join(' · ')}
-                </p>
-              </div>
+            <li key={`${x.name}-${x.since}`}>
+              {(() => {
+                const card = (
+                  <>
+                    <InitialsAvatar initials={initials(x.name)} color="var(--color-primary)" className="size-12 rounded-xl" />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-semibold">{x.name}</p>
+                      <p className="truncate text-sm text-muted-foreground">
+                        {[x.city, s.since(new Date(x.since * 1000).getFullYear())].filter(Boolean).join(' · ')}
+                      </p>
+                    </div>
+                    {x.slug && <Icon name="chevRight" className="size-4 flex-none text-muted-foreground rtl:-scale-x-100" />}
+                  </>
+                )
+                // a published school page → the card opens it
+                return x.slug ? (
+                  <Link href={`/schools/${x.slug}`} className="flex items-center gap-4 rounded-xl border bg-card p-5 transition-all hover:-translate-y-0.5 hover:shadow-md">
+                    {card}
+                  </Link>
+                ) : (
+                  <div className="flex items-center gap-4 rounded-xl border bg-card p-5">{card}</div>
+                )
+              })()}
             </li>
           ))}
         </ul>

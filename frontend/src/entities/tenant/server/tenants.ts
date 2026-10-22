@@ -59,10 +59,12 @@ export async function setGradeScale(companyId: number, scale: GradeScale) {
 }
 
 /** Schools that chose to appear on the public "Schools on Budu" page. */
-export async function publicSchools(): Promise<Array<{ name: string; city: string; since: number }>> {
-  const rows = await query<{ name: string; city: string; since: number }>(
-    `SELECT name, city, extract(epoch FROM created_at)::int AS since FROM tenants
-      WHERE iomad_url = $1 AND kind = 'school' AND public_listing ORDER BY created_at`,
+export async function publicSchools(): Promise<Array<{ name: string; city: string; since: number; slug: string | null }>> {
+  // slug only when the school's own page is published (then the card links to it)
+  const rows = await query<{ name: string; city: string; since: number; slug: string | null }>(
+    `SELECT t.name, t.city, extract(epoch FROM t.created_at)::int AS since, CASE WHEN p.published THEN t.slug END AS slug
+       FROM tenants t LEFT JOIN school_pages p ON p.iomad_url = t.iomad_url AND p.company_id = t.company_id
+      WHERE t.iomad_url = $1 AND t.kind = 'school' AND t.public_listing ORDER BY t.created_at`,
     [defaultInstance().url],
   )
   return rows

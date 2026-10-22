@@ -62,6 +62,29 @@ CREATE TABLE IF NOT EXISTS contact_messages (
 );
 CREATE INDEX IF NOT EXISTS contact_messages_ip ON contact_messages (ip_hash, created_at);
 
+-- a school's public page (/schools/<slug>): its address, settings and blocks
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS slug text;
+CREATE UNIQUE INDEX IF NOT EXISTS tenants_slug ON tenants (iomad_url, lower(slug)) WHERE slug IS NOT NULL;
+CREATE TABLE IF NOT EXISTS school_pages (
+  iomad_url  text NOT NULL,
+  company_id integer NOT NULL,
+  published  boolean NOT NULL DEFAULT false,
+  tagline    text NOT NULL DEFAULT '',
+  cover_file integer,                          -- IOMAD file id of the cover photo (served by /files)
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (iomad_url, company_id)
+);
+CREATE TABLE IF NOT EXISTS school_page_blocks (
+  id         bigserial PRIMARY KEY,
+  iomad_url  text NOT NULL,
+  company_id integer NOT NULL,
+  kind       text NOT NULL,                    -- text | photos | news | spotlight | top
+  position   integer NOT NULL,
+  data       jsonb NOT NULL DEFAULT '{}',
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS school_page_blocks_page ON school_page_blocks (iomad_url, company_id, position);
+
 -- in-app notifications (bell); text is rendered from kind + params in the reader's language
 CREATE TABLE IF NOT EXISTS notifications (
   id            bigserial PRIMARY KEY,
