@@ -69,13 +69,12 @@ export async function schoolsInfo(companyIds: number[]): Promise<Map<number, { n
   return new Map(rows.map((r) => [r.id, { name: r.name, city: r.city, country: r.country }]))
 }
 
-/** Schools that chose to appear on the public "Schools on Budu" page. */
-export async function publicSchools(): Promise<Array<{ name: string; city: string; since: number; slug: string | null }>> {
-  // slug only when the school's own page is published (then the card links to it)
-  const rows = await query<{ company_id: number; since: number; slug: string | null }>(
-    `SELECT t.company_id, extract(epoch FROM t.created_at)::int AS since, CASE WHEN p.published THEN t.slug END AS slug
-       FROM tenants t LEFT JOIN school_pages p ON p.iomad_url = t.iomad_url AND p.company_id = t.company_id
-      WHERE t.iomad_url = $1 AND t.kind = 'school' AND t.public_listing ORDER BY t.created_at`,
+/** Schools on the public "Schools on Budu" page = those whose own page is published (one switch). */
+export async function publicSchools(): Promise<Array<{ name: string; city: string; since: number; slug: string }>> {
+  const rows = await query<{ company_id: number; since: number; slug: string }>(
+    `SELECT t.company_id, extract(epoch FROM t.created_at)::int AS since, t.slug
+       FROM tenants t JOIN school_pages p ON p.iomad_url = t.iomad_url AND p.company_id = t.company_id
+      WHERE t.iomad_url = $1 AND t.kind = 'school' AND p.published AND t.slug IS NOT NULL ORDER BY t.created_at`,
     [defaultInstance().url],
   )
   const info = await schoolsInfo(rows.map((r) => r.company_id))
@@ -84,17 +83,8 @@ export async function publicSchools(): Promise<Array<{ name: string; city: strin
     .map((r) => ({ name: info.get(r.company_id)!.name, city: info.get(r.company_id)!.city, since: r.since, slug: r.slug }))
 }
 
-export async function getPublicListing(companyId: number): Promise<{ on: boolean; city: string }> {
-  const [[row], info] = await Promise.all([
-    query<{ public_listing: boolean }>(`SELECT public_listing FROM tenants WHERE iomad_url = $1 AND company_id = $2`, [defaultInstance().url, companyId]),
-    schoolsInfo([companyId]),
-  ])
-  return { on: !!row?.public_listing, city: info.get(companyId)?.city ?? '' }
-}
-
-/** Listed on /schools or not (app-db); the city is the IOMAD company's (the manager is checked there). */
-export async function setPublicListing(userId: number, companyId: number, on: boolean, city: string) {
-  await query(`UPDATE tenants SET public_listing = $3 WHERE iomad_url = $1 AND company_id = $2 AND kind = 'school'`, [defaultInstance().url, companyId, on])
+/** The school's city (the IOMAD company's; the manager is checked there). */
+export async function setSchoolCity(userId: number, companyId: number, city: string) {
   await iomadCall(defaultInstance(), 'local_budu_set_school_city', { companyid: companyId, userid: userId, city })
 }
 

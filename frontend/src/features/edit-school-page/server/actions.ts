@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { BLOCK_KINDS, normalizeSlug, PAGE_LIMITS, slugValid, type BlockKind } from '@/entities/school-page'
 import { addBlock, deleteBlock, moveBlock, pageOf, saveBlock, savePage, savePhoto, setCover, slugFree } from '@/entities/school-page/server'
 import { requireRole } from '@/entities/session/server'
-import { isSchool } from '@/entities/tenant/server'
+import { isSchool, setSchoolCity } from '@/entities/tenant/server'
 import { formText } from '@/shared/lib/form'
 
 /** The signed-in manager's school (only schools have a public page). */
@@ -48,6 +48,8 @@ export async function savePageAction(_prev: PageState, form: FormData): Promise<
     if (slug && !(await slugFree(slug, companyId))) return { status: 'error', error: 'taken', at }
     const ok = await savePage(companyId, { slug, published: form.get('published') === 'on', tagline: formText(form, 'tagline').slice(0, PAGE_LIMITS.tagline) })
     if (!ok) return { status: 'error', error: 'taken', at }
+    const { userId } = await manager()
+    await setSchoolCity(userId, companyId, formText(form, 'city').slice(0, 120)) // the IOMAD company's city
     await refresh(companyId)
     return { status: 'saved', at }
   } catch (e) {
