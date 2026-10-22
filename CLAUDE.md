@@ -162,7 +162,7 @@ shadcn classes: `bg-background`, `bg-card`, `text-foreground`, `text-muted-foreg
 `bg-sidebar` … Budu extras: `success`/`warning`/`info` (tints via opacity, `bg-success/10`),
 `highlight` (amber CTA), `subject-purple`/`subject-terra`, `bg-brand` (gradient utility), and the
 fixed dark live-classroom stage (`bg-live`, `text-live-foreground` …). Rules:
-- Fonts: body Golos Text (`--font-app`; Arabic letters: Noto Naskh Arabic); headings Geologica (`--font-head` →
+- Fonts: body Golos Text (`--font-app`; Arabic letters: Tajawal — owner); headings Geologica (`--font-head` →
   `font-heading`, applied in globals.css to h1–h6 and shadcn card/dialog/sheet/empty titles; Arabic
   heading letters in Noto Kufi Arabic — owner asked for Kufi). Loaded from Google Fonts in RootLayout.
 - **Never hardcode hex/oklch, `white`/`black`, or rgba** in components; add a token instead.
@@ -189,7 +189,7 @@ fixed dark live-classroom stage (`bg-live`, `text-live-foreground` …). Rules:
   else English — never a lower-ranked one (owner: German browser → English, not Russian; `matchLocale`).
   At sign-in the ACCOUNT's language (IOMAD pref `budu_locale`) wins and is written to the cookie, so
   it follows the user to every device; a first sign-in saves what they see as their language (`syncLocale`). `<html lang dir>` is set in RootLayout:
-  Arabic is RTL (Naskh body, Kufi headings — see Fonts) and the sidebar on the
+  Arabic is RTL (Tajawal body, Kufi headings — see Fonts) and the sidebar on the
   right. Use logical classes only (`ms-`/`me-`/`ps-`/`pe-`/`start-`/`end-`/`text-start`, `rtl:`).
   Dates via `LocalTime` (viewer's zone + UI language). Emails use the requester's language.
   Course/lesson titles and other content are data (mock now, IOMAD later), not strings.
