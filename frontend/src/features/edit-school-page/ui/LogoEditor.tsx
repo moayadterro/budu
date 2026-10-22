@@ -2,12 +2,13 @@
 
 import { useRouter } from 'next/navigation'
 import { useRef, useState, useTransition } from 'react'
+import { BrandImage } from '@/shared/ui/brand-image'
 import { Button } from '@/shared/ui/button'
 import { Icon } from '@/shared/ui/icon'
 import { useT } from '@/shared/i18n'
 import { setLogoAction } from '../server/actions'
 
-/** The school's logo: a square preview, Upload / Change, Remove. Saved at once (IOMAD's company logo). */
+/** The school's logo, icon or photo: a square preview (fits logos, fills photos), Upload / Change, Remove. Saved at once (IOMAD's company logo). */
 export function LogoEditor({ value, name }: { value: number | null; name: string }) {
   const t = useT()
   const s = t.schoolPage.editor
@@ -30,14 +31,13 @@ export function LogoEditor({ value, name }: { value: number | null; name: string
 
   return (
     <div className="flex items-center gap-4">
-      <span className="grid size-20 flex-none place-items-center overflow-hidden rounded-2xl border bg-background p-2">
-        {current ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={`/files/${current}`} alt={name} className="size-full object-contain" />
-        ) : (
-          <Icon name="image" className="size-6 text-muted-foreground" />
-        )}
-      </span>
+      {current ? (
+        <BrandImage key={current} src={`/files/${current}`} alt={name} className="size-20 flex-none rounded-2xl border" />
+      ) : (
+        <span className="grid size-20 flex-none place-items-center rounded-2xl border border-dashed text-muted-foreground">
+          <Icon name="image" className="size-6" />
+        </span>
+      )}
       <div className="flex flex-col items-start gap-2">
         <div className="flex flex-wrap gap-2">
           <Button type="button" variant="outline" size="sm" disabled={pending} onClick={() => input.current?.click()}>

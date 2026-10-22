@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { Block, BlockData, SchoolPage } from '@/entities/school-page'
+import { BrandImage } from '@/shared/ui/brand-image'
 import { Button } from '@/shared/ui/button'
 import { Icon } from '@/shared/ui/icon'
 import { InitialsAvatar } from '@/shared/ui/initials-avatar'
@@ -38,10 +39,7 @@ export async function SchoolPageView({ page, blocks }: { page: SchoolPage; block
           </>
         )}
         {page.logoId && (
-          <span className="mb-5 grid size-20 place-items-center overflow-hidden rounded-2xl bg-background p-2.5 shadow-lg ring-1 ring-foreground/10 sm:size-24">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={fileSrc(page.logoId)} alt="" className="size-full object-contain" />
-          </span>
+          <BrandImage src={fileSrc(page.logoId)} className="mb-5 size-20 rounded-2xl shadow-lg ring-1 ring-foreground/10 sm:size-24" />
         )}
         <h1 className="max-w-3xl text-3xl font-semibold tracking-tight text-balance sm:text-5xl">{page.name}</h1>
         {page.tagline && <p className="mt-3 max-w-2xl text-lg text-pretty opacity-90">{page.tagline}</p>}

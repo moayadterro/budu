@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { publicSchools } from '@/entities/tenant/server'
+import { BrandImage } from '@/shared/ui/brand-image'
 import { Button } from '@/shared/ui/button'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/shared/ui/empty'
 import { Icon } from '@/shared/ui/icon'
@@ -41,10 +42,7 @@ export async function PublicSchoolsPage() {
                 const card = (
                   <>
                     {x.logoId ? (
-                      <span className="grid size-14 flex-none place-items-center overflow-hidden rounded-xl border bg-background p-1.5">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={`/files/${x.logoId}`} alt="" className="size-full object-contain" />
-                      </span>
+                      <BrandImage src={`/files/${x.logoId}`} className="size-14 flex-none rounded-xl border" />
                     ) : (
                       <InitialsAvatar initials={initials(x.name)} color="var(--color-primary)" className="size-14 rounded-xl" />
                     )}
