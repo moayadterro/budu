@@ -1175,6 +1175,49 @@ export const en = {
     failed: 'We couldn’t save your rating. Try again.',
   },
 
+  seo: {
+    siteName: 'Budu',
+    home: {
+      title: 'Budu — online school for schools, teachers and families',
+      description:
+        'Lessons, homework, grades, timetable and parent chat in one place. Schools, teachers and students learn together on Budu — free to start.',
+    },
+    catalog: {
+      title: 'Online courses',
+      description:
+        'Browse online courses from Budu teachers and schools: video lessons, homework and quizzes. Try the first lesson free.',
+    },
+    schools: {
+      title: 'Schools on Budu',
+      description:
+        'Schools that teach with Budu — their news, photos and best students.',
+    },
+    pricing: {
+      title: 'Pricing',
+      description:
+        'Budu is free for students and teachers. Schools start free; larger schools get a quote.',
+    },
+    about: {
+      title: 'About Budu',
+      description:
+        'Budu brings school, teachers and families together: what we build and what we believe in.',
+    },
+    help: {
+      title: 'Help',
+      description:
+        'Answers to common questions about Budu, and how to reach support.',
+    },
+    contact: {
+      title: 'Contact',
+      description:
+        'Write to the Budu team — schools, partnerships and support.',
+    },
+    privacy: {
+      title: 'Privacy policy',
+      description: 'What data Budu keeps, why, and how you control it.',
+    },
+    coursePreview: (course: string) => `${course} — free first lesson`,
+  },
   site: {
     nav: { courses: 'Courses', pricing: 'Pricing', schools: 'Schools', about: 'About' },
     menu: 'Menu',

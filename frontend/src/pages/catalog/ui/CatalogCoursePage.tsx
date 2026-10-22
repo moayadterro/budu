@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { LocalLink as Link } from '@/shared/ui/local-link'
 import { notFound, redirect } from 'next/navigation'
 import { getSession } from '@/entities/session/server'
 import { getCurrency, visitorCurrency } from '@/entities/user/server'

@@ -1,14 +1,17 @@
 import 'server-only'
 import { cookies, headers } from 'next/headers'
 import { cache } from 'react'
-import { isLocale, LOCALE_COOKIE, matchLocale, type Locale } from './config'
+import { isLocale, LOCALE_COOKIE, LOCALE_HEADER, matchLocale, type Locale } from './config'
 import { MESSAGES, type Messages } from './messages'
 
 /**
- * The request's locale (owner's rule): the user's own choice (cookie — set when they pick a language,
- * and at sign-in from their account), else the browser's preferred language if Budu has it, else English.
+ * The request's locale. A public page's URL decides (/ru/… — the proxy passes it in LOCALE_HEADER).
+ * Elsewhere (owner's rule): the user's own choice (cookie — set when they pick a language, and at
+ * sign-in from their account), else the browser's preferred language if Budu has it, else English.
  */
 export const getLocale = cache(async (): Promise<Locale> => {
+  const fromUrl = (await headers()).get(LOCALE_HEADER)
+  if (isLocale(fromUrl)) return fromUrl
   const chosen = (await cookies()).get(LOCALE_COOKIE)?.value
   if (isLocale(chosen)) return chosen
   return matchLocale((await headers()).get('accept-language'))

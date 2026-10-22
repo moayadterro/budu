@@ -45,3 +45,31 @@ export function matchLocale(acceptLanguage: string | null | undefined): Locale {
   const first = ranked[0]?.code
   return isLocale(first) ? first : DEFAULT_LOCALE
 }
+
+/**
+ * SEO: the public pages exist in every language — English (the default) at /x, every other language
+ * at /<code>/x (/ru/pricing, /ar/schools/…). The URL then decides the language (the proxy passes it
+ * on in LOCALE_HEADER). Signed-in screens and auth pages are not localized by URL.
+ */
+export const LOCALIZED_PATHS = ['/catalog', '/schools', '/pricing', '/about', '/help', '/contact', '/privacy']
+export const LOCALE_HEADER = 'x-budu-locale'
+
+export const isLocalizedPath = (path: string) =>
+  path === '/' || LOCALIZED_PATHS.some((p) => path === p || path.startsWith(`${p}/`))
+
+/** The address of `path` in `locale`: "/pricing" → "/ru/pricing"; English stays "/pricing". */
+export const localePath = (path: string, locale: Locale) =>
+  locale === DEFAULT_LOCALE || !isLocalizedPath(path) ? path : `/${locale}${path === '/' ? '' : path}`
+
+/** "/ru/pricing" → { locale: "ru", path: "/pricing" }; "/pricing" → { locale: null, path: "/pricing" }. */
+export function splitLocale(pathname: string): { locale: Locale | null; path: string } {
+  const first = pathname.split('/')[1]
+  return isLocale(first) ? { locale: first, path: pathname.slice(first.length + 1) || '/' } : { locale: null, path: pathname }
+}
+
+/** localePath for a link that may carry ?query or #hash: "/contact?topic=school" → "/ru/contact?topic=school". */
+export function localeHref(href: string, locale: Locale) {
+  if (!href.startsWith('/')) return href
+  const i = href.search(/[?#]/)
+  return i < 0 ? localePath(href, locale) : localePath(href.slice(0, i), locale) + href.slice(i)
+}

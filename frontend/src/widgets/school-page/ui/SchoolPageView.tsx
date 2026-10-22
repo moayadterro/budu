@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { LocalLink as Link } from '@/shared/ui/local-link'
 import { Medal, type Block, type BlockData, type SchoolPage } from '@/entities/school-page'
 import { BrandImage } from '@/shared/ui/brand-image'
 import { Button } from '@/shared/ui/button'

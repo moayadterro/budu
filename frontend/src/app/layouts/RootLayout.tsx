@@ -9,7 +9,9 @@ import { Toaster } from '@/shared/ui/sonner'
 import { TooltipProvider } from '@/shared/ui/tooltip'
 
 export const metadata: Metadata = {
-  title: 'Budu',
+  // absolute URLs for canonical / hreflang / Open Graph (the public pages set those per language)
+  metadataBase: new URL(process.env.APP_URL ?? 'http://localhost:3000'),
+  title: { default: 'Budu', template: '%s · Budu' },
   description: 'Online learning platform',
 }
 

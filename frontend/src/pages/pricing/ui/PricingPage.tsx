@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { LocalLink as Link } from '@/shared/ui/local-link'
 import { SITE } from '@/shared/config/site'
 import { cn } from '@/shared/lib/cn'
 import { Button } from '@/shared/ui/button'

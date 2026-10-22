@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { LocalLink as Link } from '@/shared/ui/local-link'
 import type { ReactNode } from 'react'
 import { CourseCover, type ShownPrice } from '@/entities/course'
 import type { CatalogCourse } from '@/entities/course/server'

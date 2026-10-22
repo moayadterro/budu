@@ -6,7 +6,7 @@ export {
   setGradeScale,
   getTenantName,
   schoolsInfo,
-  publicSchools,
+  publicSchools, publishedSchoolSlugs,
   setSchoolCity,
   setSchoolLogo,
   isSchool,

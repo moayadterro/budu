@@ -21,8 +21,9 @@ async function manager() {
 const refresh = async (companyId: number) => {
   revalidatePath('/school/page')
   const page = await pageOf(companyId)
-  if (page?.slug) revalidatePath(`/schools/${page.slug}`)
-  revalidatePath('/schools')
+  // public pages live under /[lang] (every language version at once)
+  if (page?.slug) revalidatePath('/[lang]/schools/[slug]', 'page')
+  revalidatePath('/[lang]/schools', 'page')
 }
 
 export type SlugCheck = 'ok' | 'invalid' | 'taken'

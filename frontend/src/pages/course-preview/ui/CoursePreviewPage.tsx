@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { LocalLink as Link } from '@/shared/ui/local-link'
 import { notFound } from 'next/navigation'
 import { LessonMaterials } from '@/entities/course'
 import { previewLesson } from '@/entities/course/server'

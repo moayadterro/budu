@@ -78,6 +78,10 @@ Slice layout: `ui/` (components), `model/` (types, client state, validation), `l
 
 Adding a screen: write `src/pages/<name>/ui/<Name>Page.tsx` + `index.ts`, then a one-line route in
 `frontend/app/(shell)/<path>/page.tsx`: `export { NamePage as default } from '@/pages/<name>'`.
+A PUBLIC (SEO) page goes in `frontend/app/(public)/[lang]/<path>/page.tsx` instead: add its path to
+`LOCALIZED_PATHS` (`shared/i18n/config.ts`), export `generateMetadata` (`staticPageMetadata` / `pageMetadata`
+from `shared/server/seo`, strings in `t.seo`), add it to `src/app/seo/sitemap.ts`, and use `LocalLink`
+(`shared/ui/local-link`), never `next/link`, for links on public pages.
 Unbuilt screens stay in `shared/config/nav.ts` with `href: null` (rendered disabled).
 
 ## UI conventions
@@ -391,6 +395,21 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-22 SEO: public pages have one address per language (owner): English at `/x`, others at
+  `/<code>/x` (`/ru/pricing`, `/ar/schools/…`). Routes live in `app/(public)/[lang]/…`; the proxy
+  rewrites English addresses to `/en/…` internally (`/en/…` itself redirects to `/…`) and passes the
+  URL language in the `x-budu-locale` request header, which `getLocale()` reads first. Owner chose
+  "redirect once": a visitor on an English address whose chosen (cookie) or browser language is
+  another one is redirected to it; crawlers (by user agent) never are, so every address is indexable
+  (same content for everyone — not cloaking). Opening a `/ru/…` address saves ru in the cookie (so
+  sign-in and the app continue in it). Switching language on a public page does a full load of the
+  same page in the other language (the root layout doesn't re-render on client navigation). Each
+  page: translated title/description (`t.seo`), canonical = its own address, hreflang alternates for
+  every language + x-default (English), Open Graph/Twitter; `/sitemap.xml` (all pages × languages,
+  published schools, listed courses + previews) and `/robots.txt`. Pages are server-rendered per
+  request (crawlers get full HTML); fully static pages would need the header's session check moved
+  to the client — later if needed.
+
 - 2026-10-22 Mobile app = it will call a Budu API (`/api/v1`, token login — to build), NOT IOMAD
   directly (owner). Storage audit for it — IOMAD now holds what has a natural home there:
   per-user settings (Moodle user preferences budu_locale / budu_currency / budu_parent_skipped via

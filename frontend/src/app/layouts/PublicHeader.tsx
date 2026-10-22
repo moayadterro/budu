@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import { LocalLink as Link } from '@/shared/ui/local-link'
 import { usePathname } from 'next/navigation'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useEffect, useState } from 'react'
@@ -10,7 +10,7 @@ import { Button } from '@/shared/ui/button'
 import { Icon } from '@/shared/ui/icon'
 import { Logo } from '@/shared/ui/logo'
 import { cn } from '@/shared/lib/cn'
-import { useT } from '@/shared/i18n'
+import { splitLocale, useT } from '@/shared/i18n'
 
 const NAV = [
   { key: 'courses', href: '/catalog' },
@@ -27,7 +27,7 @@ const NAV = [
  */
 export function PublicHeader({ signedIn }: { signedIn: boolean }) {
   const t = useT()
-  const pathname = usePathname() ?? '/'
+  const pathname = splitLocale(usePathname() ?? '/').path // "/ru/pricing" → "/pricing"
   const reduce = useReducedMotion()
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)

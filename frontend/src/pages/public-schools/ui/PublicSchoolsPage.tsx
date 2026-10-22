@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { LocalLink as Link } from '@/shared/ui/local-link'
 import { publicSchools } from '@/entities/tenant/server'
 import { SchoolCards } from '@/features/browse-schools'
 import { Button } from '@/shared/ui/button'

@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { LocalLink as Link } from '@/shared/ui/local-link'
 import { Logo } from '@/shared/ui/logo'
 import { getT } from '@/shared/i18n/server'
 

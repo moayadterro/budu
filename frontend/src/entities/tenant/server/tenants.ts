@@ -102,6 +102,16 @@ export async function publicSchools(after: SchoolCursor | null = null, limit = 2
   }
 }
 
+/** Every published school page's address and when it last changed (for the sitemap). */
+export async function publishedSchoolSlugs(): Promise<Array<{ slug: string; updatedAt: Date }>> {
+  const rows = await query<{ slug: string; updated_at: Date }>(
+    `SELECT t.slug, p.updated_at FROM tenants t JOIN school_pages p ON p.iomad_url = t.iomad_url AND p.company_id = t.company_id
+      WHERE t.iomad_url = $1 AND t.kind = 'school' AND p.published AND t.slug IS NOT NULL ORDER BY t.created_at, t.company_id`,
+    [defaultInstance().url],
+  )
+  return rows.map((r) => ({ slug: r.slug, updatedAt: new Date(r.updated_at) }))
+}
+
 /** The school's logo = IOMAD's company logo (null = remove). Returns the new logo file id. */
 export async function setSchoolLogo(userId: number, companyId: number, file: File | null): Promise<number | null> {
   const draft = file ? await iomadUpload(defaultInstance(), file) : 0

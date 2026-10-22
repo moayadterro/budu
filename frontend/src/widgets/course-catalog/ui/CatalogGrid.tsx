@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { LocalLink as Link } from '@/shared/ui/local-link'
 import { CourseCover, type ShownPrice } from '@/entities/course'
 import type { CatalogCourse, Listing } from '@/entities/course/server'
 import { RatingLine, type Rating } from '@/entities/review'

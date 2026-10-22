@@ -5,6 +5,7 @@ import { getSession } from '@/entities/session/server'
 import { SchoolPageView } from '@/widgets/school-page'
 import { Alert } from '@/shared/ui/alert'
 import { getT } from '@/shared/i18n/server'
+import { pageMetadata, snippet } from '@/shared/server/seo'
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -22,9 +23,17 @@ async function load(slug: string) {
 }
 
 export async function generateSchoolMetadata({ params }: Props): Promise<Metadata> {
-  const r = await load((await params).slug)
-  if (!r || r.draft) return { title: 'Budu' }
-  return { title: `${r.page.name} · Budu`, description: r.page.tagline || undefined }
+  const slug = (await params).slug
+  const r = await load(slug)
+  if (!r) return {}
+  if (r.draft) return { title: r.page.name, robots: { index: false } } // a manager's preview
+  const t = await getT()
+  return pageMetadata({
+    path: `/schools/${slug}`,
+    title: r.page.name,
+    description: snippet(r.page.tagline || t.seo.schools.description),
+    image: r.page.coverId || r.page.logoId ? `/files/${r.page.coverId || r.page.logoId}` : null,
+  })
 }
 
 /** Public: a school's own page (/schools/<slug>) — published ones for everybody, drafts for its managers. */

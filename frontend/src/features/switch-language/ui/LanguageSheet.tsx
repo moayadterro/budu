@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState } from 'react'
 import { Icon } from '@/shared/ui/icon'
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/shared/ui/sheet'
 import { cn } from '@/shared/lib/cn'
-import { LANGUAGES, LOCALE_NAMES, isLocale, useLocale, useT } from '@/shared/i18n'
+import { LANGUAGES, LOCALE_NAMES, useLocale, useT } from '@/shared/i18n'
 import { secondaryName } from '../lib/languageLabel'
-import { setLanguage } from '../server/actions'
+import { useSwitchLanguage } from '../lib/useSwitchLanguage'
 
 /**
  * Phone language choice: a full-width row with the current language that opens a bottom sheet
@@ -17,11 +17,11 @@ export function LanguageSheet() {
   const t = useT()
   const locale = useLocale()
   const [open, setOpen] = useState(false)
-  const [pending, start] = useTransition()
+  const { pending, choose: switchTo } = useSwitchLanguage()
 
   const choose = (code: string) => {
     setOpen(false)
-    if (code !== locale && isLocale(code)) start(() => setLanguage(code))
+    if (code !== locale) switchTo(code)
   }
 
   return (

@@ -1,6 +1,5 @@
 'use client'
 
-import { useTransition } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { LanguageSkillIcon } from '@hugeicons/core-free-icons'
 import { Button } from '@/shared/ui/button'
@@ -13,15 +12,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu'
-import { LANGUAGES, isLocale, useLocale, useT } from '@/shared/i18n'
+import { LANGUAGES, useLocale, useT } from '@/shared/i18n'
 import { secondaryName } from '../lib/languageLabel'
-import { setLanguage } from '../server/actions'
+import { useSwitchLanguage } from '../lib/useSwitchLanguage'
 
 /** Globe button with a scrollable radio list of languages (header and sign-in pages). */
 export function LanguageMenu() {
   const t = useT()
   const locale = useLocale()
-  const [pending, start] = useTransition()
+  const { pending, choose } = useSwitchLanguage()
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -32,7 +31,7 @@ export function LanguageMenu() {
       <DropdownMenuContent align="end" className="max-h-80 min-w-48 overflow-y-auto">
         <DropdownMenuLabel>{t.account.language}</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuRadioGroup value={locale} onValueChange={(code) => isLocale(code) && start(() => setLanguage(code))}>
+        <DropdownMenuRadioGroup value={locale} onValueChange={choose}>
           {LANGUAGES.map((l) => {
             const other = secondaryName(l.code, locale)
             return (
