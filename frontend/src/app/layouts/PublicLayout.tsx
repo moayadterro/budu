@@ -1,60 +1,17 @@
-import Link from 'next/link'
 import { ReactNode } from 'react'
 import { getSession } from '@/entities/session/server'
-import { ThemeToggle } from '@/features/switch-theme'
-import { LanguageMenu } from '@/features/switch-language'
-import { Button } from '@/shared/ui/button'
-import { Logo } from '@/shared/ui/logo'
 import { PublicFooter } from './PublicFooter'
-import { getT } from '@/shared/i18n/server'
+import { PublicHeader } from './PublicHeader'
 
 /**
- * Public pages anyone can open without an account (the course catalog): a slim header with the
- * Budu logo, theme and language, and Sign in / Sign up — or "Open Budu" when signed in.
+ * Public pages anyone can open without an account (catalog, schools, about …): the floating header
+ * (logo, sections, theme, language, Sign in / Sign up — or "Open Budu" when signed in) and the footer.
  */
-const NAV = [
-  { key: 'courses', href: '/catalog' },
-  { key: 'pricing', href: '/pricing' },
-  { key: 'schools', href: '/schools' },
-  { key: 'about', href: '/about' },
-] as const
-
 export async function PublicLayout({ children }: { children: ReactNode }) {
-  const [t, user] = await Promise.all([getT(), getSession()])
+  const user = await getSession()
   return (
     <div className="min-h-svh bg-background">
-      <header className="sticky top-0 z-20 border-b bg-background/90 backdrop-blur">
-        <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4">
-          <Link href="/" className="flex items-center" aria-label={t.appName}>
-            <Logo className="h-7 w-auto" label={t.appName} />
-          </Link>
-          <nav className="ms-4 hidden items-center gap-5 md:flex" aria-label={t.appName}>
-            {NAV.map((n) => (
-              <Link key={n.href} href={n.href} className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
-                {t.site.nav[n.key]}
-              </Link>
-            ))}
-          </nav>
-          <div className="ms-auto flex items-center gap-2">
-            <ThemeToggle />
-            <LanguageMenu />
-            {user ? (
-              <Button size="sm" asChild>
-                <Link href="/">{t.catalog.openApp}</Link>
-              </Button>
-            ) : (
-              <>
-                <Button size="sm" variant="ghost" asChild>
-                  <Link href="/login">{t.catalog.signIn}</Link>
-                </Button>
-                <Button size="sm" asChild>
-                  <Link href="/register">{t.catalog.signUp}</Link>
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
+      <PublicHeader signedIn={!!user} />
       <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>
       <PublicFooter />
     </div>

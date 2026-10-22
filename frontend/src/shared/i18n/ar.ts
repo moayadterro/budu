@@ -1184,6 +1184,8 @@ export const ar: typeof en = {
 
   site: {
     nav: { courses: 'الدورات', pricing: 'الأسعار', schools: 'المدارس', about: 'من نحن' },
+    menu: 'القائمة',
+    closeMenu: 'إغلاق القائمة',
     footer: {
       tagline: 'تعلّم يجمع المدرسة والمعلمين والعائلات.',
       product: 'المنتج',

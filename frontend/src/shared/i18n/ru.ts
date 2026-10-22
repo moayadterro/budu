@@ -1186,6 +1186,8 @@ export const ru: typeof en = {
 
   site: {
     nav: { courses: 'Курсы', pricing: 'Цены', schools: 'Школы', about: 'О нас' },
+    menu: 'Меню',
+    closeMenu: 'Закрыть меню',
     footer: {
       tagline: 'Обучение, которое объединяет школу, учителей и семьи.',
       product: 'Продукт',

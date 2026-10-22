@@ -1177,6 +1177,8 @@ export const en = {
 
   site: {
     nav: { courses: 'Courses', pricing: 'Pricing', schools: 'Schools', about: 'About' },
+    menu: 'Menu',
+    closeMenu: 'Close menu',
     footer: {
       tagline: 'Learning that brings school, teachers and families together.',
       product: 'Product',
