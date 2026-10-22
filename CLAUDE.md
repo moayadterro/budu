@@ -164,7 +164,7 @@ shadcn classes: `bg-background`, `bg-card`, `text-foreground`, `text-muted-foreg
 fixed dark live-classroom stage (`bg-live`, `text-live-foreground` …). Rules:
 - Fonts: body Golos Text (`--font-app`; Arabic: IBM Plex Sans Arabic); headings Geologica (`--font-head` →
   `font-heading`, applied in globals.css to h1–h6 and shadcn card/dialog/sheet/empty titles; Arabic
-  letters fall back to IBM Plex Sans Arabic). Loaded from Google Fonts in RootLayout.
+  heading letters in Noto Kufi Arabic — owner asked for Kufi). Loaded from Google Fonts in RootLayout.
 - **Never hardcode hex/oklch, `white`/`black`, or rgba** in components; add a token instead.
 - Inline `style` is OK only to pass a token through (e.g. a subject's `var(--color-info)`), or to mix
   tokens with `tint()` from `shared/lib/color`.

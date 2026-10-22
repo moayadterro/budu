@@ -19,8 +19,8 @@
 :root {
   /* Golos Text covers Latin + Cyrillic; Arabic pages switch to IBM Plex Sans Arabic */
   --font-app: 'Golos Text', ui-sans-serif, system-ui, sans-serif;
-  /* headings: Geologica (Latin + Cyrillic); Arabic letters fall back to IBM Plex Sans Arabic */
-  --font-head: 'Geologica', 'IBM Plex Sans Arabic', 'Golos Text', ui-sans-serif, system-ui, sans-serif;
+  /* headings: Geologica (Latin + Cyrillic); Arabic letters in Noto Kufi Arabic (Geologica has none) */
+  --font-head: 'Geologica', 'Noto Kufi Arabic', 'Golos Text', ui-sans-serif, system-ui, sans-serif;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
