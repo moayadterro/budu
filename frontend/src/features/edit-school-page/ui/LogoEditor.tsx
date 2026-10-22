@@ -50,7 +50,6 @@ export function LogoEditor({ value, name }: { value: number | null; name: string
             </Button>
           )}
         </div>
-        <p className="text-xs text-muted-foreground">{s.logoHint}</p>
         {error && <p className="text-xs text-destructive">{error}</p>}
       </div>
       <input
