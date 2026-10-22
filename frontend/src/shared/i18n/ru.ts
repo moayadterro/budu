@@ -1587,6 +1587,8 @@ export const ru: typeof en = {
     theme: 'Тема',
     themeHint: 'Светлая, тёмная или как на устройстве.',
     themes: { light: 'Светлая', dark: 'Тёмная', system: 'Системная' },
+    /** the short name of 'system' where space is tight (segmented control) */
+    themeAuto: 'Авто',
     errors: {
       invalid: 'Заполните все поля.',
       tooLong: 'Слишком длинно — сократите, пожалуйста.',

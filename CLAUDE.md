@@ -169,6 +169,10 @@ fixed dark live-classroom stage (`bg-live`, `text-live-foreground` …). Rules:
 - **Localization: English, Russian, Arabic** (up to ~10 planned). The languages are ONE list,
   `LANGUAGES` in `src/shared/i18n/config.ts` (code, native name, dir); pickers, `<html lang/dir>`, RTL
   and Accept-Language matching all derive from it — see the steps in that file to add one.
+  **Language pickers must scale to 10+ languages (owner, 2026-10-22):** a row/button with the current
+  language that opens a scrollable list (`LanguageMenu` dropdown, `LanguageSheet` bottom sheet on
+  phones, `LanguagePicker` select) — never a segmented control or one button per language.
+  `Segmented` (`shared/ui/segmented`) is only for small FIXED sets (e.g. theme light/dark/auto).
   Strings live in `src/shared/i18n/en.ts` (reference);
   `ru.ts` and `ar.ts` are typed `typeof en`, so a missing key fails the build — add every new string
   to all three. Server components / server code: `const t = await getT()` (`@/shared/i18n/server`);

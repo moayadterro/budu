@@ -1578,6 +1578,8 @@ export const en = {
     theme: 'Theme',
     themeHint: 'Light, dark, or match your device.',
     themes: { light: 'Light', dark: 'Dark', system: 'System' },
+    /** the short name of 'system' where space is tight (segmented control) */
+    themeAuto: 'Auto',
     errors: {
       invalid: 'Please fill in every field.',
       tooLong: 'That’s too long — please shorten it.',

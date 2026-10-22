@@ -1585,6 +1585,8 @@ export const ar: typeof en = {
     theme: 'المظهر',
     themeHint: 'فاتح أو داكن أو حسب جهازك.',
     themes: { light: 'فاتح', dark: 'داكن', system: 'النظام' },
+    /** the short name of 'system' where space is tight (segmented control) */
+    themeAuto: 'تلقائي',
     errors: {
       invalid: 'يرجى ملء كل الحقول.',
       tooLong: 'النص طويل جدًا — يرجى اختصاره.',

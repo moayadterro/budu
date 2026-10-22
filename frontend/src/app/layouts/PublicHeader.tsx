@@ -4,8 +4,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useEffect, useState } from 'react'
-import { ThemeToggle } from '@/features/switch-theme'
-import { LanguageMenu } from '@/features/switch-language'
+import { ThemeSegment, ThemeToggle } from '@/features/switch-theme'
+import { LanguageMenu, LanguageSheet } from '@/features/switch-language'
 import { Button } from '@/shared/ui/button'
 import { Icon } from '@/shared/ui/icon'
 import { Logo } from '@/shared/ui/logo'
@@ -140,16 +140,18 @@ export function PublicHeader({ signedIn }: { signedIn: boolean }) {
                     <Icon name="chevRight" className="size-4 opacity-50 rtl:rotate-180" />
                   </Link>
                 ))}
-                <div className="mt-2 flex items-center gap-2">
-                  {!signedIn && (
-                    <Button variant="outline" className="h-12 flex-1 rounded-xl text-base" asChild>
-                      <Link href="/login">{t.catalog.signIn}</Link>
-                    </Button>
-                  )}
-                  <div className="ms-auto flex items-center gap-1">
-                    <ThemeToggle />
-                    <LanguageMenu />
-                  </div>
+                {!signedIn && (
+                  <Button variant="outline" className="mt-2 h-12 rounded-xl text-base" asChild>
+                    <Link href="/login">{t.catalog.signIn}</Link>
+                  </Button>
+                )}
+                <div className="mt-3 flex flex-col gap-3 border-t border-foreground/8 px-1 pt-4">
+                  <MenuSetting label={t.account.theme}>
+                    <ThemeSegment />
+                  </MenuSetting>
+                  <MenuSetting label={t.account.language}>
+                    <LanguageSheet />
+                  </MenuSetting>
                 </div>
               </div>
             </motion.nav>
@@ -157,6 +159,16 @@ export function PublicHeader({ signedIn }: { signedIn: boolean }) {
         </AnimatePresence>
       </div>
     </header>
+  )
+}
+
+/** A labelled setting in the phone menu. */
+function MenuSetting({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="px-1 text-xs font-medium text-muted-foreground">{label}</span>
+      {children}
+    </div>
   )
 }
 
