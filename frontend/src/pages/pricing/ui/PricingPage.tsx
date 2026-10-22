@@ -1,5 +1,4 @@
 import { LocalLink as Link } from '@/shared/ui/local-link'
-import { SITE } from '@/shared/config/site'
 import { cn } from '@/shared/lib/cn'
 import { Button } from '@/shared/ui/button'
 import { Icon, type IconName } from '@/shared/ui/icon'
@@ -11,21 +10,22 @@ const TONE = {
   purple: { glow: 'from-subject-purple/18', tile: 'bg-subject-purple/12 text-subject-purple', blob: 'bg-subject-purple/25' },
   amber: { glow: 'from-highlight/20', tile: 'bg-highlight/15 text-highlight', blob: 'bg-highlight/30' },
   terra: { glow: 'from-subject-terra/18', tile: 'bg-subject-terra/12 text-subject-terra', blob: 'bg-subject-terra/25' },
+  green: { glow: 'from-primary/16', tile: 'bg-primary/12 text-primary', blob: 'bg-primary/22' },
 } as const
 type Tone = keyof typeof TONE
 
 /**
- * Public: plans (owner) — students always free; teachers free (the AI creator kit will be paid);
- * schools free up to SITE.freeSchool, then an offer. The page has one job: get people to sign up
- * and schools to try Budu — so every plan's button opens that exact sign-up (`/register?as=…`),
- * true "no barrier" facts sit by the buttons, and a closing band invites schools again.
- * Design: showcase, not boxes — soft brand glows fading into the page, the school plan raised in
- * the middle on the brand gradient, glass panels for the others, coloured tiles instead of borders.
+ * Public: plans (owner) — "learning should be fun": students get free access (we support them),
+ * teachers start without paying (the AI creator kit will be paid), schools pay by their number of
+ * students. The page has one job: get people to sign up and schools to try Budu — every plan's
+ * button opens that exact sign-up (`/register?as=…`) and a closing band invites schools again.
+ * Design: showcase, not boxes, and LIGHT (owner: the solid green was too heavy) — soft glows fading
+ * into the page, the school plan raised in the middle in a light green tint, glass panels for the
+ * others, coloured tiles instead of borders.
  */
 export async function PricingPage() {
   const t = await getT()
   const s = t.site.pricing
-  const free = SITE.freeSchool
 
   const side = (key: 'students' | 'teachers', icon: IconName, tone: Tone, href: string) => {
     const p = s[key]
@@ -40,7 +40,7 @@ export async function PricingPage() {
           <h2 className="text-lg font-semibold">{p.name}</h2>
         </div>
         <div>
-          <p className="font-heading text-5xl font-semibold tracking-tight">{p.price}</p>
+          <p className="font-heading text-3xl font-semibold tracking-tight text-balance sm:text-4xl lg:text-3xl xl:text-4xl">{p.price}</p>
           <p className="mt-2 text-sm text-muted-foreground">{p.who}</p>
         </div>
         <Button variant="outline" size="lg" className="h-auto min-h-11 w-full py-2.5 whitespace-normal" asChild>
@@ -69,6 +69,7 @@ export async function PricingPage() {
   const school = s.schools
   const soon: Array<{ key: keyof typeof s.soon; icon: IconName; tone: Tone }> = [
     { key: 'ai', icon: 'spark', tone: 'purple' },
+    { key: 'certificates', icon: 'file', tone: 'green' },
     { key: 'games', icon: 'trophy', tone: 'amber' },
     { key: 'cowork', icon: 'board', tone: 'info' },
     { key: 'clubs', icon: 'users', tone: 'terra' },
@@ -99,12 +100,12 @@ export async function PricingPage() {
       <section className="grid items-stretch gap-6 lg:grid-cols-3 lg:items-center lg:gap-5">
         {side('students', 'book', 'info', '/register?as=student')}
 
-        <article className="relative isolate flex flex-col gap-6 overflow-hidden rounded-3xl bg-brand p-6 text-primary-foreground shadow-2xl shadow-primary/25 sm:p-8 lg:py-12">
-          <div aria-hidden className="absolute -end-24 -top-24 -z-10 size-72 rounded-full bg-highlight/30 blur-3xl" />
-          <div aria-hidden className="absolute -start-20 -bottom-28 -z-10 size-72 rounded-full bg-primary-foreground/10 blur-3xl" />
+        <article className="relative isolate flex flex-col gap-6 overflow-hidden rounded-3xl bg-card p-6 shadow-2xl ring-2 shadow-primary/15 ring-primary/30 sm:p-8 lg:py-12">
+          <div aria-hidden className="absolute inset-0 -z-10 bg-linear-to-b from-primary/14 via-primary/5 to-transparent dark:from-primary/20" />
+          <div aria-hidden className="absolute -end-24 -top-24 -z-10 size-72 rounded-full bg-highlight/20 blur-3xl dark:bg-highlight/10" />
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <span className="grid size-11 place-items-center rounded-2xl bg-primary-foreground/15">
+              <span className="grid size-11 place-items-center rounded-2xl bg-primary/12 text-primary">
                 <Icon name="users" className="size-5" />
               </span>
               <h2 className="text-lg font-semibold">{school.name}</h2>
@@ -112,16 +113,16 @@ export async function PricingPage() {
             <span className="rounded-full bg-highlight px-3 py-1 text-xs font-semibold text-highlight-foreground">{school.badge}</span>
           </div>
           <div>
-            <p className="font-heading text-5xl font-semibold tracking-tight">{school.price}</p>
-            <p className="mt-2 text-sm text-primary-foreground/80">{school.who(free.teachers, free.students)}</p>
+            <p className="font-heading text-3xl font-semibold tracking-tight text-balance sm:text-4xl lg:text-3xl xl:text-4xl">{school.price}</p>
+            <p className="mt-2 text-sm text-muted-foreground">{school.who}</p>
           </div>
           <div className="flex flex-col gap-2">
-            <Button variant="highlight" size="lg" className="h-auto min-h-12 w-full py-3 text-base whitespace-normal" asChild>
+            <Button size="lg" className="h-auto min-h-12 w-full py-3 text-base whitespace-normal" asChild>
               <Link href="/register?as=school">{school.cta}</Link>
             </Button>
             <Link
               href="/contact?topic=school"
-              className="self-center rounded-md px-2 py-1 text-center text-sm text-balance text-primary-foreground/80 underline-offset-4 transition-colors hover:text-primary-foreground hover:underline"
+              className="self-center rounded-md px-2 py-1 text-center text-sm text-balance text-primary underline-offset-4 hover:underline"
             >
               {school.quote}
             </Link>
@@ -129,10 +130,10 @@ export async function PricingPage() {
           <ul className="flex flex-col gap-3 text-sm">
             {school.features.map((f) => (
               <li key={f} className="flex items-start gap-2.5">
-                <span className="mt-0.5 grid size-4.5 flex-none place-items-center rounded-full bg-primary-foreground/20">
+                <span className="mt-0.5 grid size-4.5 flex-none place-items-center rounded-full bg-primary/15 text-primary">
                   <Icon name="tick" className="size-3" />
                 </span>
-                <span>{f}</span>
+                <span className="text-foreground/85">{f}</span>
               </li>
             ))}
           </ul>
@@ -152,13 +153,22 @@ export async function PricingPage() {
           <p className="text-xs font-semibold tracking-wider text-primary uppercase">{s.soonEyebrow}</p>
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">{s.soonTitle}</h2>
         </div>
-        <div className="grid gap-5 sm:grid-cols-2">
-          {soon.map(({ key, icon, tone }) => {
+        {/* the two biggest ideas wide on top, the other three below */}
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-6">
+          {soon.map(({ key, icon, tone }, i) => {
             const c = TONE[tone]
             const item = s.soon[key]
             return (
-              <article key={key} className="relative isolate flex gap-4 overflow-hidden rounded-3xl bg-card/60 p-6 ring-1 ring-foreground/8 sm:p-7">
-                <div aria-hidden className={cn('absolute -start-16 -bottom-20 -z-10 size-52 rounded-full blur-3xl', c.blob)} />
+              <article
+                key={key}
+                className={cn(
+                  'relative isolate flex gap-4 overflow-hidden rounded-3xl bg-card/60 p-6 ring-1 ring-foreground/8 sm:p-7',
+                  i < 2 ? 'lg:col-span-3' : 'lg:col-span-2',
+                  i === soon.length - 1 && 'sm:col-span-2 lg:col-span-2',
+                )}
+              >
+                {/* the colour glows on the far side — the icon is at the start */}
+                <div aria-hidden className={cn('absolute -end-16 -bottom-20 -z-10 size-52 rounded-full blur-3xl', c.blob)} />
                 <span className={cn('grid size-12 flex-none place-items-center rounded-2xl', c.tile)}>
                   <Icon name={icon} className="size-6" />
                 </span>
@@ -176,15 +186,16 @@ export async function PricingPage() {
       </section>
 
       {/* closing invitation for schools */}
-      <section className="relative isolate flex flex-col items-center gap-5 overflow-hidden rounded-3xl bg-brand px-6 py-14 text-center text-primary-foreground sm:px-12 sm:py-16">
-        <div aria-hidden className="absolute -top-28 start-1/2 -z-10 size-96 -translate-x-1/2 rounded-full bg-highlight/25 blur-3xl rtl:translate-x-1/2" />
+      <section className="relative isolate flex flex-col items-center gap-5 overflow-hidden rounded-3xl px-6 py-14 text-center ring-1 ring-primary/15 sm:px-12 sm:py-16">
+        <div aria-hidden className="absolute inset-0 -z-10 bg-linear-to-br from-primary/12 via-primary/4 to-subject-purple/10 dark:from-primary/18" />
+        <div aria-hidden className="absolute -top-28 start-1/2 -z-10 size-96 -translate-x-1/2 rounded-full bg-highlight/15 blur-3xl rtl:translate-x-1/2" />
         <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-balance sm:text-4xl">{s.cta.title}</h2>
-        <p className="max-w-xl text-pretty text-primary-foreground/85">{s.cta.sub(free.teachers, free.students)}</p>
+        <p className="max-w-xl text-pretty text-muted-foreground">{s.cta.sub}</p>
         <div className="mt-2 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row">
-          <Button variant="highlight" size="lg" className="h-12 px-6 text-base" asChild>
+          <Button size="lg" className="h-12 px-6 text-base" asChild>
             <Link href="/register?as=school">{s.cta.primary}</Link>
           </Button>
-          <Button variant="ghost" size="lg" className="h-12 px-6 text-base text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground" asChild>
+          <Button variant="outline" size="lg" className="h-12 bg-background/60 px-6 text-base" asChild>
             <Link href="/contact?topic=school">{s.cta.secondary}</Link>
           </Button>
         </div>
