@@ -1357,7 +1357,6 @@ export const ru: typeof en = {
   },
 
   schoolPage: {
-    since: (year: number) => `На Budu с ${year} года`,
     emptyPublic: 'Школа ещё готовит свою страницу.',
     newsDefault: 'Новости',
     topDefault: 'Наши лучшие ученики',

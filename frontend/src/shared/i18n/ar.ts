@@ -1355,7 +1355,6 @@ export const ar: typeof en = {
   },
 
   schoolPage: {
-    since: (year: number) => `على Budu منذ ${year}`,
     emptyPublic: 'ما زالت المدرسة تجهّز صفحتها.',
     newsDefault: 'الأخبار',
     topDefault: 'طلابنا المتفوقون',

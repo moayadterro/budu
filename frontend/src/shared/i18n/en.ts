@@ -1348,7 +1348,6 @@ export const en = {
   },
 
   schoolPage: {
-    since: (year: number) => `On Budu since ${year}`,
     emptyPublic: 'This school is still preparing its page.',
     newsDefault: 'News',
     topDefault: 'Our top students',

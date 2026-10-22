@@ -5,6 +5,7 @@ import { Button } from '@/shared/ui/button'
 import { Icon } from '@/shared/ui/icon'
 import { InitialsAvatar } from '@/shared/ui/initials-avatar'
 import { cn } from '@/shared/lib/cn'
+import { contentDir } from '@/shared/lib/text-dir'
 import { getLocale, getT } from '@/shared/i18n/server'
 
 const fileSrc = (id: number) => `/files/${id}`
@@ -17,20 +18,20 @@ const initials = (name: string) =>
     .join('')
 
 /**
- * A school's public page: the hero (cover, name, tagline, city · since) and its blocks in one calm,
+ * A school's public page: the hero (cover, logo, name, tagline, city) and its blocks in one calm,
  * readable column. Everything the manager wrote is shown as text (never HTML).
  */
 export async function SchoolPageView({ page, blocks }: { page: SchoolPage; blocks: Block[] }) {
   const [t, locale] = await Promise.all([getT(), getLocale()])
   const s = t.schoolPage
-  const year = new Date(page.since * 1000).getFullYear()
   const date = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' })
   const visible = blocks.filter((b) => !isEmpty(b))
 
   return (
     <article className="flex flex-col gap-14">
       {/* hero */}
-      <header className="relative isolate flex min-h-72 flex-col justify-end overflow-hidden rounded-3xl bg-brand p-6 text-primary-foreground sm:min-h-96 sm:p-10">
+      {/* each part reads in the language it is written in (Arabic → right-to-left), whatever the UI language */}
+      <header dir={contentDir(page.name, page.tagline, page.city)} className="relative isolate flex min-h-72 flex-col justify-end overflow-hidden rounded-3xl bg-brand p-6 text-primary-foreground sm:min-h-96 sm:p-10">
         {page.coverId && (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -43,21 +44,18 @@ export async function SchoolPageView({ page, blocks }: { page: SchoolPage; block
         )}
         <h1 className="max-w-3xl text-3xl font-semibold tracking-tight text-balance sm:text-5xl">{page.name}</h1>
         {page.tagline && <p className="mt-3 max-w-2xl text-lg text-pretty opacity-90">{page.tagline}</p>}
-        <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm opacity-85">
-          {page.city && (
-            <span className="inline-flex items-center gap-1.5">
-              <Icon name="pin" className="size-4" />
-              {page.city}
-            </span>
-          )}
-          <span>{s.since(year)}</span>
-        </p>
+        {page.city && (
+          <p className="mt-4 flex items-center gap-1.5 text-sm opacity-85">
+            <Icon name="pin" className="size-4" />
+            {page.city}
+          </p>
+        )}
       </header>
 
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-14">
         {visible.length === 0 && <p className="text-center text-muted-foreground">{s.emptyPublic}</p>}
         {visible.map((b) => (
-          <section key={b.id} className="flex flex-col gap-5">
+          <section key={b.id} dir={contentDir(...textsOf(b.data))} className="flex flex-col gap-5">
             {b.kind === 'text' && <TextBlock d={b.data as BlockData['text']} />}
             {b.kind === 'photos' && <PhotosBlock d={b.data as BlockData['photos']} />}
             {b.kind === 'news' && <NewsBlock d={b.data as BlockData['news']} date={date} title={s.newsDefault} />}
@@ -81,6 +79,14 @@ export async function SchoolPageView({ page, blocks }: { page: SchoolPage; block
       </div>
     </article>
   )
+}
+
+/** The words in a block (not its JSON keys), to tell its language direction. */
+function textsOf(v: unknown): string[] {
+  if (typeof v === 'string') return [v]
+  if (Array.isArray(v)) return v.flatMap(textsOf)
+  if (v && typeof v === 'object') return Object.values(v).flatMap(textsOf)
+  return []
 }
 
 function isEmpty(b: Block) {
@@ -139,7 +145,7 @@ function NewsBlock({ d, date, title }: { d: BlockData['news']; date: Intl.DateTi
             )}
             <div className="flex flex-col gap-2 p-5">
               <time dateTime={n.date} className="text-xs font-medium tracking-wide text-primary uppercase">
-                {date.format(new Date(`${n.date}T12:00:00`))}
+                <bdi>{date.format(new Date(`${n.date}T12:00:00`))}</bdi>
               </time>
               {n.title && <h3 className="text-lg font-semibold text-balance">{n.title}</h3>}
               {n.body && <p className="leading-relaxed whitespace-pre-line text-muted-foreground">{n.body}</p>}
@@ -168,7 +174,7 @@ function SpotlightBlock({ d }: { d: BlockData['spotlight'] }) {
         {d.label && (
           <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-highlight px-3 py-1 text-xs font-semibold text-highlight-foreground">
             <Icon name="star" className="size-3.5" />
-            {d.label}
+            <span>{d.label}</span>
           </span>
         )}
         {d.name && <h2 className="text-2xl font-semibold tracking-tight text-balance">{d.name}</h2>}

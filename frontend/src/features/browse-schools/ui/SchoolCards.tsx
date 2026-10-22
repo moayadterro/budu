@@ -7,6 +7,7 @@ import { Button } from '@/shared/ui/button'
 import { Icon } from '@/shared/ui/icon'
 import { InitialsAvatar } from '@/shared/ui/initials-avatar'
 import { cn } from '@/shared/lib/cn'
+import { contentDir } from '@/shared/lib/text-dir'
 import { useT } from '@/shared/i18n'
 import { moreSchoolsAction } from '../server/actions'
 
@@ -56,6 +57,8 @@ export function SchoolCards({ initial, next: firstNext }: { initial: School[]; n
           <li key={x.slug}>
             <Link
               href={`/schools/${x.slug}`}
+              // an Arabic school's card reads right-to-left (name, city, logo on the right) in any UI language
+              dir={contentDir(x.name, x.city)}
               className="group flex h-full flex-col overflow-hidden rounded-2xl border bg-card shadow-xs transition-all hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
             >
               {/* the school's cover photo — or a calm brand strip with its logo */}
@@ -84,7 +87,7 @@ export function SchoolCards({ initial, next: firstNext }: { initial: School[]; n
                 {x.city && (
                   <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
                     <Icon name="pin" className="size-4 flex-none" />
-                    {x.city}
+                    <span>{x.city}</span>
                   </p>
                 )}
               </div>

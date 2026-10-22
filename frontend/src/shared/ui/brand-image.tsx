@@ -18,13 +18,14 @@ export function BrandImage({ src, alt = '', className }: { src: string; alt?: st
     if (img?.complete) setFit(img.naturalWidth ? fitOf(img) : 'contain')
   }, [src])
   return (
-    <span className={cn('grid place-items-center overflow-hidden bg-background', fit !== 'cover' && 'p-[10%]', className)}>
+    <span className={cn('grid place-items-center overflow-hidden bg-background', className)}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         ref={ref}
         src={src}
         alt={alt}
-        className={cn('size-full transition-opacity duration-200', fit === 'cover' ? 'object-cover' : 'object-contain', fit ? 'opacity-100' : 'opacity-0')}
+        // a logo keeps a margin inside the tile (as % of the TILE — padding % would follow the page width)
+        className={cn('transition-opacity duration-200', fit === 'cover' ? 'size-full object-cover' : 'size-[80%] object-contain', fit ? 'opacity-100' : 'opacity-0')}
         onLoad={(e) => setFit(fitOf(e.currentTarget))}
         onError={() => setFit('contain')}
       />
