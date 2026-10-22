@@ -571,7 +571,7 @@ export const en = {
     countrySearch: 'Search country',
     countryPick: 'Choose a country',
     address: 'School username',
-    addressWarn: 'Your page link changes with it — old links people saved or shared will show “page not found”.',
+    addressWarn: 'Changing it changes your page link. Old links will stop working.',
     addressConfirm: (name: string) => `Change the school username to @${name}?`,
     addressConfirmDesc: 'Old links to your page will stop working.',
     addressChange: 'Change school username',

@@ -77,19 +77,37 @@ export function AddressForm({ slug: current, origin }: { slug: string; origin: s
         )}
         {bad && <Icon name="close" className="size-4 text-destructive" />}
       </div>
-      <p dir="ltr" className="truncate text-xs text-muted-foreground">
-        {host}/schools/<span className="font-medium text-foreground">{value || '…'}</span>
-      </p>
+      {/* the saved address opens the page; a new one being typed is only a preview (no page there yet) */}
+      {changed ? (
+        <p dir="ltr" className="truncate text-xs text-muted-foreground">
+          {host}/schools/<span className="font-medium text-foreground">{value || '…'}</span>
+        </p>
+      ) : (
+        <a
+          href={`/schools/${current}`}
+          target="_blank"
+          rel="noopener"
+          dir="ltr"
+          className="group flex w-fit max-w-full items-center gap-1 truncate text-xs text-muted-foreground transition-colors hover:text-primary"
+        >
+          <span className="truncate">
+            {host}/schools/<span className="font-medium text-foreground group-hover:text-primary">{current}</span>
+          </span>
+          <Icon name="external" className="size-3 flex-none" />
+        </a>
+      )}
       {bad && (
         <p className="text-xs font-medium text-destructive" aria-live="polite">
           {e.slugErrors[check!]}
         </p>
       )}
       {result && result !== 'saved' && <p className="text-xs font-medium text-destructive">{result === 'server' ? e.failed : e.slugErrors[result]}</p>}
-      <p className="flex gap-1.5 text-xs leading-relaxed text-muted-foreground">
-        <Icon name="alert" className="mt-0.5 size-3.5 flex-none text-warning" />
-        {s.addressWarn}
-      </p>
+      <div className="flex items-center gap-2.5 rounded-xl bg-warning/10 p-2 pe-3">
+        <span className="grid size-7 flex-none place-items-center rounded-lg bg-warning/15 text-warning" aria-hidden>
+          <Icon name="alert" className="size-4" />
+        </span>
+        <p className="text-xs leading-relaxed text-foreground/80">{s.addressWarn}</p>
+      </div>
       <div className="mt-1 flex items-center gap-3">
         <Button type="button" disabled={!changed || check !== 'ok' || pending} onClick={() => setConfirming(true)}>
           {s.addressChange}

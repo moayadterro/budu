@@ -578,7 +578,7 @@ export const ar: typeof en = {
     countrySearch: 'ابحث عن دولة',
     countryPick: 'اختر دولة',
     address: 'اسم مستخدم المدرسة',
-    addressWarn: 'يتغيّر معه رابط صفحتك — والروابط القديمة التي حُفظت أو شوركت ستعرض «الصفحة غير موجودة».',
+    addressWarn: 'عند تغييره يتغيّر رابط صفحتك، وتتوقف الروابط القديمة عن العمل.',
     addressConfirm: (name: string) => `تغيير اسم مستخدم المدرسة إلى @${name}؟`,
     addressConfirmDesc: 'ستتوقف الروابط القديمة لصفحتك عن العمل.',
     addressChange: 'تغيير اسم مستخدم المدرسة',
