@@ -4,7 +4,8 @@ import { cn } from '@/shared/lib/cn'
  * The Budu logo (source: src/assets/logo.svg — regenerate this file when the SVG changes): the steps
  * mark + the wordmark, coloured by the `logo-mark` / `logo-text` tokens so it follows light/dark
  * mode. Size it by height: `className="h-8 w-auto"`. `mark` = the steps alone (small places like the
- * collapsed sidebar).
+ * collapsed sidebar). When CENTRED, nudge it right (`translate-x-[4.5%]`): the steps carry most of
+ * the ink, so the geometric centre looks left to the eye (optical centring).
  */
 export function Logo({ mark, className, label = 'Budu' }: { mark?: boolean; className?: string; label?: string }) {
   if (mark) {

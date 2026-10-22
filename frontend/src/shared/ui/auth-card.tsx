@@ -12,7 +12,8 @@ export function AuthCard({ title, sub, children, wide }: { title: string; sub?: 
   return (
     <main className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
       <div className={cn('flex w-full flex-col gap-6', wide ? 'max-w-lg' : 'max-w-sm')}>
-        <Logo className="h-10 w-auto self-center" label={t.appName} />
+        {/* optical centring: the heavy steps sit on the left, so the logo LOOKS left of centre — nudge it right */}
+        <Logo className="h-10 w-auto self-center translate-x-[4.5%]" label={t.appName} />
         <Card>
           <CardHeader>
             <CardTitle className="text-xl">{title}</CardTitle>
