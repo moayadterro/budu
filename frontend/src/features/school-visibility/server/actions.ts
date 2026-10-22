@@ -13,7 +13,7 @@ export async function saveVisibilityAction(_prev: VisibilityState, form: FormDat
   const at = Date.now()
   if (!user.companyId || !(await isSchool(user.companyId))) return { status: 'error', at }
   const city = formText(form, 'city').slice(0, 80)
-  await setPublicListing(user.companyId, form.get('public') === 'on', city)
+  await setPublicListing(user.userId, user.companyId, form.get('public') === 'on', city)
   revalidatePath('/school/settings')
   revalidatePath('/schools')
   return { status: 'saved', at }

@@ -1,11 +1,12 @@
 import 'server-only'
 import { query } from '@/shared/server/db'
-import { defaultInstance } from '@/shared/server/iomad'
+import { defaultInstance, iomadCall } from '@/shared/server/iomad'
 import { NO_RATING, type Rating, type RatingAsk, type Review } from '../model/types'
 
 /**
- * Course ratings in app-db (`course_reviews`, `course_finishes`). Callers check the student is in
- * the course (IOMAD) before recording anything. SERVER-SIDE ONLY.
+ * Course ratings in app-db (`course_reviews`; `course_finishes` only remembers "Not now"). Whether a
+ * student FINISHED a course is IOMAD's record — Moodle course completion — so the mobile API sees it
+ * too. Callers check the student is in the course before recording anything. SERVER-SIDE ONLY.
  */
 
 const url = () => defaultInstance().url
@@ -33,16 +34,20 @@ export async function recentReviews(courseId: number, limit = 3): Promise<Review
   return rows.map((r) => ({ authorName: r.author_name, stars: r.stars, comment: r.comment, at: r.at }))
 }
 
-/** The student reached the end of the course (opened its last lesson). Idempotent. */
+/** The student reached the end of the course (opened its last lesson) → Moodle course completion. Idempotent. */
 export async function markFinished(userId: number, courseId: number) {
-  await query(
-    `INSERT INTO course_finishes (iomad_url, course_id, user_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`,
-    [url(), courseId, userId],
-  )
+  await iomadCall(defaultInstance(), 'local_budu_complete_course', { courseid: courseId, userid: userId })
+}
+
+/** Has the student completed the course (Moodle course completion)? */
+async function finished(userId: number, courseId: number): Promise<boolean> {
+  const rows = await iomadCall<Array<{ courseid: number }>>(defaultInstance(), 'local_budu_completed_courses', { userid: userId, courseids: [courseId] })
+  return rows.some((r) => r.courseid === courseId)
 }
 
 export async function ratingAsk(userId: number, courseId: number): Promise<RatingAsk> {
-  const [[f], [r]] = await Promise.all([
+  const [done, [f], [r]] = await Promise.all([
+    finished(userId, courseId),
     query<{ dismissed: boolean }>(
       `SELECT dismissed_at IS NOT NULL AS dismissed FROM course_finishes WHERE iomad_url = $1 AND course_id = $2 AND user_id = $3`,
       [url(), courseId, userId],
@@ -52,16 +57,16 @@ export async function ratingAsk(userId: number, courseId: number): Promise<Ratin
       [url(), courseId, userId],
     ),
   ])
-  return { finished: !!f, dismissed: !!f?.dismissed, mine: r ? { stars: r.stars, comment: r.comment } : null }
+  return { finished: done, dismissed: !!f?.dismissed, mine: r ? { stars: r.stars, comment: r.comment } : null }
 }
 
 /** "Not now": stop asking (the student can still rate from the course page). */
 export async function dismissAsk(userId: number, courseId: number) {
-  await query(`UPDATE course_finishes SET dismissed_at = now() WHERE iomad_url = $1 AND course_id = $2 AND user_id = $3`, [
-    url(),
-    courseId,
-    userId,
-  ])
+  await query(
+    `INSERT INTO course_finishes (iomad_url, course_id, user_id, dismissed_at) VALUES ($1, $2, $3, now())
+     ON CONFLICT (iomad_url, course_id, user_id) DO UPDATE SET dismissed_at = now()`,
+    [url(), courseId, userId],
+  )
 }
 
 /** Save (or change) the student's rating. */

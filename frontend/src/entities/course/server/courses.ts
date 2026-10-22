@@ -17,6 +17,7 @@ type RawFullCourse = RawCourse & {
   canedit: boolean
   lessonlist: RawLesson[]
   changes?: number
+  language?: string
 }
 
 const toDraft = (d?: string): DraftState => (d === 'new' || d === 'changed' || d === 'removed' ? d : '')
@@ -66,6 +67,7 @@ export async function getCourse(userId: number, courseId: number): Promise<Cours
       canEdit: c.canedit,
       lessons: c.lessonlist.map(toLesson),
       changes: c.changes ?? 0,
+      language: c.language || null,
     }
   } catch (e) {
     // no permission / no such course: treat both as "not found"
@@ -133,6 +135,10 @@ export async function publishChanges(userId: number, courseId: number): Promise<
 /** "Discard changes": back to the published version — all, or only one lesson / item. */
 export const discardChanges = (userId: number, courseId: number, only?: { kind: 'section' | 'cm'; id: number }) =>
   call<Id>('discard_changes', { courseid: courseId, userid: userId, kind: only?.kind ?? '', objectid: only?.id ?? 0 })
+
+/** The course's teaching language (an IOMAD course field; '' = not said). */
+export const setCourseLanguage = (userId: number, courseId: number, language: string) =>
+  call<Id>('set_course_language', { courseid: courseId, userid: userId, language })
 
 export const deleteLessonItem = (userId: number, courseId: number, itemId: number) =>
   call<Id>('delete_item', { courseid: courseId, userid: userId, cmid: itemId })
@@ -223,13 +229,15 @@ export type CatalogCourse = {
   imageId: number | null
   /** students enrolled — "how many took it" */
   students: number
+  /** what the course is taught in (IOMAD course field), null = not said */
+  language: string | null
 }
 
 /** Public facts of these (listed) courses; unpublished ones are left out. */
 export async function catalog(courseIds: number[], viewerId = 0): Promise<CatalogCourse[]> {
   if (!courseIds.length) return []
   const rows = await call<
-    Array<{ id: number; fullname: string; summary: string; school: string; teachers: RawPerson[]; lessons: string[]; enrolled: boolean; image: number; students?: number }>
+    Array<{ id: number; fullname: string; summary: string; school: string; teachers: RawPerson[]; lessons: string[]; enrolled: boolean; image: number; students?: number; language?: string }>
   >('catalog', { courseids: courseIds, userid: viewerId })
   return rows.map((r) => ({
     id: r.id,
@@ -241,6 +249,7 @@ export async function catalog(courseIds: number[], viewerId = 0): Promise<Catalo
     enrolled: r.enrolled,
     imageId: r.image || null,
     students: r.students ?? 0,
+    language: r.language || null,
   }))
 }
 

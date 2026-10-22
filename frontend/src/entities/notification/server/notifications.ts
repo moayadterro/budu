@@ -2,6 +2,7 @@ import 'server-only'
 import { DEFAULT_LOCALE, isLocale, type Locale } from '@/shared/i18n'
 import { MESSAGES } from '@/shared/i18n/messages'
 import { query } from '@/shared/server/db'
+import { prefsOf, setPref } from '@/shared/server/user-prefs'
 import { renderNotification } from '../lib/render'
 import { CHANNELS } from './channels'
 import type { AppNotification, NotificationKind, NotificationParams, Recipient } from '../model/types'
@@ -15,20 +16,13 @@ import type { AppNotification, NotificationKind, NotificationParams, Recipient }
 
 /** Remember a user's UI language (used for their emails and notifications). */
 export async function rememberLocale(userId: number, locale: Locale) {
-  await query(
-    `INSERT INTO user_prefs (iomad_user_id, locale) VALUES ($1, $2)
-     ON CONFLICT (iomad_user_id) DO UPDATE SET locale = EXCLUDED.locale, updated_at = now()`,
-    [userId, locale],
-  )
+  await setPref(userId, 'budu_locale', locale) // an IOMAD user preference — the mobile app reads it too
 }
 
 async function localesOf(ids: number[]): Promise<Map<number, Locale>> {
   if (!ids.length) return new Map()
-  const rows = await query<{ iomad_user_id: number; locale: string | null }>(
-    `SELECT iomad_user_id, locale FROM user_prefs WHERE iomad_user_id = ANY($1::int[])`,
-    [ids],
-  )
-  return new Map(rows.filter((r) => isLocale(r.locale)).map((r) => [r.iomad_user_id, r.locale as Locale]))
+  const prefs = await prefsOf(ids)
+  return new Map([...prefs].filter(([, p]) => isLocale(p.locale)).map(([id, p]) => [id, p.locale as Locale]))
 }
 
 /** Notify people (bell + email). Duplicate recipients are sent once. */

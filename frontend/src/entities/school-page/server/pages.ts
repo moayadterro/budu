@@ -12,35 +12,39 @@ import { emptyBlock, type Block, type BlockKind, type SchoolPage } from '../mode
 
 const url = () => defaultInstance().url
 
-type PageRow = { company_id: number; name: string; slug: string | null; city: string; since: number; published: boolean | null; tagline: string | null; cover_file: number | null }
+type PageRow = { company_id: number; slug: string | null; since: number; published: boolean | null; tagline: string | null; cover_file: number | null }
 
-const PAGE_SELECT = `SELECT t.company_id, t.name, t.slug, t.city, extract(epoch FROM t.created_at)::int AS since,
+const PAGE_SELECT = `SELECT t.company_id, t.slug, extract(epoch FROM t.created_at)::int AS since,
          p.published, p.tagline, p.cover_file
     FROM tenants t LEFT JOIN school_pages p ON p.iomad_url = t.iomad_url AND p.company_id = t.company_id
    WHERE t.iomad_url = $1 AND t.kind = 'school'`
 
-const toPage = (r: PageRow): SchoolPage => ({
-  companyId: r.company_id,
-  name: r.name,
-  slug: r.slug,
-  city: r.city,
-  since: r.since,
-  published: !!r.published,
-  tagline: r.tagline ?? '',
-  coverId: r.cover_file,
-})
+/** name and city come from the IOMAD company (one source) */
+async function toPage(r: PageRow): Promise<SchoolPage> {
+  const [info] = await iomadCall<Array<{ id: number; name: string; city: string }>>(defaultInstance(), 'local_budu_schools', { companyids: [r.company_id] })
+  return {
+    companyId: r.company_id,
+    name: info?.name ?? '',
+    slug: r.slug,
+    city: info?.city ?? '',
+    since: r.since,
+    published: !!r.published,
+    tagline: r.tagline ?? '',
+    coverId: r.cover_file,
+  }
+}
 
 /** The school's page settings (for its managers). null = not a registered school. */
 export async function pageOf(companyId: number): Promise<SchoolPage | null> {
   const [row] = await query<PageRow>(`${PAGE_SELECT} AND t.company_id = $2`, [url(), companyId])
-  return row ? toPage(row) : null
+  return row ? await toPage(row) : null
 }
 
 /** A page by its address. Drafts only when `includeDraft` (the school's own managers). */
 export async function pageBySlug(slug: string, includeDraft = false): Promise<SchoolPage | null> {
   const [row] = await query<PageRow>(`${PAGE_SELECT} AND lower(t.slug) = lower($2)`, [url(), slug])
   if (!row) return null
-  const page = toPage(row)
+  const page = await toPage(row)
   return page.published || includeDraft ? page : null
 }
 

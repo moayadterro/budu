@@ -58,43 +58,50 @@ export async function setGradeScale(companyId: number, scale: GradeScale) {
   await query(`UPDATE tenants SET grade_scale = $3 WHERE iomad_url = $1 AND company_id = $2`, [defaultInstance().url, companyId, scale])
 }
 
+/**
+ * Name, city and country of schools — from the IOMAD company (the source; app-db keeps only Budu's
+ * own settings about a school, never a second copy of these).
+ */
+export async function schoolsInfo(companyIds: number[]): Promise<Map<number, { name: string; city: string; country: string }>> {
+  const ids = [...new Set(companyIds)].filter((id) => id > 0)
+  if (!ids.length) return new Map()
+  const rows = await iomadCall<Array<{ id: number; name: string; city: string; country: string }>>(defaultInstance(), 'local_budu_schools', { companyids: ids })
+  return new Map(rows.map((r) => [r.id, { name: r.name, city: r.city, country: r.country }]))
+}
+
 /** Schools that chose to appear on the public "Schools on Budu" page. */
 export async function publicSchools(): Promise<Array<{ name: string; city: string; since: number; slug: string | null }>> {
   // slug only when the school's own page is published (then the card links to it)
-  const rows = await query<{ name: string; city: string; since: number; slug: string | null }>(
-    `SELECT t.name, t.city, extract(epoch FROM t.created_at)::int AS since, CASE WHEN p.published THEN t.slug END AS slug
+  const rows = await query<{ company_id: number; since: number; slug: string | null }>(
+    `SELECT t.company_id, extract(epoch FROM t.created_at)::int AS since, CASE WHEN p.published THEN t.slug END AS slug
        FROM tenants t LEFT JOIN school_pages p ON p.iomad_url = t.iomad_url AND p.company_id = t.company_id
       WHERE t.iomad_url = $1 AND t.kind = 'school' AND t.public_listing ORDER BY t.created_at`,
     [defaultInstance().url],
   )
+  const info = await schoolsInfo(rows.map((r) => r.company_id))
   return rows
+    .filter((r) => info.has(r.company_id))
+    .map((r) => ({ name: info.get(r.company_id)!.name, city: info.get(r.company_id)!.city, since: r.since, slug: r.slug }))
 }
 
 export async function getPublicListing(companyId: number): Promise<{ on: boolean; city: string }> {
-  const [row] = await query<{ public_listing: boolean; city: string }>(
-    `SELECT public_listing, city FROM tenants WHERE iomad_url = $1 AND company_id = $2`,
-    [defaultInstance().url, companyId],
-  )
-  return { on: !!row?.public_listing, city: row?.city ?? '' }
-}
-
-export async function setPublicListing(companyId: number, on: boolean, city: string) {
-  await query(`UPDATE tenants SET public_listing = $3, city = $4 WHERE iomad_url = $1 AND company_id = $2 AND kind = 'school'`, [
-    defaultInstance().url,
-    companyId,
-    on,
-    city,
+  const [[row], info] = await Promise.all([
+    query<{ public_listing: boolean }>(`SELECT public_listing FROM tenants WHERE iomad_url = $1 AND company_id = $2`, [defaultInstance().url, companyId]),
+    schoolsInfo([companyId]),
   ])
+  return { on: !!row?.public_listing, city: info.get(companyId)?.city ?? '' }
 }
 
-/** The tenant's display name as registered in app-db (null if not registered). */
+/** Listed on /schools or not (app-db); the city is the IOMAD company's (the manager is checked there). */
+export async function setPublicListing(userId: number, companyId: number, on: boolean, city: string) {
+  await query(`UPDATE tenants SET public_listing = $3 WHERE iomad_url = $1 AND company_id = $2 AND kind = 'school'`, [defaultInstance().url, companyId, on])
+  await iomadCall(defaultInstance(), 'local_budu_set_school_city', { companyid: companyId, userid: userId, city })
+}
+
+/** The school's / teacher workspace's name — the IOMAD company's (null if unknown). */
 export async function getTenantName(companyId: number | null): Promise<string | null> {
   if (!companyId) return null
-  const [row] = await query<{ name: string }>(`SELECT name FROM tenants WHERE iomad_url = $1 AND company_id = $2`, [
-    defaultInstance().url,
-    companyId,
-  ])
-  return row?.name ?? null
+  return (await schoolsInfo([companyId])).get(companyId)?.name ?? null
 }
 
 // ----- school (company) people & courses, for managers -----

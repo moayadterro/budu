@@ -32,7 +32,7 @@ export async function CatalogGrid({
   }
   return (
     <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-      {items.map(({ course: c, price: p, rating, listing }) => (
+      {items.map(({ course: c, price: p, rating }) => (
         <Link
           key={c.id}
           href={`${hrefBase}/${c.id}`}
@@ -48,10 +48,10 @@ export async function CatalogGrid({
             {c.description && <p className="line-clamp-2 text-sm text-muted-foreground">{c.description}</p>}
             <div className="mt-auto flex items-center justify-between gap-2 pt-2">
               <span className="flex min-w-0 items-center gap-1.5 truncate text-xs text-muted-foreground">
-                {listing.language && (
+                {c.language && (
                   <>
                     <Icon name="globe" className="size-3.5 flex-none" />
-                    {languageName(listing.language, locale)} ·{' '}
+                    {languageName(c.language, locale)} ·{' '}
                   </>
                 )}
                 {t.courses.lessonCount(c.lessons.length)}

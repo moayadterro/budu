@@ -5,6 +5,7 @@ export {
   getGradeScale,
   setGradeScale,
   getTenantName,
+  schoolsInfo,
   publicSchools,
   getPublicListing,
   setPublicListing,

@@ -12,6 +12,7 @@ export {
   saveTask,
   savePage,
   deleteLessonItem,
+  setCourseLanguage,
   publishChanges,
   discardChanges,
   lessonFileAccess,

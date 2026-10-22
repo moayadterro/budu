@@ -1,20 +1,16 @@
 import 'server-only'
 import { DEFAULT_CURRENCY, isCurrency, type Currency } from '@/shared/config/currency'
 import { cookies } from 'next/headers'
-import { query } from '@/shared/server/db'
+import { prefsOfUser, setPref } from '@/shared/server/user-prefs'
 
-/** The currency the user sees prices in (Settings); the platform default (RUB) if not chosen. */
+/** The currency the user sees prices in (Settings; an IOMAD user preference); RUB if not chosen. */
 export async function getCurrency(userId: number): Promise<Currency> {
-  const [row] = await query<{ currency: string | null }>(`SELECT currency FROM user_prefs WHERE iomad_user_id = $1`, [userId])
-  return isCurrency(row?.currency) ? row.currency : DEFAULT_CURRENCY
+  const c = (await prefsOfUser(userId)).currency
+  return isCurrency(c) ? c : DEFAULT_CURRENCY
 }
 
 export async function setCurrency(userId: number, currency: Currency) {
-  await query(
-    `INSERT INTO user_prefs (iomad_user_id, currency) VALUES ($1, $2)
-     ON CONFLICT (iomad_user_id) DO UPDATE SET currency = EXCLUDED.currency, updated_at = now()`,
-    [userId, currency],
-  )
+  await setPref(userId, 'budu_currency', currency)
 }
 
 /** A visitor's (not signed in) chosen currency lives in this cookie. */

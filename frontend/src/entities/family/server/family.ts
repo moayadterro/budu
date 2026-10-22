@@ -1,5 +1,6 @@
 import 'server-only'
 import { query } from '@/shared/server/db'
+import { prefsOfUser, setPref } from '@/shared/server/user-prefs'
 import { defaultInstance, iomadCall } from '@/shared/server/iomad'
 import { toPerson, type RawPerson } from '@/shared/lib/person'
 import type { ChildCourse, Family, FamilyMember, ParentRequest } from '../model/types'
@@ -120,21 +121,16 @@ export async function cancelParentRequest(childId: number, requestId: number) {
 // ----- the "add your parent" step after sign-up -----
 
 export async function skipParentPrompt(userId: number) {
-  await query(
-    `INSERT INTO user_prefs (iomad_user_id, parent_prompt_skipped_at) VALUES ($1, now())
-     ON CONFLICT (iomad_user_id) DO UPDATE SET parent_prompt_skipped_at = now()`,
-    [userId],
-  )
+  await setPref(userId, 'budu_parent_skipped', '1')
 }
 
 /** Show the step: a student with no parent, no request sent, and who hasn't skipped it. */
 export async function needsParentStep(userId: number): Promise<boolean> {
-  const [row] = await query<{ skipped: boolean; asked: boolean }>(
-    `SELECT EXISTS (SELECT 1 FROM user_prefs WHERE iomad_user_id = $1 AND parent_prompt_skipped_at IS NOT NULL) AS skipped,
-            EXISTS (SELECT 1 FROM parent_requests WHERE child_id = $1) AS asked`,
-    [userId],
-  )
-  if (row?.skipped || row?.asked) return false
+  const [[row], prefs] = await Promise.all([
+    query<{ asked: boolean }>(`SELECT EXISTS (SELECT 1 FROM parent_requests WHERE child_id = $1) AS asked`, [userId]),
+    prefsOfUser(userId),
+  ])
+  if (prefs.parentSkipped || row?.asked) return false
   return (await getFamily(userId)).parents.length === 0
 }
 

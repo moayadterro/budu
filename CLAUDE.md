@@ -376,6 +376,17 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-22 Mobile app = it will call a Budu API (`/api/v1`, token login — to build), NOT IOMAD
+  directly (owner). Storage audit for it — IOMAD now holds what has a natural home there:
+  per-user settings (Moodle user preferences budu_locale / budu_currency / budu_parent_skipped via
+  `shared/server/user-prefs.ts`), school name & city (the IOMAD company — `schoolsInfo`), "finished a
+  course" (Moodle course completion — `local_budu_complete_course`), a course's teaching language
+  (course custom field `budu_language`). App-db keeps what IOMAD has no good home for or what we chose
+  on purpose: sessions/tokens, chat + ticks, notifications, announcements, prices/orders/fx, ratings,
+  school pages, invites, contact messages, quiz bookkeeping. No longer read (kept, schema is additive):
+  table `user_prefs`, `tenants.city`, `tenants.name` (sign-up snapshot), `course_listings.language`,
+  `course_finishes.finished_at` (the table now only means "Not now"). Keep server logic in plain
+  `entities/*/server` modules so the API can reuse it.
 - 2026-10-22 School public pages (owner): `/schools/<slug>` (not `/school/<slug>` — that's the
   manager area). Managers edit at `/school/page` (nav "School page"): address (live check; a–z 0–9 -,
   3–40, reserved words), Published, tagline, cover, and blocks — text, photos (≤6), news (dated),

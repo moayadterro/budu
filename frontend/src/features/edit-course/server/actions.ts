@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { COURSE_LIMITS } from '@/entities/course'
-import { createCourse, discardChanges, getCourse, listStudents, publishChanges, saveListing, setCourseImage, updateCourse } from '@/entities/course/server'
+import { createCourse, setCourseLanguage, discardChanges, getCourse, listStudents, publishChanges, saveListing, setCourseImage, updateCourse } from '@/entities/course/server'
 import { notify } from '@/entities/notification/server'
 import { isCurrency } from '@/shared/config/currency'
 import { isCourseLanguage } from '@/shared/config/course-language'
@@ -110,7 +110,8 @@ export async function saveListingAction(_prev: ListingState, form: FormData): Pr
   const course = await getCourse(user.userId, courseId)
   if (!course?.canEdit) return { status: 'error', at }
   const language = formText(form, 'language')
-  await saveListing(user.userId, { courseId, listed: form.get('listed') === 'on', price, currency, language: isCourseLanguage(language) ? language : null })
+  await saveListing(user.userId, { courseId, listed: form.get('listed') === 'on', price, currency })
+  await setCourseLanguage(user.userId, courseId, isCourseLanguage(language) ? language : '') // an IOMAD course field
   revalidatePath(`/courses/${courseId}`)
   revalidatePath('/explore')
   return { status: 'saved', at }
