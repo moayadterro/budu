@@ -106,6 +106,9 @@ Unbuilt screens stay in `shared/config/nav.ts` with `href: null` (rendered disab
   `PasswordStrength`/`PasswordMatch`, `ScreenHead`, `InitialsAvatar`, `LocalTime`, `Icon`.
   Auth screens use `AuthShell` (widgets/auth-shell): split screen on desktop (form + brand panel),
   form only on phones, `back` = "← Back to sign in" above the title.
+- **Menus** (shared `DropdownMenu`, so every ⋯ / language / image menu): frosted glass (`bg-popover/80`
+  + blur, soft deep shadow, no border), rounded-2xl, rows rounded-xl, each icon in a small tinted tile
+  (red tile for the destructive item), pops out from its button. Owner: the old flat list looked 2010.
 - **Icons: Hugeicons** (free set, `@hugeicons/react` + `@hugeicons/core-free-icons`). App code uses
   `<Icon name="book" />` (`shared/ui/icon.tsx` maps names → icons); add a name there. Don't cast
   strings to `IconName` — a missing name crashes at runtime ("currentIcon is not iterable").

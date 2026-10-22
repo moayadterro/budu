@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useRef, useState, useTransition } from 'react'
 import { BrandImage } from '@/shared/ui/brand-image'
 import { ConfirmDialog } from '@/shared/ui/confirm-button'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/shared/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/shared/ui/dropdown-menu'
 import { Icon } from '@/shared/ui/icon'
 import { cn } from '@/shared/lib/cn'
 import { useT } from '@/shared/i18n'
@@ -142,7 +142,6 @@ function ImageButton({ label, has, onFile, confirmTitle }: { label: string; has:
               <Icon name="upload" />
               {s.changePhoto}
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
             <DropdownMenuItem variant="destructive" onSelect={() => setConfirming(true)}>
               <Icon name="trash" />
               {s.removePhoto}
