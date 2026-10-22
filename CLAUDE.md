@@ -119,7 +119,30 @@ Unbuilt screens stay in `shared/config/nav.ts` with `href: null` (rendered disab
 - Password fields use `PasswordInput` (`shared/ui/password-input`): show/hide toggle, every form.
 - Mock data lives in `shared/mock` and is replaced screen by screen with IOMAD data.
 
-## Theme — ONE place
+## Design principles — how to work on ANY screen (owner, 2026-10-22: "always think like this")
+Design is a first-class task here, not decoration. For every screen or component:
+1. **Research first, then design.** Look at how the best current products solve it (Apple HIG,
+   Linear, Stripe, Airbnb, Telegram …) and say what you took from where. Aim for a 2027 feel —
+   clean, calm, confident — but never at the cost of clarity.
+2. **Fit the app.** Reuse our components, sizes, radii and tokens; nothing that looks foreign (the
+   owner rejected a round "pill" picker: "we don't have anything rounded like this"). Consistency
+   beats novelty.
+3. **Calm by default.** One primary (green) action per card; secondary ones as quiet outline/link
+   buttons. Red only at the point of no return (the alert's final button, a menu's Delete). Many
+   rows → a "⋯" menu, not a button per row. No alarming colours "everywhere".
+4. **Say exactly what happens.** Titles name the thing ("Remove Class 10 from “Physics 101”?"),
+   one line says the consequence. No vague "Remove?", no "≈", no labels that add nothing
+   ("Popular"). Show real data only — empty config = hidden, never invented.
+5. **Mobile is critical.** Design phone-first: one column, full-width controls, ≥44 px touch targets,
+   cards become compact rows, no horizontal scroll; desktop can add a second column / panel.
+6. **Delight through feedback, not ornaments.** Live, useful micro-interactions: strength meters,
+   ✓ checklists, "passwords match", sent/delivered/seen ticks, instant updates, subtle Motion
+   (respect reduced motion). Every state designed: empty, loading, error, success.
+7. **All three languages and both themes.** Check RU (long words), AR (RTL: logical classes, mirrored
+   arrows) and dark mode; plurals via `plural()`.
+8. **Verify by looking.** Open it in the browser (desktop AND narrow width) before saying it's done;
+   say what was and wasn't checked. If the owner doesn't like a change, revert it fully, no argument.
+
 **Everything visual is a token in `frontend/src/shared/theme/tokens.css`** — the ONLY theme file
 (Tailwind 4: no tailwind.config). It is the owner's shadcn theme (emerald primary, neutral base):
 `:root` = light, `.dark` = dark (the `<html>` class, set by `shared/theme/store` + `ThemeSync`, and
