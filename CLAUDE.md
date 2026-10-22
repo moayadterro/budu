@@ -344,6 +344,8 @@ Built and verified:
 - UI fully in English / Russian / Arabic (RTL), switchable in Settings or the header globe menu.
 - School public page (tested 2026-10-22 as a manager + visitor): `/school/page` editor, public
   `/schools/<slug>` with hero + 5 block kinds, photos via IOMAD, draft preview for managers only.
+  Content keeps its own text direction (`shared/lib/text-dir` `contentDir`): an Arabic school reads
+  right-to-left in any UI language; hero and each block decide separately.
 - Connection strip (`shared/ui/connection-status`, in RootLayout, every page): offline → dark strip at
   the bottom; back online → green "Back online" for 3 s (like YouTube).
 - Teacher course builder (live IOMAD data): `/courses` (my courses), `/courses/new`, `/courses/:id`
@@ -397,6 +399,10 @@ Not built yet (rough priority):
   Drafts: only the school's managers see them (with a banner). ONE switch (owner): published page =
   listed on `/schools` (card opens the page); unpublished = private, not listed, page 404. City lives
   on the IOMAD company, edited in the page settings.
+  Top students: a name matching exactly one school member (on save, server-side) gets their profile
+  photo — COPIED into `local_budu/schoolpage` by `local_budu_member_photo` (profile pictures are for
+  signed-in users only, the page is public); a new copy only when their picture changes. Others get
+  initials.
   Logo = IOMAD's own company logo (system context `core_admin/logo<companyid>` + config, what IOMAD's
   admin uses; `local_budu_set_school_logo`, PNG/JPG/GIF/WebP — no SVG), public via `/files`; shown in
   the page hero and on `/schools` cards. Privacy: editors remind managers to publish students only with families' consent.

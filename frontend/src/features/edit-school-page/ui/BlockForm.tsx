@@ -9,6 +9,7 @@ import { Field } from '@/shared/ui/field'
 import { Icon } from '@/shared/ui/icon'
 import { Input } from '@/shared/ui/input'
 import { Textarea } from '@/shared/ui/textarea'
+import { pictureSrc } from '@/shared/lib/person'
 import { useT } from '@/shared/i18n'
 import { saveBlockAction } from '../server/actions'
 import { PhotoField, PhotosField } from './PhotoUpload'
@@ -16,8 +17,11 @@ import { PhotoField, PhotosField } from './PhotoUpload'
 const today = () => new Date().toISOString().slice(0, 10)
 const MEDAL = ['🥇', '🥈', '🥉']
 
+/** A member of the school, suggested by name (their photo shows on the page when it matches). */
+export type Member = { name: string; pictureId: number | null }
+
 /** Edit one block (its fields depend on its kind) → Save. */
-export function BlockForm({ block, people, onDone }: { block: Block; people: string[]; onDone: () => void }) {
+export function BlockForm({ block, people, onDone }: { block: Block; people: Member[]; onDone: () => void }) {
   const t = useT()
   const s = t.schoolPage.editor
   const router = useRouter()
@@ -47,8 +51,8 @@ export function BlockForm({ block, people, onDone }: { block: Block; people: str
   )
   const peopleList = (
     <datalist id={listId}>
-      {people.map((p) => (
-        <option key={p} value={p} />
+      {[...new Set(people.map((p) => p.name))].map((name) => (
+        <option key={name} value={name} />
       ))}
     </datalist>
   )
@@ -146,15 +150,26 @@ export function BlockForm({ block, people, onDone }: { block: Block; people: str
           <div className="flex flex-col gap-2">
             {[0, 1, 2].map((i) => {
               const it = items[i] ?? { name: '', note: '' }
+              // same rule as on save: exactly one member with this name → their photo
+              const same = people.filter((p) => p.name.trim().toLocaleLowerCase() === String(it.name ?? '').trim().toLocaleLowerCase())
+              const photo = same.length === 1 ? pictureSrc(same[0]!.pictureId) : null
               const put = (k: string, v: string) => {
                 const next = [0, 1, 2].map((j) => (j === i ? { ...it, [k]: v } : (items[j] ?? { name: '', note: '' })))
                 set('items', next)
               }
               return (
                 <div key={i} className="grid grid-cols-[auto_1fr] items-center gap-x-3 sm:grid-cols-[auto_1fr_1fr]">
-                  <span className="text-2xl" aria-hidden>
-                    {MEDAL[i]}
-                  </span>
+                  {photo ? (
+                    <span className="relative" aria-hidden>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={photo} alt="" className="size-9 rounded-full object-cover" />
+                      <span className="absolute -end-1.5 -bottom-1.5 text-sm">{MEDAL[i]}</span>
+                    </span>
+                  ) : (
+                    <span className="grid size-9 place-items-center text-2xl" aria-hidden>
+                      {MEDAL[i]}
+                    </span>
+                  )}
                   <Input value={String(it.name ?? '')} onChange={(e) => put('name', e.target.value)} maxLength={L.name} list={listId} placeholder={s.topName} aria-label={`${i + 1}. ${s.topName}`} />
                   <Input
                     value={String(it.note ?? '')}

@@ -10,7 +10,7 @@ import { MoreMenu } from '@/shared/ui/more-menu'
 import { cn } from '@/shared/lib/cn'
 import { useT } from '@/shared/i18n'
 import { addBlockAction, deleteBlockAction, moveBlockAction } from '../server/actions'
-import { BlockForm } from './BlockForm'
+import { BlockForm, type Member } from './BlockForm'
 
 export const KIND_ICON: Record<BlockKind, IconName> = { text: 'text', photos: 'image', news: 'news', spotlight: 'star', top: 'trophy' }
 
@@ -27,7 +27,7 @@ function summary(b: Block, empty: string): string {
  * The page's blocks as simple cards: a ⋯ menu (Edit, Move up / down, Delete), editing opens in place;
  * "Add block" picks one of five kinds and opens it for editing right away.
  */
-export function BlocksEditor({ blocks, people }: { blocks: Block[]; people: string[] }) {
+export function BlocksEditor({ blocks, people }: { blocks: Block[]; people: Member[] }) {
   const t = useT()
   const s = t.schoolPage.editor
   const router = useRouter()

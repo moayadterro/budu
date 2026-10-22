@@ -35,6 +35,7 @@ const FUNCTIONS = [
     'local_budu_file_access',
     'local_budu_preview_lesson',
     'local_budu_save_school_photo',
+    'local_budu_member_photo',
     'local_budu_set_school_logo',
     'local_budu_get_prefs',
     'local_budu_set_pref',

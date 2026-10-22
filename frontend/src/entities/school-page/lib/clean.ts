@@ -31,7 +31,10 @@ export function cleanBlock<K extends BlockKind>(kind: K, raw: unknown): BlockDat
     top: () => ({
       heading: str(r.heading, L.heading),
       items: arr(r.items)
-        .map((t) => ({ name: str((t as Record<string, unknown>)?.name, L.name), note: str((t as Record<string, unknown>)?.note, L.note) }))
+        .map((t) => {
+          const x = (t ?? {}) as Record<string, unknown>
+          return { name: str(x.name, L.name), note: str(x.note, L.note), userId: id(x.userId), fileId: id(x.fileId), fromPicture: id(x.fromPicture) }
+        })
         .filter((t) => t.name)
         .slice(0, L.top),
     }),

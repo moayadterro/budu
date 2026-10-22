@@ -1,10 +1,10 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { BLOCK_KINDS, normalizeSlug, PAGE_LIMITS, slugValid, type BlockKind } from '@/entities/school-page'
-import { addBlock, deleteBlock, moveBlock, pageOf, saveBlock, savePage, savePhoto, setCover, slugFree } from '@/entities/school-page/server'
+import { BLOCK_KINDS, normalizeSlug, PAGE_LIMITS, slugValid, type BlockData, type BlockKind } from '@/entities/school-page'
+import { addBlock, deleteBlock, memberPhoto, moveBlock, pageOf, saveBlock, savePage, savePhoto, setCover, slugFree } from '@/entities/school-page/server'
 import { requireRole } from '@/entities/session/server'
-import { isSchool, setSchoolCity, setSchoolLogo } from '@/entities/tenant/server'
+import { isSchool, schoolPeople, setSchoolCity, setSchoolLogo } from '@/entities/tenant/server'
 import { formText } from '@/shared/lib/form'
 
 /** The signed-in manager's school (only schools have a public page). */
@@ -68,7 +68,7 @@ export async function addBlockAction(kind: string): Promise<number | null> {
 
 /** A block's content as JSON (shape and lengths are cleaned on the server). */
 export async function saveBlockAction(id: number, json: string): Promise<boolean> {
-  const companyId = await school()
+  const { userId, companyId } = await manager()
   if (!Number.isSafeInteger(id) || json.length > 100_000) return false
   let data: unknown
   try {
@@ -76,9 +76,32 @@ export async function saveBlockAction(id: number, json: string): Promise<boolean
   } catch {
     return false
   }
-  const ok = await saveBlock(companyId, id, data)
+  const ok = await saveBlock(companyId, id, data, async (block, before) =>
+    block.kind === 'top' ? withPhotos(userId, companyId, block.data as BlockData['top'], before.data as BlockData['top']) : block.data,
+  )
   await refresh(companyId)
   return ok
+}
+
+/**
+ * Top students who are members of the school (their name matches exactly one) get their profile
+ * photo on the page. The copy is made once per picture: kept while they keep the same photo.
+ * Never trusts ids from the browser — everything is worked out from the names.
+ */
+async function withPhotos(userId: number, companyId: number, top: BlockData['top'], before: BlockData['top']): Promise<BlockData['top']> {
+  const people = (await schoolPeople(userId, companyId).catch(() => [])).filter((p) => !p.pending)
+  const key = (name: string) => name.trim().toLocaleLowerCase()
+  const items = await Promise.all(
+    top.items.map(async (it) => {
+      const same = people.filter((p) => key(p.name) === key(it.name))
+      const member = same.length === 1 ? same[0]! : null
+      if (!member?.pictureId) return { ...it, userId: member?.id ?? null, fileId: null, fromPicture: null }
+      const kept = before.items.find((b) => b.userId === member.id && b.fromPicture === member.pictureId && b.fileId)
+      const fileId = kept ? kept.fileId : await memberPhoto(userId, companyId, member.id).catch(() => null)
+      return { ...it, userId: member.id, fileId, fromPicture: fileId ? member.pictureId : null }
+    }),
+  )
+  return { ...top, items }
 }
 
 export async function moveBlockAction(id: number, dir: number) {

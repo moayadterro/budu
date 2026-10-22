@@ -78,6 +78,12 @@ export async function savePhoto(userId: number, companyId: number, file: File): 
   return r.id
 }
 
+/** A member's profile picture copied onto the school's page (manager checked in IOMAD). null = they have none. */
+export async function memberPhoto(userId: number, companyId: number, memberId: number): Promise<number | null> {
+  const r = await iomadCall<{ id: number }>(defaultInstance(), 'local_budu_member_photo', { companyid: companyId, userid: userId, memberid: memberId })
+  return r.id || null
+}
+
 export async function setCover(companyId: number, fileId: number | null) {
   await query(
     `INSERT INTO school_pages (iomad_url, company_id, cover_file) VALUES ($1, $2, $3)
@@ -109,10 +115,22 @@ export async function addBlock(companyId: number, kind: BlockKind): Promise<numb
 }
 
 /** Save a block's content (cleaned for its kind). false = not this school's block. */
-export async function saveBlock(companyId: number, id: number, raw: unknown): Promise<boolean> {
-  const [row] = await query<{ kind: BlockKind }>(`SELECT kind FROM school_page_blocks WHERE id = $1 AND iomad_url = $2 AND company_id = $3`, [id, url(), companyId])
+/**
+ * Save a block. `prepare` may finish what the browser sent (e.g. the top students' photos), given
+ * the block as it was stored before.
+ */
+export async function saveBlock(
+  companyId: number,
+  id: number,
+  raw: unknown,
+  prepare?: (block: Block, before: Block) => Promise<Block['data']>,
+): Promise<boolean> {
+  const [row] = await query<BlockRow>(`SELECT id, kind, data FROM school_page_blocks WHERE id = $1 AND iomad_url = $2 AND company_id = $3`, [id, url(), companyId])
   if (!row) return false
-  await query(`UPDATE school_page_blocks SET data = $2, updated_at = now() WHERE id = $1`, [id, JSON.stringify(cleanBlock(row.kind, raw))])
+  const before = { id, kind: row.kind, data: cleanBlock(row.kind, row.data) }
+  const block = { id, kind: row.kind, data: cleanBlock(row.kind, raw) }
+  const data = prepare ? await prepare(block, before) : block.data
+  await query(`UPDATE school_page_blocks SET data = $2, updated_at = now() WHERE id = $1`, [id, JSON.stringify(data)])
   return true
 }
 

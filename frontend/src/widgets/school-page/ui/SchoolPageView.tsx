@@ -196,8 +196,15 @@ function TopBlock({ d, title }: { d: BlockData['top']; title: string }) {
             key={i}
             className={cn('flex flex-col items-center gap-2 rounded-2xl border bg-card p-6 text-center', i === 0 && 'border-highlight/50 bg-highlight/5 sm:-translate-y-2')}
           >
-            <span className="text-4xl" aria-hidden>
-              {MEDAL[i]}
+            {/* their profile photo when they are a member with one, else their initials — same size, so the row stays even */}
+            <span className="relative mb-1" aria-hidden>
+              {x.fileId ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={fileSrc(x.fileId)} alt="" loading="lazy" className="size-24 rounded-full object-cover shadow-md ring-4 ring-background" />
+              ) : (
+                <InitialsAvatar initials={initials(x.name)} color="var(--color-primary)" className="size-24 text-2xl ring-4 ring-background" />
+              )}
+              <span className="absolute -end-1 -bottom-1 text-3xl">{MEDAL[i]}</span>
             </span>
             <span className="sr-only">{i + 1}.</span>
             <p className="text-lg font-semibold text-balance">{x.name}</p>
