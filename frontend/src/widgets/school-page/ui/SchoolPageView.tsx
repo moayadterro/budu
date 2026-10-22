@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import type { Block, BlockData, SchoolPage } from '@/entities/school-page'
+import { Medal, type Block, type BlockData, type SchoolPage } from '@/entities/school-page'
 import { BrandImage } from '@/shared/ui/brand-image'
 import { Button } from '@/shared/ui/button'
 import { Icon } from '@/shared/ui/icon'
@@ -184,8 +184,6 @@ function SpotlightBlock({ d }: { d: BlockData['spotlight'] }) {
   )
 }
 
-const MEDAL = ['🥇', '🥈', '🥉']
-
 function TopBlock({ d, title }: { d: BlockData['top']; title: string }) {
   return (
     <>
@@ -204,7 +202,7 @@ function TopBlock({ d, title }: { d: BlockData['top']; title: string }) {
               ) : (
                 <InitialsAvatar initials={initials(x.name)} color="var(--color-primary)" className="size-24 text-2xl ring-4 ring-background" />
               )}
-              <span className="absolute -end-1 -bottom-1 text-3xl">{MEDAL[i]}</span>
+              <Medal place={i + 1} className="absolute -end-0.5 -bottom-0.5 size-9 text-base" />
             </span>
             <span className="sr-only">{i + 1}.</span>
             <p className="text-lg font-semibold text-balance">{x.name}</p>

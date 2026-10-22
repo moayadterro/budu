@@ -61,6 +61,10 @@
   --logo-mark: #0b7a4a; /* the logo's own colours (src/assets/logo.svg) */
   --logo-text: #0b2e1f;
   --scrim: oklch(0 0 0 / 0.28); /* dims the page behind dialogs */
+  --gold: oklch(0.84 0.15 86); /* top-3 medals (same in dark mode) */
+  --silver: oklch(0.84 0.012 250);
+  --bronze: oklch(0.74 0.1 55);
+  --medal-foreground: oklch(0.32 0.06 60);
   --highlight-foreground: oklch(0.279 0.077 45.635);
   --subject-purple: oklch(0.558 0.163 302.3);
   --subject-terra: oklch(0.604 0.13 34.6);
@@ -180,6 +184,10 @@
   --color-logo-mark: var(--logo-mark);
   --color-logo-text: var(--logo-text);
   --color-scrim: var(--scrim);
+  --color-gold: var(--gold);
+  --color-silver: var(--silver);
+  --color-bronze: var(--bronze);
+  --color-medal-foreground: var(--medal-foreground);
   --color-highlight-foreground: var(--highlight-foreground);
   --color-subject-purple: var(--subject-purple);
   --color-subject-terra: var(--subject-terra);

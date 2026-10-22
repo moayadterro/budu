@@ -392,7 +392,7 @@ Not built yet (rough priority):
 - 2026-10-22 School public pages (owner): `/schools/<slug>` (not `/school/<slug>` — that's the
   manager area). Managers edit at `/school/page` (nav "School page"): address (live check; a–z 0–9 -,
   3–40, reserved words), Published, tagline, cover, and blocks — text, photos (≤6), news (dated),
-  spotlight (one person), top students (🥇🥈🥉). Stored in app-db (`tenants.slug`, `school_pages`,
+  spotlight (one person), top students (round 1 / 2 / 3 medals, `Medal`). Stored in app-db (`tenants.slug`, `school_pages`,
   `school_page_blocks` JSON, cleaned per kind by `entities/school-page` `cleanBlock`; rendered as
   TEXT, never HTML). Photos live in IOMAD (category context, `local_budu/schoolpage`, served via
   `/files`; `file_access` makes that area public; plugin `lib.php` pluginfile + `save_school_photo`).

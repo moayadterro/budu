@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useId, useState, useTransition } from 'react'
-import { PAGE_LIMITS as L, type Block, type BlockData } from '@/entities/school-page'
+import { Medal, PAGE_LIMITS as L, type Block, type BlockData } from '@/entities/school-page'
 import { Alert } from '@/shared/ui/alert'
 import { Button } from '@/shared/ui/button'
 import { Field } from '@/shared/ui/field'
@@ -15,7 +15,6 @@ import { saveBlockAction } from '../server/actions'
 import { PhotoField, PhotosField } from './PhotoUpload'
 
 const today = () => new Date().toISOString().slice(0, 10)
-const MEDAL = ['🥇', '🥈', '🥉']
 
 /** A member of the school, suggested by name (their photo shows on the page when it matches). */
 export type Member = { name: string; pictureId: number | null }
@@ -163,11 +162,11 @@ export function BlockForm({ block, people, onDone }: { block: Block; people: Mem
                     <span className="relative" aria-hidden>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={photo} alt="" className="size-9 rounded-full object-cover" />
-                      <span className="absolute -end-1.5 -bottom-1.5 text-sm">{MEDAL[i]}</span>
+                      <Medal place={i + 1} className="absolute -end-1.5 -bottom-1.5 size-5 text-[0.625rem] ring-1" />
                     </span>
                   ) : (
-                    <span className="grid size-9 place-items-center text-2xl" aria-hidden>
-                      {MEDAL[i]}
+                    <span aria-hidden>
+                      <Medal place={i + 1} className="size-9" />
                     </span>
                   )}
                   <Input value={String(it.name ?? '')} onChange={(e) => put('name', e.target.value)} maxLength={L.name} list={listId} placeholder={s.topName} aria-label={`${i + 1}. ${s.topName}`} />
