@@ -22,10 +22,12 @@ export function proxy(req: NextRequest) {
   if (locale) {
     // a language prefix on a non-public page means nothing
     if (!isLocalizedPath(path)) return redirect(req, path + search)
-    // the address's language beats the saved one: opening /ru/… (or /en/…) = choosing it — remember
-    // it, so English addresses, sign-in and the app continue in it. /en/x then lives at /x.
+    // a VISITOR opening /ru/… (or /en/…) chooses that language — remember it, so English addresses,
+    // sign-in and the app continue in it. A SIGNED-IN user keeps their own choice: a public page in
+    // another language (a link, a tab left open) must never switch their app. /en/x lives at /x.
     const res = locale === DEFAULT_LOCALE ? redirect(req, path + search) : withLocale(req, locale)
-    if (req.cookies.get(LOCALE_COOKIE)?.value !== locale && !CRAWLER.test(req.headers.get('user-agent') ?? '')) {
+    const visitor = !req.cookies.has(SESSION_COOKIE)
+    if (visitor && req.cookies.get(LOCALE_COOKIE)?.value !== locale && !CRAWLER.test(req.headers.get('user-agent') ?? '')) {
       res.cookies.set(LOCALE_COOKIE, locale, { path: '/', maxAge: 365 * 24 * 60 * 60, sameSite: 'lax', secure: process.env.NODE_ENV === 'production' })
     }
     return res
