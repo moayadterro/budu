@@ -13,7 +13,7 @@ import { saveLocationAction, type LocationState } from '../server/actions'
 
 const idle: LocationState = { status: 'idle' }
 
-/** City + country of the school (shown on its page and in "Schools on Budu"). */
+/** Country, then city, of the school. */
 export function LocationForm({ city, country }: { city: string; country: string }) {
   const t = useT()
   const s = t.school
@@ -21,11 +21,11 @@ export function LocationForm({ city, country }: { city: string; country: string 
   return (
     <form action={action} className="flex flex-col">
       <div className="grid gap-x-4 sm:grid-cols-2">
-        <Field label={s.city}>
-          <Input name="city" defaultValue={city} maxLength={120} placeholder={s.cityPh} />
-        </Field>
         <Field label={s.country}>
           <CountryPicker name="country" defaultValue={country} />
+        </Field>
+        <Field label={s.city}>
+          <Input name="city" defaultValue={city} maxLength={120} placeholder={s.cityPh} />
         </Field>
       </div>
       <div className="flex items-center gap-3">

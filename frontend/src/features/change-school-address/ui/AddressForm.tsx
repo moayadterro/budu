@@ -3,7 +3,6 @@
 import { useRouter } from 'next/navigation'
 import { useEffect, useState, useTransition } from 'react'
 import { normalizeSlug } from '@/entities/school-page'
-import { Alert } from '@/shared/ui/alert'
 import { Button } from '@/shared/ui/button'
 import { ConfirmDialog } from '@/shared/ui/confirm-button'
 import { Icon } from '@/shared/ui/icon'
@@ -12,8 +11,9 @@ import { useT } from '@/shared/i18n'
 import { changeSlugAction, checkSlugAction, type SlugCheck } from '../server/actions'
 
 /**
- * The school page's address (Settings). Made from the school's name; changing it breaks every link
- * people saved or shared — so the form says so as soon as it differs, and asks before saving.
+ * The school's username (Settings) — its page lives at /schools/<username>. Made from the school's
+ * name; changing it breaks every link people saved or shared, so a small line always says so and
+ * saving asks first.
  */
 export function AddressForm({ slug: current, origin }: { slug: string; origin: string }) {
   const t = useT()
@@ -42,11 +42,21 @@ export function AddressForm({ slug: current, origin }: { slug: string; origin: s
       setResult(r.ok ? 'saved' : r.error)
       if (r.ok) router.refresh()
     })
+  const bad = changed && check !== null && check !== 'ok'
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex h-10 items-center overflow-hidden rounded-md border border-input bg-background focus-within:ring-3 focus-within:ring-ring/50" dir="ltr">
-        <span className="flex h-full items-center border-e bg-muted px-3 text-sm whitespace-nowrap text-muted-foreground">{host}/schools/</span>
+    <div className="flex flex-col gap-2.5">
+      {/* the school's username, like @handle: the page lives at host/schools/<username> */}
+      <div
+        dir="ltr"
+        className={cn(
+          'flex h-11 items-center gap-1 rounded-xl border border-input bg-background ps-3.5 pe-2 transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50',
+          bad && 'border-destructive/60 focus-within:border-destructive/60 focus-within:ring-destructive/20',
+        )}
+      >
+        <span className="text-base font-medium text-muted-foreground" aria-hidden>
+          @
+        </span>
         <input
           value={slug}
           onChange={(ev) => {
@@ -55,19 +65,32 @@ export function AddressForm({ slug: current, origin }: { slug: string; origin: s
           }}
           maxLength={40}
           aria-label={s.address}
-          className="h-full min-w-0 flex-1 bg-transparent px-3 text-sm outline-none"
+          aria-invalid={bad || undefined}
+          spellCheck={false}
+          autoCapitalize="off"
+          className="h-full min-w-0 flex-1 bg-transparent text-base font-medium outline-none"
         />
+        {changed && check === 'ok' && (
+          <span className="grid size-6 place-items-center rounded-full bg-success/15 text-success" aria-label={e.available} title={e.available}>
+            <Icon name="tick" className="size-3.5" />
+          </span>
+        )}
+        {bad && <Icon name="close" className="size-4 text-destructive" />}
       </div>
-      <p className="text-xs text-muted-foreground">{e.addressHint}</p>
-      {check && (
-        <p className={cn('flex items-center gap-1.5 text-xs font-medium', check === 'ok' ? 'text-success' : 'text-destructive')} aria-live="polite">
-          <Icon name={check === 'ok' ? 'tick' : 'close'} className="size-3.5" />
-          {check === 'ok' ? e.available : e.slugErrors[check]}
+      <p dir="ltr" className="truncate text-xs text-muted-foreground">
+        {host}/schools/<span className="font-medium text-foreground">{value || '…'}</span>
+      </p>
+      {bad && (
+        <p className="text-xs font-medium text-destructive" aria-live="polite">
+          {e.slugErrors[check!]}
         </p>
       )}
-      {changed && check === 'ok' && <Alert variant="warning">{s.addressWarn}</Alert>}
-      {result && result !== 'saved' && <Alert variant="destructive">{result === 'server' ? e.failed : e.slugErrors[result]}</Alert>}
-      <div className="flex items-center gap-3">
+      {result && result !== 'saved' && <p className="text-xs font-medium text-destructive">{result === 'server' ? e.failed : e.slugErrors[result]}</p>}
+      <p className="flex gap-1.5 text-xs leading-relaxed text-muted-foreground">
+        <Icon name="alert" className="mt-0.5 size-3.5 flex-none text-warning" />
+        {s.addressWarn}
+      </p>
+      <div className="mt-1 flex items-center gap-3">
         <Button type="button" disabled={!changed || check !== 'ok' || pending} onClick={() => setConfirming(true)}>
           {s.addressChange}
         </Button>
@@ -78,7 +101,7 @@ export function AddressForm({ slug: current, origin }: { slug: string; origin: s
         onOpenChange={setConfirming}
         icon="link"
         label={s.addressChange}
-        confirmLabel={s.addressConfirm(`${host}/schools/${value}`)}
+        confirmLabel={s.addressConfirm(value)}
         description={s.addressConfirmDesc}
         onConfirm={save}
       />
