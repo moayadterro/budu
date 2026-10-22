@@ -14,7 +14,14 @@ function transport() {
   }))
 }
 
-export async function sendMail(mail: { to: string; subject: string; text: string; html: string }) {
+export async function sendMail(mail: {
+  to: string
+  subject: string
+  text: string
+  html: string
+  /** inline pictures (e.g. the logo, referenced as cid:…) */
+  attachments?: Array<{ filename: string; content: Buffer; cid: string }>
+}) {
   await transport().sendMail({ from: process.env.MAIL_FROM, ...mail })
 }
 
