@@ -69,18 +69,37 @@ export async function schoolsInfo(companyIds: number[]): Promise<Map<number, { n
   return new Map(rows.map((r) => [r.id, { name: r.name, city: r.city, country: r.country, logoId: r.logo || null }]))
 }
 
-/** Schools on the public "Schools on Budu" page = those whose own page is published (one switch). */
-export async function publicSchools(): Promise<Array<{ name: string; city: string; slug: string; logoId: number | null; coverId: number | null }>> {
-  const rows = await query<{ company_id: number; slug: string; cover_file: number | null }>(
-    `SELECT t.company_id, t.slug, p.cover_file
+export type PublicSchool = { name: string; city: string; slug: string; logoId: number | null; coverId: number | null }
+
+/** where the next page starts (opaque to callers): the last school's sign-up time + id */
+export type SchoolCursor = string
+
+/**
+ * Schools on the public "Schools on Budu" page = those whose own page is published (one switch),
+ * oldest first, a page at a time. Keyset pagination (after the last one shown — not OFFSET), so page
+ * 40 is as cheap as page 1; IOMAD is asked only for the schools on this page.
+ */
+export async function publicSchools(after: SchoolCursor | null = null, limit = 24): Promise<{ items: PublicSchool[]; next: SchoolCursor | null }> {
+  const [at, id] = (after ?? '').split('_').map(Number)
+  const keyset = after && Number.isFinite(at) && Number.isFinite(id)
+  const rows = await query<{ company_id: number; slug: string; cover_file: number | null; at: string }>(
+    `SELECT t.company_id, t.slug, p.cover_file, extract(epoch FROM t.created_at) AS at
        FROM tenants t JOIN school_pages p ON p.iomad_url = t.iomad_url AND p.company_id = t.company_id
-      WHERE t.iomad_url = $1 AND t.kind = 'school' AND p.published AND t.slug IS NOT NULL ORDER BY t.created_at`,
-    [defaultInstance().url],
+      WHERE t.iomad_url = $1 AND t.kind = 'school' AND p.published AND t.slug IS NOT NULL
+        ${keyset ? 'AND (t.created_at, t.company_id) > (to_timestamp($3), $4)' : ''}
+      ORDER BY t.created_at, t.company_id
+      LIMIT $2`,
+    keyset ? [defaultInstance().url, limit + 1, at, id] : [defaultInstance().url, limit + 1],
   )
-  const info = await schoolsInfo(rows.map((r) => r.company_id))
-  return rows
-    .filter((r) => info.has(r.company_id))
-    .map((r) => ({ name: info.get(r.company_id)!.name, city: info.get(r.company_id)!.city, slug: r.slug, logoId: info.get(r.company_id)!.logoId, coverId: r.cover_file }))
+  const page = rows.slice(0, limit)
+  const info = await schoolsInfo(page.map((r) => r.company_id))
+  const last = page.at(-1)
+  return {
+    items: page
+      .filter((r) => info.has(r.company_id))
+      .map((r) => ({ name: info.get(r.company_id)!.name, city: info.get(r.company_id)!.city, slug: r.slug, logoId: info.get(r.company_id)!.logoId, coverId: r.cover_file })),
+    next: rows.length > limit && last ? `${last.at}_${last.company_id}` : null,
+  }
 }
 
 /** The school's logo = IOMAD's company logo (null = remove). Returns the new logo file id. */

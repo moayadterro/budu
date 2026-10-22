@@ -21,6 +21,8 @@ export {
   answerInvite,
   cancelInvite,
   type SchoolInvite,
+  type PublicSchool,
+  type SchoolCursor,
   type Tenant,
   type TenantKind,
   type SchoolPerson,

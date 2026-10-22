@@ -1254,6 +1254,8 @@ export const en = {
       ],
     },
     schools: {
+      more: 'Show more',
+      loading: 'Loading…',
       title: 'Schools on Budu',
       sub: 'Schools that teach with Budu and chose to be listed here.',
       empty: 'No schools are listed yet.',

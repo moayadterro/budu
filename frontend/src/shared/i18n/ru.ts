@@ -1263,6 +1263,8 @@ export const ru: typeof en = {
       ],
     },
     schools: {
+      more: 'Показать ещё',
+      loading: 'Загрузка…',
       title: 'Школы на Budu',
       sub: 'Школы, которые учат с Budu и согласились появиться здесь.',
       empty: 'Пока здесь нет школ.',

@@ -1261,6 +1261,8 @@ export const ar: typeof en = {
       ],
     },
     schools: {
+      more: 'عرض المزيد',
+      loading: 'جارٍ التحميل…',
       title: 'المدارس على Budu',
       sub: 'مدارس تعلّم مع Budu ووافقت على الظهور هنا.',
       empty: 'لا توجد مدارس معروضة بعد.',
