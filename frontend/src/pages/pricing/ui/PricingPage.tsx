@@ -126,8 +126,8 @@ export async function PricingPage() {
           aria-hidden
           className="pointer-events-none absolute -inset-x-24 -top-40 -bottom-24 -z-10 overflow-hidden [mask-image:radial-gradient(ellipse_70%_65%_at_50%_42%,#000_35%,transparent_78%)]"
         >
-          <div className="absolute start-[8%] top-[6%] h-[26rem] w-[34rem] max-w-[70%] rounded-full bg-primary/16 blur-[110px] motion-safe:animate-aurora dark:bg-primary/12" />
-          <div className="absolute end-[6%] top-[22%] h-[24rem] w-[32rem] max-w-[65%] rounded-full bg-info/16 blur-[110px] [animation-delay:-7s] [animation-direction:alternate-reverse] motion-safe:animate-aurora dark:bg-info/12" />
+          <div className="absolute start-0 top-[6%] h-[26rem] w-[34rem] max-w-[70%] rounded-full bg-primary/16 blur-[110px] motion-safe:animate-aurora dark:bg-primary/12" />
+          <div className="absolute -end-[2%] top-[22%] h-[24rem] w-[32rem] max-w-[65%] rounded-full bg-info/16 blur-[110px] [animation-delay:-7s] [animation-direction:alternate-reverse] motion-safe:animate-aurora dark:bg-info/12" />
         </div>
         <div aria-hidden className="pointer-events-none absolute -inset-x-4 -top-20 bottom-0 -z-10 bg-dots" />
         <p className="text-xs font-semibold tracking-wider text-primary uppercase dark:text-success">{s.eyebrow}</p>
