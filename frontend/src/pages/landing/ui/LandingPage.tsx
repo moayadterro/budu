@@ -5,6 +5,7 @@ import { catalogFor } from '@/widgets/course-catalog/server'
 import { Button } from '@/shared/ui/button'
 import { Icon, type IconName } from '@/shared/ui/icon'
 import { getT } from '@/shared/i18n/server'
+import { JoinInvite } from '@/widgets/school-invite'
 
 const AUDIENCES: Array<{ key: 'schools' | 'teachers' | 'students' | 'parents'; icon: IconName }> = [
   { key: 'schools', icon: 'layers' },
@@ -67,13 +68,8 @@ export async function LandingPage() {
         </section>
       )}
 
-      <section className="flex flex-col items-center gap-4 rounded-2xl border bg-muted/40 px-6 py-12 text-center">
-        <h2 className="max-w-2xl text-2xl font-semibold tracking-tight text-balance">{s.ctaTitle}</h2>
-        <p className="max-w-xl text-muted-foreground">{s.ctaSub}</p>
-        <Button size="lg" asChild>
-          <Link href="/register">{s.start}</Link>
-        </Button>
-      </section>
+      {/* closing invitation for everyone (students, teachers, schools), the twin of SchoolInvite */}
+      <JoinInvite className="mt-4 sm:mt-8" />
     </div>
   )
 }
