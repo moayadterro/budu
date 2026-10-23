@@ -3,6 +3,7 @@ import { CourseCover, type ShownPrice } from '@/entities/course'
 import type { CatalogCourse, Listing } from '@/entities/course/server'
 import { RatingLine, type Rating } from '@/entities/review'
 import { languageName } from '@/shared/config/course-language'
+import { isCourseSubject } from '@/shared/config/course-subject'
 import { Badge } from '@/shared/ui/badge'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from '@/shared/ui/empty'
 import { Icon } from '@/shared/ui/icon'
@@ -42,6 +43,7 @@ export async function CatalogGrid({
             <CourseCover courseId={c.id} title={c.title} imageId={c.imageId} className="transition-transform duration-300 group-hover:scale-[1.03]" />
           </div>
           <div className="flex flex-1 flex-col gap-2 p-4">
+            {isCourseSubject(c.subject) && <p className="-mb-1 text-xs font-medium text-muted-foreground">{t.subjects[c.subject]}</p>}
             <h3 className="line-clamp-2 font-semibold leading-snug">{c.title}</h3>
             <RatingLine rating={rating} />
             <p className="truncate text-sm text-muted-foreground">{[c.teachers.map((x) => x.name).join(', '), c.school].filter(Boolean).join(' · ')}</p>

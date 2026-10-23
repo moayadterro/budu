@@ -421,7 +421,7 @@ Built and verified:
 Not built yet (rough priority):
 
 1. Still mock: live classroom. Live courses at a set time (BBB) — later. Real payment provider (then
-   orders confirm themselves); images in rich text; course search / filters in Explore.
+   orders confirm themselves); images in rich text.
    Video: transcoding / CDN (Kinescope, Bunny Stream or self-hosted HLS) behind `/files` later —
    NOT YouTube/RuTube (their terms require their branded player; see Decision log).
 2. Teacher follow-ups: invite link for students without an account, lesson completion / progress,
@@ -443,6 +443,14 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-23 Course subject + catalog search/filters (owner). The teacher picks a subject in the
+  listing settings (list in `shared/config/course-subject.ts`, names in `t.subjects`; stored as the
+  IOMAD course custom field `budu_subject`, like `budu_language`; `local_budu_set_course_subject`).
+  `/catalog` and `/explore` share `widgets/course-catalog` `CatalogBrowser`: search by title /
+  teacher / school, chips for subject, language, price (free / paid), all in the address
+  (?q=&subject=&lang=&price=&show=), filtered on the server over every listed course, 24 per
+  "Show more". Filters only offer values some course has. Fine for ~1000s of courses; past that,
+  move filtering into the catalog query (IOMAD is asked for every listed course on each request).
 - 2026-10-23 Pricing SEO: titles/descriptions say what people search for (free for students,
   schools by number of students, what's included), ≤ 60 / ≤ 160 characters incl. " · Budu". The
   page also carries schema.org JSON-LD (`shared/ui/json-ld` `JsonLd`, `absoluteUrl` from
