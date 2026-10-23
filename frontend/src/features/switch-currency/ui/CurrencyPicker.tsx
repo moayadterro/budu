@@ -14,8 +14,9 @@ import { setCurrencyAction } from '../server/actions'
 /**
  * The currency prices are shown in (saved at once): a button like the app's other controls that
  * opens a searchable list — code and name (owner: just "USD", no symbols here; prices themselves
- * carry the symbol). `inline`: the small "Prices in RUB" control next to prices (catalog, course
- * page); otherwise a full-width field (Settings).
+ * carry the symbol). `inline`: one soft borderless chip "Prices in RUB ⌄" next to prices (catalog,
+ * course page; owner: a label plus a bordered select looked old); otherwise a full-width field
+ * (Settings). The list is frosted glass like the app's other menus.
  */
 export function CurrencyPicker({ value, inline = false }: { value: Currency; inline?: boolean }) {
   const t = useT()
@@ -76,38 +77,53 @@ export function CurrencyPicker({ value, inline = false }: { value: Currency; inl
       aria-selected={r.code === current}
       onClick={() => choose(r.code)}
       className={cn(
-        'flex w-full items-center gap-3 rounded-sm px-2 py-1.5 text-start text-sm outline-none transition-colors hover:bg-muted focus-visible:bg-muted',
-        r.code === current && 'bg-primary/5',
+        'flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-start text-sm outline-none transition-colors hover:bg-foreground/5 focus-visible:bg-foreground/5',
+        r.code === current && 'bg-foreground/5',
       )}
     >
       <span className="w-10 flex-none font-semibold tabular-nums">{r.code}</span>
       <span className="min-w-0 flex-1 truncate text-muted-foreground">{r.name}</span>
-      {r.code === current && <Icon name="tick" className="size-4 text-primary" />}
+      {r.code === current && <Icon name="tick" className="size-4 text-primary dark:text-success" />}
     </button>
   )
 
   return (
     <Popover open={open} onOpenChange={(o) => (setOpen(o), o || setQuery(''))}>
       <div className={cn('flex items-center gap-2', !inline && 'w-full max-w-xs')}>
-        {inline && <span className="text-sm text-muted-foreground">{t.pricesIn}</span>}
         <PopoverTrigger asChild>
-          <Button
-            type="button"
-            variant="outline"
-            size={inline ? 'sm' : 'default'}
-            disabled={pending}
-            aria-label={`${t.account.currency}: ${currencyName(current, locale)}`}
-            className={cn('group', !inline && 'w-full justify-between font-normal')}
-          >
-            <span className={cn('tabular-nums', !inline && 'flex-1 truncate text-start')}>
-              {inline ? current : `${currencyName(current, locale)} · ${current}`}
-            </span>
-            <Icon name="down" className="size-3.5 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
-          </Button>
+          {inline ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={pending}
+              aria-label={`${t.account.currency}: ${currencyName(current, locale)}`}
+              className="group h-8 gap-1 rounded-lg bg-foreground/5 ps-2 pe-1.5 text-xs font-normal hover:bg-foreground/8"
+            >
+              <Icon name="wallet" className="size-3.5 text-muted-foreground" />
+              <span className="text-muted-foreground">{t.pricesIn}</span>
+              <span className="font-semibold tabular-nums">{current}</span>
+              <Icon name="down" className="size-3 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              disabled={pending}
+              aria-label={`${t.account.currency}: ${currencyName(current, locale)}`}
+              className="group w-full justify-between font-normal"
+            >
+              <span className="flex-1 truncate text-start tabular-nums">{`${currencyName(current, locale)} · ${current}`}</span>
+              <Icon name="down" className="size-3.5 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+            </Button>
+          )}
         </PopoverTrigger>
       </div>
-      <PopoverContent align="end" className="w-64 p-1">
-        <div className="flex items-center gap-2 border-b px-2 pb-1.5">
+      <PopoverContent
+        align="end"
+        className="w-72 rounded-2xl border-0 bg-popover/80 p-1.5 shadow-xl shadow-foreground/10 ring-1 ring-foreground/8 backdrop-blur-xl backdrop-saturate-150"
+      >
+        <div className="flex items-center gap-2 rounded-xl bg-foreground/5 px-2.5">
           <Icon name="search" className="size-4 text-muted-foreground" />
           <input
             autoFocus
@@ -121,7 +137,7 @@ export function CurrencyPicker({ value, inline = false }: { value: Currency; inl
             }}
           />
         </div>
-        <div role="listbox" aria-label={t.account.currency} className="mt-1 max-h-80 overflow-y-auto">
+        <div role="listbox" aria-label={t.account.currency} className="mt-1.5 max-h-80 overflow-y-auto">
           {found ? (
             found.length ? (
               found.map(row)
