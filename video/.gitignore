@@ -2,3 +2,8 @@ tools/node_modules/
 budu-promo/renders/
 budu-promo/node_modules/
 *.mp4
+tools/silero-venv/
+tools/silero/
+budu-ad/renders/
+budu-ad/voice-samples/
+budu-ad/node_modules/
