@@ -81,7 +81,7 @@ export function CurrencyPicker({ value, inline = false }: { value: Currency; inl
         r.code === current && 'bg-foreground/5',
       )}
     >
-      <span className="w-10 flex-none font-semibold tabular-nums">{r.code}</span>
+      <span className="w-10 flex-none font-medium tabular-nums">{r.code}</span>
       <span className="min-w-0 flex-1 truncate text-muted-foreground">{r.name}</span>
       {r.code === current && <Icon name="tick" className="size-4 text-primary dark:text-success" />}
     </button>
@@ -102,7 +102,7 @@ export function CurrencyPicker({ value, inline = false }: { value: Currency; inl
             >
               <Icon name="wallet" className="size-3.5 text-muted-foreground" />
               <span className="text-muted-foreground">{t.pricesIn}</span>
-              <span className="font-semibold tabular-nums">{current}</span>
+              <span className="font-medium text-foreground tabular-nums">{current}</span>
               <Icon name="down" className="size-3 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
             </Button>
           ) : (

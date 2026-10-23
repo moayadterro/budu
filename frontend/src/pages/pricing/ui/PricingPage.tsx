@@ -80,7 +80,7 @@ export async function PricingPage() {
         </div>
         {isSchool ? (
           <div className="flex flex-col gap-2">
-            <Button variant="ghost" size="lg" className={cn('h-auto min-h-11 w-full py-2.5 font-semibold whitespace-normal', c.button)} asChild>
+            <Button variant="ghost" size="lg" className={cn('h-auto min-h-11 w-full py-2.5 font-medium whitespace-normal', c.button)} asChild>
               <Link href={href}>{p.cta}</Link>
             </Button>
             <Link href="/contact?topic=school" className={cn('self-center rounded-md px-2 py-1 text-center text-[0.8125rem] text-balance underline-offset-4 hover:underline', c.mark)}>
@@ -90,7 +90,7 @@ export async function PricingPage() {
         ) : (
           // Apple's "tinted" button: a light fill in the card's own colour, coloured text, no shadow —
           // the same for all three plans (owner: no plan shouts; the visitor picks who they are)
-          <Button variant="ghost" size="lg" className={cn('h-auto min-h-11 w-full py-2.5 font-semibold whitespace-normal', c.button)} asChild>
+          <Button variant="ghost" size="lg" className={cn('h-auto min-h-11 w-full py-2.5 font-medium whitespace-normal', c.button)} asChild>
             <Link href={href}>{p.cta}</Link>
           </Button>
         )}
@@ -189,7 +189,7 @@ export async function PricingPage() {
         <div aria-hidden className="pointer-events-none absolute -inset-x-4 -top-20 bottom-0 -z-10 bg-dots" />
         {/* one heading for search engines ("Pricing: learning should be fun"), looks unchanged */}
         <h1 className="flex flex-col items-center gap-5">
-          <span className="font-sans text-xs font-semibold tracking-wider text-primary uppercase dark:text-success">{s.eyebrow}</span>
+          <span className="font-sans text-xs font-medium tracking-wider text-primary uppercase dark:text-success">{s.eyebrow}</span>
           <span className="sr-only">: </span>
           <span className="max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl">{s.title}</span>
         </h1>

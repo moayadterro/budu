@@ -66,7 +66,7 @@ export async function CourseDetail({
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
               <span className="inline-flex items-center gap-1.5">
                 <Stars value={rating.average} />
-                <span className="font-semibold tabular-nums">{avg}</span>
+                <span className="font-medium tabular-nums">{avg}</span>
                 <span className="text-muted-foreground">{rating.count ? t.reviews.count(rating.count) : t.reviews.none}</span>
               </span>
               <span className="inline-flex items-center gap-1.5 text-muted-foreground">
@@ -121,14 +121,14 @@ export async function CourseDetail({
                           title={t.preview.signInToOpen}
                           className="-mx-2 flex items-center gap-3 rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                         >
-                          <span className="grid size-7 flex-none place-items-center rounded-md bg-muted text-xs font-semibold tabular-nums">{i + 1}</span>
+                          <span className="grid size-7 flex-none place-items-center rounded-md bg-muted text-xs font-medium tabular-nums">{i + 1}</span>
                           <span className="min-w-0 flex-1">{l}</span>
                           <Icon name="lock" className="size-4 flex-none" aria-label={t.preview.signInToOpen} />
                         </Link>
                       </li>
                     ) : (
                       <li key={i} className="flex items-center gap-3 py-1.5 text-sm">
-                        <span className="grid size-7 flex-none place-items-center rounded-md bg-muted text-xs font-semibold tabular-nums">{i + 1}</span>
+                        <span className="grid size-7 flex-none place-items-center rounded-md bg-muted text-xs font-medium tabular-nums">{i + 1}</span>
                         <span className={cn('min-w-0 flex-1', previewHref && 'text-muted-foreground')}>{l}</span>
                         {previewHref && <Icon name="lock" className="size-4 flex-none text-muted-foreground" aria-label={t.preview.locked} />}
                       </li>
