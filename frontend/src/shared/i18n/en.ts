@@ -1679,7 +1679,7 @@ export const en = {
           "Repeating lessons on the timetable",
           "Announcements and chat with parents",
         ],
-        soon: "AI creator kit: coming soon, paid",
+        soon: "AI creator kit, paid",
       },
       schools: {
         name: "Schools",
@@ -1696,7 +1696,7 @@ export const en = {
           "Staff and student invitations and roles",
           "Announcements to the school, classes and parents",
         ],
-        soon: "Online certificates: coming soon",
+        soon: "Online certificates",
       },
       paidCourses: "Paid courses are priced by their teachers. Students see prices in their own currency.",
       soonEyebrow: "Coming soon",

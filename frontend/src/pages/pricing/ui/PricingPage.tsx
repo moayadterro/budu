@@ -2,6 +2,7 @@ import { LocalLink as Link } from '@/shared/ui/local-link'
 import { cn } from '@/shared/lib/cn'
 import { Button } from '@/shared/ui/button'
 import { Icon, type IconName } from '@/shared/ui/icon'
+import { SoonBadge } from '@/shared/ui/soon-badge'
 import { getT } from '@/shared/i18n/server'
 
 /**
@@ -98,11 +99,17 @@ export async function PricingPage() {
             </li>
           ))}
         </ul>
+        {/* not built yet: a row like the features above, amber instead of a tick, with the badge */}
         {'soon' in p && (
-          <p className="mt-auto flex items-center gap-2 pt-2 text-sm text-muted-foreground">
-            <Icon name="spark" className="size-4 text-warning" />
-            {p.soon}
-          </p>
+          <div className="mt-auto flex items-start gap-2.5 pt-1 text-sm">
+            <span className="mt-0.5 grid size-4.5 flex-none place-items-center rounded-full bg-warning/15 text-warning">
+              <Icon name="spark" className="size-3" />
+            </span>
+            <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-foreground/85">
+              {p.soon}
+              <SoonBadge label={s.soonBadge} />
+            </span>
+          </div>
         )}
       </article>
     )
@@ -176,8 +183,7 @@ export async function PricingPage() {
                 <div className="flex min-w-0 flex-col gap-1.5">
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="font-semibold">{item.title}</h3>
-                    {/* "coming soon" is amber everywhere — green means it already exists */}
-                    <span className="rounded-full bg-warning/12 px-2 py-0.5 text-xs font-medium text-warning">{s.soonBadge}</span>
+                    <SoonBadge label={s.soonBadge} />
                   </div>
                   <p className="text-sm leading-relaxed text-muted-foreground">{item.text}</p>
                 </div>
