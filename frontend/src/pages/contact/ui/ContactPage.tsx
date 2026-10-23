@@ -39,14 +39,14 @@ export async function ContactPage({ searchParams }: { searchParams: Promise<{ to
         <aside className="flex flex-col gap-8">
           {emails.length > 0 && (
             <section className="flex flex-col gap-3">
-              <h2 className="px-2 text-sm font-medium text-muted-foreground">{s.otherTitle}</h2>
+              <h2 className="px-2 text-sm font-medium text-foreground">{s.otherTitle}</h2>
               <EmailList rows={emails.map(([key, address]) => ({ key, address }))} />
             </section>
           )}
           <section className="flex flex-col gap-3">
-            <h2 className="px-2 text-sm font-medium text-muted-foreground">{s.socialTitle}</h2>
+            <h2 className="px-2 text-sm font-medium text-foreground">{s.socialTitle}</h2>
             {/* one short, warm line (owner: the long version went unread) */}
-            <p className="px-2 text-sm leading-relaxed text-pretty">{s.socialInvite}</p>
+            <p className="-mt-1.5 px-2 text-sm text-pretty text-muted-foreground">{s.socialInvite}</p>
             <SocialLinks className="px-1" />
           </section>
           {SITE.whatsapp && (
@@ -57,7 +57,7 @@ export async function ContactPage({ searchParams }: { searchParams: Promise<{ to
           )}
           {legal.length > 0 && (
             <section className="flex flex-col gap-3">
-              <h2 className="px-2 text-sm font-medium text-muted-foreground">{s.legalTitle}</h2>
+              <h2 className="px-2 text-sm font-medium text-foreground">{s.legalTitle}</h2>
               <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 px-2 text-sm">
                 {legal.map(([k, v]) => (
                   <div key={k} className="contents">
