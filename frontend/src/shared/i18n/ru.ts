@@ -1544,6 +1544,7 @@ export const ru: typeof en = {
     coursesTitle: "Популярные курсы",
     coursesSub:
       "Начните уже сегодня: для бесплатных курсов нужен только аккаунт.",
+    openCourse: "Открыть курс",
     allCourses: "Все курсы",
     ctaWho: { students: "Ученикам", teachers: "Учителям", schools: "Школам" },
     ctaTitle: "Готовы учиться или учить?",

@@ -1,6 +1,6 @@
 import { LocalLink as Link } from '@/shared/ui/local-link'
 import { visitorCurrency } from '@/entities/user/server'
-import { CatalogGrid } from '@/widgets/course-catalog'
+import { CatalogGrid, CourseSpotlight } from '@/widgets/course-catalog'
 import { catalogFor } from '@/widgets/course-catalog/server'
 import { Icon } from '@/shared/ui/icon'
 import { getT } from '@/shared/i18n/server'
@@ -40,7 +40,8 @@ export async function LandingPage() {
             <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-balance sm:text-5xl">{s.coursesTitle}</h2>
             <p className="max-w-xl text-lg text-pretty text-muted-foreground">{s.coursesSub}</p>
           </div>
-          <CatalogGrid items={featured} hrefBase="/catalog" centered />
+          {/* one course: a wide featured card; two or more: the grid */}
+          {featured.length === 1 ? <CourseSpotlight item={featured[0]} hrefBase="/catalog" /> : <CatalogGrid items={featured} hrefBase="/catalog" centered />}
           <Link href="/catalog" className="group flex items-center gap-1 self-center text-base font-medium text-primary dark:text-success">
             <span className="group-hover:underline group-hover:underline-offset-4">{s.allCourses}</span>
             <Icon name="chevRight" className="size-4 transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5" />
