@@ -37,17 +37,14 @@ const GROUPS: Array<{ key: 'messengers' | 'social' | 'video'; items: SocialKey[]
   { key: 'video', items: ['youtube', 'tiktok'] },
 ]
 
-/** The footer's two rows, in the owner's order: the main ones first, the rest under them. */
-const FOOTER_ROWS: SocialKey[][] = [
-  ['telegram', 'max', 'whatsapp', 'vk', 'facebook', 'instagram'],
-  ['ok', 'x', 'youtube', 'tiktok'],
-]
+/** The footer shows only the main platforms, in the owner's order (the rest are on Contact). */
+const FOOTER_ROWS: SocialKey[][] = [['telegram', 'max', 'whatsapp', 'vk', 'facebook', 'instagram']]
 
 /**
  * Budu's social accounts (SITE.social), grouped (messengers · social networks · video), no names on
  * the icons (owner: the platforms are known); the name is the screen-reader label and the hover
- * title. ONE component, two looks: `sm` = the footer, plain one-colour marks in two rows (owner's
- * order, FOOTER_ROWS), grey, black on hover (owner: no colourful icons there); default = the
+ * title. ONE component, two looks: `sm` = the footer, plain one-colour marks for the main platforms
+ * only (owner's order, FOOTER_ROWS), grey, black on hover (owner: no colourful icons there); default = the
  * Contact page, the colour app-icon tiles under a small label per group. An account that doesn't
  * exist yet: greyed out + amber dot.
  */
