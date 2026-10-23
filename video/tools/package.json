@@ -1,0 +1,10 @@
+{
+  "name": "budu-video-tools",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@dicebear/collection": "9.4.3",
+    "@dicebear/converter": "9.4.3",
+    "@dicebear/core": "9.4.3"
+  }
+}

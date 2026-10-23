@@ -15,3 +15,6 @@ dist/
 # stray / generated
 yarn.lock
 *.tsbuildinfo
+
+# demo accounts and their password (made by frontend/scripts/seed-demo.mjs) — never commit
+frontend/scripts/demo-accounts.local.md
