@@ -50,8 +50,8 @@ export async function PricingPage() {
     return (
       <article
         className={cn(
-          // the big symbol sits in the top-end corner; the colour rises from the opposite (bottom-start) one
-          'relative isolate flex flex-col gap-6 rounded-3xl bg-linear-to-tr to-card p-6 transition-transform duration-300 motion-safe:hover:-translate-y-1 sm:p-8 rtl:bg-linear-to-tl',
+          // the colour flows from the top-start corner (owner); the big symbol sits in the top-end one
+          'relative isolate flex flex-col gap-6 rounded-3xl bg-linear-to-br to-card p-6 transition-transform duration-300 motion-safe:hover:-translate-y-1 sm:p-8 rtl:bg-linear-to-bl',
           // soft NEUTRAL shadows only — never a coloured glow behind a card (owner)
           raised
             ? 'shadow-[0_1px_2px_color-mix(in_oklch,var(--foreground)_6%,transparent),0_24px_48px_-16px_color-mix(in_oklch,var(--foreground)_16%,transparent)] lg:py-12'
