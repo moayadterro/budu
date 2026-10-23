@@ -1665,7 +1665,7 @@ export const en = {
           "Parents can follow along, only if you invite them",
           "Reminders for new homework, grades and exams",
         ],
-        soon: "Educational online games in your free time",
+        soon: ["Educational online games in your free time", "AI study assistant"],
       },
       teachers: {
         name: "Teachers",
@@ -1681,7 +1681,7 @@ export const en = {
           "Repeating lessons on the timetable",
           "Announcements and chat with parents",
         ],
-        soon: "AI creator kit, paid",
+        soon: ["AI creator kit, paid"],
       },
       schools: {
         name: "Schools",
@@ -1698,7 +1698,7 @@ export const en = {
           "Staff and student invitations and roles",
           "Announcements to the school, classes and parents",
         ],
-        soon: "Online certificates",
+        soon: ["Online certificates"],
       },
       paidCourses: "Paid courses are priced by their teachers. Students see prices in their own currency.",
       soonTitle: "What we’re building next",

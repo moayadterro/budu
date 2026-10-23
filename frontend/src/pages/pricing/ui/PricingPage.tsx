@@ -101,15 +101,19 @@ export async function PricingPage() {
             </li>
           ))}
         </ul>
-        {/* not built yet: a row like the features above, amber instead of a tick, with the badge */}
-        {'soon' in p && (
-          <div className="mt-auto flex items-start gap-2.5 pt-1 text-sm">
-            <Icon name="spark" strokeWidth={2} className="mt-0.5 size-4 flex-none text-warning" />
-            <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-foreground/85">
-              {p.soon}
-              <SoonBadge label={s.soonBadge} />
-            </span>
-          </div>
+        {/* not built yet: rows like the features above, amber instead of a tick, with the badge */}
+        {p.soon.length > 0 && (
+          <ul className="mt-auto flex flex-col gap-3 pt-1 text-sm">
+            {p.soon.map((x) => (
+              <li key={x} className="flex items-start gap-2.5">
+                <Icon name="spark" strokeWidth={2} className="mt-0.5 size-4 flex-none text-warning" />
+                <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-foreground/85">
+                  {x}
+                  <SoonBadge label={s.soonBadge} />
+                </span>
+              </li>
+            ))}
+          </ul>
         )}
       </article>
     )
