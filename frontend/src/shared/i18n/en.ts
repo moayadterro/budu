@@ -1654,7 +1654,7 @@ export const en = {
         name: "Students",
         price: "Free access",
         who: "We support every learner",
-        cta: "Create an account",
+        cta: "Start learning",
         features: [
           "Classes, lessons and your timetable in one place",
           "Video, file and text lessons",
