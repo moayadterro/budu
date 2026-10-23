@@ -74,7 +74,7 @@ export async function PricingPage() {
         </div>
         <div>
           <p className="font-heading text-3xl font-semibold tracking-tight text-balance sm:text-4xl lg:text-3xl xl:text-4xl">{p.price}</p>
-          <p className="mt-2 text-sm text-muted-foreground">{p.who}</p>
+          <p className="mt-2 text-[0.8125rem] text-muted-foreground">{p.who}</p>
         </div>
         {isSchool ? (
           <div className="flex flex-col gap-2">
