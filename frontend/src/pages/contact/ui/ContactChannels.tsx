@@ -25,31 +25,31 @@ export function EmailCards({ rows }: { rows: EmailRow[] }) {
   const s = t.site.contact
   const [copied, setCopied] = useState<string | null>(null)
   return (
-    <ul className="flex flex-col gap-3">
+    <ul className="flex flex-col gap-2">
       {rows.map((r) => {
         const st = EMAIL_STYLE[r.key]
         return (
           <li
             key={r.key}
             className={cn(
-              'group relative rounded-2xl bg-linear-to-br to-card p-4 transition-transform duration-200 motion-safe:hover:-translate-y-0.5 rtl:bg-linear-to-bl',
+              'group relative rounded-2xl bg-linear-to-br to-card px-3.5 py-3 transition-transform duration-200 motion-safe:hover:-translate-y-0.5 rtl:bg-linear-to-bl',
               // the same soft edge as the plan cards; a hairline in dark mode (a shadow turns into a halo there)
               'shadow-[0_3px_8px_-2px_color-mix(in_oklch,var(--foreground)_8%,transparent),0_10px_24px_-10px_color-mix(in_oklch,var(--foreground)_7%,transparent)] dark:shadow-none dark:ring-1 dark:ring-foreground/8',
               st.fade,
             )}
           >
             {/* one compact row: icon · title, what to write about and the address · copy */}
-            <div className="flex items-start gap-3">
-              <span className={cn('grid size-10 flex-none place-items-center rounded-xl', st.tile)}>
-                <Icon name={st.icon} className="size-5" />
+            <div className="flex items-center gap-3">
+              <span className={cn('grid size-9 flex-none place-items-center rounded-xl', st.tile)}>
+                <Icon name={st.icon} className="size-[1.125rem]" />
               </span>
-              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <h3 className="font-semibold">{s.emailLabels[r.key]}</h3>
-                <p className="text-[0.8125rem] leading-snug text-pretty text-muted-foreground">{s.emailHints[r.key]}</p>
+              <div className="flex min-w-0 flex-1 flex-col">
+                <h3 className="text-sm leading-5 font-semibold">{s.emailLabels[r.key]}</h3>
+                <p title={s.emailHints[r.key]} className="truncate text-xs leading-4 text-muted-foreground">{s.emailHints[r.key]}</p>
                 {/* the whole card writes an email (stretched link) */}
                 <a
                   href={`mailto:${r.address}`}
-                  className="mt-1 truncate text-sm font-medium text-foreground after:absolute after:inset-0 after:rounded-2xl focus-visible:outline-none focus-visible:after:ring-3 focus-visible:after:ring-ring/50"
+                  className="mt-0.5 truncate text-[0.8125rem] leading-5 font-medium text-foreground after:absolute after:inset-0 after:rounded-2xl focus-visible:outline-none focus-visible:after:ring-3 focus-visible:after:ring-ring/50"
                   dir="ltr"
                 >
                   {r.address}
@@ -69,7 +69,7 @@ export function EmailCards({ rows }: { rows: EmailRow[] }) {
                   }
                 }}
                 className={cn(
-                  'relative z-10 flex h-9 flex-none items-center gap-1.5 rounded-xl px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-foreground/6 hover:text-foreground',
+                  'relative z-10 flex h-8 flex-none items-center gap-1.5 rounded-lg px-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-foreground/6 hover:text-foreground',
                   copied === r.key && 'text-primary dark:text-success',
                 )}
               >
