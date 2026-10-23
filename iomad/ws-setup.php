@@ -44,6 +44,7 @@ const FUNCTIONS = [
     'local_budu_complete_course',
     'local_budu_completed_courses',
     'local_budu_set_course_language',
+    'local_budu_set_course_subject',
     'local_budu_publish_changes',
     'local_budu_discard_changes',
     // Students, homework and grades (iomad/local_budu/classes/external/learning.php).

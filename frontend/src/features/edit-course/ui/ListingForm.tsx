@@ -3,6 +3,7 @@
 import { useActionState, useState } from 'react'
 import { CURRENCIES, type Currency } from '@/shared/config/currency'
 import { COURSE_LANGUAGES, languageName } from '@/shared/config/course-language'
+import { COURSE_SUBJECTS } from '@/shared/config/course-subject'
 import { currencyName } from '@/shared/lib/money'
 import { Alert } from '@/shared/ui/alert'
 import { Field } from '@/shared/ui/field'
@@ -14,7 +15,7 @@ import { saveListingAction, type ListingState } from '../server/actions'
 
 const idle: ListingState = { status: 'idle' }
 
-/** Teacher: show the course in Explore, with a price in their currency (empty / 0 = free). */
+/** Teacher: show the course in Explore, with a price in their currency (empty / 0 = free), its language and subject. */
 export function ListingForm({
   courseId,
   published,
@@ -22,7 +23,7 @@ export function ListingForm({
 }: {
   courseId: number
   published: boolean
-  listing: { listed: boolean; price: number; currency: Currency; language: string | null }
+  listing: { listed: boolean; price: number; currency: Currency; language: string | null; subject: string | null }
 }) {
   const t = useT()
   const locale = useLocale()
@@ -69,6 +70,16 @@ export function ListingForm({
           {COURSE_LANGUAGES.map((l) => (
             <NativeSelectOption key={l} value={l}>
               {languageName(l, locale)}
+            </NativeSelectOption>
+          ))}
+        </NativeSelect>
+      </Field>
+      <Field label={s.subject} hint={s.subjectHint}>
+        <NativeSelect name="subject" defaultValue={listing.subject ?? ''} aria-label={s.subject}>
+          <NativeSelectOption value="">{s.subjectNone}</NativeSelectOption>
+          {COURSE_SUBJECTS.map((k) => (
+            <NativeSelectOption key={k} value={k}>
+              {t.subjects[k]}
             </NativeSelectOption>
           ))}
         </NativeSelect>

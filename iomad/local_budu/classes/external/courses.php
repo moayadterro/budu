@@ -415,6 +415,7 @@ class courses extends external_api {
             'lessons' => count($lessons), 'timemodified' => $course->timemodified, 'canedit' => $canedit, 'lessonlist' => $lessons,
             'image' => self::image_id($course->id), 'changes' => count($rows),
             'language' => (string)(profile::course_languages([$course->id])[$course->id] ?? ''),
+            'subject' => (string)(profile::course_subjects([$course->id])[$course->id] ?? ''),
         ];
     }
 
@@ -424,6 +425,7 @@ class courses extends external_api {
             'lessonlist' => new external_multiple_structure(self::lesson_structure()),
             'changes' => new external_value(PARAM_INT, 'Unpublished changes (editors; 0 for others)'),
             'language' => new external_value(PARAM_ALPHA, 'Teaching language (ISO 639-1), empty = not said'),
+            'subject' => new external_value(PARAM_ALPHANUMEXT, 'Subject key, empty = not said'),
         ]);
     }
 

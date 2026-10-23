@@ -266,8 +266,18 @@ class profile extends external_api {
 
     /** The budu_language course custom field (created on first use). */
     public static function language_field_id(): int {
+        return self::text_field_id('budu_language', 'Teaching language');
+    }
+
+    /** The budu_subject course custom field: what the course is about, a key like "math" (created on first use). */
+    public static function subject_field_id(): int {
+        return self::text_field_id('budu_subject', 'Subject');
+    }
+
+    /** A short text course custom field in the "Budu" category (created on first use). */
+    private static function text_field_id(string $shortname, string $name): int {
         global $DB;
-        $id = (int)$DB->get_field('customfield_field', 'id', ['shortname' => 'budu_language']);
+        $id = (int)$DB->get_field('customfield_field', 'id', ['shortname' => $shortname]);
         if ($id) {
             return $id;
         }
@@ -277,20 +287,29 @@ class profile extends external_api {
         $category = \core_customfield\category_controller::create($catid);
         $field = \core_customfield\field_controller::create(0, (object)['type' => 'text'], $category);
         $handler->save_field_configuration($field, (object)[
-            'name' => 'Teaching language', 'shortname' => 'budu_language', 'description' => '', 'descriptionformat' => FORMAT_PLAIN,
+            'name' => $name, 'shortname' => $shortname, 'description' => '', 'descriptionformat' => FORMAT_PLAIN,
             'configdata' => ['required' => 0, 'uniquevalues' => 0, 'locked' => 0, 'visibility' => 2, 'defaultvalue' => '',
-                'displaysize' => 10, 'maxlength' => 10, 'ispassword' => 0, 'link' => '', 'linktarget' => ''],
+                'displaysize' => 20, 'maxlength' => 30, 'ispassword' => 0, 'link' => '', 'linktarget' => ''],
         ]);
         return (int)$field->get('id');
     }
 
     /** Teaching language of these courses (courseid => code). */
     public static function course_languages(array $courseids): array {
+        return self::field_values(self::language_field_id(), $courseids);
+    }
+
+    /** Subject of these courses (courseid => key). */
+    public static function course_subjects(array $courseids): array {
+        return self::field_values(self::subject_field_id(), $courseids);
+    }
+
+    /** One custom field's values for these courses (courseid => value). */
+    private static function field_values(int $fieldid, array $courseids): array {
         global $DB;
         if (!$courseids) {
             return [];
         }
-        $fieldid = self::language_field_id();
         [$in, $params] = $DB->get_in_or_equal(array_map('intval', $courseids));
         return $DB->get_records_select_menu('customfield_data', "fieldid = ? AND instanceid $in", array_merge([$fieldid], $params), '', 'instanceid, value');
     }
@@ -316,6 +335,31 @@ class profile extends external_api {
     }
 
     public static function set_course_language_returns(): external_single_structure {
+        return new external_single_structure(['id' => new external_value(PARAM_INT, 'Course')]);
+    }
+
+    public static function set_course_subject_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'courseid' => new external_value(PARAM_INT, 'Course'),
+            'userid' => new external_value(PARAM_INT, 'Acting Budu user (may edit the course)'),
+            'subject' => new external_value(PARAM_ALPHANUMEXT, 'Subject key (e.g. math), empty = not said'),
+        ]);
+    }
+
+    /** What the course is about (a key from the frontend's subject list; the frontend checks it). */
+    public static function set_course_subject(int $courseid, int $userid, string $subject): array {
+        $p = self::validate_parameters(self::set_course_subject_parameters(), compact('courseid', 'userid', 'subject'));
+        self::setup();
+        if (!has_capability('moodle/course:manageactivities', \context_course::instance($p['courseid']), $p['userid'])) {
+            throw new \moodle_exception('nopermissions', 'error', '', 'edit this course');
+        }
+        self::subject_field_id();
+        $handler = \core_course\customfield\course_handler::create();
+        $handler->instance_form_save((object)['id' => $p['courseid'], 'customfield_budu_subject' => \core_text::strtolower(substr($p['subject'], 0, 30))]);
+        return ['id' => $p['courseid']];
+    }
+
+    public static function set_course_subject_returns(): external_single_structure {
         return new external_single_structure(['id' => new external_value(PARAM_INT, 'Course')]);
     }
 }

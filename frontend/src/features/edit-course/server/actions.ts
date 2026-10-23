@@ -3,10 +3,11 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { COURSE_LIMITS } from '@/entities/course'
-import { createCourse, setCourseLanguage, discardChanges, getCourse, listStudents, publishChanges, saveListing, setCourseImage, updateCourse } from '@/entities/course/server'
+import { createCourse, setCourseLanguage, setCourseSubject, discardChanges, getCourse, listStudents, publishChanges, saveListing, setCourseImage, updateCourse } from '@/entities/course/server'
 import { notify } from '@/entities/notification/server'
 import { isCurrency } from '@/shared/config/currency'
 import { isCourseLanguage } from '@/shared/config/course-language'
+import { isCourseSubject } from '@/shared/config/course-subject'
 import { requireRole } from '@/entities/session/server'
 import { formId, formText } from '@/shared/lib/form'
 import type { CourseFormError, CourseFormState } from '../model/types'
@@ -118,6 +119,8 @@ export async function saveListingAction(_prev: ListingState, form: FormData): Pr
   await saveListing(user.userId, { courseId, listed: form.get('listed') === 'on', price, currency })
   audit('courseListingSaved', { target: `course ${courseId}`, details: { listed: form.get('listed') === 'on', price, currency } })
   await setCourseLanguage(user.userId, courseId, isCourseLanguage(language) ? language : '') // an IOMAD course field
+  const subject = formText(form, 'subject')
+  await setCourseSubject(user.userId, courseId, isCourseSubject(subject) ? subject : '') // an IOMAD course field
   revalidatePath(`/courses/${courseId}`)
   revalidatePath('/explore')
   return { status: 'saved', at }

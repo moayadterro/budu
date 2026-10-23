@@ -13,6 +13,7 @@ export {
   savePage,
   deleteLessonItem,
   setCourseLanguage,
+  setCourseSubject,
   publishChanges,
   discardChanges,
   lessonFileAccess,

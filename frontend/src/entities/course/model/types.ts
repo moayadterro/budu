@@ -49,7 +49,7 @@ export type CourseLesson = {
 }
 
 /** `changes`: unpublished changes of a published course (editors; 0 for others). */
-export type Course = CourseSummary & { canEdit: boolean; lessons: CourseLesson[]; changes: number; language: string | null }
+export type Course = CourseSummary & { canEdit: boolean; lessons: CourseLesson[]; changes: number; language: string | null; subject: string | null }
 
 /** Browser URL of a lesson file (streamed by the /files route after an access check). */
 export const fileUrl = (file: CourseFile) => `/files/${file.id}`

@@ -37,6 +37,7 @@ class market extends external_api {
         self::setup();
         $out = [];
         $languages = profile::course_languages(array_unique(array_map('intval', $p['courseids'])));
+        $subjects = profile::course_subjects(array_unique(array_map('intval', $p['courseids'])));
         foreach (array_unique(array_map('intval', $p['courseids'])) as $id) {
             $course = $DB->get_record('course', ['id' => $id]);
             if (!$course || $course->id == SITEID || !$course->visible) {
@@ -59,6 +60,7 @@ class market extends external_api {
                 'image' => courses::image_id($course->id),
                 'students' => count(learning::students_of($course->id)), // how many took the course
                 'language' => (string)($languages[$course->id] ?? ''), // teaching language (course custom field)
+                'subject' => (string)($subjects[$course->id] ?? ''), // what it is about (course custom field)
             ];
         }
         return $out;
@@ -81,6 +83,7 @@ class market extends external_api {
             'image' => new external_value(PARAM_INT, 'Cover image file id, 0 = none'),
             'students' => new external_value(PARAM_INT, 'Students enrolled (active)'),
             'language' => new external_value(PARAM_ALPHA, 'Teaching language (ISO 639-1), empty = not said'),
+            'subject' => new external_value(PARAM_ALPHANUMEXT, 'Subject key, empty = not said'),
         ]));
     }
 

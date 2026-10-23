@@ -134,6 +134,12 @@ $functions = [
         'description' => 'Set a course’s teaching language.',
         'type' => 'write',
     ],
+    'local_budu_set_course_subject' => [
+        'classname' => \local_budu\external\profile::class,
+        'methodname' => 'set_course_subject',
+        'description' => 'Set what a course is about (its subject).',
+        'type' => 'write',
+    ],
     'local_budu_set_school_logo' => [
         'classname' => \local_budu\external\profile::class,
         'methodname' => 'set_school_logo',

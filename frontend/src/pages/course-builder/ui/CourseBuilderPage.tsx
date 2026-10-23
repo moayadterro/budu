@@ -35,7 +35,7 @@ export async function CourseBuilderPage({ params }: { params: Promise<{ courseId
         course={course}
         authorName={user.name}
         // new listing: the teacher's own currency, and their UI language as a first guess for the course's
-        listing={{ ...(listing ?? { listed: false, price: 0, currency }), language: course.language ?? (isCourseLanguage(locale) ? locale : null) }}
+        listing={{ ...(listing ?? { listed: false, price: 0, currency }), language: course.language ?? (isCourseLanguage(locale) ? locale : null), subject: course.subject }}
       />
     </>
   )
