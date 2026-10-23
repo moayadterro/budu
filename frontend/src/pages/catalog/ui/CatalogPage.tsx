@@ -26,8 +26,8 @@ export async function CatalogPage() {
         </div>
         <CatalogGrid items={items} hrefBase="/catalog" />
       </div>
-      {/* our own banner after the courses; not for people who already run a school (or the platform) */}
-      {user?.role !== 'manager' && user?.role !== 'admin' && <SchoolInvite className="mt-12 sm:mt-20" />}
+      {/* our own banner after the courses, for everyone (owner) */}
+      <SchoolInvite className="mt-12 sm:mt-20" />
     </div>
   )
 }
