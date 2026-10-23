@@ -11,15 +11,19 @@ import okLogo from '@/assets/social/ok.svg'
 import telegramLogo from '@/assets/social/telegram.svg'
 import tiktokLogo from '@/assets/social/tiktok.svg'
 import vkLogo from '@/assets/social/vk.svg'
+import whatsappLogo from '@/assets/social/whatsapp.svg'
+import xLogo from '@/assets/social/x.svg'
 import youtubeLogo from '@/assets/social/youtube.svg'
 
 type SocialKey = keyof typeof SITE.social
 /** Each platform's own app-icon tile (brand colours live in the logo files, not in our tokens). */
 const SOCIAL: Record<SocialKey, { name: string; logo: { src: string } }> = {
   telegram: { name: 'Telegram', logo: telegramLogo },
+  whatsapp: { name: 'WhatsApp', logo: whatsappLogo },
   vk: { name: 'VK', logo: vkLogo },
   max: { name: 'MAX', logo: maxLogo },
   ok: { name: 'OK', logo: okLogo },
+  x: { name: 'X', logo: xLogo },
   youtube: { name: 'YouTube', logo: youtubeLogo },
   instagram: { name: 'Instagram', logo: instagramLogo },
   facebook: { name: 'Facebook', logo: facebookLogo },
@@ -28,8 +32,8 @@ const SOCIAL: Record<SocialKey, { name: string; logo: { src: string } }> = {
 
 /** Platforms grouped by what they are (owner): messengers, social networks, video. */
 const GROUPS: Array<{ key: 'messengers' | 'social' | 'video'; items: SocialKey[] }> = [
-  { key: 'messengers', items: ['telegram', 'max'] },
-  { key: 'social', items: ['vk', 'ok', 'instagram', 'facebook'] },
+  { key: 'messengers', items: ['telegram', 'whatsapp', 'max'] },
+  { key: 'social', items: ['vk', 'ok', 'x', 'instagram', 'facebook'] },
   { key: 'video', items: ['youtube', 'tiktok'] },
 ]
 
@@ -46,7 +50,7 @@ export function SocialLinks({ size = 'md', className }: { size?: 'sm' | 'md'; cl
   const soon = t.site.contact.socialSoon
   if (size === 'sm') {
     return (
-      <div className={cn('flex flex-wrap items-center gap-x-3 gap-y-1', className)}>
+      <div className={cn('flex flex-wrap items-center gap-x-2 gap-y-1', className)}>
         {GROUPS.map((g) => (
           <ul key={g.key} aria-label={t.site.contact.socialGroups[g.key]} className="flex gap-0.5">
             {g.items.map((key) => (
@@ -62,7 +66,7 @@ export function SocialLinks({ size = 'md', className }: { size?: 'sm' | 'md'; cl
       {GROUPS.map((g) => (
         <div key={g.key} className="flex flex-col gap-2.5">
           <p className="text-xs font-medium text-muted-foreground">{t.site.contact.socialGroups[g.key]}</p>
-          <ul className="flex flex-wrap gap-3">
+          <ul className="flex flex-wrap gap-2.5">
             {g.items.map((key) => (
               <Item key={key} k={key} size="md" soon={soon} />
             ))}
@@ -82,11 +86,11 @@ function Item({ k: key, size, soon }: { k: SocialKey; size: 'sm' | 'md'; soon: s
     size === 'sm' ? (
       <span
         className={cn(
-          'relative grid size-8 place-items-center rounded-lg transition-colors',
+          'relative grid size-7 place-items-center rounded-lg transition-colors',
           url ? 'text-muted-foreground group-hover:bg-foreground/6 group-hover:text-foreground' : 'text-muted-foreground/40',
         )}
       >
-        <svg viewBox={g.viewBox} aria-hidden className="size-[1.125rem]">
+        <svg viewBox={g.viewBox} aria-hidden className="size-4">
           <path fill="currentColor" fillRule={g.evenodd ? 'evenodd' : undefined} d={g.d} />
         </svg>
       </span>
@@ -96,10 +100,10 @@ function Item({ k: key, size, soon }: { k: SocialKey; size: 'sm' | 'md'; soon: s
         <img
           src={n.logo.src}
           alt=""
-          width={48}
-          height={48}
+          width={44}
+          height={44}
           className={cn(
-            'size-12 rounded-[22%] transition-transform duration-200',
+            'size-11 rounded-[22%] transition-transform duration-200',
             key === 'youtube' && 'ring-1 ring-foreground/10', // a white tile needs an edge on a white page
             url ? 'group-hover:-translate-y-0.5' : 'opacity-40 grayscale',
           )}

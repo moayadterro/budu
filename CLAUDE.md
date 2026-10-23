@@ -449,10 +449,12 @@ Not built yet (rough priority):
 - 2026-10-23 Contact page redesign (owner: "too boring"): hero with one soft green blur; the form in
   a light green card with topic CHIPS (icons) instead of a select, soft filled fields, live character
   count, a "sent" state with "Write another message"; beside it the team's emails (support@, info@,
-  partners@, billing@budu-school.ru; one hue each, copy in one click) and social tiles (Telegram,
-  VK, MAX, OK, Instagram, Facebook, TikTok; `SITE.social`, null = an amber "soon" dot, not
-  clickable). Logos are app-icon tiles in `src/assets/social/<key>.svg`: vk + max are the owner's
-  official files; telegram/ok/instagram/facebook/tiktok are INTERIM (Simple Icons shapes on drawn
+  partners@, billing@budu-school.ru; one hue each, copy in one click) and social links in groups
+  (messengers: Telegram, WhatsApp, MAX · social: VK, OK, X, Instagram, Facebook · video: YouTube,
+  TikTok; `SITE.social`, null = an amber "soon" dot, not clickable). ONE component
+  (`shared/ui/social-links` SocialLinks): colour tiles on Contact, one-colour marks
+  (`social-glyphs.ts`) in the footer. Logos are app-icon tiles in `src/assets/social/<key>.svg`: vk + max are the owner's
+  official files; telegram/whatsapp/ok/x/youtube/instagram/facebook/tiktok are INTERIM (Simple Icons shapes on drawn
   tiles) until the owner adds the official brand-kit files with the same names (OK's 2023 logo is
   newer). Until our accounts exist each tile opens the platform's own site. The hero uses the
   shared `HeroGlow` (same as Pricing); the form card is plain. support / info / partners mailboxes
@@ -757,7 +759,7 @@ Not built yet (rough priority):
 
 - Contact: create support@ / info@ / partners@budu-school.ru at Timeweb; fill `SITE.social` URLs as
   accounts appear. Instagram / Facebook: Meta is banned as "extremist" in Russia; showing their
-  links on a Russian site carries legal risk. Ask a lawyer before filling those two.
+  links on a Russian site carries legal risk; X is blocked in Russia. Ask a lawyer before filling those.
 
 - Commission on paid courses: what percentage? (pricing FAQ says "a percentage"; add the figure
   there, in the Terms, and in the teacher's listing form once decided). Payouts to teachers are not

@@ -1,7 +1,6 @@
 import { ContactForm, isContactTopic } from '@/features/contact-form'
-import { SITE, whatsappUrl } from '@/shared/config/site'
+import { SITE } from '@/shared/config/site'
 import { HeroGlow } from '@/shared/ui/hero-glow'
-import { Icon } from '@/shared/ui/icon'
 import { getT } from '@/shared/i18n/server'
 import { SocialLinks } from '@/shared/ui/social-links'
 import { EmailCards, type EmailRow } from './ContactChannels'
@@ -51,12 +50,6 @@ export async function ContactPage({ searchParams }: { searchParams: Promise<{ to
             <p className="-mt-1 px-1 text-sm leading-relaxed text-pretty text-muted-foreground">{s.socialInvite}</p>
             <SocialLinks className="mt-2 px-1" />
           </section>
-          {SITE.whatsapp && (
-            <a href={whatsappUrl(SITE.whatsapp)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-2 text-sm font-medium text-primary hover:underline dark:text-success">
-              <Icon name="chat" className="size-4" />
-              {s.whatsapp}
-            </a>
-          )}
           {legal.length > 0 && (
             <section className="flex flex-col gap-3">
               <h2 className="px-1 text-lg font-semibold tracking-tight">{s.legalTitle}</h2>

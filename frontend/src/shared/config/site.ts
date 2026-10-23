@@ -19,16 +19,16 @@ export const SITE = {
    */
   social: {
     telegram: "https://telegram.org" as string | null,
+    whatsapp: "https://www.whatsapp.com" as string | null, // later a chat link: https://wa.me/<number>
     vk: "https://vk.com" as string | null,
     max: "https://max.ru" as string | null,
     ok: "https://ok.ru" as string | null,
+    x: "https://x.com" as string | null,
     youtube: "https://www.youtube.com" as string | null,
     instagram: "https://www.instagram.com" as string | null,
     facebook: "https://www.facebook.com" as string | null,
     tiktok: "https://www.tiktok.com" as string | null,
   },
-  /** a WhatsApp number (digits, with country code) for chat, null = hidden */
-  whatsapp: null as string | null,
   /** the data controller ("оператор персональных данных", 152-FZ) — needed for the Privacy policy */
   legal: {
     name: null as string | null, // e.g. 'ООО «Буду»'
@@ -43,5 +43,3 @@ export const SITE = {
   freeSchool: { teachers: 5, students: 50 },
 } as const;
 
-export const whatsappUrl = (n: string) =>
-  `https://wa.me/${n.replace(/\D/g, "")}`;
