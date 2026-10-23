@@ -24,7 +24,7 @@ export async function LandingPage() {
         sub={s.sub}
         start={s.start}
         browse={s.browse}
-        chips={(['schedule', 'exams', 'grades', 'chat'] as const).map((key) => ({ key, label: s.chips[key] }))}
+        chips={s.chips}
       />
 
       {/* who it's for: four living cards, two per row */}

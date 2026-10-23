@@ -7,14 +7,62 @@ import { cn } from '@/shared/lib/cn'
 import { Button } from '@/shared/ui/button'
 import { Icon, type IconName } from '@/shared/ui/icon'
 
-type Chip = { key: 'schedule' | 'exams' | 'grades' | 'chat'; label: string }
+export type FeatureKey =
+  | 'schedule' | 'exams' | 'quizzes' | 'grades' | 'video' | 'homework' | 'chat' | 'parents'
+  | 'classes' | 'alerts' | 'scales' | 'currency' | 'preview' | 'page' | 'uploads' | 'languages'
 
-/** The floating glass chips: one hue per icon tile, a place around the headline, its own float rhythm. */
-const CHIP_STYLE: Record<Chip['key'], { icon: IconName; tile: string; place: string; delay: string }> = {
-  schedule: { icon: 'cal', tile: 'from-info/70 to-info', place: 'start-[7%] top-[24%]', delay: '0s' },
-  exams: { icon: 'task', tile: 'from-subject-purple/70 to-subject-purple', place: 'end-[7%] top-[20%]', delay: '-2s' },
-  grades: { icon: 'report', tile: 'from-primary/70 to-primary dark:from-success/70 dark:to-success', place: 'start-[10%] bottom-[26%]', delay: '-4s' },
-  chat: { icon: 'chat', tile: 'from-glow-rose/80 to-glow-rose', place: 'end-[9%] bottom-[30%]', delay: '-1s' },
+/** Every feature: its icon and ONE hue for its little gradient tile (all of them exist today). */
+const FEATURE: Record<FeatureKey, { icon: IconName; tile: string }> = {
+  schedule: { icon: 'cal', tile: 'from-info/70 to-info' },
+  exams: { icon: 'task', tile: 'from-subject-purple/70 to-subject-purple' },
+  quizzes: { icon: 'check', tile: 'from-glow-rose/80 to-glow-rose' },
+  grades: { icon: 'report', tile: 'from-primary/70 to-primary dark:from-success/70 dark:to-success' },
+  video: { icon: 'video', tile: 'from-info/70 to-info' },
+  homework: { icon: 'doc', tile: 'from-subject-purple/70 to-subject-purple' },
+  chat: { icon: 'chat', tile: 'from-glow-rose/80 to-glow-rose' },
+  parents: { icon: 'users', tile: 'from-primary/70 to-primary dark:from-success/70 dark:to-success' },
+  classes: { icon: 'layers', tile: 'from-info/70 to-info' },
+  alerts: { icon: 'bell', tile: 'from-subject-purple/70 to-subject-purple' },
+  scales: { icon: 'star', tile: 'from-glow-rose/80 to-glow-rose' },
+  currency: { icon: 'wallet', tile: 'from-primary/70 to-primary dark:from-success/70 dark:to-success' },
+  preview: { icon: 'play', tile: 'from-info/70 to-info' },
+  page: { icon: 'web', tile: 'from-subject-purple/70 to-subject-purple' },
+  uploads: { icon: 'upload', tile: 'from-glow-rose/80 to-glow-rose' },
+  languages: { icon: 'lang', tile: 'from-primary/70 to-primary dark:from-success/70 dark:to-success' },
+}
+
+/** Six float around the headline (desktop), three per side, each with its own rhythm. */
+const FLOATING: Array<{ key: FeatureKey; place: string; delay: string }> = [
+  { key: 'schedule', place: 'start-[6%] top-[20%]', delay: '0s' },
+  { key: 'video', place: 'start-[2%] top-[42%]', delay: '-3s' },
+  { key: 'grades', place: 'start-[9%] bottom-[30%]', delay: '-4.5s' },
+  { key: 'exams', place: 'end-[6%] top-[17%]', delay: '-2s' },
+  { key: 'chat', place: 'end-[2%] top-[40%]', delay: '-1s' },
+  { key: 'parents', place: 'end-[9%] bottom-[33%]', delay: '-5s' },
+]
+
+/** The ribbon at the bottom: every feature, in two rows moving opposite ways. */
+const RIBBON: FeatureKey[][] = [
+  ['quizzes', 'homework', 'classes', 'alerts', 'scales', 'currency', 'preview', 'page'],
+  ['uploads', 'languages', 'schedule', 'exams', 'grades', 'video', 'chat', 'parents'],
+]
+
+/** One feature as a frosted-glass pill with its gradient tile. */
+function Pill({ k, label, size = 'md' }: { k: FeatureKey; label: string; size?: 'sm' | 'md' }) {
+  const f = FEATURE[k]
+  return (
+    <span
+      className={cn(
+        'flex flex-none items-center gap-2.5 rounded-2xl bg-background/60 font-medium whitespace-nowrap ring-1 ring-foreground/6 backdrop-blur-xl backdrop-saturate-150 dark:bg-foreground/8',
+        size === 'md' ? 'py-2 ps-2 pe-4 text-sm' : 'py-1.5 ps-1.5 pe-3.5 text-[0.8125rem]',
+      )}
+    >
+      <span className={cn('grid place-items-center rounded-xl bg-linear-to-b text-primary-foreground', size === 'md' ? 'size-8' : 'size-7', f.tile)}>
+        <Icon name={f.icon} className="size-4" />
+      </span>
+      {label}
+    </span>
+  )
 }
 
 const EASE = [0.22, 1, 0.36, 1] as const
@@ -26,7 +74,8 @@ const EASE = [0.22, 1, 0.36, 1] as const
  * - a perspective grid floor gliding toward the viewer, fading into the horizon;
  * - the headline appearing word by word out of a blur, then the line and the buttons;
  * - a soft light following the pointer (desktop);
- * - frosted-glass chips with what Budu does, floating around the headline (desktop).
+ * - six frosted-glass feature chips floating around the headline (wide screens), and every feature
+ *   as an endless two-row ribbon at the bottom (pauses on hover).
  * It runs edge to edge under the transparent header. Everything is still for reduced motion.
  */
 export function HomeHero({
@@ -42,7 +91,7 @@ export function HomeHero({
   sub: string
   start: string
   browse: string
-  chips: Chip[]
+  chips: Record<FeatureKey, string>
 }) {
   const reduce = useReducedMotion()
   const ref = useRef<HTMLElement>(null)
@@ -86,29 +135,23 @@ export function HomeHero({
       <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-24 bg-linear-to-b from-transparent to-background" />
 
       {/* what Budu does, floating in frosted glass around the headline (desktop) */}
-      {chips.map((c, i) => {
-        const st = CHIP_STYLE[c.key]
-        return (
-          <motion.div
-            key={c.key}
-            aria-hidden
-            initial={reduce ? false : { opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: reduce ? 0 : 0.9 + i * 0.12, duration: 0.6, ease: EASE }}
-            className={cn('absolute hidden lg:block', st.place)}
+      {FLOATING.map((c, i) => (
+        <motion.div
+          key={c.key}
+          aria-hidden
+          initial={reduce ? false : { opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: reduce ? 0 : 0.9 + i * 0.1, duration: 0.6, ease: EASE }}
+          className={cn('absolute hidden xl:block', c.place)}
+        >
+          <span
+            className="block rounded-2xl shadow-[0_1px_2px_color-mix(in_oklch,var(--foreground)_6%,transparent),0_12px_32px_-12px_color-mix(in_oklch,var(--foreground)_20%,transparent)] motion-safe:animate-float dark:shadow-none"
+            style={{ animationDelay: c.delay }}
           >
-            <div
-              className="flex items-center gap-2.5 rounded-2xl bg-background/60 py-2 ps-2 pe-4 text-sm font-medium shadow-[0_1px_2px_color-mix(in_oklch,var(--foreground)_6%,transparent),0_12px_32px_-12px_color-mix(in_oklch,var(--foreground)_20%,transparent)] ring-1 ring-foreground/6 backdrop-blur-xl backdrop-saturate-150 motion-safe:animate-float dark:bg-foreground/8 dark:shadow-none"
-              style={{ animationDelay: st.delay }}
-            >
-              <span className={cn('grid size-8 place-items-center rounded-xl bg-linear-to-b text-primary-foreground', st.tile)}>
-                <Icon name={st.icon} className="size-4" />
-              </span>
-              {c.label}
-            </div>
-          </motion.div>
-        )
-      })}
+            <Pill k={c.key} label={chips[c.key]} />
+          </span>
+        </motion.div>
+      ))}
 
       <div className="flex max-w-4xl flex-col items-center gap-7">
         <motion.span
@@ -171,6 +214,31 @@ export function HomeHero({
           </Button>
         </motion.div>
       </div>
+
+      {/* every feature as an endless two-row ribbon (pauses on hover; still for reduced motion) */}
+      <motion.div
+        initial={reduce ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: reduce ? 0 : 1.2, duration: 0.8 }}
+        className="group/ribbon mt-16 flex w-full flex-col gap-3 [mask-image:linear-gradient(90deg,transparent,#000_12%,#000_88%,transparent)] sm:mt-20"
+      >
+        {RIBBON.map((row, r) => (
+          <ul
+            key={r}
+            className={cn(
+              'flex w-max gap-3 group-hover/ribbon:[animation-play-state:paused] motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center',
+              r === 0 ? 'motion-safe:animate-marquee rtl:motion-safe:animate-marquee-rtl' : 'motion-safe:animate-marquee-reverse rtl:motion-safe:animate-marquee-rtl-reverse',
+            )}
+          >
+            {/* the row twice: moving by half its width loops it seamlessly (the copy is hidden from screen readers) */}
+            {[...row, ...row].map((k, i) => (
+              <li key={i} aria-hidden={i >= row.length} className={cn(i >= row.length && 'motion-reduce:hidden')}>
+                <Pill k={k} label={chips[k]} size="sm" />
+              </li>
+            ))}
+          </ul>
+        ))}
+      </motion.div>
     </section>
   )
 }
