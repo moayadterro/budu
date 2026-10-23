@@ -442,6 +442,13 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-23 Pricing SEO: titles/descriptions say what people search for (free for students,
+  schools by number of students, what's included), ≤ 60 / ≤ 160 characters incl. " · Budu". The
+  page also carries schema.org JSON-LD (`shared/ui/json-ld` `JsonLd`, `absoluteUrl` from
+  `shared/server/seo`): WebPage + BreadcrumbList + OfferCatalog (teachers/students price 0 RUB,
+  schools no price, it's on request). The eyebrow is part of the h1 (looks unchanged). No meta
+  keywords: Google ignores them and Yandex doesn't rank by them. Card order: teachers · students
+  (middle, green) · schools (purple); teachers blue.
 - 2026-10-23 Pricing hero (owner): "free access for students" is a frosted-glass iOS-style pill
   with an emoji (🎓), no green tile. Owner: emoji are fine for playful Gen-Z highlights like this;
   the "custom badges instead of emoji" rule still holds for showcase blocks (podium, medals).

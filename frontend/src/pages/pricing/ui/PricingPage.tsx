@@ -3,7 +3,10 @@ import { cn } from '@/shared/lib/cn'
 import { Button } from '@/shared/ui/button'
 import { Icon, type IconName } from '@/shared/ui/icon'
 import { SoonBadge } from '@/shared/ui/soon-badge'
-import { getT } from '@/shared/i18n/server'
+import { JsonLd } from '@/shared/ui/json-ld'
+import { getLocale, getT } from '@/shared/i18n/server'
+import { localePath } from '@/shared/i18n'
+import { absoluteUrl } from '@/shared/server/seo'
 
 /**
  * Public: plans (owner) — "learning should be fun": students get free access (we support them),
@@ -11,8 +14,10 @@ import { getT } from '@/shared/i18n/server'
  * students. The page has one job: get people to sign up and schools to try Budu — every plan's
  * button opens that exact sign-up (`/register?as=…`) and a closing band invites schools again.
  * Design (owner: "2027, modern and simple"): no borders, no orange, and every gradient is ONE hue
- * fading into the page (never several colours mixed): students blue, teachers purple, schools the
- * theme's green — light tints; students in the middle, raised. Soft surfaces, large radii.
+ * fading into the page (never several colours mixed): teachers blue, students the theme's green,
+ * schools purple — light tints; teachers first, students in the middle (raised), schools last.
+ * SEO: the eyebrow is part of the h1 (the heading says it's the pricing page), and the plans are
+ * also described as schema.org data (page, breadcrumb, an offer catalog with each plan's price). Soft surfaces, large radii.
  * Depth without colour (UI/UX Pro Max "soft UI" + "aurora"): a fine dot texture fading out behind
  * the hero and the closing band, layered soft NEUTRAL shadows instead of borders. Never a coloured
  * glow or coloured shadow behind a card.
@@ -123,8 +128,52 @@ export async function PricingPage() {
     { key: 'clubs', icon: 'users', tone: 'green' },
   ]
 
+  // what search engines read: the page, where it sits, and the three plans with their prices
+  const locale = await getLocale()
+  const url = absoluteUrl(localePath('/pricing', locale))
+  const offer = (key: 'teachers' | 'students' | 'schools', price: number | null) => ({
+    '@type': 'Offer',
+    name: s[key].name,
+    description: s[key].who,
+    url: absoluteUrl(`/register?as=${key === 'schools' ? 'school' : key === 'students' ? 'student' : 'teacher'}`),
+    ...(price === null ? {} : { price, priceCurrency: 'RUB' }),
+    itemOffered: { '@type': 'Service', name: `Budu: ${s[key].name}`, description: s[key].features.join('. ') },
+  })
+  const structured = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': url,
+        url,
+        name: t.seo.pricing.title,
+        description: t.seo.pricing.description,
+        inLanguage: locale,
+        isPartOf: { '@type': 'WebSite', name: 'Budu', url: absoluteUrl(localePath('/', locale)) },
+        breadcrumb: { '@id': `${url}#breadcrumb` },
+        mainEntity: { '@id': `${url}#plans` },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${url}#breadcrumb`,
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Budu', item: absoluteUrl(localePath('/', locale)) },
+          { '@type': 'ListItem', position: 2, name: s.eyebrow, item: url },
+        ],
+      },
+      {
+        '@type': 'OfferCatalog',
+        '@id': `${url}#plans`,
+        name: s.eyebrow,
+        // schools: priced by their number of students, on request, so no price is claimed
+        itemListElement: [offer('teachers', 0), offer('students', 0), offer('schools', null)],
+      },
+    ],
+  }
+
   return (
     <div className="flex flex-col gap-20 sm:gap-28">
+      <JsonLd data={structured} />
       {/* hero: a light, wide, slowly moving blur — two soft one-hue shapes (green top-start, blue at
           the bottom; never more) drifting in different rhythms; still for people who turn motion off */}
       <section className="relative isolate flex flex-col items-center gap-5 pt-6 text-center sm:pt-12">
@@ -138,8 +187,12 @@ export async function PricingPage() {
           <div className="absolute end-[7%] bottom-[12%] h-[18rem] w-[28rem] max-w-[50%] rounded-full bg-info/28 blur-[90px] [animation-delay:-7s] [animation-direction:alternate-reverse] motion-safe:animate-aurora dark:bg-info/35" />
         </div>
         <div aria-hidden className="pointer-events-none absolute -inset-x-4 -top-20 bottom-0 -z-10 bg-dots" />
-        <p className="text-xs font-semibold tracking-wider text-primary uppercase dark:text-success">{s.eyebrow}</p>
-        <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl">{s.title}</h1>
+        {/* one heading for search engines ("Pricing: learning should be fun"), looks unchanged */}
+        <h1 className="flex flex-col items-center gap-5">
+          <span className="font-sans text-xs font-semibold tracking-wider text-primary uppercase dark:text-success">{s.eyebrow}</span>
+          <span className="sr-only">: </span>
+          <span className="max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl">{s.title}</span>
+        </h1>
         <p className="max-w-2xl text-lg text-pretty text-muted-foreground">{s.sub}</p>
         {/* the good news as frosted glass, the iPhone way: translucent, heavy blur, soft neutral
             shadow, an emoji instead of an icon tile */}

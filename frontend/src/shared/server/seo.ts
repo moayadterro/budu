@@ -56,6 +56,9 @@ export const staticPageMetadata = (page: StaticPage, path: string) => async (): 
   return pageMetadata({ path, title: page === 'home' ? { absolute: s.title } : s.title, description: s.description })
 }
 
+/** A full address on the public site (structured data and feeds need absolute URLs). */
+export const absoluteUrl = (path: string) => new URL(path, process.env.APP_URL ?? 'http://localhost:3000').toString()
+
 /** A description from free text: one line, at most ~160 characters, cut at a word. */
 export function snippet(text: string, max = 160) {
   const one = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()

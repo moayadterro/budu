@@ -1546,9 +1546,9 @@ export const en = {
         "Schools that teach with Budu — their news, photos and best students.",
     },
     pricing: {
-      title: "Pricing",
+      title: "Pricing: free for students, schools pay per student",
       description:
-        "Students have free access to Budu. Schools pay according to their number of students.",
+        "Students learn on Budu for free, teachers start without paying, schools pay by number of students. Timetable, exams, gradebook and online courses in one place.",
     },
     about: {
       title: "About Budu",
