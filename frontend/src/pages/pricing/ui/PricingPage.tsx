@@ -19,9 +19,15 @@ import { getT } from '@/shared/i18n/server'
 
 /** One hue per card: the top fade, the icon tile and (coming soon) the glow — complete class names. */
 const TONE = {
-  blue: { fade: 'from-info/10 dark:from-info/16', tile: 'bg-info/12 text-info', glow: 'bg-info/20', mark: 'text-info' },
-  purple: { fade: 'from-subject-purple/10 dark:from-subject-purple/16', tile: 'bg-subject-purple/12 text-subject-purple', glow: 'bg-subject-purple/20', mark: 'text-subject-purple' },
-  green: { fade: 'from-primary/10 dark:from-primary/16', tile: 'bg-primary/12 text-primary', glow: 'bg-primary/20', mark: 'text-primary' },
+  blue: { fade: 'from-info/10 dark:from-info/16', tile: 'bg-info/12 text-info', glow: 'bg-info/20', mark: 'text-info', button: 'bg-info/12 text-info hover:bg-info/20' },
+  purple: {
+    fade: 'from-subject-purple/10 dark:from-subject-purple/16',
+    tile: 'bg-subject-purple/12 text-subject-purple',
+    glow: 'bg-subject-purple/20',
+    mark: 'text-subject-purple',
+    button: 'bg-subject-purple/12 text-subject-purple hover:bg-subject-purple/20',
+  },
+  green: { fade: 'from-primary/10 dark:from-primary/16', tile: 'bg-primary/12 text-primary', glow: 'bg-primary/20', mark: 'text-primary', button: 'bg-primary/12 text-primary hover:bg-primary/20' },
 } as const
 type Tone = keyof typeof TONE
 
@@ -79,7 +85,8 @@ export async function PricingPage() {
             </Link>
           </div>
         ) : (
-          <Button variant="secondary" size="lg" className="h-auto min-h-11 w-full bg-background py-2.5 whitespace-normal shadow-sm hover:bg-background/70" asChild>
+          // Apple's "tinted" button: a light fill in the card's own colour, coloured text, no shadow
+          <Button variant="ghost" size="lg" className={cn('h-auto min-h-11 w-full py-2.5 font-semibold whitespace-normal', c.button)} asChild>
             <Link href={href}>{p.cta}</Link>
           </Button>
         )}
