@@ -37,17 +37,6 @@ export async function ContactPage({
         </p>
       </section>
 
-      {emails.length > 0 && (
-        <section className="flex flex-col gap-8">
-          <h2 className="text-3xl font-semibold tracking-tight">
-            {s.otherTitle}
-          </h2>
-          <EmailCards
-            rows={emails.map(([key, address]) => ({ key, address }))}
-          />
-        </section>
-      )}
-
       <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_19.5rem] lg:gap-8">
         <section className="rounded-3xl bg-card p-6 shadow-[0_3px_8px_-2px_color-mix(in_oklch,var(--foreground)_9%,transparent),0_10px_24px_-10px_color-mix(in_oklch,var(--foreground)_8%,transparent)] sm:p-10 dark:shadow-none dark:ring-1 dark:ring-foreground/8">
           <h2 className="mb-8 text-3xl font-semibold tracking-tight">
@@ -57,6 +46,17 @@ export async function ContactPage({
         </section>
 
         <aside className="flex flex-col gap-10 lg:pt-2">
+          {/* write directly: the team's addresses as compact cards, one per row (owner) */}
+          {emails.length > 0 && (
+            <section className="flex flex-col gap-4">
+              <h2 className="px-1 text-lg font-semibold tracking-tight">
+                {s.otherTitle}
+              </h2>
+              <EmailCards
+                rows={emails.map(([key, address]) => ({ key, address }))}
+              />
+            </section>
+          )}
           <section className="flex flex-col gap-3">
             <h2 className="px-1 text-lg font-semibold tracking-tight">
               {s.socialTitle}

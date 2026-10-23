@@ -16,7 +16,7 @@ const EMAIL_STYLE: Record<EmailRow['key'], { icon: IconName; tile: string; fade:
 }
 
 /**
- * The team's addresses as four cards, two per row (owner: the list looked awful): each in its own
+ * The team's addresses as compact cards, one per row beside the form (owner): each in its own
  * hue, with what to write about, the address, and copy in one click (a ✓ confirms). The whole card
  * opens the mail app; the copy button sits above that link.
  */
@@ -25,23 +25,24 @@ export function EmailCards({ rows }: { rows: EmailRow[] }) {
   const s = t.site.contact
   const [copied, setCopied] = useState<string | null>(null)
   return (
-    <ul className="grid gap-6 sm:grid-cols-2">
+    <ul className="flex flex-col gap-3">
       {rows.map((r) => {
         const st = EMAIL_STYLE[r.key]
         return (
           <li
             key={r.key}
             className={cn(
-              'group relative flex flex-col gap-6 rounded-3xl bg-linear-to-br to-card p-6 transition-transform duration-200 motion-safe:hover:-translate-y-0.5 sm:p-8 rtl:bg-linear-to-bl',
+              'group relative flex flex-col gap-2.5 rounded-2xl bg-linear-to-br to-card p-4 transition-transform duration-200 motion-safe:hover:-translate-y-0.5 rtl:bg-linear-to-bl',
               // the same soft edge as the plan cards; a hairline in dark mode (a shadow turns into a halo there)
               'shadow-[0_3px_8px_-2px_color-mix(in_oklch,var(--foreground)_8%,transparent),0_10px_24px_-10px_color-mix(in_oklch,var(--foreground)_7%,transparent)] dark:shadow-none dark:ring-1 dark:ring-foreground/8',
               st.fade,
             )}
           >
-            <div className="flex items-start justify-between gap-3">
-              <span className={cn('grid size-14 flex-none place-items-center rounded-2xl', st.tile)}>
-                <Icon name={st.icon} className="size-7" />
+            <div className="flex items-center gap-3">
+              <span className={cn('grid size-10 flex-none place-items-center rounded-xl', st.tile)}>
+                <Icon name={st.icon} className="size-5" />
               </span>
+              <h3 className="min-w-0 flex-1 font-semibold">{s.emailLabels[r.key]}</h3>
               <button
                 type="button"
                 aria-label={`${s.copy}: ${r.address}`}
@@ -56,7 +57,7 @@ export function EmailCards({ rows }: { rows: EmailRow[] }) {
                   }
                 }}
                 className={cn(
-                  'relative z-10 flex h-9 items-center gap-1.5 rounded-xl px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-foreground/6 hover:text-foreground',
+                  'relative z-10 flex h-9 flex-none items-center gap-1.5 rounded-xl px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-foreground/6 hover:text-foreground',
                   copied === r.key && 'text-primary dark:text-success',
                 )}
               >
@@ -64,14 +65,11 @@ export function EmailCards({ rows }: { rows: EmailRow[] }) {
                 {copied === r.key ? s.copied : null}
               </button>
             </div>
-            <div className="flex flex-col gap-2">
-              <h3 className="text-lg font-semibold">{s.emailLabels[r.key]}</h3>
-              <p className="text-[0.9375rem] leading-relaxed text-pretty text-muted-foreground">{s.emailHints[r.key]}</p>
-            </div>
+            <p className="text-sm leading-relaxed text-pretty text-muted-foreground">{s.emailHints[r.key]}</p>
             {/* the whole card writes an email (stretched link) */}
             <a
               href={`mailto:${r.address}`}
-              className="mt-auto truncate pt-2 text-[0.9375rem] font-medium text-foreground after:absolute after:inset-0 after:rounded-3xl focus-visible:outline-none focus-visible:after:ring-3 focus-visible:after:ring-ring/50"
+              className="truncate text-sm font-medium text-foreground after:absolute after:inset-0 after:rounded-2xl focus-visible:outline-none focus-visible:after:ring-3 focus-visible:after:ring-ring/50"
               dir="ltr"
             >
               {r.address}
