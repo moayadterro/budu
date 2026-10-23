@@ -18,7 +18,8 @@ export async function CatalogGrid({
 }: {
   items: Array<{ course: CatalogCourse; price: ShownPrice; rating: Rating; listing: Listing }>
   hrefBase: string
-  /** the home page: a short row (1 or 2 courses) is centred under the centred heading */
+  /** the home page: cards centred under the centred heading, so a short last row (2 + 1 on a
+   *  tablet, 1 or 2 courses) never hangs at the start */
   centered?: boolean
 }) {
   const [t, locale] = await Promise.all([getT(), getLocale()])
@@ -38,7 +39,7 @@ export async function CatalogGrid({
   return (
     <div
       className={
-        centered && items.length < 3
+        centered
           ? 'flex flex-wrap justify-center gap-6 [&>*]:w-full sm:[&>*]:w-[calc(50%-0.75rem)] xl:[&>*]:w-[calc(33.333%-1rem)]'
           : 'grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3'
       }
