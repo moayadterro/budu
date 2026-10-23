@@ -3,16 +3,12 @@ import { visitorCurrency } from '@/entities/user/server'
 import { CatalogGrid } from '@/widgets/course-catalog'
 import { catalogFor } from '@/widgets/course-catalog/server'
 import { Button } from '@/shared/ui/button'
-import { Icon, type IconName } from '@/shared/ui/icon'
+import { Icon } from '@/shared/ui/icon'
 import { getT } from '@/shared/i18n/server'
 import { JoinInvite } from '@/widgets/school-invite'
+import { AudienceCards } from './AudienceCards'
 
-const AUDIENCES: Array<{ key: 'schools' | 'teachers' | 'students' | 'parents'; icon: IconName }> = [
-  { key: 'schools', icon: 'layers' },
-  { key: 'teachers', icon: 'book' },
-  { key: 'students', icon: 'spark' },
-  { key: 'parents', icon: 'users' },
-]
+const AUDIENCES = ['schools', 'teachers', 'students', 'parents'] as const
 
 /** Budu's front door: what it is, who it's for, a few courses, sign up. For everyone, signed in too (owner); the app itself is at /start. */
 export async function LandingPage() {
@@ -35,19 +31,10 @@ export async function LandingPage() {
         </div>
       </section>
 
-      <section className="flex flex-col gap-6">
-        <h2 className="text-center text-2xl font-semibold tracking-tight">{s.forTitle}</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {AUDIENCES.map((a) => (
-            <div key={a.key} className="flex flex-col gap-3 rounded-xl border bg-card p-5">
-              <span className="grid size-10 place-items-center rounded-lg bg-primary/10 text-primary">
-                <Icon name={a.icon} />
-              </span>
-              <h3 className="font-semibold">{s.for[a.key].title}</h3>
-              <p className="text-sm text-muted-foreground">{s.for[a.key].text}</p>
-            </div>
-          ))}
-        </div>
+      {/* who it's for: four living cards, two per row */}
+      <section className="flex flex-col gap-10">
+        <h2 className="mx-auto max-w-2xl text-center text-3xl font-semibold tracking-tight text-balance sm:text-5xl">{s.forTitle}</h2>
+        <AudienceCards items={AUDIENCES.map((key) => ({ key, title: s.for[key].title, text: s.for[key].text }))} />
       </section>
 
       {featured.length > 0 && (
