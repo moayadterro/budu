@@ -2126,7 +2126,7 @@ export const en = {
   catalog: {
     heroTitle: "Learn with teachers and schools you trust",
     heroSub:
-      "Browse every course on Budu and watch the first lesson for free. To join a course — free ones too — create an account.",
+      "Browse every course on Budu and watch the first lesson for free. To join any course, even a free one, create an account.",
     all: "All courses",
     signIn: "Sign in",
     signUp: "Sign up",
