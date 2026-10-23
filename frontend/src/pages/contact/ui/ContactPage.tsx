@@ -2,6 +2,7 @@ import { ContactForm, isContactTopic } from "@/features/contact-form";
 import { SITE } from "@/shared/config/site";
 import { HeroGlow } from "@/shared/ui/hero-glow";
 import { getT } from "@/shared/i18n/server";
+import { SchoolInvite } from "@/widgets/school-invite";
 import { SocialLinks } from "@/shared/ui/social-links";
 import { EmailCards, type EmailRow } from "./ContactChannels";
 
@@ -84,6 +85,9 @@ export async function ContactPage({
           )}
         </aside>
       </div>
+
+      {/* the same closing invitation for schools as Pricing and Courses (owner) */}
+      <SchoolInvite />
     </div>
   );
 }

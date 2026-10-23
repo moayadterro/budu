@@ -1,8 +1,7 @@
-import { LocalLink as Link } from '@/shared/ui/local-link'
-import { Button } from '@/shared/ui/button'
 import { Icon, type IconName } from '@/shared/ui/icon'
 import { PublicHero } from '@/shared/ui/public-hero'
 import { getT } from '@/shared/i18n/server'
+import { SchoolInvite } from '@/widgets/school-invite'
 
 const VALUES: Array<{ key: 'learner' | 'simple' | 'trust' | 'open' | 'families' | 'teachers'; icon: IconName }> = [
   { key: 'learner', icon: 'spark' },
@@ -42,18 +41,8 @@ export async function AboutPage() {
           ))}
         </div>
       </section>
-      <section className="flex flex-col items-center gap-4 rounded-2xl border bg-muted/40 px-6 py-12 text-center">
-        <h2 className="text-2xl font-semibold tracking-tight">{s.ctaTitle}</h2>
-        <p className="max-w-xl text-muted-foreground">{s.ctaSub}</p>
-        <div className="flex flex-wrap justify-center gap-3">
-          <Button size="lg" asChild>
-            <Link href="/register">{s.ctaStart}</Link>
-          </Button>
-          <Button size="lg" variant="outline" asChild>
-            <Link href="/contact">{s.ctaContact}</Link>
-          </Button>
-        </div>
-      </section>
+      {/* the same closing invitation for schools as Pricing and Courses (owner) */}
+      <SchoolInvite className="mt-4 sm:mt-8" />
     </div>
   )
 }
