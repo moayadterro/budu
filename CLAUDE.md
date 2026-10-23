@@ -189,6 +189,9 @@ shadcn classes: `bg-background`, `bg-card`, `text-foreground`, `text-muted-foreg
 `highlight` (amber CTA), `subject-purple`/`subject-terra`, `bg-brand` (gradient utility), and the
 fixed dark live-classroom stage (`bg-live`, `text-live-foreground` …). Rules:
 
+- **Font weight (owner, 2026-10-23: "don't use too bold text anywhere"):** text that isn't a heading
+  (chips, pills, badges, labels, buttons, list rows, notes) is at most `font-medium` (500); no
+  `font-semibold` / `font-bold` there. Weight 600+ only for real headings and big numbers (prices).
 - Fonts: body Montserrat (`--font-app`; Arabic letters: Tajawal — owner); headings Geologica (`--font-head` →
   `font-heading`, applied in globals.css to h1–h6 and shadcn card/dialog/sheet/empty titles; Arabic
   heading letters in Noto Kufi Arabic — owner asked for Kufi). Loaded from Google Fonts in RootLayout.
