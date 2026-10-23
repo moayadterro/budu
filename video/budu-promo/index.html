@@ -1,55 +1,407 @@
 <!doctype html>
-<html lang="en" data-resolution="landscape">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=1920, height=1080" />
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-      html,
-      body {
-        margin: 0;
-        width: 1920px;
-        height: 1080px;
-        overflow: hidden;
-        background: #0a0a0a;
-      }
-      #root {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-      }
-      #title {
-        color: #f4f4f5;
-        font-size: 72px;
-        font-weight: 600;
-        letter-spacing: -0.03em;
-      }
-    </style>
-  </head>
-  <body>
-    <div
-      id="root"
-      data-composition-id="main"
-      data-start="0"
-      data-duration="10"
-      data-width="1920"
-      data-height="1080"
-    >
-      <h1 id="title" class="clip" data-start="0" data-duration="10" data-track-index="0">Title</h1>
-    </div>
-    <script>
-      const tl = gsap.timeline({ paused: true });
-      // Example: tl.fromTo("#title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6 }, 0);
-      window.__timelines["main"] = tl;
-      tl.seek(0);
-    </script>
-  </body>
+<html lang="ru" data-resolution="landscape">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@500;600;700&family=Montserrat:wght@400;500;600&display=block&subset=cyrillic" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1920px; height: 1080px; overflow: hidden; background: #f7faf8; }
+#root { position: relative; width: 1920px; height: 1080px; overflow: hidden; font-family: Montserrat, system-ui, sans-serif; color: #0f1411; }
+h1, h2, h3 { font-family: Geologica, Montserrat, sans-serif; letter-spacing: -0.02em; }
+
+/* the living aurora behind every scene (one hue per blur) */
+.aurora { position: absolute; inset: 0; overflow: hidden; }
+.blob { position: absolute; border-radius: 50%; filter: blur(120px); opacity: .55; }
+.b1 { width: 900px; height: 700px; left: -200px; top: -200px; background: #9fe3c4; }
+.b2 { width: 800px; height: 700px; right: -220px; top: 60px; background: #b8cffb; }
+.b3 { width: 700px; height: 600px; left: 520px; bottom: -320px; background: #d6c6f7; }
+.b4 { width: 520px; height: 460px; right: 280px; bottom: -160px; background: #f9c9d6; }
+.dots { position: absolute; inset: 0; background-image: radial-gradient(rgba(15,20,17,.10) 1.4px, transparent 1.6px); background-size: 28px 28px; opacity: .5; }
+
+.scene { position: absolute; inset: 0; opacity: 0; }
+
+/* hero */
+.hero-bg { position: absolute; inset: 0; overflow: hidden; }
+.hero-bg img { width: 100%; height: 100%; object-fit: cover; filter: blur(18px) saturate(1.3); }
+.hero-veil { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(5,8,7,.45), rgba(5,8,7,.85)); }
+.hero-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #fff; padding: 0 180px; }
+.brand { font-family: Geologica; font-size: 44px; font-weight: 600; color: #5fe0a8; margin-bottom: 28px; letter-spacing: .02em; }
+.hero-text h1 { font-size: 104px; line-height: 1.04; font-weight: 600; max-width: 1500px; }
+.w { display: inline-block; }
+
+/* words */
+.words { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 44px; }
+.word { font-family: Geologica; font-size: 92px; font-weight: 600; }
+.word:nth-child(1) { color: #7c4ddb; } .word:nth-child(2) { color: #2f6fe0; } .word:nth-child(3) { color: #0f8a5f; } .word:nth-child(4) { color: #c43c62; }
+.words-line { position: absolute; left: 0; right: 0; bottom: 300px; text-align: center; font-size: 40px; color: #5b6660; }
+
+/* section title */
+.sec { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px; }
+.sec-dot { width: 96px; height: 96px; border-radius: 30px; background: linear-gradient(180deg, color-mix(in oklab, var(--c) 70%, white), var(--c)); box-shadow: 0 20px 40px -18px color-mix(in oklab, var(--c) 70%, black); }
+.sec h2 { font-size: 150px; font-weight: 600; color: var(--c); line-height: 1; }
+.sec p { font-size: 44px; color: #5b6660; }
+
+/* screen + caption */
+.cap { position: absolute; top: 0; bottom: 0; width: 560px; display: flex; flex-direction: column; justify-content: center; }
+.cap.left { left: 110px; } .cap.right { right: 110px; }
+.cap.top { left: 0; right: 0; width: auto; top: 80px; bottom: auto; align-items: center; text-align: center; }
+.kicker { display: inline-block; align-self: flex-start; font-size: 26px; font-weight: 600; color: var(--c); background: color-mix(in oklab, var(--c) 12%, white); padding: 10px 20px; border-radius: 14px; margin-bottom: 26px; }
+.cap.top .kicker { align-self: center; }
+.cap h3 { font-size: 70px; line-height: 1.06; font-weight: 600; margin-bottom: 34px; }
+.cap ul { list-style: none; display: flex; flex-direction: column; gap: 20px; }
+.cap ul.row { flex-direction: row; gap: 48px; justify-content: center; }
+.cap li { font-size: 32px; color: #2c3530; display: flex; align-items: center; gap: 16px; }
+.cap li::before { content: ""; flex: none; width: 14px; height: 14px; border-radius: 5px; background: var(--c); }
+.win { position: absolute; top: 150px; width: 1140px; border-radius: 26px; background: #fff; overflow: hidden; box-shadow: 0 2px 6px rgba(15,20,17,.06), 0 40px 90px -30px rgba(15,20,17,.35); }
+.win.at-right { right: 90px; } .win.at-left { left: 90px; }
+.bar { height: 44px; display: flex; align-items: center; gap: 10px; padding: 0 20px; background: #f1f4f2; border-bottom: 1px solid #e3e8e5; }
+.bar i { width: 13px; height: 13px; border-radius: 50%; background: #d4dad6; }
+.view { aspect-ratio: 16 / 9; overflow: hidden; }
+.view img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+.duo { position: absolute; left: 90px; right: 90px; bottom: 90px; display: flex; gap: 40px; }
+.win.small { position: relative; top: 0; width: 50%; }
+
+/* manifesto */
+.mosaic { position: absolute; inset: -60px; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); gap: 14px; }
+.tile { overflow: hidden; } .tile img { width: 100%; height: 100%; object-fit: cover; }
+.mani-veil { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5,10,8,.72), rgba(5,10,8,.82)); }
+.mani { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; text-align: center; padding: 0 160px; }
+.ml { font-family: Geologica; font-size: 56px; font-weight: 500; color: #fff; line-height: 1.15; }
+.ml:nth-child(5) { font-size: 80px; font-weight: 600; color: #6be3b0; margin-top: 18px; }
+.ml:nth-child(6) { font-size: 52px; color: #f5d7e0; }
+
+/* call to action */
+.cta { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; text-align: center; }
+.logo { display: flex; align-items: center; gap: 22px; }
+.logo svg { width: 110px; height: 100px; }
+.logo span { font-family: Geologica; font-size: 96px; font-weight: 700; color: #123a2c; letter-spacing: -0.03em; }
+.cta h2 { font-size: 96px; font-weight: 600; }
+.cta p { font-size: 38px; color: #5b6660; max-width: 1300px; }
+.btn { margin-top: 18px; font-size: 40px; font-weight: 600; color: #fff; background: #0f8a5f; padding: 26px 56px; border-radius: 24px; box-shadow: 0 24px 50px -22px rgba(15,138,95,.8); }
+.url { font-size: 34px; color: #0f8a5f; font-weight: 600; letter-spacing: .02em; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="296" data-width="1920" data-height="1080">
+  <div class="aurora"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div><div class="dots"></div></div>
+<section id="s0" class="clip scene" data-start="0" data-duration="13" style="--c:#0f8a5f">
+  <div class="hero-bg"><img src="assets/screens/00-home-hero-dark.jpg" alt=""></div>
+  <div class="hero-veil"></div>
+  <div class="hero-text"><div class="brand">Budu</div><h1><span class="w">Учёба,</span> <span class="w">которая</span> <span class="w">объединяет</span> <span class="w">школу,</span> <span class="w">учителей</span> <span class="w">и</span> <span class="w">семью</span></h1></div>
+</section>
+<section id="s1" class="clip scene" data-start="13" data-duration="8" style="--c:#0f8a5f">
+  <div class="words"><div class="word" style="--k:0">Школы</div><div class="word" style="--k:1">Учителя</div><div class="word" style="--k:2">Ученики</div><div class="word" style="--k:3">Родители</div></div>
+  <p class="words-line">Одна платформа. Одно сообщество.</p>
+</section>
+<section id="s2" class="clip scene" data-start="21" data-duration="12" style="--c:#0f8a5f" data-side="left">
+  <div class="cap left"><div class="kicker">Budu</div><h3>Всё обучение в одном месте</h3><ul><li>Уроки, задания и тесты</li><li>Расписание и журнал</li><li>Связь учителей и родителей</li></ul></div>
+  <div class="win at-right"><div class="bar"><i></i><i></i><i></i></div><div class="view"><img src="assets/screens/02-home-audiences.jpg" alt="" style="transform-origin:50% 50%"></div></div>
+</section>
+<section id="s3" class="clip scene" data-start="33" data-duration="4" style="--c:#0f8a5f">
+  <div class="sec"><div class="sec-dot"></div><h2>Ученикам</h2><p>День, в котором легко разобраться</p></div>
+</section>
+<section id="s4" class="clip scene" data-start="37" data-duration="11" style="--c:#0f8a5f" data-side="left">
+  <div class="cap left"><div class="kicker">Главная</div><h3>Всё важное за день</h3><ul><li>Следующий урок одним взглядом</li><li>Задания и тесты со сроками</li><li>Новости школы и класса</li></ul></div>
+  <div class="win at-right"><div class="bar"><i></i><i></i><i></i></div><div class="view"><img src="assets/screens/20-student-home.jpg" alt="" style="transform-origin:30% 25%"></div></div>
+</section>
+<section id="s5" class="clip scene" data-start="48" data-duration="10" style="--c:#0f8a5f" data-side="right">
+  <div class="cap right"><div class="kicker">Расписание</div><h3>Неделя как на ладони</h3><ul><li>Уроки по цветам курсов</li><li>События школы</li><li>Удобно и на телефоне</li></ul></div>
+  <div class="win at-left"><div class="bar"><i></i><i></i><i></i></div><div class="view"><img src="assets/screens/21-student-timetable.jpg" alt="" style="transform-origin:50% 50%"></div></div>
+</section>
+<section id="s6" class="clip scene" data-start="58" data-duration="10" style="--c:#0f8a5f" data-side="left">
+  <div class="cap left"><div class="kicker">Уроки</div><h3>Учись в своём темпе</h3><ul><li>Видео, файлы и конспекты</li><li>Урок за уроком</li><li>Первый урок курса бесплатно</li></ul></div>
+  <div class="win at-right"><div class="bar"><i></i><i></i><i></i></div><div class="view"><img src="assets/screens/24-student-lesson.jpg" alt="" style="transform-origin:50% 50%"></div></div>
+</section>
+<section id="s7" class="clip scene" data-start="68" data-duration="10" style="--c:#0f8a5f" data-side="right">
+  <div class="cap right"><div class="kicker">Домашние задания</div><h3>Сдал и получил отзыв</h3><ul><li>Ответ и файлы в пару кликов</li><li>Оценка и комментарий учителя</li><li>Ничего не теряется</li></ul></div>
+  <div class="win at-left"><div class="bar"><i></i><i></i><i></i></div><div class="view"><img src="assets/screens/25-student-homework.jpg" alt="" style="transform-origin:50% 50%"></div></div>
+</section>
+<section id="s8" class="clip scene" data-start="78" data-duration="9" style="--c:#0f8a5f" data-side="left">
+  <div class="cap left"><div class="kicker">Тесты и экзамены</div><h3>Проверь себя</h3><ul><li>Тренировки с ответами сразу</li><li>Экзамены с таймером</li><li>Автосохранение ответов</li></ul></div>
+  <div class="win at-right"><div class="bar"><i></i><i></i><i></i></div><div class="view"><img src="assets/screens/25b-student-quiz.jpg" alt="" style="transform-origin:50% 50%"></div></div>
+</section>
+<section id="s9" class="clip scene" data-start="87" data-duration="8" style="--c:#0f8a5f" data-side="right">
+  <div class="cap right"><div class="kicker">Уведомления</div><h3>Ничего не пропустишь</h3><ul><li>Новые задания</li><li>Оценки</li><li>Напоминания о тестах</li></ul></div>
+  <div class="win at-left"><div class="bar"><i></i><i></i><i></i></div><div class="view"><img src="assets/screens/27-student-bell.jpg" alt="" style="transform-origin:82% 22%"></div></div>
+</section>
+<section id="s10" class="clip scene" data-start="95" data-duration="4" style="--c:#2f6fe0">
+  <div class="sec"><div class="sec-dot"></div><h2>Учителям</h2><p>Меньше рутины, больше времени на учеников</p></div>
+</section>
+<section id="s11" class="clip scene" data-start="99" data-duration="11" style="--c:#2f6fe0" data-side="left">
+  <div class="cap left"><div class="kicker">Обзор</div><h3>Весь класс перед глазами</h3><ul><li>Кто сдал работу</li><li>Что ждёт проверки</li><li>Объявления школы</li></ul></div>
+  <div class="win at-right"><div class="bar"><i></i><i></i><i></i></div><div class="view"><img src="assets/screens/30-teacher-dashboard.jpg" alt="" style="transform-origin:50% 50%"></div></div>
+</section>
+<section id="s12" class="clip scene" data-start="110" data-duration="12" style="--c:#2f6fe0" data-side="right">
+  <div class="cap right"><div class="kicker">Конструктор курса</div><h3>Курс за вечер</h3><ul><li>Видео, PDF, текст и задания</li><li>Большие видео без обрывов</li><li>Черновик, пока не готово</li></ul></div>
+  <div class="win at-left"><div class="bar"><i></i><i></i><i></i></div><div class="view"><img src="assets/screens/32-teacher-builder.jpg" alt="" style="transform-origin:30% 45%"></div></div>
+</section>
+<section id="s13" class="clip scene" data-start="122" data-duration="10" style="--c:#2f6fe0" data-side="left">
+  <div class="cap left"><div class="kicker">Тесты</div><h3>8 типов вопросов</h3><ul><li>Выбор, числа, соответствия</li><li>Тренировки и экзамены</li><li>Публикация по расписанию</li></ul></div>
+  <div class="win at-right"><div class="bar"><i></i><i></i><i></i></div><div class="view"><img src="assets/screens/33-teacher-quizzes.jpg" alt="" style="transform-origin:50% 50%"></div></div>
+</section>
+<section id="s14" class="clip scene" data-start="132" data-duration="9" style="--c:#2f6fe0" data-side="right">
+  <div class="cap right"><div class="kicker">Расписание</div><h3>Уроки на всю четверть</h3><ul><li>Повторяющиеся уроки</li><li>Для курса или класса</li><li>Ученики видят сразу</li></ul></div>
+  <div class="win at-left"><div class="bar"><i></i><i></i><i></i></div><div class="view"><img src="assets/screens/34-teacher-schedule.jpg" alt="" style="transform-origin:50% 50%"></div></div>
+</section>
+<section id="s15" class="clip scene" data-start="141" data-duration="11" style="--c:#2f6fe0">
+  <div class="cap top"><div class="kicker">Проверка и журнал</div><h3>Оценить и сразу дальше</h3><ul class="row"><li>Оценка и отзыв в один экран</li><li>Журнал в шкале вашей школы</li></ul></div>
+  <div class="duo"><div class="win small"><div class="bar"><i></i><i></i><i></i></div><div class="view"><img src="assets/screens/36-teacher-grading.jpg" alt=""></div></div><div class="win small"><div class="bar"><i></i><i></i><i></i></div><div class="view"><img src="assets/screens/37-teacher-gradebook.jpg" alt=""></div></div></div>
+</section>
+<section id="s16" class="clip scene" data-start="152" data-duration="9" style="--c:#2f6fe0" data-side="left">
+  <div class="cap left"><div class="kicker">Сообщения</div><h3>На связи с родителями</h3><ul><li>Чат прямо в Budu</li><li>Видно, что прочитано</li><li>Без чужих мессенджеров</li></ul></div>
+  <div class="win at-right"><div class="bar"><i></i><i></i><i></i></div><div class="view"><img src="assets/screens/39-teacher-chat.jpg" alt="" style="transform-origin:50% 50%"></div></div>
+</section>
+<section id="s17" class="clip scene" data-start="161" data-duration="4" style="--c:#7c4ddb">
+  <div class="sec"><div class="sec-dot"></div><h2>Школам</h2><p>Вся школа в одном окне</p></div>
+</section>
+<section id="s18" class="clip scene" data-start="165" data-duration="11" style="--c:#7c4ddb" data-side="right">
+  <div class="cap right"><div class="kicker">Школа</div><h3>Порядок с первого дня</h3><ul><li>Люди, курсы и классы</li><li>Объявления для всех</li><li>Приглашения по почте</li></ul></div>
+  <div class="win at-left"><div class="bar"><i></i><i></i><i></i></div><div class="view"><img src="assets/screens/40-school-overview.jpg" alt="" style="transform-origin:50% 50%"></div></div>
+</section>
+<section id="s19" class="clip scene" data-start="176" data-duration="9" style="--c:#7c4ddb" data-side="left">
+  <div class="cap left"><div class="kicker">Классы</div><h3>Успеваемость класса</h3><ul><li>Курсы всего класса</li><li>Сдано и средний балл</li><li>Классные руководители</li></ul></div>
+  <div class="win at-right"><div class="bar"><i></i><i></i><i></i></div><div class="view"><img src="assets/screens/43-school-class.jpg" alt="" style="transform-origin:50% 50%"></div></div>
+</section>
+<section id="s20" class="clip scene" data-start="185" data-duration="9" style="--c:#7c4ddb" data-side="right">
+  <div class="cap right"><div class="kicker">Шкала оценок</div><h3>10 систем оценок</h3><ul><li>Россия 1–5, ECTS, GPA…</li><li>Учителя ставят 0–100</li><li>Все видят в вашей шкале</li></ul></div>
+  <div class="win at-left"><div class="bar"><i></i><i></i><i></i></div><div class="view"><img src="assets/screens/47-school-settings.jpg" alt="" style="transform-origin:35% 70%"></div></div>
+</section>
+<section id="s21" class="clip scene" data-start="194" data-duration="11" style="--c:#7c4ddb" data-side="left">
+  <div class="cap left"><div class="kicker">Страница школы</div><h3>Ваша школа в интернете</h3><ul><li>Новости и фото</li><li>Лучшие ученики</li><li>Свой адрес</li></ul></div>
+  <div class="win at-right"><div class="bar"><i></i><i></i><i></i></div><div class="view"><img src="assets/screens/10-school-page.jpg" alt="" style="transform-origin:50% 50%"></div></div>
+</section>
+<section id="s22" class="clip scene" data-start="205" data-duration="4" style="--c:#e2557a">
+  <div class="sec"><div class="sec-dot"></div><h2>Родителям</h2><p>Вы всегда в курсе</p></div>
+</section>
+<section id="s23" class="clip scene" data-start="209" data-duration="11" style="--c:#e2557a" data-side="right">
+  <div class="cap right"><div class="kicker">Успехи ребёнка</div><h3>Неделя ребёнка за минуту</h3><ul><li>Сданные и просроченные задания</li><li>Оценки и отзывы учителей</li><li>Результаты экзаменов</li></ul></div>
+  <div class="win at-left"><div class="bar"><i></i><i></i><i></i></div><div class="view"><img src="assets/screens/51-parent-child.jpg" alt="" style="transform-origin:50% 50%"></div></div>
+</section>
+<section id="s24" class="clip scene" data-start="220" data-duration="9" style="--c:#e2557a" data-side="left">
+  <div class="cap left"><div class="kicker">Связь с учителем</div><h3>Спросить напрямую</h3><ul><li>Чат с каждым учителем</li><li>Ответ приходит в Budu</li><li>И на почту</li></ul></div>
+  <div class="win at-right"><div class="bar"><i></i><i></i><i></i></div><div class="view"><img src="assets/screens/53-parent-chat.jpg" alt="" style="transform-origin:50% 50%"></div></div>
+</section>
+<section id="s25" class="clip scene" data-start="229" data-duration="10" style="--c:#0f8a5f" data-side="right">
+  <div class="cap right"><div class="kicker">Каталог курсов</div><h3>Курсы на любой интерес</h3><ul><li>Математика, языки, код, шахматы…</li><li>Поиск и фильтры</li><li>Цены в вашей валюте</li></ul></div>
+  <div class="win at-left"><div class="bar"><i></i><i></i><i></i></div><div class="view"><img src="assets/screens/04-catalog.jpg" alt="" style="transform-origin:50% 50%"></div></div>
+</section>
+<section id="s26" class="clip scene" data-start="239" data-duration="9" style="--c:#0f8a5f" data-side="left">
+  <div class="cap left"><div class="kicker">Тарифы</div><h3>Ученикам бесплатно</h3><ul><li>Мы поддерживаем тех, кто учится</li><li>Учителя начинают без оплаты</li><li>Школам по размеру школы</li></ul></div>
+  <div class="win at-right"><div class="bar"><i></i><i></i><i></i></div><div class="view"><img src="assets/screens/08-pricing-plans.jpg" alt="" style="transform-origin:50% 50%"></div></div>
+</section>
+<section id="s27" class="clip scene" data-start="248" data-duration="30" style="--c:#0f8a5f">
+  <div class="mosaic"><div class="tile" style="--k:0"><img src="assets/photos/history.jpg" alt=""></div><div class="tile" style="--k:1"><img src="assets/photos/literature.jpg" alt=""></div><div class="tile" style="--k:2"><img src="assets/photos/physics.jpg" alt=""></div><div class="tile" style="--k:3"><img src="assets/photos/chess.jpg" alt=""></div><div class="tile" style="--k:4"><img src="assets/photos/biology.jpg" alt=""></div><div class="tile" style="--k:5"><img src="assets/photos/chemistry.jpg" alt=""></div></div>
+  <div class="mani-veil"></div>
+  <div class="mani"><p class="ml" style="--k:0">Учиться должно быть интересно.</p><p class="ml" style="--k:1">Budu помогает учиться. А жизнь учит дальше:</p><p class="ml" style="--k:2">музеи, прогулки в лесу, озеро летом</p><p class="ml" style="--k:3">и вопрос «а как это устроено?»</p><p class="ml" style="--k:4">Знание — это сила.</p><p class="ml" style="--k:5">Мы верим в тебя и в будущее, которое ты создашь.</p></div>
+</section>
+<section id="s28" class="clip scene" data-start="278" data-duration="18" style="--c:#0f8a5f">
+  <div class="cta"><div class="logo"><svg viewBox="0 0 473.2 436.3"><g fill="#0f8a5f"><rect x="0" y="341.67" width="397.51" height="94.65" rx="17.04"/><rect x="94.65" y="228.1" width="340.73" height="94.65" rx="17.04"/><rect x="189.29" y="114.52" width="283.94" height="94.65" rx="17.04"/><circle cx="369.12" cy="41.64" r="41.64"/></g></svg><span>budu</span></div>
+  <h2>Создайте аккаунт в Budu</h2><p>Для учеников бесплатно. Учителям старт без оплаты. Школам по размеру школы.</p><div class="btn">Создать аккаунт →</div><div class="url">budu-school.ru</div></div>
+</section>
+</div>
+<script>
+const tl = gsap.timeline({ paused: true });
+// the aurora drifts slowly the whole time (deterministic)
+tl.to(".b1", { x: 260, y: 140, duration: 296, ease: "none" }, 0);
+tl.to(".b2", { x: -220, y: 180, duration: 296, ease: "none" }, 0);
+tl.to(".b3", { x: 300, y: -160, duration: 296, ease: "none" }, 0);
+tl.to(".b4", { x: -260, y: -120, duration: 296, ease: "none" }, 0);
+tl.fromTo("#s0", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 0);
+tl.fromTo("#s0 .hero-bg img", { scale: 1.08 }, { scale: 1, duration: 13, ease: "none" }, 0);
+tl.fromTo("#s0 .w", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.7, stagger: 0.12, ease: "power3.out" }, 0.6);
+tl.fromTo("#s0 .brand", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6 }, 0.3);
+tl.to("#s0", { opacity: 0, duration: 0.5, ease: "power1.in" }, 12.5);
+tl.fromTo("#s1", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 13);
+tl.fromTo("#s1 .word", { opacity: 0, y: 40, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.6, stagger: 0.55, ease: "back.out(1.6)" }, 13.3);
+tl.fromTo("#s1 .words-line", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.6 }, 15.8);
+tl.to("#s1", { opacity: 0, duration: 0.5, ease: "power1.in" }, 20.5);
+tl.fromTo("#s2", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 21);
+tl.fromTo("#s2 .win", { opacity: 0, x: 120, y: 30, scale: 0.96 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, 21.1);
+tl.fromTo("#s2 .kicker", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, 21.35);
+tl.fromTo("#s2 h3", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 21.5);
+tl.fromTo("#s2 li", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.35 }, 22.1);
+tl.fromTo("#s2 .view img", { scale: 1.0 }, { scale: 1.06, duration: 12, ease: "none" }, 21);
+tl.to("#s2", { opacity: 0, duration: 0.5, ease: "power1.in" }, 32.5);
+tl.fromTo("#s3", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 33);
+tl.fromTo("#s3 .sec-dot", { scale: 0 }, { scale: 1, duration: 0.6, ease: "back.out(2)" }, 33.1);
+tl.fromTo("#s3 .sec h2", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 33.25);
+tl.fromTo("#s3 .sec p", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.6 }, 33.7);
+tl.to("#s3", { opacity: 0, duration: 0.5, ease: "power1.in" }, 36.5);
+tl.fromTo("#s4", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 37);
+tl.fromTo("#s4 .win", { opacity: 0, x: 120, y: 30, scale: 0.96 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, 37.1);
+tl.fromTo("#s4 .kicker", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, 37.35);
+tl.fromTo("#s4 h3", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 37.5);
+tl.fromTo("#s4 li", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.35 }, 38.1);
+tl.fromTo("#s4 .view img", { scale: 1 }, { scale: 1.35, duration: 7, ease: "power2.inOut" }, 39.5);
+tl.to("#s4", { opacity: 0, duration: 0.5, ease: "power1.in" }, 47.5);
+tl.fromTo("#s5", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 48);
+tl.fromTo("#s5 .win", { opacity: 0, x: -120, y: 30, scale: 0.96 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, 48.1);
+tl.fromTo("#s5 .kicker", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, 48.35);
+tl.fromTo("#s5 h3", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 48.5);
+tl.fromTo("#s5 li", { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.35 }, 49.1);
+tl.fromTo("#s5 .view img", { scale: 1.0 }, { scale: 1.06, duration: 10, ease: "none" }, 48);
+tl.to("#s5", { opacity: 0, duration: 0.5, ease: "power1.in" }, 57.5);
+tl.fromTo("#s6", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 58);
+tl.fromTo("#s6 .win", { opacity: 0, x: 120, y: 30, scale: 0.96 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, 58.1);
+tl.fromTo("#s6 .kicker", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, 58.35);
+tl.fromTo("#s6 h3", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 58.5);
+tl.fromTo("#s6 li", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.35 }, 59.1);
+tl.fromTo("#s6 .view img", { scale: 1.0 }, { scale: 1.06, duration: 10, ease: "none" }, 58);
+tl.to("#s6", { opacity: 0, duration: 0.5, ease: "power1.in" }, 67.5);
+tl.fromTo("#s7", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 68);
+tl.fromTo("#s7 .win", { opacity: 0, x: -120, y: 30, scale: 0.96 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, 68.1);
+tl.fromTo("#s7 .kicker", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, 68.35);
+tl.fromTo("#s7 h3", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 68.5);
+tl.fromTo("#s7 li", { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.35 }, 69.1);
+tl.fromTo("#s7 .view img", { scale: 1.0 }, { scale: 1.06, duration: 10, ease: "none" }, 68);
+tl.to("#s7", { opacity: 0, duration: 0.5, ease: "power1.in" }, 77.5);
+tl.fromTo("#s8", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 78);
+tl.fromTo("#s8 .win", { opacity: 0, x: 120, y: 30, scale: 0.96 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, 78.1);
+tl.fromTo("#s8 .kicker", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, 78.35);
+tl.fromTo("#s8 h3", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 78.5);
+tl.fromTo("#s8 li", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.35 }, 79.1);
+tl.fromTo("#s8 .view img", { scale: 1.0 }, { scale: 1.06, duration: 9, ease: "none" }, 78);
+tl.to("#s8", { opacity: 0, duration: 0.5, ease: "power1.in" }, 86.5);
+tl.fromTo("#s9", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 87);
+tl.fromTo("#s9 .win", { opacity: 0, x: -120, y: 30, scale: 0.96 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, 87.1);
+tl.fromTo("#s9 .kicker", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, 87.35);
+tl.fromTo("#s9 h3", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 87.5);
+tl.fromTo("#s9 li", { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.35 }, 88.1);
+tl.fromTo("#s9 .view img", { scale: 1 }, { scale: 1.5, duration: 4, ease: "power2.inOut" }, 89.5);
+tl.to("#s9", { opacity: 0, duration: 0.5, ease: "power1.in" }, 94.5);
+tl.fromTo("#s10", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 95);
+tl.fromTo("#s10 .sec-dot", { scale: 0 }, { scale: 1, duration: 0.6, ease: "back.out(2)" }, 95.1);
+tl.fromTo("#s10 .sec h2", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 95.25);
+tl.fromTo("#s10 .sec p", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.6 }, 95.7);
+tl.to("#s10", { opacity: 0, duration: 0.5, ease: "power1.in" }, 98.5);
+tl.fromTo("#s11", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 99);
+tl.fromTo("#s11 .win", { opacity: 0, x: 120, y: 30, scale: 0.96 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, 99.1);
+tl.fromTo("#s11 .kicker", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, 99.35);
+tl.fromTo("#s11 h3", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 99.5);
+tl.fromTo("#s11 li", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.35 }, 100.1);
+tl.fromTo("#s11 .view img", { scale: 1.0 }, { scale: 1.06, duration: 11, ease: "none" }, 99);
+tl.to("#s11", { opacity: 0, duration: 0.5, ease: "power1.in" }, 109.5);
+tl.fromTo("#s12", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 110);
+tl.fromTo("#s12 .win", { opacity: 0, x: -120, y: 30, scale: 0.96 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, 110.1);
+tl.fromTo("#s12 .kicker", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, 110.35);
+tl.fromTo("#s12 h3", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 110.5);
+tl.fromTo("#s12 li", { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.35 }, 111.1);
+tl.fromTo("#s12 .view img", { scale: 1 }, { scale: 1.3, duration: 8, ease: "power2.inOut" }, 112.5);
+tl.to("#s12", { opacity: 0, duration: 0.5, ease: "power1.in" }, 121.5);
+tl.fromTo("#s13", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 122);
+tl.fromTo("#s13 .win", { opacity: 0, x: 120, y: 30, scale: 0.96 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, 122.1);
+tl.fromTo("#s13 .kicker", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, 122.35);
+tl.fromTo("#s13 h3", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 122.5);
+tl.fromTo("#s13 li", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.35 }, 123.1);
+tl.fromTo("#s13 .view img", { scale: 1.0 }, { scale: 1.06, duration: 10, ease: "none" }, 122);
+tl.to("#s13", { opacity: 0, duration: 0.5, ease: "power1.in" }, 131.5);
+tl.fromTo("#s14", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 132);
+tl.fromTo("#s14 .win", { opacity: 0, x: -120, y: 30, scale: 0.96 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, 132.1);
+tl.fromTo("#s14 .kicker", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, 132.35);
+tl.fromTo("#s14 h3", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 132.5);
+tl.fromTo("#s14 li", { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.35 }, 133.1);
+tl.fromTo("#s14 .view img", { scale: 1.0 }, { scale: 1.06, duration: 9, ease: "none" }, 132);
+tl.to("#s14", { opacity: 0, duration: 0.5, ease: "power1.in" }, 140.5);
+tl.fromTo("#s15", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 141);
+tl.fromTo("#s15 .duo .win", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.8, stagger: 0.3, ease: "power3.out" }, 141.2);
+tl.fromTo("#s15 .cap > *", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.2 }, 141.3);
+tl.fromTo("#s15 .duo .view img", { scale: 1 }, { scale: 1.05, duration: 11, ease: "none" }, 141);
+tl.to("#s15", { opacity: 0, duration: 0.5, ease: "power1.in" }, 151.5);
+tl.fromTo("#s16", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 152);
+tl.fromTo("#s16 .win", { opacity: 0, x: 120, y: 30, scale: 0.96 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, 152.1);
+tl.fromTo("#s16 .kicker", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, 152.35);
+tl.fromTo("#s16 h3", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 152.5);
+tl.fromTo("#s16 li", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.35 }, 153.1);
+tl.fromTo("#s16 .view img", { scale: 1.0 }, { scale: 1.06, duration: 9, ease: "none" }, 152);
+tl.to("#s16", { opacity: 0, duration: 0.5, ease: "power1.in" }, 160.5);
+tl.fromTo("#s17", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 161);
+tl.fromTo("#s17 .sec-dot", { scale: 0 }, { scale: 1, duration: 0.6, ease: "back.out(2)" }, 161.1);
+tl.fromTo("#s17 .sec h2", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 161.25);
+tl.fromTo("#s17 .sec p", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.6 }, 161.7);
+tl.to("#s17", { opacity: 0, duration: 0.5, ease: "power1.in" }, 164.5);
+tl.fromTo("#s18", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 165);
+tl.fromTo("#s18 .win", { opacity: 0, x: -120, y: 30, scale: 0.96 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, 165.1);
+tl.fromTo("#s18 .kicker", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, 165.35);
+tl.fromTo("#s18 h3", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 165.5);
+tl.fromTo("#s18 li", { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.35 }, 166.1);
+tl.fromTo("#s18 .view img", { scale: 1.0 }, { scale: 1.06, duration: 11, ease: "none" }, 165);
+tl.to("#s18", { opacity: 0, duration: 0.5, ease: "power1.in" }, 175.5);
+tl.fromTo("#s19", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 176);
+tl.fromTo("#s19 .win", { opacity: 0, x: 120, y: 30, scale: 0.96 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, 176.1);
+tl.fromTo("#s19 .kicker", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, 176.35);
+tl.fromTo("#s19 h3", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 176.5);
+tl.fromTo("#s19 li", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.35 }, 177.1);
+tl.fromTo("#s19 .view img", { scale: 1.0 }, { scale: 1.06, duration: 9, ease: "none" }, 176);
+tl.to("#s19", { opacity: 0, duration: 0.5, ease: "power1.in" }, 184.5);
+tl.fromTo("#s20", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 185);
+tl.fromTo("#s20 .win", { opacity: 0, x: -120, y: 30, scale: 0.96 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, 185.1);
+tl.fromTo("#s20 .kicker", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, 185.35);
+tl.fromTo("#s20 h3", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 185.5);
+tl.fromTo("#s20 li", { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.35 }, 186.1);
+tl.fromTo("#s20 .view img", { scale: 1 }, { scale: 1.35, duration: 5, ease: "power2.inOut" }, 187.5);
+tl.to("#s20", { opacity: 0, duration: 0.5, ease: "power1.in" }, 193.5);
+tl.fromTo("#s21", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 194);
+tl.fromTo("#s21 .win", { opacity: 0, x: 120, y: 30, scale: 0.96 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, 194.1);
+tl.fromTo("#s21 .kicker", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, 194.35);
+tl.fromTo("#s21 h3", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 194.5);
+tl.fromTo("#s21 li", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.35 }, 195.1);
+tl.fromTo("#s21 .view img", { scale: 1.0 }, { scale: 1.06, duration: 11, ease: "none" }, 194);
+tl.to("#s21", { opacity: 0, duration: 0.5, ease: "power1.in" }, 204.5);
+tl.fromTo("#s22", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 205);
+tl.fromTo("#s22 .sec-dot", { scale: 0 }, { scale: 1, duration: 0.6, ease: "back.out(2)" }, 205.1);
+tl.fromTo("#s22 .sec h2", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 205.25);
+tl.fromTo("#s22 .sec p", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.6 }, 205.7);
+tl.to("#s22", { opacity: 0, duration: 0.5, ease: "power1.in" }, 208.5);
+tl.fromTo("#s23", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 209);
+tl.fromTo("#s23 .win", { opacity: 0, x: -120, y: 30, scale: 0.96 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, 209.1);
+tl.fromTo("#s23 .kicker", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, 209.35);
+tl.fromTo("#s23 h3", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 209.5);
+tl.fromTo("#s23 li", { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.35 }, 210.1);
+tl.fromTo("#s23 .view img", { scale: 1.0 }, { scale: 1.06, duration: 11, ease: "none" }, 209);
+tl.to("#s23", { opacity: 0, duration: 0.5, ease: "power1.in" }, 219.5);
+tl.fromTo("#s24", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 220);
+tl.fromTo("#s24 .win", { opacity: 0, x: 120, y: 30, scale: 0.96 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, 220.1);
+tl.fromTo("#s24 .kicker", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, 220.35);
+tl.fromTo("#s24 h3", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 220.5);
+tl.fromTo("#s24 li", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.35 }, 221.1);
+tl.fromTo("#s24 .view img", { scale: 1.0 }, { scale: 1.06, duration: 9, ease: "none" }, 220);
+tl.to("#s24", { opacity: 0, duration: 0.5, ease: "power1.in" }, 228.5);
+tl.fromTo("#s25", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 229);
+tl.fromTo("#s25 .win", { opacity: 0, x: -120, y: 30, scale: 0.96 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, 229.1);
+tl.fromTo("#s25 .kicker", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, 229.35);
+tl.fromTo("#s25 h3", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 229.5);
+tl.fromTo("#s25 li", { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.35 }, 230.1);
+tl.fromTo("#s25 .view img", { scale: 1.0 }, { scale: 1.06, duration: 10, ease: "none" }, 229);
+tl.to("#s25", { opacity: 0, duration: 0.5, ease: "power1.in" }, 238.5);
+tl.fromTo("#s26", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 239);
+tl.fromTo("#s26 .win", { opacity: 0, x: 120, y: 30, scale: 0.96 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, 239.1);
+tl.fromTo("#s26 .kicker", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, 239.35);
+tl.fromTo("#s26 h3", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 239.5);
+tl.fromTo("#s26 li", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.35 }, 240.1);
+tl.fromTo("#s26 .view img", { scale: 1.0 }, { scale: 1.06, duration: 9, ease: "none" }, 239);
+tl.to("#s26", { opacity: 0, duration: 0.5, ease: "power1.in" }, 247.5);
+tl.fromTo("#s27", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 248);
+tl.fromTo("#s27 .tile", { opacity: 0, scale: 1.15 }, { opacity: 1, scale: 1, duration: 1.2, stagger: 0.25, ease: "power2.out" }, 248);
+tl.fromTo("#s27 .mosaic", { scale: 1 }, { scale: 1.12, duration: 30, ease: "none" }, 248);
+tl.fromTo("#s27 .ml:nth-child(1)", { opacity: 0, y: 26, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.9, ease: "power3.out" }, 249.2);
+tl.fromTo("#s27 .ml:nth-child(2)", { opacity: 0, y: 26, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.9, ease: "power3.out" }, 253.53333333333333);
+tl.fromTo("#s27 .ml:nth-child(3)", { opacity: 0, y: 26, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.9, ease: "power3.out" }, 257.8666666666667);
+tl.fromTo("#s27 .ml:nth-child(4)", { opacity: 0, y: 26, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.9, ease: "power3.out" }, 262.2);
+tl.fromTo("#s27 .ml:nth-child(5)", { opacity: 0, y: 26, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.9, ease: "power3.out" }, 266.5333333333333);
+tl.fromTo("#s27 .ml:nth-child(6)", { opacity: 0, y: 26, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.9, ease: "power3.out" }, 270.8666666666667);
+tl.to("#s27", { opacity: 0, duration: 0.5, ease: "power1.in" }, 277.5);
+tl.fromTo("#s28", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 278);
+tl.fromTo("#s28 .logo", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.8, ease: "back.out(1.8)" }, 278.2);
+tl.fromTo("#s28 .cta h2, #s28 .cta p", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, stagger: 0.3, ease: "power3.out" }, 278.8);
+tl.fromTo("#s28 .btn", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.6, ease: "back.out(2)" }, 279.8);
+tl.fromTo("#s28 .btn", { scale: 1 }, { scale: 1.05, duration: 0.8, repeat: 9, yoyo: true, ease: "sine.inOut" }, 280.6);
+tl.fromTo("#s28 .url", { opacity: 0 }, { opacity: 1, duration: 0.6 }, 280.4);
+window.__timelines = window.__timelines || {};
+window.__timelines["main"] = tl;
+tl.seek(0);
+</script>
+</body>
 </html>
