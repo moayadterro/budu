@@ -2,7 +2,6 @@ import { LocalLink as Link } from '@/shared/ui/local-link'
 import { visitorCurrency } from '@/entities/user/server'
 import { CatalogGrid } from '@/widgets/course-catalog'
 import { catalogFor } from '@/widgets/course-catalog/server'
-import { Button } from '@/shared/ui/button'
 import { Icon } from '@/shared/ui/icon'
 import { getT } from '@/shared/i18n/server'
 import { JoinInvite } from '@/widgets/school-invite'
@@ -33,21 +32,19 @@ export async function LandingPage() {
         <AudienceCards items={AUDIENCES.map((key) => ({ key, title: s.for[key].title, text: s.for[key].text }))} />
       </section>
 
+      {/* a few courses, only when the catalog has some (the home page's look: big centred heading,
+          modern cards, a quiet link instead of a bordered button) */}
       {featured.length > 0 && (
-        <section className="flex flex-col gap-6">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <h2 className="text-2xl font-semibold tracking-tight">{s.coursesTitle}</h2>
-              <p className="text-muted-foreground">{s.coursesSub}</p>
-            </div>
-            <Button variant="outline" asChild>
-              <Link href="/catalog">
-                {s.allCourses}
-                <Icon name="chevRight" className="rtl:-scale-x-100" />
-              </Link>
-            </Button>
+        <section className="flex flex-col gap-10">
+          <div className="flex flex-col items-center gap-3 text-center">
+            <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-balance sm:text-5xl">{s.coursesTitle}</h2>
+            <p className="max-w-xl text-lg text-pretty text-muted-foreground">{s.coursesSub}</p>
           </div>
-          <CatalogGrid items={featured} hrefBase="/catalog" />
+          <CatalogGrid items={featured} hrefBase="/catalog" centered />
+          <Link href="/catalog" className="group flex items-center gap-1 self-center text-base font-medium text-primary dark:text-success">
+            <span className="group-hover:underline group-hover:underline-offset-4">{s.allCourses}</span>
+            <Icon name="chevRight" className="size-4 transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5" />
+          </Link>
         </section>
       )}
 

@@ -34,3 +34,22 @@ export function Appear({ children, className }: { children: ReactNode; className
     </motion.div>
   )
 }
+
+/**
+ * Rises into place when scrolled into view (cards in a grid): `index` staggers neighbours a little.
+ * Skipped for reduced motion.
+ */
+export function Rise({ children, index = 0, className }: { children: ReactNode; index?: number; className?: string }) {
+  const reduce = useReducedMotion()
+  return (
+    <motion.div
+      className={className}
+      initial={reduce ? false : { opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.55, delay: reduce ? 0 : (index % 3) * 0.08, ease: [0.22, 1, 0.36, 1] }}
+    >
+      {children}
+    </motion.div>
+  )
+}

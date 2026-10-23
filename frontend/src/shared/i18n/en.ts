@@ -1496,7 +1496,7 @@ export const en = {
       },
     },
     coursesTitle: "Popular courses",
-    coursesSub: "Start one today — free courses need just an account.",
+    coursesSub: "Start one today: free courses need just an account.",
     allCourses: "All courses",
     ctaWho: { students: "Students", teachers: "Teachers", schools: "Schools" },
     ctaTitle: "Ready to learn or to teach?",

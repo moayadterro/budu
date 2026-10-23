@@ -7,15 +7,19 @@ import { isCourseSubject } from '@/shared/config/course-subject'
 import { Badge } from '@/shared/ui/badge'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from '@/shared/ui/empty'
 import { Icon } from '@/shared/ui/icon'
+import { Rise } from '@/shared/ui/motion'
 import { getLocale, getT } from '@/shared/i18n/server'
 
 /** Course cards with covers, linking to `${hrefBase}/:id` (students: /explore; visitors: /catalog). */
 export async function CatalogGrid({
   items,
   hrefBase,
+  centered = false,
 }: {
   items: Array<{ course: CatalogCourse; price: ShownPrice; rating: Rating; listing: Listing }>
   hrefBase: string
+  /** the home page: a short row (1 or 2 courses) is centred under the centred heading */
+  centered?: boolean
 }) {
   const [t, locale] = await Promise.all([getT(), getLocale()])
   const s = t.shop
@@ -32,17 +36,25 @@ export async function CatalogGrid({
     )
   }
   return (
-    <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-      {items.map(({ course: c, price: p, rating }) => (
+    <div
+      className={
+        centered && items.length < 3
+          ? 'flex flex-wrap justify-center gap-6 [&>*]:w-full sm:[&>*]:w-[calc(50%-0.75rem)] xl:[&>*]:w-[calc(33.333%-1rem)]'
+          : 'grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3'
+      }
+    >
+      {items.map(({ course: c, price: p, rating }, i) => (
+        <Rise key={c.id} index={i} className="flex">
         <Link
-          key={c.id}
           href={`${hrefBase}/${c.id}`}
-          className="group flex flex-col overflow-hidden rounded-xl border bg-card shadow-xs transition-all hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
+          // the home page's look (owner): no border, large radius, a soft NEUTRAL shadow (a hairline in
+          // dark mode), a gentle lift on hover
+          className="group flex w-full flex-col overflow-hidden rounded-3xl bg-card shadow-[0_3px_8px_-2px_color-mix(in_oklch,var(--foreground)_8%,transparent),0_12px_28px_-12px_color-mix(in_oklch,var(--foreground)_10%,transparent)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_6px_12px_-4px_color-mix(in_oklch,var(--foreground)_10%,transparent),0_20px_40px_-16px_color-mix(in_oklch,var(--foreground)_16%,transparent)] focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none dark:shadow-none dark:ring-1 dark:ring-foreground/8 dark:hover:shadow-none"
         >
           <div className="overflow-hidden">
             <CourseCover courseId={c.id} title={c.title} imageId={c.imageId} className="transition-transform duration-300 group-hover:scale-[1.03]" />
           </div>
-          <div className="flex flex-1 flex-col gap-2 p-4">
+          <div className="flex flex-1 flex-col gap-2 p-5">
             {isCourseSubject(c.subject) && <p className="-mb-1 text-xs font-medium text-muted-foreground">{t.subjects[c.subject]}</p>}
             <h3 className="line-clamp-2 font-semibold leading-snug">{c.title}</h3>
             <RatingLine rating={rating} />
@@ -70,6 +82,7 @@ export async function CatalogGrid({
             </div>
           </div>
         </Link>
+        </Rise>
       ))}
     </div>
   )

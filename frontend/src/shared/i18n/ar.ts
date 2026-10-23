@@ -1473,7 +1473,7 @@ export const ar: typeof en = {
       },
     },
     coursesTitle: "مقررات شائعة",
-    coursesSub: "ابدأ اليوم — المقررات المجانية تحتاج حسابًا فقط.",
+    coursesSub: "ابدأ اليوم: المقررات المجانية تحتاج حسابًا فقط.",
     allCourses: "كل المقررات",
     ctaWho: { students: "للطلاب", teachers: "للمعلمين", schools: "للمدارس" },
     ctaTitle: "مستعد لتتعلّم أو لتعلّم؟",
