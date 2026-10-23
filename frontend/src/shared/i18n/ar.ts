@@ -1672,7 +1672,6 @@ export const ar: typeof en = {
         soon: "شهادات إلكترونية",
       },
       paidCourses: "يحدّد المعلمون أسعار الدورات المدفوعة. ويرى الطلاب الأسعار بعملتهم.",
-      soonEyebrow: "قريبًا",
       soonTitle: "ما نعمل عليه الآن",
       soonBadge: "قريبًا",
       soon: {

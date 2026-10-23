@@ -1751,7 +1751,6 @@ export const ru: typeof en = {
       },
       paidCourses:
         "Цену платных курсов назначают их учителя. Ученики видят цены в своей валюте.",
-      soonEyebrow: "Скоро",
       soonTitle: "Что мы делаем дальше",
       soonBadge: "Скоро",
       soon: {

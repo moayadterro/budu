@@ -152,7 +152,6 @@ export async function PricingPage() {
       {/* coming soon: the two biggest ideas wide on top, the other three below */}
       <section className="flex flex-col gap-8">
         <div className="flex flex-col items-center gap-3 text-center">
-          <p className="text-xs font-semibold tracking-wider text-warning uppercase">{s.soonEyebrow}</p>
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">{s.soonTitle}</h2>
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-6">

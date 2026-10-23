@@ -1699,7 +1699,6 @@ export const en = {
         soon: "Online certificates",
       },
       paidCourses: "Paid courses are priced by their teachers. Students see prices in their own currency.",
-      soonEyebrow: "Coming soon",
       soonTitle: "What we’re building next",
       soonBadge: "Soon",
       soon: {
