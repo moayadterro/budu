@@ -1,6 +1,8 @@
 // Builds index.html (the 5-minute Budu product video) from the scene list below.
 // Run: node build.mjs && npm run check && npm run render
-import { writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
+// narration: one clip per scene (macOS voice "Milena", from VOICEOVER.md; see vo.json)
+const VO = JSON.parse(readFileSync(new URL('./vo.json', import.meta.url), 'utf8'))
 
 // ---- palette (the app's tokens, as fixed colours for video) ---------------------------------------
 const C = {
@@ -343,6 +345,7 @@ h1, h2, h3 { font-family: Geologica, Montserrat, sans-serif; letter-spacing: -0.
 <div id="root" data-composition-id="main" data-start="0" data-duration="${TOTAL}" data-width="1920" data-height="1080">
   <div class="aurora"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div><div class="dots"></div></div>
 ${S.map(sceneHtml).join('\n')}
+${VO.map((v, i) => `<audio id="vo${i}" src="${v.file}" data-start="${v.start}" data-duration="${v.dur}" data-volume="1"></audio>`).join('\n')}
 </div>
 <script>
 const tl = gsap.timeline({ paused: true });
