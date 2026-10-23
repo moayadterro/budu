@@ -766,6 +766,14 @@ Not built yet (rough priority):
 
 ## Open questions (ask the owner)
 
+- Demo for the product video (2026-10-23): `frontend/scripts/seed-demo.mjs` (+ `seed-demo-images.mjs`,
+  `seed-demo-reset.sh`) made 34 @demo.budu.test accounts (logins in the git-ignored
+  `frontend/scripts/demo-accounts.local.md`), 3 schools, 14 courses with Unsplash covers (credits in
+  `video/assets/photos/sources.tsv`) and drawn avatars. Older test data was HIDDEN, not deleted:
+  course listing 4 unlisted (`course_listings.listed`), school pages of companies 7–37 unpublished
+  (`school_pages.published`). Re-enable by hand if needed. Video project: `video/budu-promo`
+  (HyperFrames 0.8.143).
+
 - Contact: create support@ / info@ / partners@budu-school.ru at Timeweb; fill `SITE.social` URLs as
   accounts appear. Instagram / Facebook: Meta is banned as "extremist" in Russia; showing their
   links on a Russian site carries legal risk; X is blocked in Russia. Ask a lawyer before filling those.
