@@ -1942,7 +1942,7 @@ export const ru: typeof en = {
       copy: "Скопировать адрес",
       copied: "Скопировано",
       socialTitle: "Budu в соцсетях",
-      socialInvite: "Будем рады видеть вас с нами!",
+      socialInvite: "Будем рады видеть вас с нами! Каждая подписка поддерживает Budu.",
       socialSoon: "Скоро",
       whatsapp: "WhatsApp",
       legalTitle: "Реквизиты",

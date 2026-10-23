@@ -45,8 +45,8 @@ export async function ContactPage({ searchParams }: { searchParams: Promise<{ to
           )}
           <section className="flex flex-col gap-3">
             <h2 className="px-2 text-sm font-medium text-foreground">{s.socialTitle}</h2>
-            {/* one short, warm line (owner: the long version went unread) */}
-            <p className="-mt-1.5 px-2 text-sm text-pretty text-muted-foreground">{s.socialInvite}</p>
+            {/* short and warm, and it says following helps (owner: the long version went unread) */}
+            <p className="-mt-1.5 px-2 text-[0.9375rem] leading-relaxed text-pretty text-muted-foreground">{s.socialInvite}</p>
             <SocialLinks className="px-1" />
           </section>
           {SITE.whatsapp && (

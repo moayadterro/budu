@@ -1824,7 +1824,7 @@ export const ar: typeof en = {
       copy: "انسخ العنوان",
       copied: "تم النسخ",
       socialTitle: "Budu على وسائل التواصل",
-      socialInvite: "يسعدنا أن تكون معنا!",
+      socialInvite: "يسعدنا أن تكون معنا! كل متابعة تدعم Budu.",
       socialSoon: "قريبًا",
       whatsapp: "واتساب",
       legalTitle: "بيانات الشركة",
