@@ -4,6 +4,13 @@ import { useState } from 'react'
 import { cn } from '@/shared/lib/cn'
 import { Icon, type IconName } from '@/shared/ui/icon'
 import { useT } from '@/shared/i18n'
+import facebookLogo from '@/assets/social/facebook.svg'
+import instagramLogo from '@/assets/social/instagram.svg'
+import maxLogo from '@/assets/social/max.svg'
+import okLogo from '@/assets/social/ok.svg'
+import telegramLogo from '@/assets/social/telegram.svg'
+import tiktokLogo from '@/assets/social/tiktok.svg'
+import vkLogo from '@/assets/social/vk.svg'
 
 export type EmailRow = { key: 'support' | 'info' | 'partners' | 'billing'; address: string }
 
@@ -63,17 +70,18 @@ export function EmailList({ rows }: { rows: EmailRow[] }) {
 }
 
 export type SocialKey = 'telegram' | 'vk' | 'max' | 'ok' | 'instagram' | 'facebook' | 'tiktok'
-const SOCIAL: Record<SocialKey, { name: string; icon: IconName | null }> = {
-  telegram: { name: 'Telegram', icon: 'telegram' },
-  vk: { name: 'VK', icon: 'vk' },
-  max: { name: 'MAX', icon: null }, // no logo in our icon set: a lettered tile
-  ok: { name: 'OK', icon: null },
-  instagram: { name: 'Instagram', icon: 'instagram' },
-  facebook: { name: 'Facebook', icon: 'facebook' },
-  tiktok: { name: 'TikTok', icon: 'tiktok' },
+/** Each platform's own app-icon tile (brand colours live in the logo files, not in our tokens). */
+const SOCIAL: Record<SocialKey, { name: string; logo: { src: string } }> = {
+  telegram: { name: 'Telegram', logo: telegramLogo },
+  vk: { name: 'VK', logo: vkLogo },
+  max: { name: 'MAX', logo: maxLogo },
+  ok: { name: 'OK', logo: okLogo },
+  instagram: { name: 'Instagram', logo: instagramLogo },
+  facebook: { name: 'Facebook', logo: facebookLogo },
+  tiktok: { name: 'TikTok', logo: tiktokLogo },
 }
 
-/** Social accounts as quiet app-like tiles; an account that doesn't exist yet is shown as "soon". */
+/** Social accounts as app icons; one that doesn't exist yet is greyed out with an amber "soon" dot. */
 export function SocialRow({ links }: { links: Array<{ key: SocialKey; url: string | null }> }) {
   const t = useT()
   const s = t.site.contact
@@ -83,8 +91,9 @@ export function SocialRow({ links }: { links: Array<{ key: SocialKey; url: strin
         const n = SOCIAL[key]
         const tile = (
           <>
-            <span className="relative grid size-12 place-items-center rounded-2xl bg-foreground/5 transition-colors group-hover:bg-foreground/8">
-              {n.icon ? <Icon name={n.icon} className="size-5.5" /> : <span className="text-xs font-medium tracking-tight lowercase">{n.name}</span>}
+            <span className="relative">
+              {/* eslint-disable-next-line @next/next/no-img-element -- tiny static logos, no resizing needed */}
+              <img src={n.logo.src} alt="" width={48} height={48} className={cn('size-12 rounded-[0.9rem] transition-transform duration-200', url ? 'group-hover:-translate-y-0.5' : 'opacity-40 grayscale')} />
               {/* coming soon: a small amber dot (amber = not there yet) */}
               {!url && <span className="absolute -end-0.5 -top-0.5 size-2.5 rounded-full bg-warning ring-2 ring-background" />}
             </span>
@@ -94,11 +103,11 @@ export function SocialRow({ links }: { links: Array<{ key: SocialKey; url: strin
         return (
           <li key={key}>
             {url ? (
-              <a href={url} target="_blank" rel="noopener noreferrer" className="group flex flex-col items-center gap-1.5 rounded-xl py-1 text-foreground">
+              <a href={url} target="_blank" rel="noopener noreferrer" aria-label={n.name} className="group flex flex-col items-center gap-1.5 rounded-xl py-1">
                 {tile}
               </a>
             ) : (
-              <span title={`${n.name}: ${s.socialSoon}`} aria-label={`${n.name}: ${s.socialSoon}`} className="group flex cursor-default flex-col items-center gap-1.5 py-1 text-foreground/50">
+              <span title={`${n.name}: ${s.socialSoon}`} aria-label={`${n.name}: ${s.socialSoon}`} className="flex cursor-default flex-col items-center gap-1.5 py-1">
                 {tile}
               </span>
             )}

@@ -4,6 +4,7 @@ import { Button } from '@/shared/ui/button'
 import { Icon, type IconName } from '@/shared/ui/icon'
 import { SoonBadge, SoonMark } from '@/shared/ui/soon-badge'
 import { SchoolInvite } from '@/widgets/school-invite'
+import { HeroGlow } from '@/shared/ui/hero-glow'
 import { JsonLd } from '@/shared/ui/json-ld'
 import { getLocale, getT } from '@/shared/i18n/server'
 import { localePath } from '@/shared/i18n'
@@ -177,16 +178,7 @@ export async function PricingPage() {
       {/* hero: a light, wide, slowly moving blur — two soft one-hue shapes (green top-start, blue at
           the bottom; never more) drifting in different rhythms; still for people who turn motion off */}
       <section className="relative isolate flex flex-col items-center gap-5 pt-6 text-center sm:pt-12">
-        {/* no visible box: the shapes sit well inside a large area (their blur fades to nothing before
-            any edge), and the area itself fades out softly all the way to its edges */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -inset-x-32 -top-60 -bottom-48 -z-10 overflow-hidden [mask-image:radial-gradient(ellipse_closest-side_at_50%_50%,#000_60%,transparent_100%)]"
-        >
-          <div className="absolute start-[7%] top-[14%] h-[20rem] w-[30rem] max-w-[55%] rounded-full bg-primary/30 blur-[90px] motion-safe:animate-aurora dark:bg-primary/35" />
-          <div className="absolute end-[7%] bottom-[12%] h-[18rem] w-[28rem] max-w-[50%] rounded-full bg-info/28 blur-[90px] [animation-delay:-7s] [animation-direction:alternate-reverse] motion-safe:animate-aurora dark:bg-info/35" />
-        </div>
-        <div aria-hidden className="pointer-events-none absolute -inset-x-4 -top-20 bottom-0 -z-10 bg-dots" />
+        <HeroGlow />
         {/* one heading for search engines ("Pricing: learning should be fun"), looks unchanged */}
         <h1 className="flex flex-col items-center gap-5">
           <span className="font-sans text-xs font-medium tracking-wider text-primary uppercase dark:text-success">{s.eyebrow}</span>

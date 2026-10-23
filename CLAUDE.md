@@ -451,8 +451,12 @@ Not built yet (rough priority):
   count, a "sent" state with "Write another message"; beside it the team's emails (support@, info@,
   partners@, billing@budu-school.ru; one hue each, copy in one click) and social tiles (Telegram,
   VK, MAX, OK, Instagram, Facebook, TikTok; `SITE.social`, null = an amber "soon" dot, not
-  clickable). MAX and OK have no logo in Hugeicons → lettered tiles (no invented logos). The
-  support / info / partners mailboxes must be created at Timeweb before launch.
+  clickable). Logos are app-icon tiles in `src/assets/social/<key>.svg`: vk + max are the owner's
+  official files; telegram/ok/instagram/facebook/tiktok are INTERIM (Simple Icons shapes on drawn
+  tiles) until the owner adds the official brand-kit files with the same names (OK's 2023 logo is
+  newer). Until our accounts exist each tile opens the platform's own site. The hero uses the
+  shared `HeroGlow` (same as Pricing); the form card is plain. support / info / partners mailboxes
+  must be created at Timeweb before launch.
 - 2026-10-23 Revenue from paid courses (owner): teachers pay nothing to publish or sell; when a
   student buys a paid course, Budu keeps a percentage of the price and the teacher gets the rest;
   free courses have no fee. Said on the pricing FAQ (no figure until the owner sets one).

@@ -1,12 +1,13 @@
 import { ContactForm, isContactTopic } from '@/features/contact-form'
 import { SITE, whatsappUrl } from '@/shared/config/site'
+import { HeroGlow } from '@/shared/ui/hero-glow'
 import { Icon } from '@/shared/ui/icon'
 import { getT } from '@/shared/i18n/server'
 import { EmailList, SocialRow, type EmailRow, type SocialKey } from './ContactChannels'
 
 /**
- * Public: Contact (owner: "too boring", make it modern but simple). A hero with a soft one-hue blur;
- * the form in a light green card (topic chips, soft fields); beside it the team's emails (one hue
+ * Public: Contact (owner: "too boring", make it modern but simple). The hero has Pricing's soft
+ * background (`HeroGlow`); the form in a plain card (topic chips, soft fields); beside it the team's emails (one hue
  * each, copy in one click) and the social accounts (amber dot = not there yet). All facts come
  * from SITE; empty emails / legal details are hidden.
  */
@@ -20,22 +21,17 @@ export async function ContactPage({ searchParams }: { searchParams: Promise<{ to
 
   return (
     <div className="flex flex-col gap-12 sm:gap-16">
-      {/* hero: one soft green blur behind the heading, fading into the page */}
+      {/* hero: the same soft background as Pricing (owner) */}
       <section className="relative isolate flex flex-col items-center gap-4 pt-6 text-center sm:pt-12">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -inset-x-24 -top-48 -bottom-24 -z-10 overflow-hidden [mask-image:radial-gradient(ellipse_closest-side_at_50%_50%,#000_55%,transparent_100%)]"
-        >
-          <div className="absolute start-1/2 top-1/3 h-72 w-[34rem] max-w-[80%] -translate-x-1/2 rounded-full bg-primary/22 blur-[90px] motion-safe:animate-aurora rtl:translate-x-1/2 dark:bg-primary/30" />
-        </div>
+        <HeroGlow />
         <p className="text-xs font-medium tracking-wider text-primary uppercase dark:text-success">{s.eyebrow}</p>
         <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl">{s.title}</h1>
         <p className="max-w-2xl text-lg text-pretty text-muted-foreground">{s.sub}</p>
       </section>
 
       <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-10">
-        {/* the form: a light green fade from the top, soft edge on the sides and bottom (as the plan cards) */}
-        <section className="rounded-3xl bg-linear-to-b from-primary/7 to-card p-5 shadow-[0_3px_8px_-2px_color-mix(in_oklch,var(--foreground)_9%,transparent),0_10px_24px_-10px_color-mix(in_oklch,var(--foreground)_8%,transparent)] sm:p-8 dark:from-success/8 dark:shadow-none dark:ring-1 dark:ring-foreground/8">
+        {/* the form: a plain card (owner: no gradient here), soft edge on the sides and bottom (as the plan cards) */}
+        <section className="rounded-3xl bg-card p-5 shadow-[0_3px_8px_-2px_color-mix(in_oklch,var(--foreground)_9%,transparent),0_10px_24px_-10px_color-mix(in_oklch,var(--foreground)_8%,transparent)] sm:p-8 dark:shadow-none dark:ring-1 dark:ring-foreground/8">
           <h2 className="mb-6 text-2xl font-semibold tracking-tight">{s.formTitle}</h2>
           <ContactForm topic={isContactTopic(q.topic) ? q.topic : 'general'} />
         </section>

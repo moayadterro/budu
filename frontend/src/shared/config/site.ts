@@ -13,17 +13,18 @@ export const SITE = {
     billing: "billing@budu-school.ru" as string | null, // course payments (receipts) — confirmed by the owner
   },
   /**
-   * Social accounts (owner: show them all). A full https:// address, or null = shown as "soon"
-   * (not clickable) until the account exists. Order = order on the page.
+   * Social accounts (owner: show them all). FOR NOW each opens the platform's own site; replace with
+   * our account's address once it exists. null = shown as "soon" (not clickable). Order = page order.
+   * Logos: src/assets/social/<key>.svg (brand app-icon tiles).
    */
   social: {
-    telegram: null as string | null,
-    vk: null as string | null,
-    max: null as string | null,
-    ok: null as string | null,
-    instagram: null as string | null,
-    facebook: null as string | null,
-    tiktok: null as string | null,
+    telegram: "https://telegram.org" as string | null,
+    vk: "https://vk.com" as string | null,
+    max: "https://max.ru" as string | null,
+    ok: "https://ok.ru" as string | null,
+    instagram: "https://www.instagram.com" as string | null,
+    facebook: "https://www.facebook.com" as string | null,
+    tiktok: "https://www.tiktok.com" as string | null,
   },
   /** a WhatsApp number (digits, with country code) for chat, null = hidden */
   whatsapp: null as string | null,
