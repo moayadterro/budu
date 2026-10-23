@@ -838,6 +838,9 @@ Nothing a user, visitor or attacker can see may tell what Budu runs on or how it
 
 ## Gotchas we hit
 
+- Full-width ("full-bleed") blocks inside the page column: use `w-screen ms-[calc(50%-50vw)]`, NOT
+  `left-1/2 -translate-x-1/2` (that one shifts the block ~400 px in Arabic / RTL). In RTL Chrome puts
+  the scrollbar on the LEFT, so measure against the visible area, not 0…clientWidth.
 - Phones: a plain `grid` column grows to fit its widest content, so a page can be wider than the
   screen. Give stacked grids `grid-cols-1` (= minmax(0,1fr)). Decorative glows bigger than the
   screen are clipped by `overflow-x-clip` on PublicLayout (`clip`, not `hidden`: keeps the sticky header).
