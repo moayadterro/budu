@@ -37,19 +37,19 @@ export async function ContactPage({ searchParams }: { searchParams: Promise<{ to
         </section>
       )}
 
-      <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-16">
+      <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-8">
         {/* the form: a plain card (owner: no gradient here), soft edge on the sides and bottom (as the plan cards) */}
         <section className="rounded-3xl bg-card p-6 shadow-[0_3px_8px_-2px_color-mix(in_oklch,var(--foreground)_9%,transparent),0_10px_24px_-10px_color-mix(in_oklch,var(--foreground)_8%,transparent)] sm:p-10 dark:shadow-none dark:ring-1 dark:ring-foreground/8">
           <h2 className="mb-8 text-3xl font-semibold tracking-tight">{s.formTitle}</h2>
           <ContactForm topic={isContactTopic(q.topic) ? q.topic : 'general'} />
         </section>
 
-        <aside className="flex flex-col gap-12 lg:pt-4">
+        <aside className="flex flex-col gap-10 lg:pt-2">
           <section className="flex flex-col gap-3">
             <h2 className="px-1 text-lg font-semibold tracking-tight">{s.socialTitle}</h2>
             {/* short and warm, and it says following helps (owner: the long version went unread) */}
             <p className="-mt-1 px-1 text-sm leading-relaxed text-pretty text-muted-foreground">{s.socialInvite}</p>
-            <SocialLinks className="mt-1 px-1" />
+            <SocialLinks className="mt-2 px-1" />
           </section>
           {SITE.whatsapp && (
             <a href={whatsappUrl(SITE.whatsapp)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-2 text-sm font-medium text-primary hover:underline dark:text-success">

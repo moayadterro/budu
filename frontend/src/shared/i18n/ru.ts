@@ -1949,6 +1949,7 @@ export const ru: typeof en = {
       copied: "Скопировано",
       socialTitle: "Budu в соцсетях",
       socialInvite: "Будем рады видеть вас с нами! Каждая подписка поддерживает Budu.",
+      socialGroups: { messengers: "Мессенджеры", social: "Соцсети", video: "Видео" },
       socialSoon: "Скоро",
       whatsapp: "WhatsApp",
       legalTitle: "Реквизиты",

@@ -1860,6 +1860,7 @@ export const en = {
       copied: "Copied",
       socialTitle: "Budu on social media",
       socialInvite: "We’d love to have you with us! Every follow supports Budu.",
+      socialGroups: { messengers: "Messengers", social: "Social networks", video: "Video" },
       socialSoon: "Coming soon",
       whatsapp: "WhatsApp",
       legalTitle: "Company details",
