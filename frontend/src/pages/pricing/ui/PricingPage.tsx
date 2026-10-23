@@ -19,9 +19,9 @@ import { getT } from '@/shared/i18n/server'
 
 /** One hue per card: the top fade, the icon tile and (coming soon) the glow — complete class names. */
 const TONE = {
-  blue: { fade: 'from-info/8 dark:from-info/14', tile: 'bg-info/12 text-info', glow: 'bg-info/20' },
-  purple: { fade: 'from-subject-purple/8 dark:from-subject-purple/14', tile: 'bg-subject-purple/12 text-subject-purple', glow: 'bg-subject-purple/20' },
-  green: { fade: 'from-primary/8 dark:from-primary/14', tile: 'bg-primary/12 text-primary', glow: 'bg-primary/20' },
+  blue: { fade: 'from-info/10 dark:from-info/16', tile: 'bg-info/12 text-info', glow: 'bg-info/20', mark: 'text-info' },
+  purple: { fade: 'from-subject-purple/10 dark:from-subject-purple/16', tile: 'bg-subject-purple/12 text-subject-purple', glow: 'bg-subject-purple/20', mark: 'text-subject-purple' },
+  green: { fade: 'from-primary/10 dark:from-primary/16', tile: 'bg-primary/12 text-primary', glow: 'bg-primary/20', mark: 'text-primary' },
 } as const
 type Tone = keyof typeof TONE
 
@@ -50,7 +50,8 @@ export async function PricingPage() {
     return (
       <article
         className={cn(
-          'flex flex-col gap-6 rounded-3xl bg-linear-to-b to-card p-6 transition-transform duration-300 motion-safe:hover:-translate-y-1 sm:p-8',
+          // the colour comes from the far bottom corner — the big icon fills the top-start corner
+          'relative isolate flex flex-col gap-6 overflow-hidden rounded-3xl bg-linear-to-tl to-card p-6 transition-transform duration-300 motion-safe:hover:-translate-y-1 sm:p-8 rtl:bg-linear-to-tr',
           // soft NEUTRAL shadows only — never a coloured glow behind a card (owner)
           raised
             ? 'shadow-[0_1px_2px_color-mix(in_oklch,var(--foreground)_6%,transparent),0_24px_48px_-16px_color-mix(in_oklch,var(--foreground)_16%,transparent)] lg:py-12'
@@ -58,13 +59,10 @@ export async function PricingPage() {
           c.fade,
         )}
       >
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <span className={cn('grid size-11 place-items-center rounded-2xl', c.tile)}>
-              <Icon name={icon} className="size-5" />
-            </span>
-            <h2 className="text-lg font-semibold">{p.name}</h2>
-          </div>
+        {/* the plan's own symbol, big and faint in the top-start corner — no tile around it */}
+        <Icon aria-hidden name={icon} className={cn('pointer-events-none absolute -start-4 -top-4 -z-10 size-36 opacity-[0.13] dark:opacity-[0.18]', c.mark)} />
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-14">
+          <h2 className="text-lg font-semibold">{p.name}</h2>
           {isSchool && <span className="rounded-full bg-primary/12 px-3 py-1 text-xs font-semibold text-primary dark:text-success">{s.schools.badge}</span>}
         </div>
         <div>
@@ -134,9 +132,9 @@ export async function PricingPage() {
 
       {/* the plans: schools · students (in the middle, raised) · teachers — each in its own light hue */}
       <section className="grid items-stretch gap-6 lg:grid-cols-3 lg:items-center lg:gap-5">
-        {plan('schools', 'users', 'green', '/register?as=school')}
-        {plan('students', 'book', 'blue', '/register?as=student', true)}
-        {plan('teachers', 'board', 'purple', '/register?as=teacher')}
+        {plan('schools', 'school', 'green', '/register?as=school')}
+        {plan('students', 'student', 'blue', '/register?as=student', true)}
+        {plan('teachers', 'teacher', 'purple', '/register?as=teacher')}
       </section>
 
       <p className="-mt-12 flex items-center justify-center gap-2 text-center text-sm text-muted-foreground sm:-mt-20">

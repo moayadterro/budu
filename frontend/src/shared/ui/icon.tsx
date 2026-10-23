@@ -87,6 +87,9 @@ import {
   CancelCircleIcon,
   SquareLock02Icon,
   WifiDisconnected02Icon,
+  SchoolIcon,
+  StudentIcon,
+  TeacherIcon,
 } from '@hugeicons/core-free-icons'
 
 /** App icon names → Hugeicons (free set). One place to swap an icon everywhere. */
@@ -177,6 +180,9 @@ const icons = {
   atom: Atom01Icon,
   lang: TranslateIcon,
   arabic: TextFontIcon,
+  school: SchoolIcon,
+  student: StudentIcon,
+  teacher: TeacherIcon,
 }
 
 export type IconName = keyof typeof icons
