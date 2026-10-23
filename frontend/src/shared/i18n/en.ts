@@ -1649,7 +1649,7 @@ export const en = {
       eyebrow: "Pricing",
       title: "Learning should be fun",
       sub: "We support students, so they have free access. Schools pay according to how many students they have.",
-      trust: ["Free access for students", "School price by number of students"],
+      free: "Free access for students",
       students: {
         name: "Students",
         price: "Free access",

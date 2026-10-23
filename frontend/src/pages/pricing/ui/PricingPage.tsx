@@ -134,14 +134,13 @@ export async function PricingPage() {
         <p className="text-xs font-semibold tracking-wider text-primary uppercase dark:text-success">{s.eyebrow}</p>
         <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl">{s.title}</h1>
         <p className="max-w-2xl text-lg text-pretty text-muted-foreground">{s.sub}</p>
-        <ul className="mt-1 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
-          {s.trust.map((x) => (
-            <li key={x} className="flex items-center gap-1.5">
-              <Icon name="tick" className="size-4 text-primary" />
-              {x}
-            </li>
-          ))}
-        </ul>
+        {/* the good news as a highlight chip (Linear / Vercel announcement style): green = it exists */}
+        <p className="mt-2 inline-flex items-center gap-2.5 rounded-full bg-primary/10 py-1.5 ps-1.5 pe-4 text-sm font-semibold text-foreground backdrop-blur-sm dark:bg-primary/20">
+          <span className="grid size-7 flex-none place-items-center rounded-full bg-primary text-primary-foreground">
+            <Icon name="student" className="size-4" />
+          </span>
+          {s.free}
+        </p>
       </section>
 
       {/* the plans: schools · students (in the middle, raised) · teachers — each in its own light hue */}
