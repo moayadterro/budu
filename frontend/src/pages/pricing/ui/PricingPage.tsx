@@ -25,9 +25,9 @@ import { absoluteUrl } from '@/shared/server/seo'
 
 /** One hue per card: the top fade, the icon tile and (coming soon) the glow — complete class names. */
 const TONE = {
-  blue: { fade: 'from-info/10 dark:from-info/8', tile: 'bg-info/12 text-info', glow: 'bg-info/7 dark:bg-info/12', mark: 'text-info', button: 'bg-info/12 text-info hover:bg-info/20' },
+  blue: { fade: 'from-info/5 dark:from-info/8', tile: 'bg-info/12 text-info', glow: 'bg-info/7 dark:bg-info/12', mark: 'text-info', button: 'bg-info/12 text-info hover:bg-info/20' },
   purple: {
-    fade: 'from-subject-purple/10 dark:from-subject-purple/8',
+    fade: 'from-subject-purple/5 dark:from-subject-purple/8',
     tile: 'bg-subject-purple/12 text-subject-purple',
     glow: 'bg-subject-purple/7 dark:bg-subject-purple/12',
     mark: 'text-subject-purple',
@@ -35,7 +35,7 @@ const TONE = {
   },
   // dark mode: the theme's deep emerald is too dark for text, so text uses the lighter success green
   green: {
-    fade: 'from-primary/10 dark:from-success/7',
+    fade: 'from-primary/5 dark:from-success/7',
     tile: 'bg-primary/12 text-primary dark:bg-success/15 dark:text-success',
     glow: 'bg-primary/7 dark:bg-success/10',
     mark: 'text-primary dark:text-success',
