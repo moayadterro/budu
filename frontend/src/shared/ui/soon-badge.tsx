@@ -24,10 +24,10 @@ export function SoonBadge({ label, className }: { label: string; className?: str
  */
 export function SoonMark({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden className={cn('size-4 flex-none', className)}>
+    <svg viewBox="0 0 24 24" aria-hidden className={cn('size-5 flex-none', className)}>
       <defs>
         <linearGradient id="budu-soon-mark" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="var(--warning)" stopOpacity="0.55" />
+          <stop offset="0" stopColor="var(--warning)" stopOpacity="0.7" />
           <stop offset="1" stopColor="var(--warning)" />
         </linearGradient>
       </defs>

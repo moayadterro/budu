@@ -106,7 +106,7 @@ export async function PricingPage() {
           <ul className="mt-auto flex flex-col gap-3 pt-1 text-sm">
             {p.soon.map((x) => (
               <li key={x} className="flex items-start gap-2.5">
-                <SoonMark className="mt-0.5" />
+                <SoonMark className="-ms-0.5 -mt-px" />
                 <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-foreground/85">
                   {x}
                   <SoonBadge label={s.soonBadge} />
