@@ -43,12 +43,6 @@ export async function PricingPage() {
   const t = await getT()
   const s = t.site.pricing
 
-  const tick = (
-    <span className="mt-0.5 grid size-4.5 flex-none place-items-center rounded-full bg-primary/12 text-primary">
-      <Icon name="tick" className="size-3" />
-    </span>
-  )
-
   /** A plan: one-hue fade from the top, icon tile, price, the sign-up button, what's included. */
   const plan = (key: 'students' | 'teachers' | 'schools', icon: IconName, tone: Tone, href: string, raised = false) => {
     const p = s[key]
@@ -94,7 +88,8 @@ export async function PricingPage() {
         <ul className="flex flex-col gap-3 text-sm">
           {p.features.map((f) => (
             <li key={f} className="flex items-start gap-2.5">
-              {tick}
+              {/* a plain checkmark in the card's own colour, no circle around it (the Apple way) */}
+              <Icon name="tick" strokeWidth={2.2} className={cn('mt-0.5 size-4 flex-none', c.mark)} />
               <span className="text-foreground/85">{f}</span>
             </li>
           ))}
@@ -102,9 +97,7 @@ export async function PricingPage() {
         {/* not built yet: a row like the features above, amber instead of a tick, with the badge */}
         {'soon' in p && (
           <div className="mt-auto flex items-start gap-2.5 pt-1 text-sm">
-            <span className="mt-0.5 grid size-4.5 flex-none place-items-center rounded-full bg-warning/15 text-warning">
-              <Icon name="spark" className="size-3" />
-            </span>
+            <Icon name="spark" strokeWidth={2} className="mt-0.5 size-4 flex-none text-warning" />
             <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-foreground/85">
               {p.soon}
               <SoonBadge label={s.soonBadge} />
