@@ -21,10 +21,10 @@ export async function ContactPage({ searchParams }: { searchParams: Promise<{ to
 
   return (
     <div className="flex flex-col gap-12 sm:gap-16">
-      {/* hero: the same soft background as Pricing (owner) */}
+      {/* hero: the colours of talking to people, wandering slowly (owner: "make the page alive") */}
       <section className="relative isolate flex flex-col items-center gap-4 pt-6 text-center sm:pt-12">
-        <HeroGlow />
-        <p className="text-xs font-medium tracking-wider text-primary uppercase dark:text-success">{s.eyebrow}</p>
+        <HeroGlow tone="talk" />
+        <p className="text-xs font-medium tracking-wider text-info uppercase">{s.eyebrow}</p>
         <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl">{s.title}</h1>
         <p className="max-w-2xl text-lg text-pretty text-muted-foreground">{s.sub}</p>
       </section>

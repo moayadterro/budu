@@ -71,6 +71,7 @@
   --medal-foreground: oklch(0.32 0.06 60);
   --highlight-foreground: oklch(0.279 0.077 45.635);
   --subject-purple: oklch(0.558 0.163 302.3);
+  --glow-rose: oklch(0.74 0.13 12); /* a warm, friendly rose for soft glows (Contact) */
   --subject-terra: oklch(0.604 0.13 34.6);
   --gradient-brand: linear-gradient(135deg, var(--chart-5), var(--chart-4) 55%, var(--chart-3));
 
@@ -130,6 +131,7 @@
   --logo-text: oklch(0.985 0 0);
   --scrim: oklch(0 0 0 / 0.55);
   --subject-purple: oklch(0.714 0.143 302.3);
+  --glow-rose: oklch(0.68 0.13 12);
   --subject-terra: oklch(0.7 0.13 34.6);
   color-scheme: dark;
 }
@@ -192,6 +194,7 @@
   --color-medal-foreground: var(--medal-foreground);
   --color-highlight-foreground: var(--highlight-foreground);
   --color-subject-purple: var(--subject-purple);
+  --color-glow-rose: var(--glow-rose);
   --color-subject-terra: var(--subject-terra);
   --color-live: var(--live);
   --color-live-panel: var(--live-panel);
@@ -231,4 +234,34 @@
 }
 @utility animate-aurora {
   animation: aurora-drift 14s ease-in-out infinite alternate;
+}
+
+/* animate-wander-*: a long, slow path around a hero for one soft glow (Contact: "the page alive").
+   Three different paths and lengths so the colours never move together; motion-safe only. */
+@keyframes wander-1 {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  33% { transform: translate3d(38%, 18%, 0) scale(1.12); }
+  66% { transform: translate3d(12%, 42%, 0) scale(0.92); }
+  100% { transform: translate3d(-10%, 12%, 0) scale(1.05); }
+}
+@keyframes wander-2 {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  33% { transform: translate3d(-42%, -10%, 0) scale(0.9); }
+  66% { transform: translate3d(-18%, 30%, 0) scale(1.15); }
+  100% { transform: translate3d(8%, -18%, 0) scale(1); }
+}
+@keyframes wander-3 {
+  0% { transform: translate3d(0, 0, 0) scale(1.05); }
+  33% { transform: translate3d(30%, -35%, 0) scale(0.95); }
+  66% { transform: translate3d(-25%, -15%, 0) scale(1.1); }
+  100% { transform: translate3d(10%, 10%, 0) scale(0.95); }
+}
+@utility animate-wander-1 {
+  animation: wander-1 26s ease-in-out infinite alternate;
+}
+@utility animate-wander-2 {
+  animation: wander-2 32s ease-in-out infinite alternate;
+}
+@utility animate-wander-3 {
+  animation: wander-3 38s ease-in-out infinite alternate;
 }
