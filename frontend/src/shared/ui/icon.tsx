@@ -1,5 +1,6 @@
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
+  Loading03Icon,
   Add01Icon,
   Alert02Icon,
   Analytics01Icon,
@@ -98,6 +99,7 @@ const icons = {
   cal: Calendar03Icon,
   book: Book02Icon,
   search: Search01Icon,
+  loading: Loading03Icon,
   video: Video01Icon,
   check: CheckmarkCircle02Icon,
   layers: Layers01Icon,

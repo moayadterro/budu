@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useRef, useState, useTransition } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { languageName } from '@/shared/config/course-language'
 import { isCourseSubject } from '@/shared/config/course-subject'
 import { cn } from '@/shared/lib/cn'
@@ -17,6 +17,7 @@ import {
 import { Icon } from '@/shared/ui/icon'
 import { useLocale, useT } from '@/shared/i18n'
 import type { CatalogQuery } from '../lib/filter'
+import { useCatalogPending } from './CatalogPending'
 
 type Facet = { key: string; n: number }
 
@@ -47,7 +48,7 @@ export function CatalogFilters({
   const router = useRouter()
   const pathname = usePathname()
   const params = useSearchParams()
-  const [pending, start] = useTransition()
+  const { pending, start } = useCatalogPending()
   const [text, setText] = useState(query.q)
 
   // the address changed elsewhere (reset, back button): show its search
@@ -86,7 +87,11 @@ export function CatalogFilters({
   return (
     <div className="flex flex-col gap-3">
       <div className="relative">
-        <Icon name="search" className="pointer-events-none absolute start-3.5 top-1/2 size-4.5 -translate-y-1/2 text-muted-foreground" />
+        {/* the magnifier turns into a spinner while the search runs */}
+        <Icon
+          name={pending ? 'loading' : 'search'}
+          className={cn('pointer-events-none absolute start-3.5 top-1/2 size-4.5 -translate-y-1/2 text-muted-foreground', pending && 'animate-spin')}
+        />
         <input
           type="search"
           value={text}

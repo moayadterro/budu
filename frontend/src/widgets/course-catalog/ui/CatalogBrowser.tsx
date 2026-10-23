@@ -7,6 +7,7 @@ import { getT } from '@/shared/i18n/server'
 import { CATALOG_PAGE, catalogFacets, filterCatalog, isFiltered, readCatalogQuery } from '../lib/filter'
 import { CatalogFilters } from './CatalogFilters'
 import { CatalogGrid } from './CatalogGrid'
+import { CatalogPendingArea, CatalogPendingProvider } from './CatalogPending'
 import { ResetFilters, ShowMore } from './ShowMore'
 
 type Item = { course: CatalogCourse; price: ShownPrice; rating: Rating; listing: Listing }
@@ -31,34 +32,39 @@ export async function CatalogBrowser({
   const found = filterCatalog(items, query)
   const t = await getT()
   return (
-    <div className="flex flex-col gap-6">
-      {items.length > 0 && (
-        <CatalogFilters
-          query={query}
-          subjects={facets.subjects}
-          languages={facets.languages}
-          prices={{ free: facets.hasFree, paid: facets.hasPaid }}
-          found={found.length}
-          end={end}
-        />
-      )}
-      {items.length > 0 && found.length === 0 && isFiltered(query) ? (
-        <Empty className="bg-foreground/3 rounded-2xl">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <Icon name="search" />
-            </EmptyMedia>
-            <EmptyTitle>{t.shop.filter.noMatch}</EmptyTitle>
-            <EmptyDescription>{t.shop.filter.noMatchSub}</EmptyDescription>
-          </EmptyHeader>
-          <EmptyContent>
-            <ResetFilters />
-          </EmptyContent>
-        </Empty>
-      ) : (
-        <CatalogGrid items={found.slice(0, query.show)} hrefBase={hrefBase} />
-      )}
-      {found.length > query.show && <ShowMore next={query.show + CATALOG_PAGE} />}
-    </div>
+    <CatalogPendingProvider>
+      <div className="flex flex-col gap-6">
+        {items.length > 0 && (
+          <CatalogFilters
+            query={query}
+            subjects={facets.subjects}
+            languages={facets.languages}
+            prices={{ free: facets.hasFree, paid: facets.hasPaid }}
+            found={found.length}
+            end={end}
+          />
+        )}
+        {/* the results fade while a new search loads */}
+        <CatalogPendingArea>
+          {items.length > 0 && found.length === 0 && isFiltered(query) ? (
+            <Empty className="bg-foreground/3 rounded-2xl">
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <Icon name="search" />
+                </EmptyMedia>
+                <EmptyTitle>{t.shop.filter.noMatch}</EmptyTitle>
+                <EmptyDescription>{t.shop.filter.noMatchSub}</EmptyDescription>
+              </EmptyHeader>
+              <EmptyContent>
+                <ResetFilters />
+              </EmptyContent>
+            </Empty>
+          ) : (
+            <CatalogGrid items={found.slice(0, query.show)} hrefBase={hrefBase} />
+          )}
+          {found.length > query.show && <ShowMore next={query.show + CATALOG_PAGE} />}
+        </CatalogPendingArea>
+      </div>
+    </CatalogPendingProvider>
   )
 }
