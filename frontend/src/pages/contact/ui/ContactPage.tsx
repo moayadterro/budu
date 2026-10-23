@@ -37,7 +37,8 @@ export async function ContactPage({
         </p>
       </section>
 
-      <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_26.5rem] lg:gap-10">
+      {/* grid-cols-1 on phones: the column may never grow past the screen (a plain grid column grows to fit its widest content) */}
+      <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-[minmax(0,1fr)_26.5rem] lg:gap-10">
         <section className="lg:pt-2">
           <h2 className="mb-8 text-3xl font-semibold tracking-tight">
             {s.formTitle}

@@ -14,7 +14,9 @@ export async function PublicLayout({ children, params }: { children: ReactNode; 
   if (!isLocale((await params).lang)) notFound()
   const user = await getSession()
   return (
-    <div className="min-h-svh bg-background">
+    // overflow-x-clip: decorative glows bigger than the screen (HeroGlow) never make phones scroll
+    // sideways; `clip`, not `hidden`, so the sticky header keeps working
+    <div className="min-h-svh overflow-x-clip bg-background">
       <PublicHeader signedIn={!!user} />
       <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>
       <PublicFooter />

@@ -45,7 +45,7 @@ export function EmailCards({ rows }: { rows: EmailRow[] }) {
               </span>
               <div className="flex min-w-0 flex-1 flex-col">
                 <h3 className="text-sm leading-5 font-semibold">{s.emailLabels[r.key]}</h3>
-                <p title={s.emailHints[r.key]} className="truncate text-xs leading-4 text-muted-foreground">{s.emailHints[r.key]}</p>
+                <p title={s.emailHints[r.key]} className="text-xs leading-4 text-muted-foreground lg:truncate">{s.emailHints[r.key]}</p>
                 {/* the whole card writes an email (stretched link) */}
                 <a
                   href={`mailto:${r.address}`}
