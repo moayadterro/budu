@@ -77,7 +77,7 @@ export async function PricingPage() {
         </div>
         {isSchool ? (
           <div className="flex flex-col gap-2">
-            <Button size="lg" className="h-auto min-h-11 w-full py-2.5 whitespace-normal" asChild>
+            <Button variant="ghost" size="lg" className={cn('h-auto min-h-11 w-full py-2.5 font-semibold whitespace-normal', c.button)} asChild>
               <Link href={href}>{p.cta}</Link>
             </Button>
             <Link href="/contact?topic=school" className="self-center rounded-md px-2 py-1 text-center text-sm text-balance text-primary underline-offset-4 dark:text-success hover:underline">
@@ -85,7 +85,8 @@ export async function PricingPage() {
             </Link>
           </div>
         ) : (
-          // Apple's "tinted" button: a light fill in the card's own colour, coloured text, no shadow
+          // Apple's "tinted" button: a light fill in the card's own colour, coloured text, no shadow —
+          // the same for all three plans (owner: no plan shouts; the visitor picks who they are)
           <Button variant="ghost" size="lg" className={cn('h-auto min-h-11 w-full py-2.5 font-semibold whitespace-normal', c.button)} asChild>
             <Link href={href}>{p.cta}</Link>
           </Button>
