@@ -171,7 +171,8 @@ Design is a first-class task here, not decoration. For every screen or component
 9. **Colour & gradients (owner, 2026-10-23).** Each card / glow uses ONE hue fading into the page
    (blue, purple, the theme green … several cards may each have their own colour) — never mix
    three colours in one gradient. No borders/rings on showcase cards (soft surfaces + soft shadow
-   instead). No orange/amber accents on public pages (owner: "not in my theme") — EXCEPT "coming soon" markers,
+   instead); exception: a very light hairline (`ring-1 ring-foreground/6`) where a near-white tile
+   would otherwise not read as a card (owner, 2026-10-23, pricing coming-soon tiles). No orange/amber accents on public pages (owner: "not in my theme") — EXCEPT "coming soon" markers,
    which are amber (`warning`) everywhere (owner, 2026-10-23); green means it already exists; no big solid-green
    blocks — light tints. NEVER a coloured glow, halo or coloured shadow behind a card (owner,
    2026-10-23: "not cool at all, don't do that again") — card shadows are soft and neutral.

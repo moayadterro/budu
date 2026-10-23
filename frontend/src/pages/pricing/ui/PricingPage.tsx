@@ -227,7 +227,8 @@ export async function PricingPage() {
               <article
                 key={key}
                 className={cn(
-                  'relative isolate flex gap-4 overflow-hidden rounded-3xl bg-muted/20 p-6 sm:p-7',
+                  // a hairline edge (owner: show it's a card, very lightly) + a soft fade from the top corner
+                  'relative isolate flex gap-4 overflow-hidden rounded-3xl bg-linear-to-br from-muted/60 to-card p-6 ring-1 ring-foreground/6 ring-inset sm:p-7 rtl:bg-linear-to-bl dark:from-muted/40 dark:ring-foreground/8',
                   i < 2 ? 'lg:col-span-3' : 'lg:col-span-2',
                   i === soon.length - 1 && 'sm:col-span-2 lg:col-span-2',
                 )}
