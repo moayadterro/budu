@@ -118,16 +118,16 @@ export async function PricingPage() {
 
   return (
     <div className="flex flex-col gap-20 sm:gap-28">
-      {/* hero: a light, wide, slowly moving blur — two soft one-hue shapes (green, blue; never more)
-          drifting in different rhythms behind the headline; still for people who turn motion off */}
+      {/* hero: a light, wide, slowly moving blur — two soft one-hue shapes (green top-start, blue at
+          the bottom; never more) drifting in different rhythms; still for people who turn motion off */}
       <section className="relative isolate flex flex-col items-center gap-5 pt-6 text-center sm:pt-12">
         {/* the area fades out at its edges (mask), so the blur melts into the page — no visible box */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -inset-x-24 -top-40 -bottom-24 -z-10 overflow-hidden [mask-image:radial-gradient(ellipse_70%_65%_at_50%_42%,#000_35%,transparent_78%)]"
+          className="pointer-events-none absolute -inset-x-24 -top-40 -bottom-24 -z-10 overflow-hidden [mask-image:radial-gradient(ellipse_75%_75%_at_50%_50%,#000_40%,transparent_80%)]"
         >
-          <div className="absolute start-0 top-[6%] h-[26rem] w-[34rem] max-w-[70%] rounded-full bg-primary/16 blur-[110px] motion-safe:animate-aurora dark:bg-primary/12" />
-          <div className="absolute -end-[2%] top-[22%] h-[24rem] w-[32rem] max-w-[65%] rounded-full bg-info/16 blur-[110px] [animation-delay:-7s] [animation-direction:alternate-reverse] motion-safe:animate-aurora dark:bg-info/12" />
+          <div className="absolute start-0 top-0 h-[26rem] w-[34rem] max-w-[70%] rounded-full bg-primary/16 blur-[110px] motion-safe:animate-aurora dark:bg-primary/12" />
+          <div className="absolute end-[12%] bottom-0 h-[24rem] w-[32rem] max-w-[65%] rounded-full bg-info/16 blur-[110px] [animation-delay:-7s] [animation-direction:alternate-reverse] motion-safe:animate-aurora dark:bg-info/12" />
         </div>
         <div aria-hidden className="pointer-events-none absolute -inset-x-4 -top-20 bottom-0 -z-10 bg-dots" />
         <p className="text-xs font-semibold tracking-wider text-primary uppercase dark:text-success">{s.eyebrow}</p>
