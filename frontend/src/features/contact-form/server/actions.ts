@@ -4,7 +4,9 @@ import { createHash } from 'node:crypto'
 import { headers } from 'next/headers'
 import { query } from '@/shared/server/db'
 import { sendMail } from '@/shared/server/mailer'
-import { getLocale } from '@/shared/i18n/server'
+import { getLocale, messagesFor } from '@/shared/i18n/server'
+import { LANGUAGES } from '@/shared/i18n'
+import { composeMail } from '@/shared/server/mail-layout'
 import { CONTACT_TOPICS, type ContactTopic } from '../model/topics'
 import { reportError } from '@/shared/server/errors'
 import { audit } from '@/shared/server/audit'
@@ -19,7 +21,8 @@ const PER_HOUR = 5
 
 /**
  * The public Contact form (no account needed). Stored in app-db (`contact_messages`) and emailed to
- * CONTACT_EMAIL when set. Anti-abuse: a hidden "website" field bots fill in, and at most 5 messages
+ * the team at CONTACT_EMAIL (.env; empty = only stored) in our usual layout, in English, with
+ * Reply-To = the visitor, so "Reply" in the inbox answers them, not no-reply. Anti-abuse: a hidden "website" field bots fill in, and at most 5 messages
  * an hour per IP (only its hash is kept).
  */
 export async function sendContactAction(_prev: ContactState, form: FormData): Promise<ContactState> {
@@ -52,10 +55,28 @@ export async function sendContactAction(_prev: ContactState, form: FormData): Pr
     ])
     const to = process.env.CONTACT_EMAIL
     if (to) {
-      const body = `${message}\n\n— ${name} <${email}> · ${topic} · ${locale}`
-      await sendMail({ to, subject: `[Budu · ${topic}] ${name}`, text: body, html: `<pre style="font-family:inherit;white-space:pre-wrap">${escapeHtml(body)}</pre>` }).catch(
-        (e) => reportError('contact email failed', e),
-      )
+      const t = messagesFor('en') // the team's email is in English (like the other admin emails)
+      const c = t.email.contactTeam
+      const topicName = t.site.contact.topics[topic]
+      const reply = `mailto:${email}?subject=${encodeURIComponent(`Re: ${topicName}`)}`
+      await sendMail({
+        to,
+        replyTo: `${name.replace(/[<>"\r\n]/g, '')} <${email}>`,
+        subject: c.subject(topicName, name),
+        ...composeMail(t, 'ltr', {
+          title: c.title,
+          name: c.name,
+          body: `${c.body}\n\n${message}`,
+          details: [
+            { label: c.details.name, value: name },
+            { label: c.details.email, value: email },
+            { label: c.details.topic, value: topicName },
+            { label: c.details.language, value: LANGUAGES.find((l) => l.code === locale)?.name ?? locale },
+          ],
+          action: c.action,
+          link: reply,
+        }),
+      }).catch((e) => reportError('contact email failed', e))
     }
   } catch (e) {
     reportError('contact form failed', e)
@@ -64,4 +85,3 @@ export async function sendContactAction(_prev: ContactState, form: FormData): Pr
   return { status: 'sent' }
 }
 
-const escapeHtml = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!)

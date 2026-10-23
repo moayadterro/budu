@@ -2570,6 +2570,14 @@ export const ru: typeof en = {
   },
 
   email: {
+    contactTeam: {
+      subject: (topic: string, name: string) => `Новое сообщение: ${topic}, от ${name}`,
+      title: "Новое сообщение с сайта",
+      name: "команда",
+      body: "Кто-то написал в Budu через форму на сайте. Сообщение ниже; нажмите «Ответить», чтобы ответить по почте.",
+      details: { name: "Имя", email: "Почта", topic: "Тема", language: "Язык", message: "Сообщение" },
+      action: "Ответить",
+    },
     fallback: "Если кнопка не работает, скопируйте ссылку в браузер:",
     footer: "Budu — обучение, которое объединяет школу, учителей и семьи.",
     examInvite: {

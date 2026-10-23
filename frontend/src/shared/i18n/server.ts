@@ -31,3 +31,7 @@ export async function rememberBrowserLocale(locale: Locale) {
 export async function getT(): Promise<Messages> {
   return MESSAGES[await getLocale()]
 }
+
+/** The strings of one language, for server code that writes to someone else than the visitor
+ *  (e.g. the team's email about a Contact message, always in English). */
+export const messagesFor = (locale: Locale): Messages => MESSAGES[locale]

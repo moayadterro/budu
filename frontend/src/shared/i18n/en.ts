@@ -2482,6 +2482,14 @@ export const en = {
   },
 
   email: {
+    contactTeam: {
+      subject: (topic: string, name: string) => `New message: ${topic}, from ${name}`,
+      title: "New message from the website",
+      name: "team",
+      body: "Someone wrote to Budu through the contact form. Their message is below; press Reply to answer them by email.",
+      details: { name: "Name", email: "Email", topic: "Topic", language: "Language", message: "Message" },
+      action: "Reply",
+    },
     fallback: "If the button doesn’t work, copy this link into your browser:",
     footer:
       "Budu — learning that brings school, teachers and families together.",

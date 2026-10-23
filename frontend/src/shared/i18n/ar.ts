@@ -2430,6 +2430,14 @@ export const ar: typeof en = {
   },
 
   email: {
+    contactTeam: {
+      subject: (topic: string, name: string) => `رسالة جديدة: ${topic}، من ${name}`,
+      title: "رسالة جديدة من الموقع",
+      name: "الفريق",
+      body: "كتب أحدهم إلى Budu عبر نموذج التواصل. الرسالة أدناه؛ اضغط «ردّ» للرد عليه بالبريد.",
+      details: { name: "الاسم", email: "البريد", topic: "الموضوع", language: "اللغة", message: "الرسالة" },
+      action: "ردّ",
+    },
     fallback: "إن لم يعمل الزر، انسخ هذا الرابط إلى المتصفح:",
     footer: "Budu — تعلّم يجمع المدرسة والمعلمين والعائلات.",
     examInvite: {

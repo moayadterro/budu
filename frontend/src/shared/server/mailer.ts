@@ -19,6 +19,8 @@ export async function sendMail(mail: {
   subject: string
   text: string
   html: string
+  /** where "Reply" goes (e.g. the visitor who wrote through the Contact form); default: MAIL_FROM */
+  replyTo?: string
   /** inline pictures (e.g. the logo, referenced as cid:…) */
   attachments?: Array<{ filename: false; content: Buffer; cid: string; contentType: string; contentDisposition: 'inline' }>
 }) {
