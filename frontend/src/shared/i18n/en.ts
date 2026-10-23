@@ -1685,7 +1685,6 @@ export const en = {
         name: "Schools",
         price: "By student count",
         who: "The price depends on how many students your school has",
-        badge: "For your whole school",
         cta: "Create a school account",
         quote: "Get a price for your school",
         features: [

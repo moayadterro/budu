@@ -69,7 +69,6 @@ export async function PricingPage() {
         <Icon aria-hidden name={icon} className={cn('pointer-events-none absolute end-5 top-5 -z-10 size-20 opacity-[0.16] sm:end-6 sm:top-6 sm:size-24 dark:opacity-[0.22]', c.mark)} />
         <div className="flex flex-wrap items-center gap-3 pe-20 sm:pe-24">
           <h2 className="text-lg font-semibold">{p.name}</h2>
-          {isSchool && <span className="rounded-full bg-primary/12 px-3 py-1 text-xs font-semibold text-primary dark:text-success">{s.schools.badge}</span>}
         </div>
         <div>
           <p className="font-heading text-3xl font-semibold tracking-tight text-balance sm:text-4xl lg:text-3xl xl:text-4xl">{p.price}</p>
