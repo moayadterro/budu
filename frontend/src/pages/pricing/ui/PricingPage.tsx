@@ -50,8 +50,8 @@ export async function PricingPage() {
     return (
       <article
         className={cn(
-          // the colour comes from the far bottom corner — the big icon fills the top-start corner
-          'relative isolate flex flex-col gap-6 overflow-hidden rounded-3xl bg-linear-to-tl to-card p-6 transition-transform duration-300 motion-safe:hover:-translate-y-1 sm:p-8 rtl:bg-linear-to-tr',
+          // the big symbol sits in the top-end corner; the colour rises from the opposite (bottom-start) one
+          'relative isolate flex flex-col gap-6 rounded-3xl bg-linear-to-tr to-card p-6 transition-transform duration-300 motion-safe:hover:-translate-y-1 sm:p-8 rtl:bg-linear-to-tl',
           // soft NEUTRAL shadows only — never a coloured glow behind a card (owner)
           raised
             ? 'shadow-[0_1px_2px_color-mix(in_oklch,var(--foreground)_6%,transparent),0_24px_48px_-16px_color-mix(in_oklch,var(--foreground)_16%,transparent)] lg:py-12'
@@ -59,9 +59,9 @@ export async function PricingPage() {
           c.fade,
         )}
       >
-        {/* the plan's own symbol, big and faint in the top-start corner — no tile around it */}
-        <Icon aria-hidden name={icon} className={cn('pointer-events-none absolute -start-4 -top-4 -z-10 size-36 opacity-[0.13] dark:opacity-[0.18]', c.mark)} />
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-14">
+        {/* the plan's own symbol, big and faint, whole, inside the top-end corner — no tile around it */}
+        <Icon aria-hidden name={icon} className={cn('pointer-events-none absolute end-5 top-5 -z-10 size-20 opacity-[0.16] sm:end-6 sm:top-6 sm:size-24 dark:opacity-[0.22]', c.mark)} />
+        <div className="flex flex-wrap items-center gap-3 pe-20 sm:pe-24">
           <h2 className="text-lg font-semibold">{p.name}</h2>
           {isSchool && <span className="rounded-full bg-primary/12 px-3 py-1 text-xs font-semibold text-primary dark:text-success">{s.schools.badge}</span>}
         </div>
