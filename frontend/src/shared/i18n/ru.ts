@@ -1595,7 +1595,7 @@ export const ru: typeof en = {
         "Школы, которые учат с Budu: их новости, фотографии и лучшие ученики.",
     },
     pricing: {
-      title: "Цены",
+      title: "Тарифы",
       description:
         "У учеников бесплатный доступ к Budu. Школы платят в зависимости от числа учеников.",
     },
@@ -1627,7 +1627,7 @@ export const ru: typeof en = {
   site: {
     nav: {
       courses: "Курсы",
-      pricing: "Цены",
+      pricing: "Тарифы",
       schools: "Школы",
       about: "О нас",
     },
@@ -1640,7 +1640,7 @@ export const ru: typeof en = {
       help: "Помощь",
       links: {
         courses: "Курсы",
-        pricing: "Цены",
+        pricing: "Тарифы",
         schools: "Школы на Budu",
         about: "О нас",
         values: "Наши ценности",

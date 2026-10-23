@@ -1522,7 +1522,7 @@ export const ar: typeof en = {
       description: "مدارس تعلّم مع Budu: أخبارها وصورها وأفضل طلابها.",
     },
     pricing: {
-      title: "الأسعار",
+      title: "الباقات",
       description:
         "للطلاب وصول مجاني إلى Budu. وتدفع المدارس حسب عدد طلابها.",
     },
@@ -1553,7 +1553,7 @@ export const ar: typeof en = {
   site: {
     nav: {
       courses: "الدورات",
-      pricing: "الأسعار",
+      pricing: "الباقات",
       schools: "المدارس",
       about: "من نحن",
     },
@@ -1566,7 +1566,7 @@ export const ar: typeof en = {
       help: "المساعدة",
       links: {
         courses: "الدورات",
-        pricing: "الأسعار",
+        pricing: "الباقات",
         schools: "المدارس على Budu",
         about: "من نحن",
         values: "قيمنا",
@@ -1619,7 +1619,7 @@ export const ar: typeof en = {
       ctaContact: "تواصل معنا",
     },
     pricing: {
-      eyebrow: "الأسعار",
+      eyebrow: "الباقات",
       title: "التعلّم يجب أن يكون ممتعًا",
       sub: "ندعم الطلاب، لذلك لديهم وصول مجاني. وتدفع المدارس حسب عدد طلابها.",
       trust: ["وصول مجاني للطلاب", "سعر المدرسة حسب عدد الطلاب"],
