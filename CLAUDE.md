@@ -321,7 +321,7 @@ Built and verified:
 - Stack upgraded 2026-10-19 (see Running → Versions).
 - Public catalog (tested 2026-10-21 as a visitor over HTTP): `/catalog` and `/catalog/:id` need no
   account (route group `(public)`, `PublicLayout`: language, currency, Sign in / Sign up). `/` is the
-  marketing landing page for visitors (hero, who it's for, featured courses; signed-in users → home). Course covers: teachers upload one in the course builder (Moodle course image,
+  marketing landing page for everyone, signed-in users too (owner, 2026-10-23; `/start` = "my app home": header Open Budu, sidebar logo, emails, after an invite). Course covers: teachers upload one in the course builder (Moodle course image,
   `course/overviewfiles`); without one a generated gradient + initials (`entities/course` CourseCover).
   Students keep `/explore` (same `widgets/course-catalog`). "I have an account" signs in straight to
   that course's enrol page. Visitors' currency = cookie `budu_currency`.
