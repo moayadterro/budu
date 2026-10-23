@@ -121,13 +121,14 @@ export async function PricingPage() {
       {/* hero: a light, wide, slowly moving blur — two soft one-hue shapes (green top-start, blue at
           the bottom; never more) drifting in different rhythms; still for people who turn motion off */}
       <section className="relative isolate flex flex-col items-center gap-5 pt-6 text-center sm:pt-12">
-        {/* the area fades out at its edges (mask), so the blur melts into the page — no visible box */}
+        {/* no visible box: the shapes sit well inside a large area (their blur fades to nothing before
+            any edge), and the area itself fades out softly all the way to its edges */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -inset-x-24 -top-40 -bottom-24 -z-10 overflow-hidden [mask-image:radial-gradient(ellipse_75%_75%_at_50%_50%,#000_40%,transparent_80%)]"
+          className="pointer-events-none absolute -inset-x-32 -top-60 -bottom-48 -z-10 overflow-hidden [mask-image:radial-gradient(ellipse_closest-side_at_50%_50%,#000_45%,transparent_100%)]"
         >
-          <div className="absolute start-0 top-0 h-[26rem] w-[34rem] max-w-[70%] rounded-full bg-primary/16 blur-[110px] motion-safe:animate-aurora dark:bg-primary/12" />
-          <div className="absolute end-[12%] bottom-0 h-[24rem] w-[32rem] max-w-[65%] rounded-full bg-info/16 blur-[110px] [animation-delay:-7s] [animation-direction:alternate-reverse] motion-safe:animate-aurora dark:bg-info/12" />
+          <div className="absolute start-[16%] top-[24%] h-[20rem] w-[30rem] max-w-[55%] rounded-full bg-primary/16 blur-[100px] motion-safe:animate-aurora dark:bg-primary/12" />
+          <div className="absolute end-[22%] bottom-[22%] h-[18rem] w-[28rem] max-w-[50%] rounded-full bg-info/16 blur-[100px] [animation-delay:-7s] [animation-direction:alternate-reverse] motion-safe:animate-aurora dark:bg-info/12" />
         </div>
         <div aria-hidden className="pointer-events-none absolute -inset-x-4 -top-20 bottom-0 -z-10 bg-dots" />
         <p className="text-xs font-semibold tracking-wider text-primary uppercase dark:text-success">{s.eyebrow}</p>
