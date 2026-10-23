@@ -446,6 +446,13 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-23 Contact page redesign (owner: "too boring"): hero with one soft green blur; the form in
+  a light green card with topic CHIPS (icons) instead of a select, soft filled fields, live character
+  count, a "sent" state with "Write another message"; beside it the team's emails (support@, info@,
+  partners@, billing@budu-school.ru; one hue each, copy in one click) and social tiles (Telegram,
+  VK, MAX, OK, Instagram, Facebook, TikTok; `SITE.social`, null = an amber "soon" dot, not
+  clickable). MAX and OK have no logo in Hugeicons → lettered tiles (no invented logos). The
+  support / info / partners mailboxes must be created at Timeweb before launch.
 - 2026-10-23 Revenue from paid courses (owner): teachers pay nothing to publish or sell; when a
   student buys a paid course, Budu keeps a percentage of the price and the teacher gets the rest;
   free courses have no fee. Said on the pricing FAQ (no figure until the owner sets one).
@@ -743,6 +750,10 @@ Not built yet (rough priority):
   official `mariadb` image.
 
 ## Open questions (ask the owner)
+
+- Contact: create support@ / info@ / partners@budu-school.ru at Timeweb; fill `SITE.social` URLs as
+  accounts appear. Instagram / Facebook: Meta is banned as "extremist" in Russia; showing their
+  links on a Russian site carries legal risk. Ask a lawyer before filling those two.
 
 - Commission on paid courses: what percentage? (pricing FAQ says "a percentage"; add the figure
   there, in the Terms, and in the teacher's listing form once decided). Payouts to teachers are not

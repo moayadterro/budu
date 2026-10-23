@@ -1,72 +1,74 @@
 import { ContactForm, isContactTopic } from '@/features/contact-form'
-import { SITE, telegramUrl, whatsappUrl } from '@/shared/config/site'
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
+import { SITE, whatsappUrl } from '@/shared/config/site'
 import { Icon } from '@/shared/ui/icon'
-import { PublicHero } from '@/shared/ui/public-hero'
 import { getT } from '@/shared/i18n/server'
+import { EmailList, SocialRow, type EmailRow, type SocialKey } from './ContactChannels'
 
-/** Public: the contact form + the ways to reach us that exist (SITE — empty ones are hidden). */
+/**
+ * Public: Contact (owner: "too boring", make it modern but simple). A hero with a soft one-hue blur;
+ * the form in a light green card (topic chips, soft fields); beside it the team's emails (one hue
+ * each, copy in one click) and the social accounts (amber dot = not there yet). All facts come
+ * from SITE; empty emails / legal details are hidden.
+ */
 export async function ContactPage({ searchParams }: { searchParams: Promise<{ topic?: string }> }) {
   const t = await getT()
   const s = t.site.contact
   const q = await searchParams
-  const emails = (Object.entries(SITE.emails) as Array<[keyof typeof SITE.emails, string | null]>).filter(([, v]) => v)
+  const emails = (Object.entries(SITE.emails) as Array<[EmailRow['key'], string | null]>).filter((e): e is [EmailRow['key'], string] => !!e[1])
   const legal = (Object.entries(SITE.legal) as Array<[keyof typeof SITE.legal, string | null]>).filter(([, v]) => v)
-  const chats = [SITE.telegram && { label: s.telegram, href: telegramUrl(SITE.telegram) }, SITE.whatsapp && { label: s.whatsapp, href: whatsappUrl(SITE.whatsapp) }].filter(
-    Boolean,
-  ) as Array<{ label: string; href: string }>
+  const social = (Object.entries(SITE.social) as Array<[SocialKey, string | null]>).map(([key, url]) => ({ key, url }))
+
   return (
-    <div className="flex flex-col gap-10">
-      <PublicHero title={s.title} sub={s.sub} />
-      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
-        <Card>
-          <CardHeader>
-            <CardTitle>{s.formTitle}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ContactForm topic={isContactTopic(q.topic) ? q.topic : 'general'} />
-          </CardContent>
-        </Card>
-        <aside className="flex flex-col gap-4">
-          {(emails.length > 0 || chats.length > 0) && (
-            <Card size="sm">
-              <CardHeader>
-                <CardTitle>{s.otherTitle}</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-3 text-sm">
-                {emails.map(([k, v]) => (
-                  <div key={k}>
-                    <div className="text-xs text-muted-foreground">{s.emailLabels[k]}</div>
-                    <a href={`mailto:${v}`} className="font-medium text-primary hover:underline" dir="ltr">
-                      {v}
-                    </a>
-                  </div>
-                ))}
-                {chats.map((c) => (
-                  <a key={c.href} href={c.href} target="_blank" rel="noopener" className="inline-flex items-center gap-2 font-medium text-primary hover:underline">
-                    <Icon name="chat" className="size-4" />
-                    {c.label}
-                  </a>
-                ))}
-              </CardContent>
-            </Card>
+    <div className="flex flex-col gap-12 sm:gap-16">
+      {/* hero: one soft green blur behind the heading, fading into the page */}
+      <section className="relative isolate flex flex-col items-center gap-4 pt-6 text-center sm:pt-12">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -inset-x-24 -top-48 -bottom-24 -z-10 overflow-hidden [mask-image:radial-gradient(ellipse_closest-side_at_50%_50%,#000_55%,transparent_100%)]"
+        >
+          <div className="absolute start-1/2 top-1/3 h-72 w-[34rem] max-w-[80%] -translate-x-1/2 rounded-full bg-primary/22 blur-[90px] motion-safe:animate-aurora rtl:translate-x-1/2 dark:bg-primary/30" />
+        </div>
+        <p className="text-xs font-medium tracking-wider text-primary uppercase dark:text-success">{s.eyebrow}</p>
+        <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl">{s.title}</h1>
+        <p className="max-w-2xl text-lg text-pretty text-muted-foreground">{s.sub}</p>
+      </section>
+
+      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-10">
+        {/* the form: a light green fade from the top, soft edge on the sides and bottom (as the plan cards) */}
+        <section className="rounded-3xl bg-linear-to-b from-primary/7 to-card p-5 shadow-[0_3px_8px_-2px_color-mix(in_oklch,var(--foreground)_9%,transparent),0_10px_24px_-10px_color-mix(in_oklch,var(--foreground)_8%,transparent)] sm:p-8 dark:from-success/8 dark:shadow-none dark:ring-1 dark:ring-foreground/8">
+          <h2 className="mb-6 text-2xl font-semibold tracking-tight">{s.formTitle}</h2>
+          <ContactForm topic={isContactTopic(q.topic) ? q.topic : 'general'} />
+        </section>
+
+        <aside className="flex flex-col gap-8">
+          {emails.length > 0 && (
+            <section className="flex flex-col gap-3">
+              <h2 className="px-2 text-sm font-medium text-muted-foreground">{s.otherTitle}</h2>
+              <EmailList rows={emails.map(([key, address]) => ({ key, address }))} />
+            </section>
+          )}
+          <section className="flex flex-col gap-3">
+            <h2 className="px-2 text-sm font-medium text-muted-foreground">{s.socialTitle}</h2>
+            <SocialRow links={social} />
+          </section>
+          {SITE.whatsapp && (
+            <a href={whatsappUrl(SITE.whatsapp)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-2 text-sm font-medium text-primary hover:underline dark:text-success">
+              <Icon name="chat" className="size-4" />
+              {s.whatsapp}
+            </a>
           )}
           {legal.length > 0 && (
-            <Card size="sm">
-              <CardHeader>
-                <CardTitle>{s.legalTitle}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 text-sm">
-                  {legal.map(([k, v]) => (
-                    <div key={k} className="contents">
-                      <dt className="text-muted-foreground">{s.legal[k]}</dt>
-                      <dd>{v}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </CardContent>
-            </Card>
+            <section className="flex flex-col gap-3">
+              <h2 className="px-2 text-sm font-medium text-muted-foreground">{s.legalTitle}</h2>
+              <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 px-2 text-sm">
+                {legal.map(([k, v]) => (
+                  <div key={k} className="contents">
+                    <dt className="text-muted-foreground">{s.legal[k]}</dt>
+                    <dd>{v}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
           )}
         </aside>
       </div>
