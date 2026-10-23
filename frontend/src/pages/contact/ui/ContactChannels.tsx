@@ -25,22 +25,22 @@ export function EmailCards({ rows }: { rows: EmailRow[] }) {
   const s = t.site.contact
   const [copied, setCopied] = useState<string | null>(null)
   return (
-    <ul className="grid gap-4 sm:grid-cols-2">
+    <ul className="grid gap-6 sm:grid-cols-2">
       {rows.map((r) => {
         const st = EMAIL_STYLE[r.key]
         return (
           <li
             key={r.key}
             className={cn(
-              'group relative flex flex-col gap-4 rounded-3xl bg-linear-to-br to-card p-5 transition-transform duration-200 motion-safe:hover:-translate-y-0.5 sm:p-6 rtl:bg-linear-to-bl',
+              'group relative flex flex-col gap-6 rounded-3xl bg-linear-to-br to-card p-6 transition-transform duration-200 motion-safe:hover:-translate-y-0.5 sm:p-8 rtl:bg-linear-to-bl',
               // the same soft edge as the plan cards; a hairline in dark mode (a shadow turns into a halo there)
               'shadow-[0_3px_8px_-2px_color-mix(in_oklch,var(--foreground)_8%,transparent),0_10px_24px_-10px_color-mix(in_oklch,var(--foreground)_7%,transparent)] dark:shadow-none dark:ring-1 dark:ring-foreground/8',
               st.fade,
             )}
           >
             <div className="flex items-start justify-between gap-3">
-              <span className={cn('grid size-12 flex-none place-items-center rounded-2xl', st.tile)}>
-                <Icon name={st.icon} className="size-6" />
+              <span className={cn('grid size-14 flex-none place-items-center rounded-2xl', st.tile)}>
+                <Icon name={st.icon} className="size-7" />
               </span>
               <button
                 type="button"
@@ -64,14 +64,14 @@ export function EmailCards({ rows }: { rows: EmailRow[] }) {
                 {copied === r.key ? s.copied : null}
               </button>
             </div>
-            <div className="flex flex-col gap-1">
-              <h3 className="font-semibold">{s.emailLabels[r.key]}</h3>
-              <p className="text-sm text-pretty text-muted-foreground">{s.emailHints[r.key]}</p>
+            <div className="flex flex-col gap-2">
+              <h3 className="text-lg font-semibold">{s.emailLabels[r.key]}</h3>
+              <p className="text-[0.9375rem] leading-relaxed text-pretty text-muted-foreground">{s.emailHints[r.key]}</p>
             </div>
             {/* the whole card writes an email (stretched link) */}
             <a
               href={`mailto:${r.address}`}
-              className="mt-auto truncate text-sm font-medium text-foreground after:absolute after:inset-0 after:rounded-3xl focus-visible:outline-none focus-visible:after:ring-3 focus-visible:after:ring-ring/50"
+              className="mt-auto truncate pt-2 text-[0.9375rem] font-medium text-foreground after:absolute after:inset-0 after:rounded-3xl focus-visible:outline-none focus-visible:after:ring-3 focus-visible:after:ring-ring/50"
               dir="ltr"
             >
               {r.address}

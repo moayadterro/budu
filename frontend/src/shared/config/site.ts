@@ -22,6 +22,7 @@ export const SITE = {
     vk: "https://vk.com" as string | null,
     max: "https://max.ru" as string | null,
     ok: "https://ok.ru" as string | null,
+    youtube: "https://www.youtube.com" as string | null,
     instagram: "https://www.instagram.com" as string | null,
     facebook: "https://www.facebook.com" as string | null,
     tiktok: "https://www.tiktok.com" as string | null,

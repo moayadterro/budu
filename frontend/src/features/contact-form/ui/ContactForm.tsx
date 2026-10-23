@@ -62,7 +62,7 @@ function Form({ topic, again }: { topic: ContactTopic; again: () => void }) {
   }
 
   return (
-    <form action={action} className="flex flex-col gap-5">
+    <form action={action} className="flex flex-col gap-6">
       {state.status === 'error' && <Alert variant="destructive">{s.errors[state.error]}</Alert>}
       {/* bots fill every field; people never see this one */}
       <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />
@@ -88,7 +88,7 @@ function Form({ topic, again }: { topic: ContactTopic; again: () => void }) {
         </div>
       </fieldset>
 
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="grid gap-6 sm:grid-cols-2">
         <label className="flex flex-col gap-2">
           <span className="text-sm font-medium">{s.name}</span>
           <input name="name" required maxLength={100} autoComplete="name" placeholder={s.namePh} className={cn(field, 'h-12')} />

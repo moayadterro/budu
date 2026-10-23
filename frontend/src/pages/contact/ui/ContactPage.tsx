@@ -20,7 +20,7 @@ export async function ContactPage({ searchParams }: { searchParams: Promise<{ to
   const legal = (Object.entries(SITE.legal) as Array<[keyof typeof SITE.legal, string | null]>).filter(([, v]) => v)
 
   return (
-    <div className="flex flex-col gap-12 sm:gap-16">
+    <div className="flex flex-col gap-16 sm:gap-24">
       {/* hero: the colours of talking to people, wandering slowly (owner: "make the page alive") */}
       <section className="relative isolate flex flex-col items-center gap-4 pt-6 text-center sm:pt-12">
         <HeroGlow tone="talk" />
@@ -31,25 +31,25 @@ export async function ContactPage({ searchParams }: { searchParams: Promise<{ to
 
       {/* write directly: four cards, two per row */}
       {emails.length > 0 && (
-        <section className="flex flex-col gap-5">
-          <h2 className="text-2xl font-semibold tracking-tight">{s.otherTitle}</h2>
+        <section className="flex flex-col gap-8">
+          <h2 className="text-3xl font-semibold tracking-tight">{s.otherTitle}</h2>
           <EmailCards rows={emails.map(([key, address]) => ({ key, address }))} />
         </section>
       )}
 
-      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-10">
+      <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-16">
         {/* the form: a plain card (owner: no gradient here), soft edge on the sides and bottom (as the plan cards) */}
-        <section className="rounded-3xl bg-card p-5 shadow-[0_3px_8px_-2px_color-mix(in_oklch,var(--foreground)_9%,transparent),0_10px_24px_-10px_color-mix(in_oklch,var(--foreground)_8%,transparent)] sm:p-8 dark:shadow-none dark:ring-1 dark:ring-foreground/8">
-          <h2 className="mb-6 text-2xl font-semibold tracking-tight">{s.formTitle}</h2>
+        <section className="rounded-3xl bg-card p-6 shadow-[0_3px_8px_-2px_color-mix(in_oklch,var(--foreground)_9%,transparent),0_10px_24px_-10px_color-mix(in_oklch,var(--foreground)_8%,transparent)] sm:p-10 dark:shadow-none dark:ring-1 dark:ring-foreground/8">
+          <h2 className="mb-8 text-3xl font-semibold tracking-tight">{s.formTitle}</h2>
           <ContactForm topic={isContactTopic(q.topic) ? q.topic : 'general'} />
         </section>
 
-        <aside className="flex flex-col gap-8">
+        <aside className="flex flex-col gap-12 lg:pt-4">
           <section className="flex flex-col gap-3">
-            <h2 className="px-2 text-sm font-medium text-foreground">{s.socialTitle}</h2>
+            <h2 className="px-1 text-lg font-semibold tracking-tight">{s.socialTitle}</h2>
             {/* short and warm, and it says following helps (owner: the long version went unread) */}
-            <p className="-mt-1.5 px-2 text-[0.9375rem] leading-relaxed text-pretty text-muted-foreground">{s.socialInvite}</p>
-            <SocialLinks className="px-1" />
+            <p className="-mt-1 px-1 text-sm leading-relaxed text-pretty text-muted-foreground">{s.socialInvite}</p>
+            <SocialLinks className="mt-1 px-1" />
           </section>
           {SITE.whatsapp && (
             <a href={whatsappUrl(SITE.whatsapp)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-2 text-sm font-medium text-primary hover:underline dark:text-success">
@@ -59,7 +59,7 @@ export async function ContactPage({ searchParams }: { searchParams: Promise<{ to
           )}
           {legal.length > 0 && (
             <section className="flex flex-col gap-3">
-              <h2 className="px-2 text-sm font-medium text-foreground">{s.legalTitle}</h2>
+              <h2 className="px-1 text-lg font-semibold tracking-tight">{s.legalTitle}</h2>
               <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 px-2 text-sm">
                 {legal.map(([k, v]) => (
                   <div key={k} className="contents">

@@ -11,6 +11,7 @@ import okLogo from '@/assets/social/ok.svg'
 import telegramLogo from '@/assets/social/telegram.svg'
 import tiktokLogo from '@/assets/social/tiktok.svg'
 import vkLogo from '@/assets/social/vk.svg'
+import youtubeLogo from '@/assets/social/youtube.svg'
 
 type SocialKey = keyof typeof SITE.social
 /** Each platform's own app-icon tile (brand colours live in the logo files, not in our tokens). */
@@ -19,6 +20,7 @@ const SOCIAL: Record<SocialKey, { name: string; logo: { src: string } }> = {
   vk: { name: 'VK', logo: vkLogo },
   max: { name: 'MAX', logo: maxLogo },
   ok: { name: 'OK', logo: okLogo },
+  youtube: { name: 'YouTube', logo: youtubeLogo },
   instagram: { name: 'Instagram', logo: instagramLogo },
   facebook: { name: 'Facebook', logo: facebookLogo },
   tiktok: { name: 'TikTok', logo: tiktokLogo },
@@ -28,14 +30,14 @@ const SOCIAL: Record<SocialKey, { name: string; logo: { src: string } }> = {
  * Budu's social accounts (SITE.social), no names (owner: the platforms are known); the name is the
  * screen-reader label and the hover title. `sm` = the footer: plain one-colour marks, grey, black
  * on hover (owner: no colourful icons there); default = the Contact page: the colour app-icon
- * tiles, four per row. An account that doesn't exist yet: greyed out + amber dot.
+ * tiles, four per row (8 platforms = 4 + 4). An account that doesn't exist yet: greyed out + amber dot.
  */
 export function SocialLinks({ size = 'md', className }: { size?: 'sm' | 'md'; className?: string }) {
   const t = useT()
   const soon = t.site.contact.socialSoon
   const links = (Object.entries(SITE.social) as Array<[SocialKey, string | null]>).map(([key, url]) => ({ key, url }))
   return (
-    <ul className={cn(size === 'sm' ? 'flex flex-wrap gap-1' : 'grid max-w-[15rem] grid-cols-4 gap-2.5', className)}>
+    <ul className={cn(size === 'sm' ? 'flex flex-wrap gap-1' : 'grid max-w-[16rem] grid-cols-4 gap-3', className)}>
       {links.map(({ key, url }) => {
         const n = SOCIAL[key]
         const g = SOCIAL_GLYPHS[key]
