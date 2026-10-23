@@ -1457,7 +1457,7 @@ export const en = {
     title: "Learning that brings school, teachers and families together",
     sub: "Courses with video lessons, homework, quizzes and live classes — with a timetable, grades, and parents who can follow along.",
     browse: "Browse courses",
-    start: "Create a free account",
+    start: "Create an account",
     forTitle: "Made for everyone in learning",
     for: {
       schools: {
@@ -1495,7 +1495,7 @@ export const en = {
     nothing: "This lesson has no videos or materials yet.",
     nextTitle: "Continue the course",
     nextFree: (n: number) =>
-      `Create a free account to open all ${n} lessons, hand in homework and get feedback.`,
+      `Create an account to open all ${n} lessons, hand in homework and get feedback.`,
     nextPaid: (n: number) =>
       `Create an account to buy the course and open all ${n} lessons.`,
     nextStudent: (n: number) => `Join the course to open all ${n} lessons.`,
@@ -1642,8 +1642,8 @@ export const en = {
       },
       ctaTitle: "Learn or teach with us",
       ctaSub:
-        "Create a free account in a minute — or tell us about your school.",
-      ctaStart: "Create a free account",
+        "Create an account in a minute or tell us about your school.",
+      ctaStart: "Create an account",
       ctaContact: "Contact us",
     },
     pricing: {
@@ -1665,7 +1665,7 @@ export const en = {
           "Parents can follow along, only if you invite them",
           "Reminders for new homework, grades and exams",
         ],
-        soon: "Online learning games for free time",
+        soon: "Educational online games for free time",
       },
       teachers: {
         name: "Teachers",
@@ -1706,7 +1706,7 @@ export const en = {
       soon: {
         ai: { title: "AI creator kit", text: "Turn a topic into a lesson plan, quiz and homework in minutes, and get drafts of feedback and lesson summaries. For teachers; paid." },
         certificates: { title: "Online certificates", text: "Schools and teachers issue certificates for finished courses and exams. Anyone can check them online." },
-        games: { title: "Games for free time", text: "Short learning games students can play between lessons, on their own or against classmates." },
+        games: { title: "Educational games", text: "Short learning games students can play between lessons, on their own or against classmates." },
         cowork: { title: "Co-working rooms", text: "A shared room and board where a class or study group brainstorms and works on a project together." },
         clubs: { title: "Interest circles", text: "Students who love the same things, like robotics, chess or poetry, find each other and start a circle." },
       },
@@ -1748,7 +1748,7 @@ export const en = {
           items: [
             {
               q: "How do I create an account?",
-              a: "Press “Create a free account”, choose whether you are a school, a teacher or a student, and confirm your email with the link we send.",
+              a: "Press “Create an account”, choose whether you are a school, a teacher or a student, and confirm your email with the link we send.",
             },
             {
               q: "I didn’t get the confirmation email.",
@@ -2012,7 +2012,7 @@ export const en = {
     ctaTitle: (school: string) => `Learn with ${school}`,
     ctaSub:
       "Students, families and teachers use Budu for lessons, homework, grades and news — all in one place.",
-    ctaJoin: "Create a free account",
+    ctaJoin: "Create an account",
     ctaMore: "More schools on Budu",
     editor: {
       title: "School page",
