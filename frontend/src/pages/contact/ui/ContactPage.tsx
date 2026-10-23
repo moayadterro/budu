@@ -37,7 +37,7 @@ export async function ContactPage({
         </p>
       </section>
 
-      <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_19.5rem] lg:gap-8">
+      <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-10">
         <section className="rounded-3xl bg-card p-6 shadow-[0_3px_8px_-2px_color-mix(in_oklch,var(--foreground)_9%,transparent),0_10px_24px_-10px_color-mix(in_oklch,var(--foreground)_8%,transparent)] sm:p-10 dark:shadow-none dark:ring-1 dark:ring-foreground/8">
           <h2 className="mb-8 text-3xl font-semibold tracking-tight">
             {s.formTitle}
