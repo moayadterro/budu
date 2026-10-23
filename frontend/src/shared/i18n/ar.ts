@@ -1552,6 +1552,7 @@ export const ar: typeof en = {
   },
   site: {
     nav: {
+      home: "الرئيسية",
       courses: "الدورات",
       pricing: "الباقات",
       schools: "المدارس",

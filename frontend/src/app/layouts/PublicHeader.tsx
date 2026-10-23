@@ -12,7 +12,9 @@ import { Logo } from '@/shared/ui/logo'
 import { cn } from '@/shared/lib/cn'
 import { splitLocale, useT } from '@/shared/i18n'
 
+// "Home" too, not only the logo: not everyone knows the logo leads home (owner)
 const NAV = [
+  { key: 'home', href: '/' },
   { key: 'courses', href: '/catalog' },
   { key: 'pricing', href: '/pricing' },
   { key: 'schools', href: '/schools' },

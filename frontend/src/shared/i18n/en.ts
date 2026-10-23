@@ -1578,6 +1578,7 @@ export const en = {
   },
   site: {
     nav: {
+      home: "Home",
       courses: "Courses",
       pricing: "Pricing",
       schools: "Schools",

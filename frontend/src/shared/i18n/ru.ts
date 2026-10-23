@@ -1626,6 +1626,7 @@ export const ru: typeof en = {
   },
   site: {
     nav: {
+      home: "Главная",
       courses: "Курсы",
       pricing: "Тарифы",
       schools: "Школы",
