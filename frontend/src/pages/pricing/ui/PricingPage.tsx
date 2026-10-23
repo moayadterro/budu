@@ -81,7 +81,7 @@ export async function PricingPage() {
             <Button variant="ghost" size="lg" className={cn('h-auto min-h-11 w-full py-2.5 font-semibold whitespace-normal', c.button)} asChild>
               <Link href={href}>{p.cta}</Link>
             </Button>
-            <Link href="/contact?topic=school" className={cn('self-center rounded-md px-2 py-1 text-center text-sm text-balance underline-offset-4 hover:underline', c.mark)}>
+            <Link href="/contact?topic=school" className={cn('self-center rounded-md px-2 py-1 text-center text-[0.8125rem] text-balance underline-offset-4 hover:underline', c.mark)}>
               {s.schools.quote}
             </Link>
           </div>
