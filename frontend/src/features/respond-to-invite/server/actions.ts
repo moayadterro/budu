@@ -32,7 +32,7 @@ export async function answerInviteAction(form: FormData) {
     }
   }
   revalidatePath('/', 'layout')
-  if (accept) redirect('/') // role / school may have changed: land on the (new) home
+  if (accept) redirect('/start') // role / school may have changed: land on the (new) home
 }
 
 /** Manager withdraws a pending invitation. */
@@ -59,5 +59,5 @@ export async function answerParentRequestAction(form: FormData) {
   if (child) await notify([child], 'parentAnswered', { parent: user.name, answer: accept ? 'accepted' : 'declined' }, '/account')
   if (accept) await refreshSessionsOf(user.userId) // may become a parent now
   revalidatePath('/', 'layout')
-  if (accept) redirect('/')
+  if (accept) redirect('/start')
 }

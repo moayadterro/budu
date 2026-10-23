@@ -40,7 +40,7 @@ export async function notify(recipients: Recipient[], kind: NotificationKind, pa
     unique.map(async (recipient) => {
       const locale = locales.get(recipient.id) ?? DEFAULT_LOCALE
       const { title, body } = renderNotification(MESSAGES[locale], kind, params)
-      const delivery = { recipient, locale, title, body, link: link ?? '/' }
+      const delivery = { recipient, locale, title, body, link: link ?? '/start' }
       for (const channel of CHANNELS) {
         try {
           await channel.send(delivery)

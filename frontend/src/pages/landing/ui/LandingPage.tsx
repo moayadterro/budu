@@ -1,10 +1,7 @@
 import { LocalLink as Link } from '@/shared/ui/local-link'
-import { redirect } from 'next/navigation'
-import { getSession } from '@/entities/session/server'
 import { visitorCurrency } from '@/entities/user/server'
 import { CatalogGrid } from '@/widgets/course-catalog'
 import { catalogFor } from '@/widgets/course-catalog/server'
-import { homeFor } from '@/shared/config/nav'
 import { Button } from '@/shared/ui/button'
 import { Icon, type IconName } from '@/shared/ui/icon'
 import { getT } from '@/shared/i18n/server'
@@ -16,10 +13,8 @@ const AUDIENCES: Array<{ key: 'schools' | 'teachers' | 'students' | 'parents'; i
   { key: 'parents', icon: 'users' },
 ]
 
-/** Budu's front door for visitors: what it is, who it's for, a few courses, sign up. Signed-in users go home. */
+/** Budu's front door: what it is, who it's for, a few courses, sign up. For everyone, signed in too (owner); the app itself is at /start. */
 export async function LandingPage() {
-  const user = await getSession()
-  if (user) redirect(homeFor(user.role))
   const t = await getT()
   const s = t.landing
   const featured = (await catalogFor(0, await visitorCurrency())).slice(0, 6)

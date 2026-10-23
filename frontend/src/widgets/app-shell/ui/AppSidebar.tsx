@@ -50,7 +50,7 @@ export function AppSidebar({ inSchool }: { inSchool: boolean }) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/" onClick={closeOnMobile} aria-label={t.appName}>
+              <Link href="/start" onClick={closeOnMobile} aria-label={t.appName}>
                 {/* full logo; only the steps mark when the sidebar is collapsed to icons
                     (`!`: the menu button shrinks every <svg> inside it to icon size) */}
                 <span className="flex w-full group-data-[collapsible=icon]:justify-center">

@@ -94,7 +94,7 @@ export function PublicHeader({ signedIn }: { signedIn: boolean }) {
               <LanguageMenu />
             </div>
             {signedIn ? (
-              <CtaButton href="/">{t.catalog.openApp}</CtaButton>
+              <CtaButton href="/start">{t.catalog.openApp}</CtaButton>
             ) : (
               <>
                 <Button variant="ghost" size="sm" className="hidden text-muted-foreground hover:text-foreground md:inline-flex" asChild>
