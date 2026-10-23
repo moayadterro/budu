@@ -830,6 +830,11 @@ Nothing a user, visitor or attacker can see may tell what Budu runs on or how it
 
 ## Gotchas we hit
 
+- Phones: a plain `grid` column grows to fit its widest content, so a page can be wider than the
+  screen. Give stacked grids `grid-cols-1` (= minmax(0,1fr)). Decorative glows bigger than the
+  screen are clipped by `overflow-x-clip` on PublicLayout (`clip`, not `hidden`: keeps the sticky header).
+- Claude-in-Chrome can't always resize the window: test phone width by loading the page in a 390 px
+  `<iframe>` injected into any same-origin page, then compare `scrollWidth` with `clientWidth`.
 - Moodle 4.5: `question_get_default_category($contextid)` has no "create" flag — use
   `question_make_default_categories([$ctx])` when it returns false. A quiz's pass mark lives on its
   grade item, not the quiz row. `quiz_update_events($quiz)` — the 2nd arg is an override, not the cm.
