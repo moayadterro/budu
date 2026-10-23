@@ -1449,7 +1449,7 @@ export const ar: typeof en = {
       preview: "الدرس الأول مجانًا",
       page: "صفحة مدرستك",
       uploads: "فيديوهات كبيرة دون انقطاع",
-      languages: "3 لغات",
+      languages: "واجهة متعددة اللغات",
     },
     browse: "تصفّح المقررات",
     start: "أنشئ حسابًا",

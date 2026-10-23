@@ -1472,7 +1472,7 @@ export const en = {
       preview: "First lesson free",
       page: "Your school’s page",
       uploads: "Big videos, no lost uploads",
-      languages: "3 languages",
+      languages: "Multilingual",
     },
     browse: "Browse courses",
     start: "Create an account",

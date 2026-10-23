@@ -109,8 +109,9 @@ export function HomeHero({
     <section
       ref={ref}
       onPointerMove={onMove}
-      // full width (out of the page column) and under the floating header
-      className="relative isolate left-1/2 -mt-[6.25rem] flex min-h-[min(54rem,94svh)] w-screen -translate-x-1/2 flex-col items-center justify-center overflow-hidden px-4 pt-28 pb-24 text-center sm:-mt-[7.25rem] sm:pt-36"
+      // full width (out of the page column) and under the floating header; `ms-[calc(50%-50vw)]`
+      // centres it in BOTH directions (left-1/2 + -translate-x-1/2 shifts it 400 px in Arabic)
+      className="relative isolate -mt-[6.25rem] ms-[calc(50%-50vw)] flex min-h-[min(54rem,94svh)] w-screen flex-col items-center justify-center overflow-hidden px-4 pt-28 pb-24 text-center sm:-mt-[7.25rem] sm:pt-36"
     >
       {/* the aurora: each blur one hue, wandering; the whole field drifts in colour */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-20 motion-safe:animate-hue-drift">
