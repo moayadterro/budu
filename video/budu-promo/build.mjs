@@ -22,9 +22,13 @@ const ROLE = { student: C.green, teacher: C.blue, school: C.purple, parent: C.ro
 // screen: { img, kicker, title, points[], side: 'left'|'right' (where the text sits), zoom: {x,y,s} }
 let t = 0
 const S = []
+// each scene is at least as long as its narration line (+ room to breathe before and after)
 const add = (dur, scene) => {
-  S.push({ start: t, dur, ...scene })
-  t += dur
+  const vo = VO[S.length]
+  const lead = scene.kind === 'manifesto' ? 1.0 : 0.5
+  const d = Math.max(dur, vo ? Math.ceil((vo.dur + lead + 1.0) * 2) / 2 : 0)
+  S.push({ start: t, dur: d, vo: vo && { ...vo, start: +(t + lead).toFixed(2) }, ...scene })
+  t += d
 }
 
 add(13, { kind: 'hero', img: '00-home-hero-dark', title: 'Учёба, которая объединяет школу, учителей и семью', sub: 'Budu' })
@@ -130,7 +134,7 @@ add(9, {
 })
 
 // manifesto (to students) and the call to action
-add(30, {
+add(22, {
   kind: 'manifesto',
   lines: [
     'Учиться должно быть интересно.',
@@ -345,7 +349,7 @@ h1, h2, h3 { font-family: Geologica, Montserrat, sans-serif; letter-spacing: -0.
 <div id="root" data-composition-id="main" data-start="0" data-duration="${TOTAL}" data-width="1920" data-height="1080">
   <div class="aurora"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div><div class="dots"></div></div>
 ${S.map(sceneHtml).join('\n')}
-${VO.map((v, i) => `<audio id="vo${i}" src="${v.file}" data-start="${v.start}" data-duration="${v.dur}" data-volume="1"></audio>`).join('\n')}
+${S.filter((x) => x.vo).map((x, i) => `<audio id="vo${i}" src="${x.vo.file}" data-start="${x.vo.start}" data-duration="${x.vo.dur}" data-volume="1"></audio>`).join('\n')}
 </div>
 <script>
 const tl = gsap.timeline({ paused: true });

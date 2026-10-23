@@ -1,147 +1,118 @@
 [
  {
   "file": "assets/vo/00.wav",
-  "start": 0.4,
-  "dur": 4.73
+  "dur": 6.97
  },
  {
   "file": "assets/vo/01.wav",
-  "start": 13.4,
-  "dur": 5.27
+  "dur": 7.29
  },
  {
   "file": "assets/vo/02.wav",
-  "start": 21.4,
-  "dur": 8.93
+  "dur": 10.36
  },
  {
   "file": "assets/vo/03.wav",
-  "start": 33.4,
-  "dur": 1.36
+  "dur": 2.54
  },
  {
   "file": "assets/vo/04.wav",
-  "start": 37.4,
-  "dur": 5.91
+  "dur": 6.49
  },
  {
   "file": "assets/vo/05.wav",
-  "start": 48.4,
-  "dur": 6.44
+  "dur": 8.31
  },
  {
   "file": "assets/vo/06.wav",
-  "start": 58.4,
-  "dur": 4.71
+  "dur": 7.25
  },
  {
   "file": "assets/vo/07.wav",
-  "start": 68.4,
-  "dur": 4.67
+  "dur": 6.86
  },
  {
   "file": "assets/vo/08.wav",
-  "start": 78.4,
-  "dur": 5.84
+  "dur": 7.04
  },
  {
   "file": "assets/vo/09.wav",
-  "start": 87.4,
-  "dur": 5.18
+  "dur": 6.47
  },
  {
   "file": "assets/vo/10.wav",
-  "start": 95.4,
-  "dur": 3.16
+  "dur": 5.85
  },
  {
   "file": "assets/vo/11.wav",
-  "start": 99.4,
-  "dur": 3.85
+  "dur": 5.05
  },
  {
   "file": "assets/vo/12.wav",
-  "start": 110.4,
-  "dur": 7.47
+  "dur": 9.95
  },
  {
   "file": "assets/vo/13.wav",
-  "start": 122.4,
-  "dur": 4.82
+  "dur": 6.07
  },
  {
   "file": "assets/vo/14.wav",
-  "start": 132.4,
-  "dur": 4.58
+  "dur": 5.97
  },
  {
   "file": "assets/vo/15.wav",
-  "start": 141.4,
-  "dur": 5.37
+  "dur": 6.36
  },
  {
   "file": "assets/vo/16.wav",
-  "start": 152.4,
-  "dur": 3.92
+  "dur": 4.68
  },
  {
   "file": "assets/vo/17.wav",
-  "start": 161.4,
-  "dur": 2.89
+  "dur": 4.34
  },
  {
   "file": "assets/vo/18.wav",
-  "start": 165.4,
-  "dur": 5.8
+  "dur": 7.95
  },
  {
   "file": "assets/vo/19.wav",
-  "start": 176.4,
-  "dur": 3.87
+  "dur": 6.48
  },
  {
   "file": "assets/vo/20.wav",
-  "start": 185.4,
-  "dur": 8.14
+  "dur": 10.56
  },
  {
   "file": "assets/vo/21.wav",
-  "start": 194.4,
-  "dur": 5.83
+  "dur": 6.77
  },
  {
   "file": "assets/vo/22.wav",
-  "start": 205.4,
-  "dur": 2.1
+  "dur": 4.27
  },
  {
   "file": "assets/vo/23.wav",
-  "start": 209.4,
-  "dur": 6.18
+  "dur": 7.25
  },
  {
   "file": "assets/vo/24.wav",
-  "start": 220.4,
-  "dur": 3.5
+  "dur": 4.68
  },
  {
   "file": "assets/vo/25.wav",
-  "start": 229.4,
-  "dur": 8.26
+  "dur": 10.57
  },
  {
   "file": "assets/vo/26.wav",
-  "start": 239.4,
-  "dur": 4.33
+  "dur": 6.77
  },
  {
   "file": "assets/vo/27.wav",
-  "start": 249.0,
-  "dur": 17.91
+  "dur": 18.87
  },
  {
   "file": "assets/vo/28.wav",
-  "start": 278.4,
-  "dur": 5.41
+  "dur": 7.69
  }
 ]
