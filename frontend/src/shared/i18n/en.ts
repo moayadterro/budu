@@ -1664,6 +1664,7 @@ export const en = {
           "Parents can follow along, only if you invite them",
           "Reminders for new homework, grades and exams",
         ],
+        soon: "Online learning games for free time",
       },
       teachers: {
         name: "Teachers",
