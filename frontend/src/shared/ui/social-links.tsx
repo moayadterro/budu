@@ -102,7 +102,6 @@ function Item({ k: key, size, soon }: { k: SocialKey; size: 'sm' | 'md'; soon: s
           height={44}
           className={cn(
             'size-11 rounded-[22%] transition-transform duration-200',
-            key === 'youtube' && 'ring-1 ring-foreground/10', // a white tile needs an edge on a white page
             url ? 'group-hover:-translate-y-0.5' : 'opacity-40 grayscale',
           )}
         />
