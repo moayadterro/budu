@@ -45,7 +45,7 @@ export async function ContactPage({ searchParams }: { searchParams: Promise<{ to
           )}
           <section className="flex flex-col gap-3">
             <h2 className="px-2 text-sm font-medium text-muted-foreground">{s.socialTitle}</h2>
-            {/* why follow: welcome, first to hear, and helping a good cause */}
+            {/* one short, warm line (owner: the long version went unread) */}
             <p className="px-2 text-sm leading-relaxed text-pretty">{s.socialInvite}</p>
             <SocialLinks className="px-1" />
           </section>
