@@ -28,7 +28,14 @@ const TONE = {
     mark: 'text-subject-purple',
     button: 'bg-subject-purple/12 text-subject-purple hover:bg-subject-purple/20',
   },
-  green: { fade: 'from-primary/10 dark:from-primary/16', tile: 'bg-primary/12 text-primary', glow: 'bg-primary/20', mark: 'text-primary', button: 'bg-primary/12 text-primary hover:bg-primary/20' },
+  // dark mode: the theme's deep emerald is too dark for text, so text uses the lighter success green
+  green: {
+    fade: 'from-primary/10 dark:from-success/12',
+    tile: 'bg-primary/12 text-primary dark:bg-success/15 dark:text-success',
+    glow: 'bg-primary/20',
+    mark: 'text-primary dark:text-success',
+    button: 'bg-primary/12 text-primary hover:bg-primary/20 dark:bg-success/15 dark:text-success dark:hover:bg-success/22',
+  },
 } as const
 type Tone = keyof typeof TONE
 
@@ -74,7 +81,7 @@ export async function PricingPage() {
             <Button variant="ghost" size="lg" className={cn('h-auto min-h-11 w-full py-2.5 font-semibold whitespace-normal', c.button)} asChild>
               <Link href={href}>{p.cta}</Link>
             </Button>
-            <Link href="/contact?topic=school" className="self-center rounded-md px-2 py-1 text-center text-sm text-balance text-primary underline-offset-4 dark:text-success hover:underline">
+            <Link href="/contact?topic=school" className={cn('self-center rounded-md px-2 py-1 text-center text-sm text-balance underline-offset-4 hover:underline', c.mark)}>
               {s.schools.quote}
             </Link>
           </div>
@@ -144,9 +151,9 @@ export async function PricingPage() {
 
       {/* the plans: schools · students (in the middle, raised) · teachers — each in its own light hue */}
       <section className="grid items-stretch gap-6 lg:grid-cols-3 lg:items-center lg:gap-5">
-        {plan('schools', 'school', 'green', '/register?as=school')}
-        {plan('students', 'student', 'blue', '/register?as=student', true)}
-        {plan('teachers', 'teacher', 'purple', '/register?as=teacher')}
+        {plan('schools', 'school', 'purple', '/register?as=school')}
+        {plan('students', 'student', 'green', '/register?as=student', true)}
+        {plan('teachers', 'teacher', 'blue', '/register?as=teacher')}
       </section>
 
       <p className="-mt-12 flex items-center justify-center gap-2 text-center text-sm text-muted-foreground sm:-mt-20">
