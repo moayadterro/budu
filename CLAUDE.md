@@ -153,6 +153,8 @@ Design is a first-class task here, not decoration. For every screen or component
 4. **Say exactly what happens.** Titles name the thing ("Remove Class 10 from “Physics 101”?"),
    one line says the consequence. No vague "Remove?", no "≈", no labels that add nothing
    ("Popular"). Show real data only — empty config = hidden, never invented.
+   Avoid the long dash (—) in UI text as much as possible (owner, 2026-10-23): write a period,
+   comma, colon or "and" instead. (Code comments may keep it.)
 5. **Mobile is critical.** Design phone-first: one column, full-width controls, ≥44 px touch targets,
    cards become compact rows, no horizontal scroll; desktop can add a second column / panel.
 6. **Delight through feedback, not ornaments.** Live, useful micro-interactions: strength meters,
