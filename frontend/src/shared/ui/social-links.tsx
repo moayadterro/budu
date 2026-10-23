@@ -30,23 +30,21 @@ const SOCIAL: Record<SocialKey, { name: string; logo: { src: string } }> = {
   tiktok: { name: 'TikTok', logo: tiktokLogo },
 }
 
-/** Platforms grouped by what they are (owner): messengers, social networks, video. */
-const GROUPS: Array<{ key: 'messengers' | 'social' | 'video'; items: SocialKey[] }> = [
-  { key: 'messengers', items: ['telegram', 'whatsapp', 'max'] },
-  { key: 'social', items: ['vk', 'ok', 'x', 'instagram', 'facebook'] },
-  { key: 'video', items: ['youtube', 'tiktok'] },
+/** Contact: two rows of five, the most used first (owner's order; YouTube before TikTok). */
+const CONTACT_ROWS: SocialKey[][] = [
+  ['telegram', 'max', 'whatsapp', 'vk', 'facebook'],
+  ['instagram', 'ok', 'x', 'youtube', 'tiktok'],
 ]
 
 /** The footer shows only the main platforms, in the owner's order (the rest are on Contact). */
 const FOOTER_ROWS: SocialKey[][] = [['telegram', 'max', 'whatsapp', 'vk', 'facebook', 'instagram']]
 
 /**
- * Budu's social accounts (SITE.social), grouped (messengers · social networks · video), no names on
- * the icons (owner: the platforms are known); the name is the screen-reader label and the hover
- * title. ONE component, two looks: `sm` = the footer, plain one-colour marks for the main platforms
- * only (owner's order, FOOTER_ROWS), grey, black on hover (owner: no colourful icons there); default = the
- * Contact page, the colour app-icon tiles under a small label per group. An account that doesn't
- * exist yet: greyed out + amber dot.
+ * Budu's social accounts (SITE.social), no names on the icons (owner: the platforms are known); the
+ * name is the screen-reader label and the hover title. ONE component, two looks: `sm` = the footer,
+ * plain one-colour marks for the main platforms only (FOOTER_ROWS), grey, black on hover (owner: no
+ * colourful icons there); default = the Contact page, colour app-icon tiles in two rows of five
+ * (CONTACT_ROWS). An account that doesn't exist yet: greyed out + amber dot.
  */
 export function SocialLinks({ size = 'md', className }: { size?: 'sm' | 'md'; className?: string }) {
   const t = useT()
@@ -65,16 +63,13 @@ export function SocialLinks({ size = 'md', className }: { size?: 'sm' | 'md'; cl
     )
   }
   return (
-    <div className={cn('flex flex-col gap-5', className)}>
-      {GROUPS.map((g) => (
-        <div key={g.key} className="flex flex-col gap-2.5">
-          <p className="text-xs font-medium text-muted-foreground">{t.site.contact.socialGroups[g.key]}</p>
-          <ul className="flex flex-wrap gap-2.5">
-            {g.items.map((key) => (
-              <Item key={key} k={key} size="md" soon={soon} />
-            ))}
-          </ul>
-        </div>
+    <div className={cn('flex flex-col gap-2.5', className)}>
+      {CONTACT_ROWS.map((row, i) => (
+        <ul key={i} className="flex gap-2.5">
+          {row.map((key) => (
+            <Item key={key} k={key} size="md" soon={soon} />
+          ))}
+        </ul>
       ))}
     </div>
   )
