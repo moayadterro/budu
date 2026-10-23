@@ -81,33 +81,33 @@ const SOCIAL: Record<SocialKey, { name: string; logo: { src: string } }> = {
   tiktok: { name: 'TikTok', logo: tiktokLogo },
 }
 
-/** Social accounts as app icons; one that doesn't exist yet is greyed out with an amber "soon" dot. */
+/** Social accounts as app icons, no names (owner: the platforms are known); the name is the label
+ *  for screen readers and the hover title. One that doesn't exist yet: greyed out, amber "soon" dot. */
 export function SocialRow({ links }: { links: Array<{ key: SocialKey; url: string | null }> }) {
   const t = useT()
   const s = t.site.contact
   return (
-    <ul className="grid grid-cols-4 gap-2 sm:grid-cols-7 lg:grid-cols-4">
+    <ul className="grid max-w-sm grid-cols-7 gap-2 px-1">
       {links.map(({ key, url }) => {
         const n = SOCIAL[key]
         const tile = (
           <>
-            <span className="relative">
+            <span className="relative block">
               {/* eslint-disable-next-line @next/next/no-img-element -- tiny static logos, no resizing needed */}
-              <img src={n.logo.src} alt="" width={48} height={48} className={cn('size-12 rounded-[0.9rem] transition-transform duration-200', url ? 'group-hover:-translate-y-0.5' : 'opacity-40 grayscale')} />
+              <img src={n.logo.src} alt="" width={44} height={44} className={cn('aspect-square w-full rounded-[22%] transition-transform duration-200', url ? 'group-hover:-translate-y-0.5' : 'opacity-40 grayscale')} />
               {/* coming soon: a small amber dot (amber = not there yet) */}
               {!url && <span className="absolute -end-0.5 -top-0.5 size-2.5 rounded-full bg-warning ring-2 ring-background" />}
             </span>
-            <span className="text-[0.6875rem] text-muted-foreground">{n.name}</span>
           </>
         )
         return (
           <li key={key}>
             {url ? (
-              <a href={url} target="_blank" rel="noopener noreferrer" aria-label={n.name} className="group flex flex-col items-center gap-1.5 rounded-xl py-1">
+              <a href={url} target="_blank" rel="noopener noreferrer" aria-label={n.name} title={n.name} className="group block rounded-[22%] focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none">
                 {tile}
               </a>
             ) : (
-              <span title={`${n.name}: ${s.socialSoon}`} aria-label={`${n.name}: ${s.socialSoon}`} className="flex cursor-default flex-col items-center gap-1.5 py-1">
+              <span title={`${n.name}: ${s.socialSoon}`} aria-label={`${n.name}: ${s.socialSoon}`} className="block cursor-default">
                 {tile}
               </span>
             )}
