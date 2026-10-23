@@ -730,6 +730,10 @@ Not built yet (rough priority):
 
 ## Open questions (ask the owner)
 
+- Security gap (2026-10-23): no general rate limiting yet on sign-up, forgot password, sign-in
+  (beyond IOMAD lockout), messages, uploads, search. Build a shared limiter (app-db, per IP hash /
+  account) and apply it everywhere a stranger can call.
+
 - Public site facts still empty in `shared/config/site.ts`: support/hello emails, Telegram, WhatsApp,
   company legal details (INN, OGRN, address). School prices by student count (the page says "on request").
 - Old Postgres 16 volume `budu_app-db-data` is kept for rollback; delete it once 18 is confirmed fine
@@ -738,6 +742,36 @@ Not built yet (rough priority):
   Still confirm before actually running `down -v` / deleting volumes. Test data includes companies
   "Test School Alpha/Gamma/Beta", "Test Teacher", "Test Teacher (…)", users `*@example.test`.
 - Accounts created before 2026-10-19 were never suspended, so they can sign in without confirming.
+
+## Security rules (owner, 2026-10-23: "follow the standard security rules for the whole app")
+Apply to EVERY change; review new code against OWASP Top 10 / ASVS. When in doubt, the safer option.
+- **Routes & access:** every page and server action checks the session and role on the server
+  (`requireRole` / `getSession`) AND the acting user's right to THAT object (see "Access rule" in the
+  Decision log); wrong user → 404. Never trust ids, roles or prices sent by the browser. Hiding a
+  button is not access control. Public routes are only those in `PUBLIC_PATHS`.
+- **Cookies:** server-set and `HttpOnly` + `Secure` (production) + `SameSite=Lax` (or Strict) by
+  default. Only harmless UI preferences may be readable by JavaScript (`budu_locale`,
+  `budu_currency`); never put an id, token, role or anything personal in a readable cookie, URL or
+  localStorage. Secrets are stored only as sha256 hashes (`shared/server/tokens.ts`).
+- **Input:** treat every form field, URL parameter and upload as hostile. Validate on the server
+  (type, length, allowed values, e.g. `isCourseSubject`), whatever the browser already checked.
+  SQL ONLY with parameters (`$1, $2` in `pg`), never by pasting text into a query; IOMAD via its API
+  only. HTML from users is cleaned by IOMAD (HTMLPurifier) and plain text is rendered as text (React
+  escapes it); never `dangerouslySetInnerHTML` with user content (JsonLd escapes `<`). Uploads:
+  check type + size, serve only safe types inline (sandbox CSP), never run uploaded files.
+- **Rate limits:** every server action / route that a stranger can call, or that sends email,
+  costs money or guesses secrets (sign-in, sign-up, forgot password, resend links, contact,
+  invites, messages, uploads, search), needs a limit per IP hash and/or per account, with our own
+  friendly message. Today only some have one (IOMAD lockout after 10 failed passwords, contact
+  5/hour per IP, invite resend 60 s, exam reminders 1/hour, confirmation resend); the rest is
+  OPEN WORK (see Open questions). Add a shared limiter instead of ad-hoc counters.
+- **CSRF / origin:** mutations only through server actions (Next checks the Origin) or the three
+  route exceptions, which check the session themselves. No state change on GET.
+- **Errors & logs:** users see our own words, never stack traces or `e.message` (see below);
+  errors go to `reportError`, security-relevant events to `audit()`. Never log passwords, tokens,
+  full card / ID numbers; IPs only as hashes.
+- **Secrets & deps:** secrets only in `.env` (never committed, never echoed); dependencies pinned,
+  ≥ 2 weeks old, from the official registry; keep security headers (no X-Powered-By, CSP on files).
 
 ## Never reveal the stack (owner, 2026-10-22 — security)
 Nothing a user, visitor or attacker can see may tell what Budu runs on or how it works inside:
