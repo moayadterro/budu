@@ -25,9 +25,9 @@ import { absoluteUrl } from '@/shared/server/seo'
 
 /** One hue per card: the top fade, the icon tile and (coming soon) the glow — complete class names. */
 const TONE = {
-  blue: { fade: 'from-info/5 dark:from-info/8', tile: 'bg-info/12 text-info', glow: 'bg-info/7 dark:bg-info/12', mark: 'text-info', button: 'bg-info/12 text-info hover:bg-info/20' },
+  blue: { fade: 'from-info/10 dark:from-info/8', tile: 'bg-info/12 text-info', glow: 'bg-info/7 dark:bg-info/12', mark: 'text-info', button: 'bg-info/12 text-info hover:bg-info/20' },
   purple: {
-    fade: 'from-subject-purple/5 dark:from-subject-purple/8',
+    fade: 'from-subject-purple/10 dark:from-subject-purple/8',
     tile: 'bg-subject-purple/12 text-subject-purple',
     glow: 'bg-subject-purple/7 dark:bg-subject-purple/12',
     mark: 'text-subject-purple',
@@ -35,7 +35,7 @@ const TONE = {
   },
   // dark mode: the theme's deep emerald is too dark for text, so text uses the lighter success green
   green: {
-    fade: 'from-primary/5 dark:from-success/7',
+    fade: 'from-primary/10 dark:from-success/7',
     tile: 'bg-primary/12 text-primary dark:bg-success/15 dark:text-success',
     glow: 'bg-primary/7 dark:bg-success/10',
     mark: 'text-primary dark:text-success',
@@ -69,8 +69,8 @@ export async function PricingPage() {
           // (mixed from the light text colour they turned into a white halo around the cards)
           'dark:shadow-none',
           raised
-            ? 'shadow-[0_1px_2px_color-mix(in_oklch,var(--foreground)_6%,transparent),0_24px_48px_-16px_color-mix(in_oklch,var(--foreground)_16%,transparent)] lg:py-12'
-            : 'shadow-[0_1px_2px_color-mix(in_oklch,var(--foreground)_5%,transparent),0_12px_32px_-12px_color-mix(in_oklch,var(--foreground)_12%,transparent)]',
+            ? 'shadow-[0_1px_2px_color-mix(in_oklch,var(--foreground)_4%,transparent),0_16px_32px_-16px_color-mix(in_oklch,var(--foreground)_7%,transparent)] lg:py-12'
+            : 'shadow-[0_1px_2px_color-mix(in_oklch,var(--foreground)_4%,transparent),0_10px_24px_-12px_color-mix(in_oklch,var(--foreground)_5%,transparent)]',
           c.fade,
         )}
       >
