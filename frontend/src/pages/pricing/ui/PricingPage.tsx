@@ -65,8 +65,10 @@ export async function PricingPage() {
         className={cn(
           // the colour flows from the top-start corner (owner); the big symbol sits in the top-end one
           'relative isolate flex flex-col gap-6 rounded-3xl bg-linear-to-br to-card p-6 transition-transform duration-300 motion-safe:hover:-translate-y-1 sm:p-8 rtl:bg-linear-to-bl',
-          // the edge is a tight hairline like a border, nothing spreading out around the card (owner)
-          'ring-1 ring-foreground/6 ring-inset dark:ring-foreground/8',
+          // a soft edge pushed slightly down: it spreads a little on the sides and bottom and fades
+          // out before the top, where the colour is (owner: no line along the top). Dark mode: none
+          // (mixed from the light text colour, a shadow turns into a white halo there)
+          'shadow-[0_3px_8px_-2px_color-mix(in_oklch,var(--foreground)_9%,transparent),0_10px_24px_-10px_color-mix(in_oklch,var(--foreground)_8%,transparent)] dark:shadow-none',
           raised && 'lg:py-12',
           c.fade,
         )}
