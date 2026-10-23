@@ -26,8 +26,9 @@ import { absoluteUrl } from '@/shared/server/seo'
 
 /** One hue per card: the top fade, the icon tile and (coming soon) the glow — complete class names. */
 const TONE = {
-  blue: { fade: 'from-info/10 dark:from-info/8', tile: 'bg-info/12 text-info', glow: 'bg-info/7 dark:bg-info/12', mark: 'text-info', button: 'bg-info/12 text-info hover:bg-info/20' },
+  blue: { hue: 'var(--info)', fade: 'from-info/10 dark:from-info/8', tile: 'bg-info/12 text-info', glow: 'bg-info/7 dark:bg-info/12', mark: 'text-info', button: 'bg-info/12 text-info hover:bg-info/20' },
   purple: {
+    hue: 'var(--subject-purple)',
     fade: 'from-subject-purple/10 dark:from-subject-purple/8',
     tile: 'bg-subject-purple/12 text-subject-purple',
     glow: 'bg-subject-purple/7 dark:bg-subject-purple/12',
@@ -36,6 +37,7 @@ const TONE = {
   },
   // dark mode: the theme's deep emerald is too dark for text, so text uses the lighter success green
   green: {
+    hue: 'var(--success)',
     fade: 'from-primary/10 dark:from-success/7',
     tile: 'bg-primary/12 text-primary dark:bg-success/15 dark:text-success',
     glow: 'bg-primary/7 dark:bg-success/10',
@@ -95,8 +97,7 @@ export async function PricingPage() {
         <ul className="flex flex-col gap-3 text-sm">
           {p.features.map((f) => (
             <li key={f} className="flex items-start gap-2.5">
-              {/* a plain checkmark in the card's own colour, no circle around it (the Apple way) */}
-              <Icon name="tick" strokeWidth={2.2} className={cn('mt-0.5 size-4 flex-none', c.mark)} />
+              <FeatureMark tone={tone} />
               <span className="text-foreground/85">{f}</span>
             </li>
           ))}
@@ -268,5 +269,28 @@ export async function PricingPage() {
         ))}
       </section>
     </div>
+  )
+}
+
+/** "Included": a small verified seal (Apple-style scalloped badge) in the card's own hue, a one-hue
+ *  gradient light at the top, with the tick cut out of it. Goes with SoonMark (the amber sparkle). */
+function FeatureMark({ tone }: { tone: Tone }) {
+  // one gradient per hue: a shared id would paint every card in the first card's colour
+  const id = `budu-feature-mark-${tone}`
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden className="-ms-0.5 size-5 flex-none" style={{ color: TONE[tone].hue }}>
+      <defs>
+        <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="currentColor" stopOpacity="0.7" />
+          <stop offset="1" stopColor="currentColor" />
+        </linearGradient>
+        {/* a mask works in luminance: white keeps the seal, black cuts the tick out (not visible colours) */}
+        <mask id="budu-feature-tick">
+          <rect width="24" height="24" fill="#fff" />
+          <path d="M7.6 12.4l2.9 2.9 5.9-6.1" fill="none" stroke="#000" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" />
+        </mask>
+      </defs>
+      <path fill={`url(#${id})`} mask="url(#budu-feature-tick)" d="M22.95 12.00 L22.83 12.71 L22.48 13.38 L22.00 13.99 L21.49 14.54 L21.04 15.07 L20.73 15.62 L20.57 16.22 L20.51 16.91 L20.48 17.67 L20.39 18.44 L20.16 19.15 L19.74 19.74 L19.15 20.16 L18.44 20.39 L17.67 20.48 L16.91 20.51 L16.22 20.57 L15.62 20.73 L15.07 21.04 L14.54 21.49 L13.99 22.00 L13.38 22.48 L12.71 22.83 L12.00 22.95 L11.29 22.83 L10.62 22.48 L10.01 22.00 L9.46 21.49 L8.93 21.04 L8.38 20.73 L7.78 20.57 L7.09 20.51 L6.33 20.48 L5.56 20.39 L4.85 20.16 L4.26 19.74 L3.84 19.15 L3.61 18.44 L3.52 17.67 L3.49 16.91 L3.43 16.22 L3.27 15.62 L2.96 15.07 L2.51 14.54 L2.00 13.99 L1.52 13.38 L1.17 12.71 L1.05 12.00 L1.17 11.29 L1.52 10.62 L2.00 10.01 L2.51 9.46 L2.96 8.93 L3.27 8.38 L3.43 7.78 L3.49 7.09 L3.52 6.33 L3.61 5.56 L3.84 4.85 L4.26 4.26 L4.85 3.84 L5.56 3.61 L6.33 3.52 L7.09 3.49 L7.78 3.43 L8.38 3.27 L8.93 2.96 L9.46 2.51 L10.01 2.00 L10.62 1.52 L11.29 1.17 L12.00 1.05 L12.71 1.17 L13.38 1.52 L13.99 2.00 L14.54 2.51 L15.07 2.96 L15.62 3.27 L16.22 3.43 L16.91 3.49 L17.67 3.52 L18.44 3.61 L19.15 3.84 L19.74 4.26 L20.16 4.85 L20.39 5.56 L20.48 6.33 L20.51 7.09 L20.57 7.78 L20.73 8.38 L21.04 8.93 L21.49 9.46 L22.00 10.01 L22.48 10.62 L22.83 11.29Z" />
+    </svg>
   )
 }
