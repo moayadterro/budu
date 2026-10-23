@@ -25,11 +25,11 @@ import { absoluteUrl } from '@/shared/server/seo'
 
 /** One hue per card: the top fade, the icon tile and (coming soon) the glow — complete class names. */
 const TONE = {
-  blue: { fade: 'from-info/10 dark:from-info/16', tile: 'bg-info/12 text-info', glow: 'bg-info/20', mark: 'text-info', button: 'bg-info/12 text-info hover:bg-info/20' },
+  blue: { fade: 'from-info/10 dark:from-info/16', tile: 'bg-info/12 text-info', glow: 'bg-info/7 dark:bg-info/12', mark: 'text-info', button: 'bg-info/12 text-info hover:bg-info/20' },
   purple: {
     fade: 'from-subject-purple/10 dark:from-subject-purple/16',
     tile: 'bg-subject-purple/12 text-subject-purple',
-    glow: 'bg-subject-purple/20',
+    glow: 'bg-subject-purple/7 dark:bg-subject-purple/12',
     mark: 'text-subject-purple',
     button: 'bg-subject-purple/12 text-subject-purple hover:bg-subject-purple/20',
   },
@@ -37,7 +37,7 @@ const TONE = {
   green: {
     fade: 'from-primary/10 dark:from-success/12',
     tile: 'bg-primary/12 text-primary dark:bg-success/15 dark:text-success',
-    glow: 'bg-primary/20',
+    glow: 'bg-primary/7 dark:bg-success/10',
     mark: 'text-primary dark:text-success',
     button: 'bg-primary/12 text-primary hover:bg-primary/20 dark:bg-success/15 dark:text-success dark:hover:bg-success/22',
   },
@@ -227,7 +227,7 @@ export async function PricingPage() {
               <article
                 key={key}
                 className={cn(
-                  'relative isolate flex gap-4 overflow-hidden rounded-3xl bg-muted/40 p-6 sm:p-7',
+                  'relative isolate flex gap-4 overflow-hidden rounded-3xl bg-muted/20 p-6 sm:p-7',
                   i < 2 ? 'lg:col-span-3' : 'lg:col-span-2',
                   i === soon.length - 1 && 'sm:col-span-2 lg:col-span-2',
                 )}
