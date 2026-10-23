@@ -37,11 +37,17 @@ const GROUPS: Array<{ key: 'messengers' | 'social' | 'video'; items: SocialKey[]
   { key: 'video', items: ['youtube', 'tiktok'] },
 ]
 
+/** The footer's two rows, in the owner's order: the main ones first, the rest under them. */
+const FOOTER_ROWS: SocialKey[][] = [
+  ['telegram', 'max', 'whatsapp', 'vk', 'facebook', 'instagram'],
+  ['ok', 'x', 'youtube', 'tiktok'],
+]
+
 /**
  * Budu's social accounts (SITE.social), grouped (messengers · social networks · video), no names on
  * the icons (owner: the platforms are known); the name is the screen-reader label and the hover
- * title. ONE component, two looks: `sm` = the footer, plain one-colour marks in one row (a wider
- * gap between groups), grey, black on hover (owner: no colourful icons there); default = the
+ * title. ONE component, two looks: `sm` = the footer, plain one-colour marks in two rows (owner's
+ * order, FOOTER_ROWS), grey, black on hover (owner: no colourful icons there); default = the
  * Contact page, the colour app-icon tiles under a small label per group. An account that doesn't
  * exist yet: greyed out + amber dot.
  */
@@ -50,10 +56,10 @@ export function SocialLinks({ size = 'md', className }: { size?: 'sm' | 'md'; cl
   const soon = t.site.contact.socialSoon
   if (size === 'sm') {
     return (
-      <div className={cn('flex flex-wrap items-center gap-x-2 gap-y-1', className)}>
-        {GROUPS.map((g) => (
-          <ul key={g.key} aria-label={t.site.contact.socialGroups[g.key]} className="flex gap-0.5">
-            {g.items.map((key) => (
+      <div className={cn('flex flex-col gap-1', className)}>
+        {FOOTER_ROWS.map((row, i) => (
+          <ul key={i} className="flex gap-0.5">
+            {row.map((key) => (
               <Item key={key} k={key} size="sm" soon={soon} />
             ))}
           </ul>
