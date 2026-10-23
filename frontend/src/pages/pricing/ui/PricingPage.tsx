@@ -2,7 +2,7 @@ import { LocalLink as Link } from '@/shared/ui/local-link'
 import { cn } from '@/shared/lib/cn'
 import { Button } from '@/shared/ui/button'
 import { Icon, type IconName } from '@/shared/ui/icon'
-import { SoonBadge } from '@/shared/ui/soon-badge'
+import { SoonBadge, SoonMark } from '@/shared/ui/soon-badge'
 import { SchoolInvite } from '@/widgets/school-invite'
 import { JsonLd } from '@/shared/ui/json-ld'
 import { getLocale, getT } from '@/shared/i18n/server'
@@ -106,7 +106,7 @@ export async function PricingPage() {
           <ul className="mt-auto flex flex-col gap-3 pt-1 text-sm">
             {p.soon.map((x) => (
               <li key={x} className="flex items-start gap-2.5">
-                <Icon name="spark" strokeWidth={2} className="mt-0.5 size-4 flex-none text-warning" />
+                <SoonMark className="mt-0.5" />
                 <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-foreground/85">
                   {x}
                   <SoonBadge label={s.soonBadge} />

@@ -16,3 +16,29 @@ export function SoonBadge({ label, className }: { label: string; className?: str
     </span>
   )
 }
+
+/**
+ * The "not built yet" mark in front of a coming-soon row: a filled sparkle (a big and a small
+ * four-pointed star) in a one-hue amber gradient, light at the top (owner: the thin outline icon
+ * looked cheap). Same amber as the badge.
+ */
+export function SoonMark({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden className={cn('size-4 flex-none', className)}>
+      <defs>
+        <linearGradient id="budu-soon-mark" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="var(--warning)" stopOpacity="0.55" />
+          <stop offset="1" stopColor="var(--warning)" />
+        </linearGradient>
+      </defs>
+      <path
+        fill="url(#budu-soon-mark)"
+        d="M10 3.5c.5 3.9 2.6 6 6.5 6.5-3.9.5-6 2.6-6.5 6.5-.5-3.9-2.6-6-6.5-6.5 3.9-.5 6-2.6 6.5-6.5Z"
+      />
+      <path
+        fill="url(#budu-soon-mark)"
+        d="M18 13.5c.28 2.17 1.33 3.22 3.5 3.5-2.17.28-3.22 1.33-3.5 3.5-.28-2.17-1.33-3.22-3.5-3.5 2.17-.28 3.22-1.33 3.5-3.5Z"
+      />
+    </svg>
+  )
+}
