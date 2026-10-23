@@ -25,9 +25,9 @@ import { absoluteUrl } from '@/shared/server/seo'
 
 /** One hue per card: the top fade, the icon tile and (coming soon) the glow — complete class names. */
 const TONE = {
-  blue: { fade: 'from-info/10 dark:from-info/16', tile: 'bg-info/12 text-info', glow: 'bg-info/7 dark:bg-info/12', mark: 'text-info', button: 'bg-info/12 text-info hover:bg-info/20' },
+  blue: { fade: 'from-info/10 dark:from-info/8', tile: 'bg-info/12 text-info', glow: 'bg-info/7 dark:bg-info/12', mark: 'text-info', button: 'bg-info/12 text-info hover:bg-info/20' },
   purple: {
-    fade: 'from-subject-purple/10 dark:from-subject-purple/16',
+    fade: 'from-subject-purple/10 dark:from-subject-purple/8',
     tile: 'bg-subject-purple/12 text-subject-purple',
     glow: 'bg-subject-purple/7 dark:bg-subject-purple/12',
     mark: 'text-subject-purple',
@@ -35,7 +35,7 @@ const TONE = {
   },
   // dark mode: the theme's deep emerald is too dark for text, so text uses the lighter success green
   green: {
-    fade: 'from-primary/10 dark:from-success/12',
+    fade: 'from-primary/10 dark:from-success/7',
     tile: 'bg-primary/12 text-primary dark:bg-success/15 dark:text-success',
     glow: 'bg-primary/7 dark:bg-success/10',
     mark: 'text-primary dark:text-success',
@@ -65,7 +65,9 @@ export async function PricingPage() {
         className={cn(
           // the colour flows from the top-start corner (owner); the big symbol sits in the top-end one
           'relative isolate flex flex-col gap-6 rounded-3xl bg-linear-to-br to-card p-6 transition-transform duration-300 motion-safe:hover:-translate-y-1 sm:p-8 rtl:bg-linear-to-bl',
-          // soft NEUTRAL shadows only — never a coloured glow behind a card (owner)
+          // soft NEUTRAL shadows only — never a coloured glow behind a card (owner). Dark mode: none
+          // (mixed from the light text colour they turned into a white halo around the cards)
+          'dark:shadow-none',
           raised
             ? 'shadow-[0_1px_2px_color-mix(in_oklch,var(--foreground)_6%,transparent),0_24px_48px_-16px_color-mix(in_oklch,var(--foreground)_16%,transparent)] lg:py-12'
             : 'shadow-[0_1px_2px_color-mix(in_oklch,var(--foreground)_5%,transparent),0_12px_32px_-12px_color-mix(in_oklch,var(--foreground)_12%,transparent)]',
@@ -260,7 +262,7 @@ export async function PricingPage() {
             <li key={a.key} className="flex w-18 flex-col items-center gap-2 sm:w-20">
               <span
                 className={cn(
-                  'grid size-16 place-items-center rounded-[1.35rem] text-primary-foreground shadow-[0_1px_1px_color-mix(in_oklch,var(--foreground)_8%,transparent),0_8px_20px_-8px_color-mix(in_oklch,var(--foreground)_25%,transparent)] sm:size-18 sm:rounded-[1.5rem]',
+                  'grid size-16 place-items-center rounded-[1.35rem] text-primary-foreground shadow-[0_1px_1px_color-mix(in_oklch,var(--foreground)_8%,transparent),0_8px_20px_-8px_color-mix(in_oklch,var(--foreground)_25%,transparent)] sm:size-18 dark:shadow-none sm:rounded-[1.5rem]',
                   a.tile,
                 )}
               >
