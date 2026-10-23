@@ -1548,7 +1548,7 @@ export const en = {
     pricing: {
       title: "Pricing: free for students, schools pay per student",
       description:
-        "Students learn on Budu for free, teachers start without paying, schools pay by number of students. Timetable, exams, gradebook and online courses in one place.",
+        "Students learn on Budu for free, teachers start without paying, schools pay by the number of students. Timetable, exams, gradebook and online courses in one place.",
     },
     about: {
       title: "About Budu",
@@ -1685,7 +1685,7 @@ export const en = {
       },
       schools: {
         name: "Schools",
-        price: "By student count",
+        price: "Sized to your school",
         who: "The price depends on how many students your school has",
         cta: "Create a school account",
         quote: "Get a price for your school",
@@ -1713,7 +1713,7 @@ export const en = {
       cta: {
         apps: { portal: "Portal", schedule: "Schedule", exams: "Exams", gradebook: "Gradebook" },
         title: "Bring your school to Budu",
-        sub: "Your portal, schedule, exams and gradebook in one place. Create a school account and look around. We’ll prepare a price for your number of students.",
+        sub: "Your portal, schedule, exams and gradebook in one place. Create a school account and look around. We’ll prepare a price for the size of your school.",
         primary: "Create a school account",
         secondary: "Get a price",
       },
