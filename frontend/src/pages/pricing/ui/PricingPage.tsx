@@ -149,11 +149,11 @@ export async function PricingPage() {
         </p>
       </section>
 
-      {/* the plans: schools · students (in the middle, raised) · teachers — each in its own light hue */}
+      {/* the plans: teachers · students (in the middle, raised) · schools — each in its own light hue */}
       <section className="grid items-stretch gap-6 lg:grid-cols-3 lg:items-center lg:gap-5">
-        {plan('schools', 'school', 'purple', '/register?as=school')}
-        {plan('students', 'student', 'green', '/register?as=student', true)}
         {plan('teachers', 'teacher', 'blue', '/register?as=teacher')}
+        {plan('students', 'student', 'green', '/register?as=student', true)}
+        {plan('schools', 'school', 'purple', '/register?as=school')}
       </section>
 
       <p className="-mt-12 flex items-center justify-center gap-2 text-center text-sm text-muted-foreground sm:-mt-20">
