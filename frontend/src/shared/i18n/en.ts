@@ -1853,6 +1853,7 @@ export const en = {
       copy: "Copy address",
       copied: "Copied",
       socialTitle: "Budu on social media",
+      socialInvite: "We’d love to have you with us. Follow along to be the first to hear about new courses, and every follow helps us keep learning open to everyone.",
       socialSoon: "Coming soon",
       whatsapp: "WhatsApp",
       legalTitle: "Company details",

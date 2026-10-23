@@ -3,7 +3,8 @@ import { SITE, whatsappUrl } from '@/shared/config/site'
 import { HeroGlow } from '@/shared/ui/hero-glow'
 import { Icon } from '@/shared/ui/icon'
 import { getT } from '@/shared/i18n/server'
-import { EmailList, SocialRow, type EmailRow, type SocialKey } from './ContactChannels'
+import { SocialLinks } from '@/shared/ui/social-links'
+import { EmailList, type EmailRow } from './ContactChannels'
 
 /**
  * Public: Contact (owner: "too boring", make it modern but simple). The hero has Pricing's soft
@@ -17,7 +18,6 @@ export async function ContactPage({ searchParams }: { searchParams: Promise<{ to
   const q = await searchParams
   const emails = (Object.entries(SITE.emails) as Array<[EmailRow['key'], string | null]>).filter((e): e is [EmailRow['key'], string] => !!e[1])
   const legal = (Object.entries(SITE.legal) as Array<[keyof typeof SITE.legal, string | null]>).filter(([, v]) => v)
-  const social = (Object.entries(SITE.social) as Array<[SocialKey, string | null]>).map(([key, url]) => ({ key, url }))
 
   return (
     <div className="flex flex-col gap-12 sm:gap-16">
@@ -45,7 +45,9 @@ export async function ContactPage({ searchParams }: { searchParams: Promise<{ to
           )}
           <section className="flex flex-col gap-3">
             <h2 className="px-2 text-sm font-medium text-muted-foreground">{s.socialTitle}</h2>
-            <SocialRow links={social} />
+            {/* why follow: welcome, first to hear, and helping a good cause */}
+            <p className="px-2 text-sm leading-relaxed text-pretty">{s.socialInvite}</p>
+            <SocialLinks className="px-1" />
           </section>
           {SITE.whatsapp && (
             <a href={whatsappUrl(SITE.whatsapp)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-2 text-sm font-medium text-primary hover:underline dark:text-success">

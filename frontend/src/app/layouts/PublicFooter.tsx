@@ -1,5 +1,6 @@
 import { LocalLink as Link } from '@/shared/ui/local-link'
 import { Logo } from '@/shared/ui/logo'
+import { SocialLinks } from '@/shared/ui/social-links'
 import { getT } from '@/shared/i18n/server'
 
 /** Footer links share the header's quiet style: muted text, a soft highlight on hover. */
@@ -8,7 +9,8 @@ const LINK =
 
 /**
  * The public pages' footer, in the header's language: no border lines — the soft muted band, the
- * logo and what Budu is, Product · Company · Help, then a quiet last line with © and the legal pages.
+ * logo, what Budu is and our social icons (small), Product · Company · Help, then a quiet last line
+ * with © and the legal pages.
  */
 export async function PublicFooter() {
   const t = await getT()
@@ -28,6 +30,7 @@ export async function PublicFooter() {
               <Logo className="h-10 w-auto" label={t.appName} />
             </Link>
             <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">{s.tagline}</p>
+            <SocialLinks size="sm" />
           </div>
           <div className="grid grid-cols-2 gap-8 sm:col-span-3 sm:grid-cols-3 lg:col-span-3">
             {columns.map((c) => (
