@@ -443,6 +443,14 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-23 Feature marks (owner loved it: "great, save it"). Lists of what a plan / product
+  includes use CUSTOM FILLED SVG marks, never a thin outline icon or a plain tick: "included" = a
+  verified seal (Apple-style scalloped badge, `FeatureMark` in `pages/pricing`) in the card's own
+  hue, one-hue gradient lighter at the top (stop 0.7 → 1), the tick cut out with a mask; "coming
+  soon" = `SoonMark` (`shared/ui/soon-badge`), a filled big + small four-pointed sparkle in the same
+  amber gradient, plus the small `SoonBadge`. Both 20 px (size-5) so they read next to text. An SVG
+  gradient using currentColor needs one id per hue (a shared id paints every card in the first
+  card's colour). Reuse this pattern (move FeatureMark to shared/ui when a second page needs it).
 - 2026-10-23 Course subject + catalog search/filters (owner). The teacher picks a subject in the
   listing settings (list in `shared/config/course-subject.ts`, names in `t.subjects`; stored as the
   IOMAD course custom field `budu_subject`, like `budu_language`; `local_budu_set_course_subject`).
