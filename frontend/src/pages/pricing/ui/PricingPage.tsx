@@ -134,11 +134,10 @@ export async function PricingPage() {
         <p className="text-xs font-semibold tracking-wider text-primary uppercase dark:text-success">{s.eyebrow}</p>
         <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl">{s.title}</h1>
         <p className="max-w-2xl text-lg text-pretty text-muted-foreground">{s.sub}</p>
-        {/* the good news as a highlight chip (Linear / Vercel announcement style): green = it exists */}
-        <p className="mt-2 inline-flex items-center gap-2.5 rounded-full bg-primary/10 py-1.5 ps-1.5 pe-4 text-sm font-semibold text-foreground backdrop-blur-sm dark:bg-primary/20">
-          <span className="grid size-7 flex-none place-items-center rounded-full bg-primary text-primary-foreground">
-            <Icon name="student" className="size-4" />
-          </span>
+        {/* the good news as frosted glass, the iPhone way: translucent, heavy blur, soft neutral
+            shadow, an emoji instead of an icon tile */}
+        <p className="mt-2 inline-flex items-center gap-2 rounded-full bg-background/55 py-2 ps-3 pe-4 text-sm font-semibold text-foreground shadow-[inset_0_1px_0_color-mix(in_oklch,var(--background)_70%,transparent),0_1px_2px_color-mix(in_oklch,var(--foreground)_6%,transparent),0_10px_30px_-10px_color-mix(in_oklch,var(--foreground)_22%,transparent)] backdrop-blur-xl backdrop-saturate-150 dark:bg-foreground/8 dark:shadow-[inset_0_1px_0_color-mix(in_oklch,var(--foreground)_10%,transparent),0_10px_30px_-10px_color-mix(in_oklch,var(--background)_80%,transparent)]">
+          <span aria-hidden className="text-base leading-none">🎓</span>
           {s.free}
         </p>
       </section>

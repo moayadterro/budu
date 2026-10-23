@@ -442,6 +442,9 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-23 Pricing hero (owner): "free access for students" is a frosted-glass iOS-style pill
+  with an emoji (🎓), no green tile. Owner: emoji are fine for playful Gen-Z highlights like this;
+  the "custom badges instead of emoji" rule still holds for showcase blocks (podium, medals).
 - 2026-10-22 Pricing model & page (owner): "learning should be fun" — students get free access (we
   support them), teachers start without paying (the AI creator kit will be paid), schools PAY by
   their number of students (price on request; no free school tier is advertised any more —
