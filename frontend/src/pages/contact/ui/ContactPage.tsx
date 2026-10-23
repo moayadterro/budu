@@ -4,11 +4,11 @@ import { HeroGlow } from '@/shared/ui/hero-glow'
 import { Icon } from '@/shared/ui/icon'
 import { getT } from '@/shared/i18n/server'
 import { SocialLinks } from '@/shared/ui/social-links'
-import { EmailList, type EmailRow } from './ContactChannels'
+import { EmailCards, type EmailRow } from './ContactChannels'
 
 /**
  * Public: Contact (owner: "too boring", make it modern but simple). The hero has Pricing's soft
- * background (`HeroGlow`); the form in a plain card (topic chips, soft fields); beside it the team's emails (one hue
+ * background (`HeroGlow tone="talk"`); the team's emails as four cards (two per row); the form in a plain card (topic chips, soft fields); beside it the team's emails (one hue
  * each, copy in one click) and the social accounts (amber dot = not there yet). All facts come
  * from SITE; empty emails / legal details are hidden.
  */
@@ -29,6 +29,14 @@ export async function ContactPage({ searchParams }: { searchParams: Promise<{ to
         <p className="max-w-2xl text-lg text-pretty text-muted-foreground">{s.sub}</p>
       </section>
 
+      {/* write directly: four cards, two per row */}
+      {emails.length > 0 && (
+        <section className="flex flex-col gap-5">
+          <h2 className="text-2xl font-semibold tracking-tight">{s.otherTitle}</h2>
+          <EmailCards rows={emails.map(([key, address]) => ({ key, address }))} />
+        </section>
+      )}
+
       <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-10">
         {/* the form: a plain card (owner: no gradient here), soft edge on the sides and bottom (as the plan cards) */}
         <section className="rounded-3xl bg-card p-5 shadow-[0_3px_8px_-2px_color-mix(in_oklch,var(--foreground)_9%,transparent),0_10px_24px_-10px_color-mix(in_oklch,var(--foreground)_8%,transparent)] sm:p-8 dark:shadow-none dark:ring-1 dark:ring-foreground/8">
@@ -37,12 +45,6 @@ export async function ContactPage({ searchParams }: { searchParams: Promise<{ to
         </section>
 
         <aside className="flex flex-col gap-8">
-          {emails.length > 0 && (
-            <section className="flex flex-col gap-3">
-              <h2 className="px-2 text-sm font-medium text-foreground">{s.otherTitle}</h2>
-              <EmailList rows={emails.map(([key, address]) => ({ key, address }))} />
-            </section>
-          )}
           <section className="flex flex-col gap-3">
             <h2 className="px-2 text-sm font-medium text-foreground">{s.socialTitle}</h2>
             {/* short and warm, and it says following helps (owner: the long version went unread) */}

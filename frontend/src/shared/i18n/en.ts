@@ -1850,6 +1850,12 @@ export const en = {
         partners: "Partnerships",
         billing: "Payments and receipts",
       },
+      emailHints: {
+        support: "Something isn’t working or you need a hand.",
+        info: "Anything about Budu, schools and courses.",
+        partners: "Ideas for working together and joint projects.",
+        billing: "Paying for courses, orders and receipts.",
+      },
       copy: "Copy address",
       copied: "Copied",
       socialTitle: "Budu on social media",
