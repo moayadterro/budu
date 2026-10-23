@@ -37,15 +37,15 @@ export async function ContactPage({
         </p>
       </section>
 
-      <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-10">
-        <section className="rounded-3xl bg-card p-6 shadow-[0_3px_8px_-2px_color-mix(in_oklch,var(--foreground)_9%,transparent),0_10px_24px_-10px_color-mix(in_oklch,var(--foreground)_8%,transparent)] sm:p-10 dark:shadow-none dark:ring-1 dark:ring-foreground/8">
+      <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_26.5rem] lg:gap-10">
+        <section className="lg:pt-2">
           <h2 className="mb-8 text-3xl font-semibold tracking-tight">
             {s.formTitle}
           </h2>
           <ContactForm topic={isContactTopic(q.topic) ? q.topic : "general"} />
         </section>
 
-        <aside className="flex flex-col gap-10 lg:pt-2">
+        <aside className="flex flex-col gap-10 lg:border-s lg:border-foreground/8 lg:ps-10 lg:pt-2">
           {/* write directly: the team's addresses as compact cards, one per row (owner) */}
           {emails.length > 0 && (
             <section className="flex flex-col gap-4">
