@@ -7,6 +7,7 @@ import { Icon } from '@/shared/ui/icon'
 import { getT } from '@/shared/i18n/server'
 import { JoinInvite } from '@/widgets/school-invite'
 import { AudienceCards } from './AudienceCards'
+import { HomeHero } from './HomeHero'
 
 const AUDIENCES = ['schools', 'teachers', 'students', 'parents'] as const
 
@@ -17,19 +18,14 @@ export async function LandingPage() {
   const featured = (await catalogFor(0, await visitorCurrency())).slice(0, 6)
   return (
     <div className="flex flex-col gap-16">
-      <section className="flex flex-col items-center gap-6 rounded-3xl bg-brand px-6 py-16 text-center text-primary-foreground sm:px-12">
-        <span className="rounded-full bg-background/15 px-3 py-1 text-xs font-medium">{s.badge}</span>
-        <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl">{s.title}</h1>
-        <p className="max-w-2xl text-lg opacity-90 text-balance">{s.sub}</p>
-        <div className="flex flex-wrap justify-center gap-3">
-          <Button size="lg" variant="highlight" asChild>
-            <Link href="/catalog">{s.browse}</Link>
-          </Button>
-          <Button size="lg" variant="outline" className="border-primary-foreground/40 bg-transparent text-primary-foreground hover:bg-background/10 hover:text-primary-foreground" asChild>
-            <Link href="/register">{s.start}</Link>
-          </Button>
-        </div>
-      </section>
+      <HomeHero
+        badge={s.badge}
+        title={s.title}
+        sub={s.sub}
+        start={s.start}
+        browse={s.browse}
+        chips={(['schedule', 'exams', 'grades', 'chat'] as const).map((key) => ({ key, label: s.chips[key] }))}
+      />
 
       {/* who it's for: four living cards, two per row */}
       <section className="flex flex-col gap-10">

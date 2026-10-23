@@ -274,3 +274,22 @@
 @utility animate-float {
   animation: float 6s ease-in-out infinite;
 }
+
+/* Home hero ("from the future", owner): the aurora field slowly shifts its colours (each blur
+   stays one hue at any moment), and the perspective grid floor glides toward the viewer.
+   Motion-safe only. */
+@keyframes hue-drift {
+  0% { filter: hue-rotate(0deg) saturate(1); }
+  50% { filter: hue-rotate(35deg) saturate(1.15); }
+  100% { filter: hue-rotate(-25deg) saturate(1); }
+}
+@utility animate-hue-drift {
+  animation: hue-drift 22s ease-in-out infinite alternate;
+}
+@keyframes grid-glide {
+  from { background-position: 0 0; }
+  to { background-position: 0 64px; }
+}
+@utility animate-grid-glide {
+  animation: grid-glide 4s linear infinite;
+}

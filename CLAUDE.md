@@ -446,6 +446,14 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-23 Home hero "from the future" (owner: "wow"): `pages/landing/ui/HomeHero` replaces the
+  solid green box. Full width under the transparent header; a living aurora (four ONE-hue blurs,
+  green / blue / purple / rose, wandering; the whole field slowly hue-shifts = the holographic
+  look), a perspective grid floor gliding toward the viewer, the headline word by word out of a
+  blur, a pointer light (desktop), frosted-glass feature chips floating around (desktop). Green
+  primary CTA (Create an account) + glass "Browse courses" (the orange highlight button is gone).
+  All still for reduced motion. "Who it's for" = four living cards (`AudienceCards`), the closing
+  block = `JoinInvite` (twin of SchoolInvite).
 - 2026-10-23 Contact page redesign (owner: "too boring"): hero with one soft green blur; the form in
   a light green card with topic CHIPS (icons) instead of a select, soft filled fields, live character
   count, a "sent" state with "Write another message"; beside it the team's emails (support@, info@,
