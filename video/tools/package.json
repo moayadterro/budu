@@ -5,6 +5,7 @@
   "dependencies": {
     "@dicebear/collection": "9.4.3",
     "@dicebear/converter": "9.4.3",
-    "@dicebear/core": "9.4.3"
+    "@dicebear/core": "9.4.3",
+    "puppeteer-core": "25.13.0"
   }
 }
