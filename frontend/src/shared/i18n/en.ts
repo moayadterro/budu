@@ -1721,7 +1721,8 @@ export const en = {
       faq: [
         { q: "Why do students have free access?", a: "Because learning should be open to everyone. Students never pay for Budu itself, only for paid courses they choose to buy." },
         { q: "How much does a school pay?", a: "It depends on how many students the school has. Write to us and we’ll prepare a price for your school." },
-        { q: "What will teachers pay for?", a: "Only the optional AI creator kit once it launches." },
+        { q: "What will teachers pay for?", a: "Budu itself is free for teachers. Only the optional AI tools will be paid, once they launch. When you sell a paid course, Budu keeps a percentage of each sale." },
+        { q: "How does Budu earn from paid courses?", a: "Publishing a course costs teachers nothing. When a student buys a paid course, Budu keeps a percentage of the price and the teacher gets the rest. Free courses have no fee." },
         { q: "Can our school see Budu before deciding?", a: "Yes. Create a school account and look around, or write to us and we’ll show you everything." },
       ],
     },

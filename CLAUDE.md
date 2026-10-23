@@ -446,6 +446,9 @@ Not built yet (rough priority):
    to `public/` — update the Dockerfile/config accordingly). 4.5 LTS has security fixes to 2027-10-04.
 
 ## Decision log (newest first)
+- 2026-10-23 Revenue from paid courses (owner): teachers pay nothing to publish or sell; when a
+  student buys a paid course, Budu keeps a percentage of the price and the teacher gets the rest;
+  free courses have no fee. Said on the pricing FAQ (no figure until the owner sets one).
 - 2026-10-23 Feature marks (owner loved it: "great, save it"). Lists of what a plan / product
   includes use CUSTOM FILLED SVG marks, never a thin outline icon or a plain tick: "included" = a
   verified seal (Apple-style scalloped badge, `FeatureMark` in `pages/pricing`) in the card's own
@@ -740,6 +743,10 @@ Not built yet (rough priority):
   official `mariadb` image.
 
 ## Open questions (ask the owner)
+
+- Commission on paid courses: what percentage? (pricing FAQ says "a percentage"; add the figure
+  there, in the Terms, and in the teacher's listing form once decided). Payouts to teachers are not
+  built yet (today the platform's account receives the transfer).
 
 - Security gap (2026-10-23): no general rate limiting yet on sign-up, forgot password, sign-in
   (beyond IOMAD lockout), messages, uploads, search. Build a shared limiter (app-db, per IP hash /
